@@ -1,6 +1,3 @@
-To do:
-- Check tile tooltips issue in Pokemon, Cyborg Weapons, and Blob Pack.
-
 Cyborg Weapons
 - Emboldening Screech: also grants upgrades (range is base; A grants A, B grants B)
   - make an animation for it based on Djinn's icon

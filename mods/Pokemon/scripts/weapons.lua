@@ -1368,14 +1368,19 @@ function Poke_ShadowBall:GetFinalEffect(p1, p2, p3, remainingShots)
 	if not remainingShots then 
 		remainingShots = self.Shots
 		if distance == 1 then
-			ret:AddDamage(SpaceDamage(p2, 0, direction))
+			
+			local pushDamage = SpaceDamage(p2, 0, direction)
+			pushDamage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, p2)
+			ret:AddDamage(pushDamage)
 		else
 			local target = GetProjectileEnd(p2, p3)
 			local hurt = true
 			if not Board:IsBlocked(target, PATH_PROJECTILE) then hurt = false else target = target - DIR_VECTORS[direction] end
 			ret:AddCharge(Board:GetSimplePath(p2, target), FULL_DELAY)
 			if hurt then
-				ret:AddSafeDamage(SpaceDamage(target, 1))
+				local pushDamage = SpaceDamage(target, 1)
+				pushDamage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
+				ret:AddSafeDamage(pushDamage)
 				ret:AddSafeDamage(SpaceDamage(target + DIR_VECTORS[direction], 1))
 			end
 		end
@@ -1383,6 +1388,7 @@ function Poke_ShadowBall:GetFinalEffect(p1, p2, p3, remainingShots)
 	else
 		local target = GetProjectileEnd(p1,p2)
 		local damage = SpaceDamage(target, 1)
+		-- damage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
 		ret:AddProjectile(p1, damage, "effects/shadowball", NO_DELAY)
 		ret:AddDelay(0.1 + remainingShots * 0.05)
 		remainingShots = remainingShots - 1
@@ -1425,6 +1431,7 @@ function Poke_Psystrike:GetSkillEffect(p1, p2)
 			local damageAmount = 1
 			if Board:GetPawn(curr):IsArmor() and not Board:GetPawn(curr):IsAcid() then damageAmount = 2 end
 			local damage = SpaceDamage(curr, damageAmount)
+			damage.sImageMark = MultishotLib:getImageMark(damageAmount, self.Damage, p1, curr)
 			for j = 1, self.Damage do
 				ret:AddArtillery(curr + DIR_VECTORS[math.random(0, 3)], damage, "effects/shotup_psystrike.png", NO_DELAY)
 				ret:AddDelay(0.05)
@@ -1576,13 +1583,18 @@ function Poke_FormChange:GetSkillEffect(p1, p2)
 		local direction = GetDirection(p2-p1)
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_DeoxysA"))
 		local damage = SpaceDamage(p2, 1)
-		damage.sSound = "/enemy/starfish_1/attack"
 		for i = 1, self.Damage do
-			-- damage.sAnimation = "alienwhip"..math.random(0, 3).."_"..direction
-			ret:AddAnimation(p2, "alienwhip"..math.random(0, 3).."_"..direction, 1 + math.random(0, 1) * 4)	--either 1 or 5, normal or reverse
+			damage.loc = p2 + DIR_VECTORS[(direction+1)%4]
+			damage.sImageMark = MultishotLib:getImageMark(1, self.Damage, p1, p2 + DIR_VECTORS[(direction+1)%4])
+			ret:AddDamage(damage)
+			damage.loc = p2 + DIR_VECTORS[(direction-1)%4]
+			damage.sImageMark = MultishotLib:getImageMark(1, self.Damage, p1, p2 + DIR_VECTORS[(direction-1)%4])
+			ret:AddDamage(damage)
+			damage.loc = p2
+			damage.sImageMark = MultishotLib:getImageMark(1, self.Damage, p1, p2)
+			ret:AddAnimation(p2, "alienwhip"..math.random(0, 3).."_"..direction, 1 + math.random(0, 1) + 4)	--either 1 or 5, normal or reverse
 			ret:AddMelee(p1, damage)
-			ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[(direction+1)%4], 1))
-			ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[(direction+3)%4], 1))
+			ret:AddSound("/enemy/starfish_1/attack")
 			ret:AddDelay(0.35 - self.Damage * 0.05)			--makes it go faster when we hit more times
 		end
 	elseif GetProjectileEnd(p1, p2) == p2 and Board:IsBlocked(p2, PATH_PROJECTILE) then	--normal Form
@@ -1777,17 +1789,17 @@ function Poke_PsychoBoost:GetSkillEffect(p1, p2)
 	if pawn:GetWeaponBaseType(1) == "Poke_PsychoBoost" then index = 2 else index = 1 end
 	ret.effect:AppendAll(_G[pawn:GetWeaponType(index)]:GetSkillEffect(p1,p2).effect)
 	ret:AddDelay(0.3)
-	if pawn:GetCustomAnim() == "Poke_DeoxysA" then		--attack form: boost
-		ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
+	if pawn:GetCustomAnim() == "Poke_DeoxysA" then			--attack form: boost
+		ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", pawn:GetId()))
 	elseif pawn:GetCustomAnim() == "Poke_DeoxysS" then		--speed form: +MS
-		ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", p1:GetString(), pawn:GetMoveSpeed() + 2))
+		ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", pawn:GetId(), pawn:GetMoveSpeed() + 2))
 	elseif pawn:GetCustomAnim() == "Poke_DeoxysD" then		--defense form: +max HP
-		ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), pawn:GetMaxHealth() + 2))
-		ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), pawn:GetHealth() + 2))
-	else											--normal form: heal
+		ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", pawn:GetId(), pawn:GetMaxHealth() + 2))
+		ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(%s)", pawn:GetId(), pawn:GetHealth() + 2))
+	else													--normal form: heal
 		ret:AddDamage(SpaceDamage(p1, -2))
 	end
-	ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", p1:GetString()))
+	ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetActive(true) end)", pawn:GetId()))
 	return ret
 end
 
@@ -2597,7 +2609,7 @@ function Poke_MetalClaw:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
 	local strikes = 2
-	if GetCurrentMission() then strikes = 2 + GetCurrentMission().MetalClawUses or 0 end
+	if GetCurrentMission() then strikes = self.Strikes + GetCurrentMission().MetalClawUses or 0 end
 	local anim = Board:GetPawn(p1):GetCustomAnim()
 	Board:GetPawn(p1):SetCustomAnim("Metang_swipe")
 	for i = 1, strikes do
