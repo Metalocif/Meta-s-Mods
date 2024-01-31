@@ -1,0 +1,31 @@
+Metabolize is a weapon added by this mod that deal 2 melee damage on an organic target with a weapon (ie. not Bots/Psions).
+The weapon is then stored; subsequent casts let you use the stolen weapon as though Metabolize had its effects.
+You can also self-target to get rid of the stored weapon as a free action.
+I turn queued effects into instant effects, have a dumb hack to make the target area look decent, and make spawns be allies.
+This is very tricky to code and some things don't work or won't work as you'd expect, especially with modded content.
+
+Overall:
+  - Webs immediately dissipate, but it's not like they'd do anything anyway.
+In Vanilla:
+  - The Spider boss, for some reason, does not have a weapon; you copy the alpha spider's weapon instead. Other bosses with no weapons (if they exist) should be handled the same way.
+  - The Spiders spawns are not working in multiple, interesting ways.
+  - Artillery weapons (scarab/crab) have a max range of 5. This is normal, that's how the weapon is defined.
+  - The Gastropod sends a projectile, pulls, then dashes. The reason why is a mystery to me.
+In Vextra:
+  - the Anthill's weapon (alpha/boss version) spawns ants. The first is an ally, the second one is not.
+  - the Termite's weapon does not work well, because it does a charge, which does not seem to mesh well with the targeting issue.
+  - the Ice Crawler's weapon works. Shocking.
+  - the Dragonfly boss' weapon does not do the T-shape blast unless there already was smoke on the tile. This is due to the way it is coded.
+  - the Junebug's weapon will always use the powered version, since there will be no Ladybug on the map (unless you choose to enable it).
+In Bots n' Bugs:
+  - the enemy skills are hardcoded to only be usable by a creature of their type; they won't work. You can remove the checks in the code with little issue, though.
+  - if you do, the Wyrm's attack bounces are not working in your favor.
+  - I don't see a world in which the Floater is functional.
+In Into the Wild:
+  - Chompers should pull their target before attacking them; however, given stolen weapons have a range issue, you'll hit yourself if your target is not in melee.
+  - Sunflowers don't work. Their multishot attack shoots forever. Fortunately, if you close the game, you won't have any issues.
+  - Springseeds do work, except for the boss version (it leaps around a bunch)
+  - As far as I can tell, Infusers do work, but why would you want that?
+  - Buds don't work; they use a dumb hack that damages Copters, which is cleared by a script in the original weapon.
+ 
+  

@@ -1,0 +1,44 @@
+To do:
+- Check tile tooltips issue in Pokemon, Cyborg Weapons, and Blob Pack.
+
+Cyborg Weapons
+- Emboldening Screech: also grants upgrades (range is base; A grants A, B grants B)
+  - make an animation for it based on Djinn's icon
+  - make it play a sound
+
+Pokemon
+- Needs a lot of incapacitation to make enemies die from the sandstorm
+- Tyranitar
+  - Sandstorm/Rock Throw/Rock Slide/Stone Edge
+    - rock throw is artillery, rock slide is dropper, stone edge is animation
+    - rock throw targets 1, rock slide target 1 and both sides, stone edge is two-click to go in either direction, upgrade to hit 5 tiles
+    - upgrade: Stealth Rocks (double damage to flying stuff lmao)
+    - Sandstorm: set terrain (rubble/ground/acid/fire/forest/ice) to sand, damage all enemies for 1 at the start of each turn
+	- use advanced mission_sand for sandstorm effecters
+        - adds a sand custom anim (front + back) on buildings/mountains)
+- Metagross
+  - Take Down (push, self-damage for half) /Zen Headbutt (push, flip adj)
+  - Metal Claw/Meteor Mash(hit all adjacents or one four times); sharpens (hits 1 more time this battle)
+- Garchomp
+  - Bite/Earthquake/Crunch
+    - Bite upgrade: Drag - drag user and target in any direction, except the target's
+    - Earthquake: target an area, flip stuff in area, damage nonflying
+
+Future plans:
+- Starters squad (Charizard/Blastoise/Venusaur, with triple attack & mega for Charizard)
+- Ghosts squad (Gengar/Dusknoir/Chandelure/Banette+Mega/Mimikyu)
+- Islands (Pokemon as enemies, profs as CEOs)
+  - Two-phase mission where you go to a moon biome to fight Deoxys/Lunarock/Selerock/Minior/Elgyem
+  - Lavender Tower mission where enemies spawn temp Ghastlies on death/tower spawns them
+
+
+HM moves
+- Strength: can be used as a free action against rocks, pushing them
+  - also pushes Stealth Rocks & Tosx's rubble
+- Surf: can be used as a free action to cross water
+- Cut: can be used as a free action on forests
+- Rock Smash: oneshots rocks & shrapnels
+- Dive: used adjacent to water; emerge from another water tile, dealing damage and pushing
+
+
+

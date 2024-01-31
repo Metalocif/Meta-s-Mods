@@ -1,0 +1,7 @@
+This is for nonobvious tricks you can use with this squad.
+- The artillery can slam Vek into itself; its death effect triggers the sticky bomb it just applied.
+- The smart lasers hit the cell you click first. You can shield a building, trigger an adjacent sticky, and the building is safe.
+- The cannon's recoil lets you deal massive damage in open maps.
+- Often, the cannon bot's corpse will be on a fire tile, dooming it after you revive it. An easy fix is to use recoil to be propelled into water.
+- You can use fire to get your bots to explode at the start of the enemy's turn, finishing them off.
+- Add stickies on your own bots when possible; this increases their self-destruct damage.

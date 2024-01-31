@@ -1,0 +1,41 @@
+Tips on how to deal with the various enemies in this mod.
+
+Shapeshifter:
+- You can control its transformation by aligning your mechs in a specific way.
+- For instance, line up your pawns so they'd all get hit by a Centipede shot, but the shot would go wide once they move.
+
+Pylon: 
+- The pylon will not spawn if the tile is blocked or a chasm.
+
+Spiky:
+- Make it hit an enemy.
+
+Splitting:
+- It will try to spawn blobs adjacent to buildings within a 2 tiles radius of its death location, away from other blobs.
+- If that fails, it will try to spawn blobs adjacent to buildings within a 4 tiles radius, away from other blobs.
+- If that fails, it will try to spawn blobs within a 4 tiles radius, away from other blobs.
+- On the last turn, it will instead fire a blob in the manner of a Blobber.
+- Note that, while a Splitting Goo's blobs will avoid spawning next to each other, they won't avoid other blobs.
+
+Nested:
+- Killing it prevents its attack.
+- Set its tile on fire to deal with it efficiently.
+- Throw it down a chasm and it won't spawn inner goos.
+- A Blast Psion will cause a chain reaction; its death explosion will affect the inner goo, causing it to explode as well.
+
+Sludge:
+- You can bodyblock its attack easily. Try to do so close to its position so it doesn't generate extra gunk.
+- Due to gunk being an item, it won't be placed on fire tiles.
+
+Titanic:
+- Only this mod's enemies can spawn during this mission. All of them can spawn.
+- Any weapon that affects several tiles will be very effective.
+- Given its massive health, A.C.I.D. will be very helpful.
+- Smoke affects it, but it then gets removed from the location.
+- You know when you will face it, so only go into the island once you have a solution to the fight.
+- You can easily bait it away from buildings.
+  - On turn 1, it will leap at a location adjacent to at least one building, hitting as many mechs as possible.
+  - This lets you choose where it will leap during deployment.
+  - On turn 2, it will use its main attack, hitting as many buildings + mechs as possible.
+  - So if you made it leap at a location where it can only hit 1 building at a time and give it 2 mechs to hit...
+- Mechs it kills cannot be revived.

@@ -1,0 +1,7 @@
+v1.1
+- Bug fixes.
+  - Rogue Mechs are no longer affected by psions.
+  - They no longer overwrite vanilla mech graphics.
+
+v1.0
+- Release. 12 enemies.

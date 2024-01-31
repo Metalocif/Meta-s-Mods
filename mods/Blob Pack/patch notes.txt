@@ -1,0 +1,10 @@
+v1.0.2
+- Bug fixes.
+  - Gunk tooltip was not working with other mods that add item tooltips.
+  - Gunk effect and animation was removed on resetting turn.
+v1.0.1
+- Bug fixes.
+  - The Alpha Pylon Goo was not spawning a pylon on death.
+  - The Nested Goo was leaving an invisible corpse in water.
+v1.0
+- Release. Six enemies, one boss.

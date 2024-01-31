@@ -1,0 +1,65 @@
+v1.4.3
+- Fixed a bug where prefixes would be added to enemies in a test mission. They still can but won't be removed from the list anymore.
+
+v1.4.2
+- Added a missing tip for the Tyrannical prefix.
+- Fixed the bug with prefixing emerging enemies for the third time or so.
+
+v1.4.1
+- Added tutorial tips that explain what each prefix does when they first appear in game.
+
+v1.4
+- Prefixed enemy spawns are finally working.
+- Undying enemies have their corpses disappear if they die in water.
+  - Corpses can still be pushed into water and stay there just fine, but this should help.
+- Added a failsafe to prevent an infinite loop if too many prefixes were disabled and none are valid.
+- Added the following prefixes: Frenzied, Freezing, Venomous.
+- Nerfed Heavy. It now lowers MS by 2 instead of 1. Max HP is highly visible to the player, a difference of 1 MS is not.
+- Fixes to Webbing and Wrathful.
+
+v1.3
+- Added a mod option to prevent deterministic prefixes (Vek on fire -> Fireproof) and make them random instead.
+- Added the following prefixes: Brood, Webbing, Mirroring, Pushing, Groundbreaking.
+  - I can now modify skill effects!
+- Probably fixed an issue occuring on save reload.
+
+v1.2.1
+- Should have fixed a long-standing bug by rerolling prefixes when it occurs.
+  - This bug was made invisible to the player by preventing prefixing when it occured in v1.1.
+  - So this should only make more prefixed Vek appear.
+  - I cannot stress enough how weird this bug is, but at least it's handled, if not fixed.
+- Added pings where a prefixed Vek appears to make the player aware of them. Alerts didn't work for some reason.
+- Fixed an issue where Healing Vek would not heal adjacent Vek corpses back to life.
+- Fixed an issue where Wrathful Vek would lose their Boost status after queueing the attack.
+- Flying pawns can't be prefixed with Massive anymore.
+
+v1.2
+- Added the following prefixes: Cannibalistic, Spiteful, Copying (melee and ranged versions).
+- Added upgraded versions of the Tyrannical weapon so that things that upgrade Vek weapons can upgrade it.
+  - AFAIK this is only my Rock Leader.
+
+v1.1.3
+- Fixed a bug caused by a missing value for mod.
+
+v1.1.2
+- Removed leftover debug stuff.
+
+v1.1.1
+- Added a failsafe to spawn alteration.
+
+v1.1
+- Added the following prefixes: Burrowing, Light, Splitting, Oozing, Infectious, Regenerating, Wrathful, Tyrannical.
+  - Figured out a cool trick to trigger effects at the start of a prefixed Vek's movement, enabling most of the above.
+- Armored, Volatile, and four of the new ones can be given if a condition is met (psion presence/goo boss mission).
+- Added mod options to individually disable prefixes and alter prefixing conditions.
+  - This also serves as a way to explain in-game what each prefix actually does.
+- May have fixed a strange bug where some prefixed Vek were not found in _G.
+  - It seemed the bug only triggered when I tried altering two Vek in the same missionStartHook.
+  - So I only prefix one at the start of a mission; less overwhelming this way anyway.
+  - Added an extra failsafe for it, just in case.
+- Related: prefixed enemies at the start of a mission correctly emerge instead of standing in their starting tile.
+- Vek that are frozen at the end of a mission no longer become evolved Vek.
+
+v1.0
+- Release.
+- Added the following prefixes: Stable, Fireproof, Smokeproof, Leaping, Armored, Volatile, Heavy, Massive, Undying, Ruinous, Purifying, Healing.

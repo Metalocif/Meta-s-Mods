@@ -1,0 +1,8 @@
+To do:
+- Options to disable prefixes separately
+- Modifiers
+
+- should check on the max upgrade version of the weapon
+Modifiers for prefixes that add core cost should cost cores to equip, we should check they are powered and the fused version can drop
+
+Can use Game:AddWeapon() to add a modifier to the player inventory at game start, check it costs 0 cores
