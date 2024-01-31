@@ -1927,6 +1927,7 @@ Poke_Bloom=Skill:new{
 }
 Poke_Bloom_A=Poke_Bloom:new{ UpgradeDescription = "Heals allies on forests.", Healing = -1 }
 Poke_Bloom_B=Poke_Bloom:new{ UpgradeDescription = "Damages enemies on forests.", Damage = 2 }
+Poke_Bloom_AB=Poke_Bloom:new{ Healing = -1, Damage = 2 }
 
 function Poke_Bloom:GetTargetArea(p1)
 	local ret = PointList()

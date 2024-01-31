@@ -1742,11 +1742,13 @@ CyborgWeapons_Metabolize_A = CyborgWeapons_Metabolize:new{
 CyborgWeapons_Metabolize_B = CyborgWeapons_Metabolize:new{	
 	UpgradeDescription = "Increases damage dealt by 1.",
 	DamageUp = 1,
+	Damage = 3,
 }
 
 CyborgWeapons_Metabolize_AB = CyborgWeapons_Metabolize:new{
 	Digest = true,
 	DamageUp = 1,
+	Damage = 3,
 }
 
 ANIMS.DNATwirl = Animation:new{
@@ -1804,10 +1806,10 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2-p1)
 	if IsTestMechScenario() then	--just melee
-		ret:AddMelee(p1, SpaceDamage(p2, 2 + self.DamageUp))
+		ret:AddMelee(p1, SpaceDamage(p2, self.Damage))
 		ret:AddScript(string.format("Board:AddAlert(%s, %q)",p1:GetString(),"Cannot metabolize in simulation."))
 	elseif Board:IsTipImage() then  --melee, then shoot a fake centipede shot
-		local damage = SpaceDamage(p2, 2 + self.DamageUp)
+		local damage = SpaceDamage(p2, self.Damage)
 		ret:AddMelee(p1, damage)
 		ret:AddDelay(2)
 		local damage1 = SpaceDamage(Point(2, 1), 2 + self.DamageUp)
@@ -1834,7 +1836,7 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 		ret:AddDelay(0.2)
 		if self.Digest then ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)", Board:GetPawn(p1):GetId())) end
 	elseif not GAME.Metabolized then						--munch something to gain its weapon
-		local copied
+		local copied = ""
 		if Board:GetPawn(p2):GetWeaponCount() == 0 then		--handles Spider boss who has no weapon for some reason
 			local pawnType = Board:GetPawn(p2):GetType()
 			if string.sub(pawnType, -4) == "Boss" then 
@@ -1845,7 +1847,7 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 			copied = Board:GetPawn(p2):GetWeaponType(1)
 		end
 		ret:AddScript(string.format("GAME.Metabolized = %q", copied))
-		ret:AddMelee(p1, SpaceDamage(p2, 2))
+		ret:AddMelee(p1, SpaceDamage(p2, self.Damage))
 	else													--use weapon
 		local skillEffect = _G[GAME.Metabolized]:GetSkillEffect(p1,p2)
 		local target = GetProjectileEnd(p1,p2)

@@ -51,7 +51,7 @@ ANIMS.gunk = Animation:new{
 	PosY = 0
 }
 
-merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Enemy units heal 1 damage. Allied units are inflicted with Gunk. (Gunk: -1 Move. Blobs that melee attack or move next to a unit with Gunk remove Gunk and heal 1 damage.)"},}
+merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Enemy units heal 1 damage. Allied units are inflicted with Gunk. (Gunk: -1 Move. Blobs that melee attack or move next to a unit with Gunk remove Gunk and heal 1 damage.)"},} )
 Meta_BlobGunk = { Image = "effects/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "effects/gunk.png", UsedImage = ""}
 Location["effects/gunk.png"] = Point(-16,7)
 
@@ -112,18 +112,22 @@ function Meta_sludgegooAtk1:GetSkillEffect(p1,p2)
 	ret = SkillEffect()
 	local direction = GetDirection(p2-p1)
 	local target = GetProjectileEnd(p1,p2,PATH_GROUND)
-	if not Board:GetPawn(p1) then return ret end
+	
+	local blob = Board:GetPawn(p1)
+	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
 	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		if Board:GetPawn(curr) and CustomAnim:get(Board:GetPawn(curr):GetId(), "gunk") then
-			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
+		local gunkedPawn = Board:GetPawn(curr)
+		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
+			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
+				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
 			end
 			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
-			ret:AddQueuedScript("table.remove(GetCurrentMission().GunkTable,"..pawn:GetId()..")")
+			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
+			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
+			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
 		end
 	end
 	

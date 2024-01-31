@@ -85,77 +85,79 @@ function Meta_splittinggooAtk1:GetSkillEffect(p1,p2)
 	local nearbySpawnPoints = {}
 	local spawnPoints = {}
 	local backup = {}
-	if Board:GetPawn(p1) then
 	
-		--check for adjacent gunk to eat unqueued, used on all goos
-		if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
-		for i = DIR_START, DIR_END do
-			local curr = p1 + DIR_VECTORS[i]
-			if Board:GetPawn(curr) and CustomAnim:get(Board:GetPawn(curr):GetId(), "gunk") then
-				if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-					ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
-				end
-				ret:AddDamage(SpaceDamage(p1, -1))
-				ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
-				ret:AddQueuedScript("table.remove(GetCurrentMission().GunkTable,"..pawn:GetId()..")")
+	local blob = Board:GetPawn(p1)
+	if not blob then return ret end
+	--check for adjacent gunk to eat unqueued, used on all goos
+	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		local gunkedPawn = Board:GetPawn(curr)
+		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
+			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
+				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
 			end
+			ret:AddDamage(SpaceDamage(p1, -1))
+			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
+			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
+			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
 		end
-	
-		local spawn_amount = Board:GetPawn(p1):GetHealth()
-		if Board:GetItem(p2) == "Meta_BlobGunk" then spawn_amount = spawn_amount + 1 end
-		for _,v in ipairs(vicinity) do
-			if not Board:IsBlocked(v,PATH_GROUND) and v ~= p2 then
-				local adjacent = false
-				for k = 1, #nearbySpawnPoints do
-					if v:Manhattan(nearbySpawnPoints[k]) == 1 then adjacent = true end
-				end
-				for k = 1, #spawnPoints do
-					if v:Manhattan(spawnPoints[k]) == 1 then adjacent = true end
-				end
-				-- we don't iterate on backup, because those will be spawned last, so they'll act after the good ones
-				if p2:Manhattan(v) <= 2 and Board:GetDistanceToBuilding(v) == 1 and not adjacent then
-					nearbySpawnPoints[#nearbySpawnPoints + 1] = v
-				elseif Board:GetDistanceToBuilding(v) == 1 and not adjacent then
-					spawnPoints[#spawnPoints + 1] = v
-				elseif not adjacent then
-					backup[#backup + 1] = v
-				end
-			end
-		end
-
-		ret:AddQueuedScript(string.format([[
-			local leap = PointList();
-			leap:push_back(%s);
-			leap:push_back(%s);
-			fx = SkillEffect();
-			fx:AddLeap(leap, FULL_DELAY);
-			Board:AddEffect(fx);
-		]], p1:GetString(), p2:GetString()))
-		ret:AddQueuedDelay(1)
-		
-		for i = 1, spawn_amount do
-			local damage = SpaceDamage(0)
-			if #spawnPoints ~= 0 then
-				damage.loc = random_removal(spawnPoints)
-			elseif #nearbySpawnPoints ~= 0 then
-				damage.loc = random_removal(nearbySpawnPoints)
-			elseif #backup ~= 0 then
-				damage.loc = random_removal(backup)
-			else
-				break
-			end
-			
-			damage.sPawn = "Blob2"
-			damage.sSound = '/impact/generic/blob'
-			damage.bHide = true
-			ret:AddQueuedArtilleryFromLoc(p2,damage,"effects/shotup_blobber2.png",NO_DELAY)
-		end
-		ret:AddQueuedDamage(SpaceDamage(p2, spawn_amount))
-		ret:AddQueuedArtillery(SpaceDamage(p2, 0),"effects/nothing.png",NO_DELAY)	
-		--this is just for the preview
-		if IsTipImage() then ret:AddQueuedDelay(1.5) end
-		--otherwise you don't see the blobs properly in the tooltip
 	end
+	
+	local spawn_amount = blob:GetHealth()
+	if Board:GetItem(p2) == "Meta_BlobGunk" then spawn_amount = spawn_amount + 1 end
+	for _,v in ipairs(vicinity) do
+		if not Board:IsBlocked(v,PATH_GROUND) and v ~= p2 then
+			local adjacent = false
+			for k = 1, #nearbySpawnPoints do
+				if v:Manhattan(nearbySpawnPoints[k]) == 1 then adjacent = true end
+			end
+			for k = 1, #spawnPoints do
+				if v:Manhattan(spawnPoints[k]) == 1 then adjacent = true end
+			end
+			-- we don't iterate on backup, because those will be spawned last, so they'll act after the good ones
+			if p2:Manhattan(v) <= 2 and Board:GetDistanceToBuilding(v) == 1 and not adjacent then
+				nearbySpawnPoints[#nearbySpawnPoints + 1] = v
+			elseif Board:GetDistanceToBuilding(v) == 1 and not adjacent then
+				spawnPoints[#spawnPoints + 1] = v
+			elseif not adjacent then
+				backup[#backup + 1] = v
+			end
+		end
+	end
+
+	ret:AddQueuedScript(string.format([[
+		local leap = PointList();
+		leap:push_back(%s);
+		leap:push_back(%s);
+		fx = SkillEffect();
+		fx:AddLeap(leap, FULL_DELAY);
+		Board:AddEffect(fx);
+	]], p1:GetString(), p2:GetString()))
+	ret:AddQueuedDelay(1)
+	
+	for i = 1, spawn_amount do
+		local damage = SpaceDamage(0)
+		if #spawnPoints ~= 0 then
+			damage.loc = random_removal(spawnPoints)
+		elseif #nearbySpawnPoints ~= 0 then
+			damage.loc = random_removal(nearbySpawnPoints)
+		elseif #backup ~= 0 then
+			damage.loc = random_removal(backup)
+		else
+			break
+		end
+		
+		damage.sPawn = "Blob2"
+		damage.sSound = '/impact/generic/blob'
+		damage.bHide = true
+		ret:AddQueuedArtilleryFromLoc(p2,damage,"effects/shotup_blobber2.png",NO_DELAY)
+	end
+	ret:AddQueuedDamage(SpaceDamage(p2, spawn_amount))
+	ret:AddQueuedArtillery(SpaceDamage(p2, 0),"effects/nothing.png",NO_DELAY)	
+	--this is just for the preview
+	if IsTipImage() then ret:AddQueuedDelay(1.5) end
+	--otherwise you don't see the blobs properly in the tooltip
 	return ret
 end
 
