@@ -40,6 +40,8 @@ local files = {
 	"Teleport.png",
 	"TakeDown.png",
 	"ZenHeadbutt.png",
+	"MetalClaw.png",
+	"MeteorMash.png",
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/weapons/"..file, resourcePath.."img/weapons/"..file)
@@ -349,23 +351,25 @@ function Poke_Protect:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()        
 	local damage = SpaceDamage(p2)
+	if not Board:GetPawn(p1) then return ret end
 	damage.iShield = EFFECT_CREATE
-	if mission and self.FreeShield then
+	ret:AddDamage(damage)
+	if mission and self.FreeShield and not Board:IsTipImage() then
 		if not mission.LastProtectTurn then mission.LastProtectTurn = -1 end
 		if mission.LastProtectTurn ~= Game:GetTurnCount() then
 			ret:AddDelay(0.3)
 			ret:AddScript([[modApi:runLater(function() 
-				local self = Point(]].. p1:GetString() .. [[)
-				Board:GetPawn(self):SetActive(true)
+				local pos = ]]..p1:GetString()..[[;
+				Board:GetPawn(pos):SetActive(true);
 				Game:TriggerSound("/ui/map/flyin_rewards");
-				Board:Ping(self, GL_Color(255, 255, 255));
+				Board:Ping(pos, GL_Color(255, 255, 255));
 				GetCurrentMission().LastProtectTurn = Game:GetTurnCount();
 				end)
 			]])
 		end
 		ret:AddScript("GetCurrentMission().LastProtectTurn = Game:GetTurnCount()")
 	end
-	ret:AddDamage(damage)
+	
 	return ret
 end
 
@@ -2581,7 +2585,7 @@ Poke_ZenHeadbutt_B=Poke_ZenHeadbutt:new{ UpgradeDescription = "Increases damage 
 Poke_ZenHeadbutt_AB=Poke_ZenHeadbutt:new{ Damage = 4 }
 
 
-Poke_MetalClaw = Brute_Beetle:new{
+Poke_MetalClaw = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/MetalClaw.png",	
 	Rarity = 3,
@@ -2608,7 +2612,7 @@ Poke_MetalClaw = Brute_Beetle:new{
 function Poke_MetalClaw:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
-	local strikes = 2
+	local strikes = self.Strikes
 	if GetCurrentMission() then strikes = self.Strikes + GetCurrentMission().MetalClawUses or 0 end
 	local anim = Board:GetPawn(p1):GetCustomAnim()
 	Board:GetPawn(p1):SetCustomAnim("Metang_swipe")
@@ -2625,3 +2629,58 @@ end
 Poke_MetalClaw_A=Poke_MetalClaw:new{ UpgradeDescription = "Adds one more strike.", Strikes = 4 }
 Poke_MetalClaw_B=Poke_MetalClaw:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
 Poke_MetalClaw_AB=Poke_MetalClaw:new{ Strikes = 4, Damage = 2 }
+
+
+Poke_MeteorMash = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/MeteorMash.png",	
+	Rarity = 3,
+	Name = "Meteor Mash",
+	Description = "Strike a target four times with metal fists. Each time this is used, it will strike one more time for the rest of the mission. Pushes on the final hit. Can also self-target to hit all adjacent tiles once.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	Strikes = 4,
+	Upgrades = 2,
+	UpgradeList = {"+1 Strike", "+1 Damage"},
+	UpgradeCost = {2, 3},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,3),
+		Target = Point(2,3),
+		CustomPawn = "Poke_Beldum",
+	}
+}
+
+function Poke_MeteorMash:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	
+	local strikes = self.Strikes
+	if GetCurrentMission() then strikes = self.Strikes + GetCurrentMission().MeteorMashUses or 0 end
+	local anim = Board:GetPawn(p1):GetCustomAnim()
+	if p1 ~= p2 then
+		local direction = GetDirection(p2 - p1)
+		for i = 1, strikes do
+			local damage = SpaceDamage(p2, self.Damage)
+			if i == strikes then damage.iPush = direction end
+			damage.sAnimation = "metalpunch"..((i%2)+1).."_"..direction
+			damage.sImageMark = MultishotLib:getImageMark(self.Damage, strikes, p1, p2)
+			ret:AddMelee(p1, damage)
+		end
+	else
+		for dir = DIR_START, DIR_END do
+			local damage = SpaceDamage(p1 + DIR_VECTORS[dir], self.Damage, dir)
+			damage.sAnimation = "metalpunch1_"..direction
+			ret:AddDamage(damage)
+		end
+	end
+	if GetCurrentMission() then ret:AddScript("GetCurrentMission().MeteorMashUses = "..(GetCurrentMission().MeteorMashUses or 0) + 1) end
+	return ret
+end
+
+Poke_MeteorMash_A=Poke_MeteorMash:new{ UpgradeDescription = "Adds one more strike.", Strikes = 5 }
+Poke_MeteorMash_B=Poke_MeteorMash:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_MeteorMash_AB=Poke_MeteorMash:new{ Strikes = 4, Damage = 2 }
