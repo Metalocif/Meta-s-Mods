@@ -1,0 +1,15 @@
+v1.1
+- Added a multishot mode to the wyvern's weapon.
+  - This is both a way to easily know the amount of stomach and a reason to bite stuff.
+- The wyvern can now munch allies while boosted for exactly 1 damage and conserve boost.
+- Fixed a preview issue with the drake's Impact upgrade.
+- Added a bounce on landing with the drake's melee mode.
+- Gave the drake fire immunity, given the amount of fire it puts around, the fact it jumps, and the fact it's a dragon.
+- Hydra death anim offset fix.
+- Fixed hydra/wyvern eye color not taking the palette color.
+
+v1.0.1
+- Fixed an issue with the wyvern's ranged weapon.
+
+v1.0
+- Release.
