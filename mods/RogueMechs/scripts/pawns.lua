@@ -128,6 +128,206 @@ function GetBestWeapon()
 	--since second weapon may be a limited or ultimate move, better to only use it when strictly better
 end
 
+
+
+modApi:addPalette({
+    ID = "Meta_RogueMechs_1",
+    Name = "Rogue Rift Walkers",
+	PlateHighlight = {191,40,40},
+	PlateLight     = {134,126,83},
+	PlateMid       = {68,73,61},
+	PlateDark      = {37,37,37},
+	PlateOutline   = {20,20,20},
+	BodyHighlight  = {139,144,132},
+	BodyColor      = {71,71,71},
+	PlateShadow    = {35,35,35},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_2",
+    Name = "Rogue Rusting Hulks",
+    Image = "units/player/mech_pulse_ns.png",
+	PlateHighlight = {234,141,141},
+	PlateLight     = {167,124,89},
+	PlateMid       = {111,67,51},
+	PlateDark      = {38,38,38},
+	PlateOutline   = {12,12,12},
+	BodyHighlight  = {89,89,89},
+	BodyColor      = {44,44,44},
+	PlateShadow    = {20,20,20},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_3",
+    Name = "Rogue Zenith Guard",
+    Image = "units/player/mech_charge_ns.png",
+	PlateHighlight = {218,79,79},
+	PlateLight     = {97,118,123},
+	PlateMid       = {61,61,62},
+	PlateDark      = {35,35,35},
+	PlateOutline   = {29,29,29},
+	BodyHighlight  = {128,126,122},
+	BodyColor      = {59,59,59},
+	PlateShadow    = {29,29,29},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_4",
+    Name = "Rogue Blitzkrieg",
+    Image = "units/player/mech_electric_ns.png",
+	PlateHighlight = {249,142,142},
+	PlateLight     = {245,252,185},
+	PlateMid       = {124,120,87},
+	PlateDark      = {70,60,48},
+	PlateOutline   = {22,19,17},
+	BodyHighlight  = {146,154,157},
+	BodyColor      = {77,79,88},
+	PlateShadow    = {29,30,34},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_5",
+    Name = "Rogue Steel Judoka",
+    Image = "units/player/mech_judo_ns.png",
+	PlateHighlight = {174,44,44},
+	PlateLight     = {82,76,65},
+	PlateMid       = {37,38,34},
+	PlateDark      = {19,21,21},
+	PlateOutline   = {9,10,11},
+	BodyHighlight  = {223,209,195},
+	BodyColor      = {81,81,81},
+	PlateShadow    = {38,38,38},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_6",
+    Name = "Rogue Flame Behemoths",
+    Image = "units/player/mech_flame_ns.png",
+	PlateHighlight = {220,89,89},
+	PlateLight     = {151,87,106},
+	PlateMid       = {103,48,68},
+	PlateDark      = {60,33,40},
+	PlateOutline   = {26,16,18},
+	BodyHighlight  = {131,116,103},
+	BodyColor      = {66,58,52},
+	PlateShadow    = {29,29,25},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_7",
+    Name = "Rogue Frozen Titans",
+    Image = "units/player/mech_guard_ns.png",
+	PlateHighlight = {219,84,116},
+	PlateLight     = {169,230,220},
+	PlateMid       = {114,144,120},
+	PlateDark      = {69,81,83},
+	PlateOutline   = {23,25,28},
+	BodyHighlight  = {113,114,113},
+	BodyColor      = {77,80,82},
+	PlateShadow    = {43,47,49},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_8",
+    Name = "Rogue Hazardous Mechs",
+    Image = "units/player/mech_leap_ns.png",
+	PlateHighlight = {184,87,87},
+	PlateLight     = {139,112,109},
+	PlateMid       = {75,63,65},
+	PlateDark      = {50,42,46},
+	PlateOutline   = {17,15,16},
+	BodyHighlight  = {102,109,92},
+	BodyColor      = {64,67,63},
+	PlateShadow    = {24,26,24},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_9",
+    Name = "Rogue Bombermechs",
+    Image = "advanced/units/player/brute_pierce_ns.png",
+	PlateHighlight = {216,89,89},
+	PlateLight     = {210,161,62},
+	PlateMid       = {148,85,71},
+	PlateDark      = {86,44,46},
+	PlateOutline   = {22,13,14},
+	BodyHighlight  = {65,93,99},
+	BodyColor      = {39,49,56},
+	PlateShadow    = {18,20,24},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_10",
+    Name = "Rogue Arachnophiles",
+    Image = "advanced/units/player/brute_bulk_ns.png",
+	PlateHighlight = {217,74,74},
+	PlateLight     = {223,103,201},
+	PlateMid       = {113,75,134},
+	PlateDark      = {43,36,48},
+	PlateOutline   = {18,14,23},
+	BodyHighlight  = {171,175,162},
+	BodyColor      = {87,94,92},
+	PlateShadow    = {47,46,37},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_11",
+    Name = "Rogue Mist Eaters",
+    Image = "advanced/units/player/brute_needle_ns.png",
+	PlateHighlight = {188,44,44},
+	PlateLight     = {73,206,137},
+	PlateMid       = {59,84,86},
+	PlateDark      = {32,40,45},
+	PlateOutline   = {17,16,14},
+	BodyHighlight  = {107,84,67},
+	BodyColor      = {55,42,40},
+	PlateShadow    = {31,29,30},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_12",
+    Name = "Rogue Heat Sinkers",
+    Image = "advanced/units/player/prime_firefighter_ns.png",
+	PlateHighlight = {182,90,113},
+	PlateLight     = {78,94,74},
+	PlateMid       = {39,41,39},
+	PlateDark      = {17,19,18},
+	PlateOutline   = {7,7,8},
+	BodyHighlight  = {59,58,57},
+	BodyColor      = {33,33,32},
+	PlateShadow    = {11,11,11},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_13",
+    Name = "Rogue Cataclysm",
+    Image = "advanced/units/player/prime_bottlecap_ns.png",
+	PlateHighlight = {206,164,164},
+	PlateLight     = {191,191,191},
+	PlateMid       = {131,78,61},
+	PlateDark      = {57,57,57},
+	PlateOutline   = {27,27,27},
+	BodyHighlight  = {154,154,154},
+	BodyColor      = {97,97,97},
+	PlateShadow    = {42,42,42},
+    }
+)
+modApi:addPalette({
+    ID = "Meta_RogueMechs_14",
+    Name = "Rogue Secret Squad",
+    Image = "units/player/vek_scarab_ns.png",
+	PlateHighlight = {255,86,116},
+	PlateLight     = {139, 121, 164},
+	PlateMid       = {85,110,112},
+	PlateDark      = {36,65,65},
+	PlateOutline   = {19,15,6},
+	BodyHighlight  = {252,255,210},
+	BodyColor      = {111,125,112},
+	PlateShadow    = {64,54,48},
+    }
+)
+
+
+
 RMMechPunch0 = Pawn:new
 {
 	Name = "Rogue Combat Mech",
@@ -141,7 +341,7 @@ RMMechPunch0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 0,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_1"),
 }
 AddPawn("RMMechPunch0")
 RMMechPunch1 = RMMechPunch0:new
@@ -157,6 +357,7 @@ RMMechPunch1 = RMMechPunch0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_1"),
 }
 AddPawn("RMMechPunch1")
 RMMechPunch2 = RMMechPunch0:new
@@ -173,6 +374,7 @@ RMMechPunch2 = RMMechPunch0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_1"),
 }
 AddPawn("RMMechPunch2")
 RMMechPunch3 = RMMechPunch0:new
@@ -189,6 +391,7 @@ RMMechPunch3 = RMMechPunch0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_1"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechPunch3")
@@ -209,7 +412,7 @@ RMMechDStrike0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 4,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_5"),
 }
 RMMechDStrike1 = RMMechDStrike0:new
 {
@@ -225,7 +428,7 @@ RMMechDStrike1 = RMMechDStrike0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 4,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_5"),
 }
 RMMechDStrike2 = RMMechDStrike0:new
 {
@@ -241,7 +444,7 @@ RMMechDStrike2 = RMMechDStrike0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 4,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_5"),
 }
 RMMechDStrike3 = RMMechDStrike0:new
 {
@@ -257,7 +460,7 @@ RMMechDStrike3 = RMMechDStrike0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 4,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_5"),
 	GetWeapon = GetBestWeapon,
 }
 
@@ -276,7 +479,7 @@ RMMechLaser0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechLaser0")
 RMMechLaser1 = RMMechLaser0:new
@@ -292,7 +495,7 @@ RMMechLaser1 = RMMechLaser0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechLaser1")
 RMMechLaser2 = RMMechLaser0:new
@@ -308,7 +511,7 @@ RMMechLaser2 = RMMechLaser0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechLaser2")
 RMMechLaser3 = RMMechLaser0:new
@@ -324,7 +527,7 @@ RMMechLaser3 = RMMechLaser0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechLaser3")
@@ -346,7 +549,7 @@ RMMechCharge0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechCharge0")
 RMMechCharge1 = RMMechCharge0:new
@@ -363,7 +566,7 @@ RMMechCharge1 = RMMechCharge0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechCharge1")
 RMMechCharge2 = RMMechCharge0:new
@@ -380,7 +583,7 @@ RMMechCharge2 = RMMechCharge0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 }
 AddPawn("RMMechCharge2")
 RMMechCharge3 = RMMechCharge0:new
@@ -397,7 +600,7 @@ RMMechCharge3 = RMMechCharge0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 2,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_3"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechCharge3")
@@ -417,7 +620,7 @@ RMMechGuard0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechGuard0")
 RMMechGuard1 = RMMechGuard0:new
@@ -433,7 +636,7 @@ RMMechGuard1 = RMMechGuard0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechGuard1")
 RMMechGuard2 = RMMechGuard0:new
@@ -449,7 +652,7 @@ RMMechGuard2 = RMMechGuard0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechGuard2")
 RMMechGuard3 = RMMechGuard0:new
@@ -465,7 +668,7 @@ RMMechGuard3 = RMMechGuard0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechGuard3")
@@ -485,7 +688,7 @@ RMMechMirror0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechMirror0")
 RMMechMirror1 = RMMechMirror0:new
@@ -501,7 +704,7 @@ RMMechMirror1 = RMMechMirror0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechMirror1")
 RMMechMirror2 = RMMechMirror0:new
@@ -517,7 +720,7 @@ RMMechMirror2 = RMMechMirror0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 }
 AddPawn("RMMechMirror2")
 RMMechMirror3 = RMMechMirror0:new
@@ -533,7 +736,7 @@ RMMechMirror3 = RMMechMirror0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 6,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_7"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechMirror3")
@@ -553,7 +756,7 @@ RMMechDispersal0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 12,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_12"),
 }
 AddPawn("RMMechDispersal0")
 RMMechDispersal1 = RMMechDispersal0:new
@@ -569,7 +772,7 @@ RMMechDispersal1 = RMMechDispersal0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 12,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_12"),
 }
 AddPawn("RMMechDispersal1")
 RMMechDispersal2 = RMMechDispersal0:new
@@ -585,7 +788,7 @@ RMMechDispersal2 = RMMechDispersal0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 12,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_12"),
 }
 AddPawn("RMMechDispersal2")
 RMMechDispersal3 = RMMechDispersal0:new
@@ -601,7 +804,7 @@ RMMechDispersal3 = RMMechDispersal0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 12,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_12"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechDispersal3")
@@ -621,7 +824,7 @@ RMMechBulk0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 10,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_10"),
 }
 AddPawn("RMMechBulk0")
 RMMechBulk1 = RMMechBulk0:new
@@ -637,7 +840,7 @@ RMMechBulk1 = RMMechBulk0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 10,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_10"),
 }
 AddPawn("RMMechBulk1")
 RMMechBulk2 = RMMechBulk0:new
@@ -653,7 +856,7 @@ RMMechBulk2 = RMMechBulk0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 10,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_10"),
 }
 AddPawn("RMMechBulk2")
 RMMechBulk3 = RMMechBulk0:new
@@ -669,7 +872,7 @@ RMMechBulk3 = RMMechBulk0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 10,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_10"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechBulk3")
@@ -689,7 +892,7 @@ RMMechTrimissile0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 13,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_13"),
 }
 AddPawn("RMMechTrimissile0")
 RMMechTrimissile1 = RMMechTrimissile0:new
@@ -705,7 +908,7 @@ RMMechTrimissile1 = RMMechTrimissile0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 13,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_13"),
 }
 AddPawn("RMMechTrimissile1")
 RMMechTrimissile2 = RMMechTrimissile0:new
@@ -721,7 +924,7 @@ RMMechTrimissile2 = RMMechTrimissile0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 13,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_13"),
 }
 AddPawn("RMMechTrimissile2")
 RMMechTrimissile3 = RMMechTrimissile0:new
@@ -737,7 +940,7 @@ RMMechTrimissile3 = RMMechTrimissile0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 13,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_13"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechTrimissile3")
@@ -758,7 +961,7 @@ RMMechNeedle0 = Pawn:new
 	Massive = true,
 	Corpse = true,
 	Flying = true,
-	ImageOffset = 11,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_11"),
 }
 AddPawn("RMMechNeedle0")
 RMMechNeedle1 = RMMechNeedle0:new
@@ -775,7 +978,7 @@ RMMechNeedle1 = RMMechNeedle0:new
 	Massive = true,
 	Corpse = true,
 	Flying = true,
-	ImageOffset = 11,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_11"),
 }
 AddPawn("RMMechNeedle1")
 RMMechNeedle2 = RMMechNeedle0:new
@@ -792,7 +995,7 @@ RMMechNeedle2 = RMMechNeedle0:new
 	Massive = true,
 	Corpse = true,
 	Flying = true,
-	ImageOffset = 11,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_11"),
 }
 AddPawn("RMMechNeedle2")
 RMMechNeedle3 = RMMechNeedle0:new
@@ -809,7 +1012,7 @@ RMMechNeedle3 = RMMechNeedle0:new
 	Massive = true,
 	Corpse = true,
 	Flying = true,
-	ImageOffset = 11,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_11"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechNeedle3")
@@ -829,7 +1032,7 @@ RMMechMiner0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 9,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_9"),
 }
 AddPawn("RMMechMiner0")
 RMMechMiner1 = RMMechMiner0:new
@@ -845,7 +1048,7 @@ RMMechMiner1 = RMMechMiner0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 9,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_9"),
 }
 AddPawn("RMMechMiner1")
 RMMechMiner2 = RMMechMiner0:new
@@ -861,7 +1064,7 @@ RMMechMiner2 = RMMechMiner0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 9,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_9"),
 }
 AddPawn("RMMechMiner2")
 RMMechMiner3 = RMMechMiner0:new
@@ -877,7 +1080,7 @@ RMMechMiner3 = RMMechMiner0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 9,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_9"),
 	GetWeapon = GetBestWeapon,
 }
 AddPawn("RMMechMiner3")
@@ -895,7 +1098,7 @@ RMMechElec0 = Pawn:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 3,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_4"),
 }
 AddPawn("RMMechElec0")
 RMMechElec1 = RMMechElec0:new
@@ -911,7 +1114,7 @@ RMMechElec1 = RMMechElec0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 3,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_4"),
 }
 AddPawn("RMMechElec1")
 RMMechElec2 = RMMechElec0:new
@@ -927,7 +1130,7 @@ RMMechElec2 = RMMechElec0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 3,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_4"),
 }
 AddPawn("RMMechElec2")
 RMMechElec3 = RMMechElec0:new
@@ -943,6 +1146,6 @@ RMMechElec3 = RMMechElec0:new
 	ImpactMaterial = IMPACT_METAL,
 	Massive = true,
 	Corpse = true,
-	ImageOffset = 3,
+	ImageOffset = modApi:getPaletteImageOffset("Meta_RogueMechs_4"),
 }
 AddPawn("RMMechElec3")
