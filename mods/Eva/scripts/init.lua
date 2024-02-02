@@ -4,13 +4,14 @@
 local mod = {
 	id = "Metalocif_Evangelion",
 	name = "Evangelion Mod",
-	version = "0",
+	version = "0.3",
 	requirements = {},
 	dependencies = { --This requests modApiExt from the mod loader
 		modApiExt = "1.17", --We can get this by using the variable `modapiext`
 		memedit = "1.0.1",
 	},
-	modApiVersion = "2.8.3",
+	modApiVersion = "2.9.3",
+	description = "An incomplete mod that adds some of the Evangelion mechas and Angels to the game.",
 	icon = "img/mod_icon.png"
 }
 

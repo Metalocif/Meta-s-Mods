@@ -1,32 +1,15 @@
-Cyborg Weapons
-- Emboldening Screech: also grants upgrades (range is base; A grants A, B grants B)
-  - make an animation for it based on Djinn's icon
-  - make it play a sound
-
-Pokemon
-- Needs a lot of incapacitation to make enemies die from the sandstorm
-- Tyranitar
-  - Sandstorm/Rock Throw/Rock Slide/Stone Edge
-    - rock throw is artillery, rock slide is dropper, stone edge is animation
-    - rock throw targets 1, rock slide target 1 and both sides, stone edge is two-click to go in either direction, upgrade to hit 5 tiles
-    - upgrade: Stealth Rocks (double damage to flying stuff lmao)
-    - Sandstorm: set terrain (rubble/ground/acid/fire/forest/ice) to sand, damage all enemies for 1 at the start of each turn
-	- use advanced mission_sand for sandstorm effecters
-        - adds a sand custom anim (front + back) on buildings/mountains)
-- Metagross
-  - Take Down (push, self-damage for half) /Zen Headbutt (push, flip adj)
-  - Metal Claw/Meteor Mash(hit all adjacents or one four times); sharpens (hits 1 more time this battle)
-- Garchomp
-  - Bite/Earthquake/Crunch
-    - Bite upgrade: Drag - drag user and target in any direction, except the target's
-    - Earthquake: target an area, flip stuff in area, damage nonflying
-
 Future plans:
 - Starters squad (Charizard/Blastoise/Venusaur, with triple attack & mega for Charizard)
 - Ghosts squad (Gengar/Dusknoir/Chandelure/Banette+Mega/Mimikyu)
 - Islands (Pokemon as enemies, profs as CEOs)
-  - Two-phase mission where you go to a moon biome to fight Deoxys/Lunarock/Selerock/Minior/Elgyem
+  - Two-phase mission where you go to a moon biome to fight Deoxys/Lunarock/Solarock/Minior/Elgyem
   - Lavender Tower mission where enemies spawn temp Ghastlies on death/tower spawns them
+- Pokemon enemies:
+  - Some are island-specific, can spawn in final island (Magmar/Magmortar, Slugma/Magcargo, Numel/Camerupt, Heatran/Entei as boss)
+  - Bug-types can spawn anywhere, others in specific islands/tileset
+  - Water-types are massive and heal in water
+- Missions where your reward is a Mega Stone, which enables Mega-Evo for that Pokemon permanently as an achievement
+  - Sprited Megas: Charizard X, Absol, Mewtwo Y, Houndoom, Sceptile, Gardevoir, Branette, Camerupt, Lopunny, Gallade
 
 
 HM moves

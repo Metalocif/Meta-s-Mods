@@ -42,6 +42,13 @@ local files = {
 	"ZenHeadbutt.png",
 	"MetalClaw.png",
 	"MeteorMash.png",
+	"Bite.png",
+	"Crunch.png",
+	"Earthquake.png",
+	"RockThrow.png",
+	"RockSlide.png",
+	"StoneEdge.png",
+	"Sandstorm.png",
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/weapons/"..file, resourcePath.."img/weapons/"..file)
@@ -77,6 +84,23 @@ modApi:appendAsset("img/effects/alienwhip3_L.png", resourcePath.."img/effects/al
 modApi:appendAsset("img/effects/alienwhip3_R.png", resourcePath.."img/effects/alienwhip3_R.png")
 modApi:appendAsset("img/effects/alienwhip3_U.png", resourcePath.."img/effects/alienwhip3_U.png")
 
+modApi:appendAsset("img/effects/bite_0.png", resourcePath .."img/effects/bite_0.png")
+modApi:appendAsset("img/effects/bite_1.png", resourcePath .."img/effects/bite_1.png")
+modApi:appendAsset("img/effects/bite_2.png", resourcePath .."img/effects/bite_2.png")
+modApi:appendAsset("img/effects/bite_3.png", resourcePath .."img/effects/bite_3.png")
+
+modApi:appendAsset("img/effects/metalclaw_D.png", resourcePath .."img/effects/metalclaw_D.png")
+modApi:appendAsset("img/effects/metalclaw_R.png", resourcePath .."img/effects/metalclaw_R.png")
+
+modApi:appendAsset("img/effects/metalpunch1_D.png", resourcePath .."img/effects/metalpunch1_D.png")
+modApi:appendAsset("img/effects/metalpunch1_L.png", resourcePath .."img/effects/metalpunch1_L.png")
+modApi:appendAsset("img/effects/metalpunch1_R.png", resourcePath .."img/effects/metalpunch1_R.png")
+modApi:appendAsset("img/effects/metalpunch1_U.png", resourcePath .."img/effects/metalpunch1_U.png")
+modApi:appendAsset("img/effects/metalpunch2_D.png", resourcePath .."img/effects/metalpunch2_D.png")
+modApi:appendAsset("img/effects/metalpunch2_L.png", resourcePath .."img/effects/metalpunch2_L.png")
+modApi:appendAsset("img/effects/metalpunch2_R.png", resourcePath .."img/effects/metalpunch2_R.png")
+modApi:appendAsset("img/effects/metalpunch2_U.png", resourcePath .."img/effects/metalpunch2_U.png")
+
 
 modApi:appendAsset("img/effects/icywind_R.png", resourcePath.."img/effects/icywind_R.png")
 modApi:appendAsset("img/effects/icywind_U.png", resourcePath.."img/effects/icywind_U.png")
@@ -91,6 +115,11 @@ modApi:appendAsset("img/effects/petal_U.png", resourcePath.."img/effects/petal_U
 modApi:appendAsset("img/effects/shotup_seedflare.png", resourcePath.."img/effects/shotup_seedflare.png")
 modApi:appendAsset("img/effects/item_seedflare.png", resourcePath.."img/effects/item_seedflare.png")
 modApi:appendAsset("img/effects/item_gracidea.png", resourcePath.."img/effects/item_gracidea.png")
+modApi:appendAsset("img/effects/item_stealthrocks.png", resourcePath.."img/effects/item_stealthrocks.png")
+modApi:appendAsset("img/effects/rock.png", resourcePath.."img/effects/rock.png")
+modApi:appendAsset("img/effects/stoneedgeline.png", resourcePath.."img/effects/stoneedgeline.png")
+modApi:appendAsset("img/effects/sandanim_back.png", resourcePath.."img/effects/sandanim_back.png")
+modApi:appendAsset("img/effects/sandanim_front.png", resourcePath.."img/effects/sandanim_front.png")
 
 local effects = {
 	"laser_hyperbeam_R.png",
@@ -187,25 +216,48 @@ ANIMS.clockAnimRev = Animation:new{
 	PosY = -32
 }
 
-ANIMS.alienwhip0_0 = Animation:new{Image = "effects/alienwhip0_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
-ANIMS.alienwhip1_0 = Animation:new{Image = "effects/alienwhip1_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
-ANIMS.alienwhip2_0 = Animation:new{Image = "effects/alienwhip2_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
-ANIMS.alienwhip3_0 = Animation:new{Image = "effects/alienwhip3_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
+local a = ANIMS
 
-ANIMS.alienwhip0_1 = Animation:new{Image = "effects/alienwhip0_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
-ANIMS.alienwhip1_1 = Animation:new{Image = "effects/alienwhip1_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
-ANIMS.alienwhip2_1 = Animation:new{Image = "effects/alienwhip2_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
-ANIMS.alienwhip3_1 = Animation:new{Image = "effects/alienwhip3_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
+a.bite_0 = a.explopunch1_0:new{ Image = "effects/bite_0.png", NumFrames = 5, PosX = -19, PosY = -5 }
+a.bite_1 = a.explopunch1_1:new{ Image = "effects/bite_1.png", NumFrames = 5, PosX = -14, PosY = -2,  }
+a.bite_2 = a.explopunch1_2:new{ Image = "effects/bite_2.png", NumFrames = 5, PosX = -10, PosY = -2,  }
+a.bite_3 = a.explopunch1_3:new{ Image = "effects/bite_3.png", NumFrames = 5, PosX = -7, PosY = -5 }
 
-ANIMS.alienwhip0_2 = Animation:new{Image = "effects/alienwhip0_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
-ANIMS.alienwhip1_2 = Animation:new{Image = "effects/alienwhip1_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
-ANIMS.alienwhip2_2 = Animation:new{Image = "effects/alienwhip2_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
-ANIMS.alienwhip3_2 = Animation:new{Image = "effects/alienwhip3_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
+a.metalclawanim_0 = a.explopunch1_0:new{ Image = "effects/metalclaw_D.png", NumFrames = 6, PosX = -19, PosY = -15 }
+a.metalclawanim_1 = a.explopunch1_1:new{ Image = "effects/metalclaw_R.png", NumFrames = 6, PosX = -20, PosY = -12 }
 
-ANIMS.alienwhip0_3 = Animation:new{Image = "effects/alienwhip0_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
-ANIMS.alienwhip1_3 = Animation:new{Image = "effects/alienwhip1_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
-ANIMS.alienwhip2_3 = Animation:new{Image = "effects/alienwhip2_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
-ANIMS.alienwhip3_3 = Animation:new{Image = "effects/alienwhip3_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
+a.metalpunch1_0 = a.explopunch1_0:new{ Image = "effects/metalpunch1_U.png", Time = 0.03}
+a.metalpunch1_1 = a.explopunch1_1:new{ Image = "effects/metalpunch1_R.png", Time = 0.03}
+a.metalpunch1_2 = a.explopunch1_2:new{ Image = "effects/metalpunch1_D.png", Time = 0.03}
+a.metalpunch1_3 = a.explopunch1_3:new{ Image = "effects/metalpunch1_L.png", Time = 0.03}
+
+a.metalpunch2_0 = a.explopunch1_0:new{ Image = "effects/metalpunch2_U.png", Time = 0.03}
+a.metalpunch2_1 = a.explopunch1_1:new{ Image = "effects/metalpunch2_R.png", Time = 0.03}
+a.metalpunch2_2 = a.explopunch1_2:new{ Image = "effects/metalpunch2_D.png", Time = 0.03}
+a.metalpunch2_3 = a.explopunch1_3:new{ Image = "effects/metalpunch2_L.png", Time = 0.03}
+
+a.alienwhip0_0 = Animation:new{Image = "effects/alienwhip0_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
+a.alienwhip1_0 = Animation:new{Image = "effects/alienwhip1_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
+a.alienwhip2_0 = Animation:new{Image = "effects/alienwhip2_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
+a.alienwhip3_0 = Animation:new{Image = "effects/alienwhip3_U.png",NumFrames = 6,Time = 0.07,PosX = -46,PosY = -7}
+
+a.alienwhip0_1 = Animation:new{Image = "effects/alienwhip0_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
+a.alienwhip1_1 = Animation:new{Image = "effects/alienwhip1_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
+a.alienwhip2_1 = Animation:new{Image = "effects/alienwhip2_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
+a.alienwhip3_1 = Animation:new{Image = "effects/alienwhip3_R.png",NumFrames = 6,Time = 0.07,PosX = -42,PosY = -27}
+
+a.alienwhip0_2 = Animation:new{Image = "effects/alienwhip0_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
+a.alienwhip1_2 = Animation:new{Image = "effects/alienwhip1_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
+a.alienwhip2_2 = Animation:new{Image = "effects/alienwhip2_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
+a.alienwhip3_2 = Animation:new{Image = "effects/alienwhip3_D.png",NumFrames = 6,Time = 0.07,PosX = -22,PosY = -22}
+
+a.alienwhip0_3 = Animation:new{Image = "effects/alienwhip0_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
+a.alienwhip1_3 = Animation:new{Image = "effects/alienwhip1_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
+a.alienwhip2_3 = Animation:new{Image = "effects/alienwhip2_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
+a.alienwhip3_3 = Animation:new{Image = "effects/alienwhip3_L.png",NumFrames = 6,Time = 0.07,PosX = -18,PosY = -8}
+
+a.sandAnim_front = Animation:new{Image = "effects/sandanim_front.png",NumFrames = 1,Loop=true,Layer = LAYER_FRONT, PosX = -28, PosY = 1}
+a.sandAnim_back = Animation:new{Image = "effects/sandanim_back.png",NumFrames = 1,Loop=true,Layer = LAYER_BACK, PosX = -28, PosY = 1}
 
 Poke_Pound = Skill:new{
 	Class = "TechnoVek",
@@ -1987,7 +2039,8 @@ function Poke_Bloom:GetSkillEffect(p1, p2)
 end
 
 merge_table(TILE_TOOLTIPS, { Poke_SeedFlare_Text = {"Seed Flare", "Deals 3 Damage to units that move onto it."},
-						     Poke_Gracidea_Text = {"Gracidea", "Boosts units that move onto it."} } )	
+						     Poke_Gracidea_Text = {"Gracidea", "Boosts units that move onto it."},
+							 Poke_StealthRock_Text = {"Stealth Rocks", "Deals 1 damage to units that move onto it, doubled against flying units."}, } )	
 
 local seedflare_damage = SpaceDamage(3)
 seedflare_damage.iTerrain = TERRAIN_FOREST
@@ -1999,6 +2052,8 @@ Poke_SeedFlareItem = { Image = "effects/item_seedflare.png", Damage = seedflare_
 Location["effects/item_seedflare.png"] = Point(-10,10)
 Poke_Gracidea = { Image = "effects/item_gracidea.png", Damage = gracidea_damage, Tooltip = "Poke_Gracidea_Text", Icon = "effects/item_gracidea.png", UsedImage = ""}
 Location["effects/item_gracidea.png"] = Point(-10,10)
+Poke_StealthRock = { Image = "effects/item_stealthrocks.png", Damage = SpaceDamage(0), Tooltip = "Poke_StealthRock_Text", Icon = "effects/item_stealthrocks.png", UsedImage = ""}
+Location["effects/item_stealthrocks.png"] = Point(-15,0)
 
 BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
     if removed_item == "Poke_Gracidea" then
@@ -2008,7 +2063,14 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 			gracidea_damage.sScript = "Board:GetPawn("..loc:GetString().."):SetBoosted(true)"
 			Board:DamageSpace(gracidea_damage)
         end
-    end
+    elseif removed_item == "Poke_StealthRock" then
+		local pawn = Board:GetPawn(loc)
+		if pawn then
+			local rockDamage = SpaceDamage(loc, 1)
+			if pawn:IsFlying() then rockDamage.iDamage = 2 end
+			Board:DamageSpace(rockDamage)
+		end
+	end
 end)
 
 
@@ -2465,13 +2527,17 @@ function Poke_TakeDown:GetSkillEffect(p1,p2)
 	damage.sSound = self.ImpactSound
 	local amountDealt = self.Damage
 	local pawnHit = Board:GetPawn(target)
-	if Board:GetPawn(p1):IsBoosted() then amountDealt = amountDealt + 1 end
-	if pawnHit:IsAcid() then
-		amountDealt = amountDealt * 2
-	elseif pawnHit:IsArmor() then
-		amountDealt = amountDealt - 1
+	if pawnHit then
+		if Board:GetPawn(p1):IsBoosted() then amountDealt = amountDealt + 1 end
+		if pawnHit:IsAcid() then
+			amountDealt = amountDealt * 2
+		elseif pawnHit:IsArmor() then
+			amountDealt = amountDealt - 1
+		end
+		amountDealt = math.min(amountDealt, pawnHit:GetHealth())
+	else
+		amountDealt = 0
 	end
-	amountDealt = math.min(amountDealt, pawnHit:GetHealth())
 	
 	if distance == 1 and doDamage then
 		ret:AddMelee(p1,damage, NO_DELAY)
@@ -2544,6 +2610,12 @@ function Poke_ZenHeadbutt:GetSkillEffect(p1,p2)
 	local doDamage = true
 	local target = p2
 	local distance = p1:Manhattan(target)
+	local user = Board:GetPawn(p1)
+	local resetAnim
+	if user:GetCustomAnim() == "Poke_Metagross" and (p1:Manhattan(p2) > 1 or not Board:IsBlocked(p2, PATH_PROJECTILE)) and not Board:IsTipImage() then
+		resetAnim = true
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Metagross_hover"))
+	end
 	ret:AddAnimation(p1, "ExploRepulseSmall", ANIM_REVERSE)
 	ret:AddDelay(0.5)
 	if not Board:IsBlocked(target,pathing) then -- dont attack an empty edge square, just run to the edge
@@ -2560,23 +2632,22 @@ function Poke_ZenHeadbutt:GetSkillEffect(p1,p2)
 		ret:AddCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), NO_DELAY)--FULL_DELAY)
 
 		local temp = p1 
-		while temp ~= target  do 
+		while temp ~= target do 
 			temp = temp + DIR_VECTORS[direction]
-			if temp ~= target then
-				ret:AddDelay(0.06)
-			end
+			if temp ~= target then ret:AddDelay(0.06) end
 		end
 		
 		if doDamage then ret:AddDamage(damage) end
 	
 	end
-	if doDamage then
-		local damage = SpaceDamage(target + DIR_VECTORS[(dir+1)%4], 0, DIR_FLIP)
+
+		local damage = SpaceDamage(p2 + DIR_VECTORS[(direction+1)%4], 0, DIR_FLIP)
 		damage.sAnimation = "confusionAnim"
 		ret:AddDamage(damage)
-		damage.loc = target + DIR_VECTORS[(dir-1)%4]
+		damage.loc = p2 + DIR_VECTORS[(direction-1)%4]
 		ret:AddDamage(damage)
-	end
+	
+	if resetAnim then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", (target - DIR_VECTORS[direction]):GetString(), "Poke_Metagross")) end
 	return ret
 end
 
@@ -2590,7 +2661,60 @@ Poke_MetalClaw = Skill:new{
 	Icon = "weapons/MetalClaw.png",	
 	Rarity = 3,
 	Name = "Metal Claw",
-	Description = "Strike a target three times with sharp claws. Each time this is used, it will strike one more time for the rest of the mission.",
+	Description = "Strike a target two times with sharp claws. Each time this is used, it will strike one more time for the rest of the mission.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	Strikes = 2,
+	Upgrades = 2,
+	UpgradeList = {"+1 Strike", "+1 Damage"},
+	UpgradeCost = {2, 3},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,3),
+		Target = Point(2,3),
+		CustomPawn = "Poke_Beldum",
+	}
+}
+
+function Poke_MetalClaw:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	local strikes = self.Strikes
+	if GetCurrentMission() then 
+		if not GetCurrentMission().MetalClawUses then GetCurrentMission().MetalClawUses = 0 end
+		strikes = self.Strikes + GetCurrentMission().MetalClawUses
+	end
+	local anim = Board:GetPawn(p1):GetCustomAnim()
+	if not Board:IsTipImage() then 
+		-- Board:GetPawn(p1):SetCustomAnim("Poke_Metang_swipe") 
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Metang_swipe"))
+	end
+	for i = 1, strikes do
+		local damage = SpaceDamage(p2, self.Damage)
+		damage.sImageMark = MultishotLib:getImageMark(self.Damage, strikes, p1, p2)
+		damage.sAnimation = "metalclawanim_"..i%2
+		ret:AddMelee(p1, damage)
+	end
+	if GetCurrentMission() and not Board:IsTipImage() then ret:AddScript("GetCurrentMission().MetalClawUses = "..GetCurrentMission().MetalClawUses + 1) end
+	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), anim))
+	return ret
+end
+
+Poke_MetalClaw_A=Poke_MetalClaw:new{ UpgradeDescription = "Adds one more strike.", Strikes = 3 }
+Poke_MetalClaw_B=Poke_MetalClaw:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_MetalClaw_AB=Poke_MetalClaw:new{ Strikes = 3, Damage = 2 }
+
+
+Poke_MeteorMash = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/MeteorMash.png",	
+	Rarity = 3,
+	Name = "Meteor Mash",
+	Description = "Strike a target three times with metal fists. Each time this is used, it will strike one more time for the rest of the mission. Pushes on the final hit. Can also self-target to hit all adjacent tiles once.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	SelfDamage = 0,
@@ -2609,57 +2733,23 @@ Poke_MetalClaw = Skill:new{
 	}
 }
 
-function Poke_MetalClaw:GetSkillEffect(p1,p2)
-	local ret = SkillEffect()
-	local direction = GetDirection(p2 - p1)
-	local strikes = self.Strikes
-	if GetCurrentMission() then strikes = self.Strikes + GetCurrentMission().MetalClawUses or 0 end
-	local anim = Board:GetPawn(p1):GetCustomAnim()
-	Board:GetPawn(p1):SetCustomAnim("Metang_swipe")
-	for i = 1, strikes do
-		local damage = SpaceDamage(p2, self.Damage)
-		damage.sAnimation = "metalClawAnim_"..dir%2
-		ret:AddMelee(p1, damage)
+function Poke_MeteorMash:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		ret:push_back(point + DIR_VECTORS[i])
 	end
-	if GetCurrentMission() then ret:AddScript("GetCurrentMission().MetalClawUses = "..(GetCurrentMission().MetalClawUses or 0) + 1) end
-	Board:GetPawn(p1):SetCustomAnim(anim)
+	ret:push_back(point)
 	return ret
 end
-
-Poke_MetalClaw_A=Poke_MetalClaw:new{ UpgradeDescription = "Adds one more strike.", Strikes = 4 }
-Poke_MetalClaw_B=Poke_MetalClaw:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
-Poke_MetalClaw_AB=Poke_MetalClaw:new{ Strikes = 4, Damage = 2 }
-
-
-Poke_MeteorMash = Skill:new{
-	Class = "TechnoVek",
-	Icon = "weapons/MeteorMash.png",	
-	Rarity = 3,
-	Name = "Meteor Mash",
-	Description = "Strike a target four times with metal fists. Each time this is used, it will strike one more time for the rest of the mission. Pushes on the final hit. Can also self-target to hit all adjacent tiles once.",
-	Push = 1,--TOOLTIP HELPER
-	Damage = 1,
-	SelfDamage = 0,
-	PathSize = 1,
-	PowerCost = 0, --AE Change
-	Strikes = 4,
-	Upgrades = 2,
-	UpgradeList = {"+1 Strike", "+1 Damage"},
-	UpgradeCost = {2, 3},
-	ZoneTargeting = ZONE_DIR,
-	TipImage = {
-		Unit = Point(2,4),
-		Enemy = Point(2,3),
-		Target = Point(2,3),
-		CustomPawn = "Poke_Beldum",
-	}
-}
 
 function Poke_MeteorMash:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	
 	local strikes = self.Strikes
-	if GetCurrentMission() then strikes = self.Strikes + GetCurrentMission().MeteorMashUses or 0 end
+	if GetCurrentMission() then 
+		if not GetCurrentMission().MeteorMashUses then GetCurrentMission().MeteorMashUses = 0 end
+		strikes = self.Strikes + GetCurrentMission().MeteorMashUses
+	end
 	local anim = Board:GetPawn(p1):GetCustomAnim()
 	if p1 ~= p2 then
 		local direction = GetDirection(p2 - p1)
@@ -2668,19 +2758,488 @@ function Poke_MeteorMash:GetSkillEffect(p1,p2)
 			if i == strikes then damage.iPush = direction end
 			damage.sAnimation = "metalpunch"..((i%2)+1).."_"..direction
 			damage.sImageMark = MultishotLib:getImageMark(self.Damage, strikes, p1, p2)
+			ret:AddSound("/weapons/titan_fist")
 			ret:AddMelee(p1, damage)
 		end
 	else
 		for dir = DIR_START, DIR_END do
 			local damage = SpaceDamage(p1 + DIR_VECTORS[dir], self.Damage, dir)
-			damage.sAnimation = "metalpunch1_"..direction
+			damage.sAnimation = "metalpunch1_"..dir
 			ret:AddDamage(damage)
 		end
 	end
-	if GetCurrentMission() then ret:AddScript("GetCurrentMission().MeteorMashUses = "..(GetCurrentMission().MeteorMashUses or 0) + 1) end
+	if GetCurrentMission() and not Board:IsTipImage() then ret:AddScript("GetCurrentMission().MeteorMashUses = "..GetCurrentMission().MeteorMashUses + 1) end
 	return ret
 end
 
-Poke_MeteorMash_A=Poke_MeteorMash:new{ UpgradeDescription = "Adds one more strike.", Strikes = 5 }
+Poke_MeteorMash_A=Poke_MeteorMash:new{ UpgradeDescription = "Adds one more strike.", Strikes = 4 }
 Poke_MeteorMash_B=Poke_MeteorMash:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
 Poke_MeteorMash_AB=Poke_MeteorMash:new{ Strikes = 4, Damage = 2 }
+
+
+Poke_Bite = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Bite.png",	
+	Rarity = 3,
+	Name = "Bite",
+	Description = "Bite a target with sharp fangs and drag it to an adjacent space.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	TwoClick = true,
+	Upgrades = 2,
+	UpgradeList = {"+1 Damage", "+1 Damage"},
+	UpgradeCost = {2, 3},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,2),
+		Enemy = Point(2,1),
+		Target = Point(2,1),
+		-- Second_Origin = Point(2,2),
+		-- Second_Target = Point(2,2),
+		-- Second_Click = Point(2,2),
+		CustomPawn = "Poke_Gible",
+	}
+}
+
+function Poke_Bite:IsTwoClickException(p1,p2)
+	if not Board:GetPawn(p2) then return true end
+	if Board:GetPawn(p2):IsGuarding() then return true end
+	return false
+end
+
+function Poke_Bite:GetSecondTargetArea(p1, p2)
+	local ret = PointList()
+	local direction = GetDirection(p2 - p1)
+	for i = DIR_START, DIR_END do
+		if not Board:IsBlocked(p1 + DIR_VECTORS[i], Board:GetPawn(p1):GetPathProf()) and 
+		   not Board:IsBlocked(p2 + DIR_VECTORS[i], PATH_PROJECTILE) and
+		   i ~= direction then ret:push_back(p2 + DIR_VECTORS[i]) end
+		if i == (direction + 2)%4 and not Board:IsBlocked(p1 - DIR_VECTORS[direction], Board:GetPawn(p1):GetPathProf()) then ret:push_back(p1) end
+	end
+	return ret
+end
+
+function Poke_Bite:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	local damage = SpaceDamage(p2, self.Damage)
+	damage.sAnimation = "bite_"..direction
+	ret:AddMelee(p1, damage)
+	if Board:IsTipImage() then		--kept crashing when done the normal way for some reason
+		ret:AddCharge(Board:GetSimplePath(p1, p1 - DIR_VECTORS[direction]), NO_DELAY)
+		ret:AddCharge(Board:GetSimplePath(p2, p1), FULL_DELAY)
+		ret:AddDelay(2)
+	end
+	return ret
+end
+
+function Poke_Bite:GetFinalEffect(p1,p2,p3)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	local direction2 = GetDirection(p3 - p2)
+	local damage = SpaceDamage(p2, self.Damage)
+	damage.sAnimation = "bite_"..direction
+	ret:AddMelee(p1, damage)
+	ret:AddCharge(Board:GetSimplePath(p1, p1 + DIR_VECTORS[direction2]), NO_DELAY)
+	ret:AddCharge(Board:GetSimplePath(p2, p2 + DIR_VECTORS[direction2]), FULL_DELAY)
+	return ret
+end
+
+Poke_Bite_A=Poke_Bite:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_Bite_B=Poke_Bite:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_Bite_AB=Poke_Bite:new{ Damage = 3 }
+
+
+Poke_Crunch = Poke_Bite:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Crunch.png",	
+	Rarity = 3,
+	Name = "Crunch",
+	Description = "Crunch a target with sharp fangs and drag it to an adjacent space.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 2,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	TwoClick = true,
+	Upgrades = 2,
+	UpgradeList = {"+1 Damage", "+1 Damage"},
+	UpgradeCost = {2, 3},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,2),
+		Enemy = Point(2,1),
+		Target = Point(2,1),
+		-- Second_Origin = Point(2,1),
+		-- Second_Target = Point(2,3),
+		-- Second_Click = Point(2, 2),
+		CustomPawn = "Poke_Gible",
+	}
+}
+
+Poke_Crunch_A=Poke_Crunch:new{ UpgradeDescription = "Increases damage by 1.", Damage = 3 }
+Poke_Crunch_B=Poke_Crunch:new{ UpgradeDescription = "Increases damage by 1.", Damage = 3 }
+Poke_Crunch_AB=Poke_Crunch:new{ Damage = 4 }
+
+
+Poke_Earthquake=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Earthquake.png",	
+	Rarity = 3,
+	Name = "Earthquake",
+	Description = "Damages all non-flying units in an area and flips their attack direction. Turns sand into smoke and breaks cracked tiles.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,	
+	PowerCost = 0,
+	Range = 1,
+	HitBuildings = true,
+	Upgrades = 2,
+	UpgradeList = { "+1 Area", "Buildings immune" },
+	UpgradeCost = { 2, 1 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,0),
+		Enemy1 = Point(2,2),
+		Enemy2 = Point(1,1),
+		Building1 = Point(3,0),
+		Building2 = Point(4,0),
+		CustomPawn = "Poke_Gible",
+		CustomEnemy = "Scorpion2",
+	}
+}
+Poke_Earthquake_A=Poke_Earthquake:new{ UpgradeDescription = "Affects tiles in a larger radius.", Range = 2 }
+Poke_Earthquake_B=Poke_Earthquake:new{ UpgradeDescription = "Doesn't affect buildings.", HitBuildings = false }
+Poke_Earthquake_AB=Poke_Earthquake:new{ Range = 2, HitBuildings = false }
+
+function Poke_Earthquake:GetTargetArea(p1)
+	local ret = PointList()
+	ret:push_back(p1)
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+
+function Poke_Earthquake:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local targets = extract_table(general_DiamondTarget(p2, self.Range))
+	ret:AddSound("/props/cataclysm")
+	ret:AddScript("Board:StartShake(2)")
+	for k = 1, #targets do
+		local pawn = Board:GetPawn(targets[k])
+		if (pawn and not pawn:IsFlying()) or (Board:IsBuilding(targets[k]) and self.HitBuildings) or Board:IsCracked(targets[k]) or Board:IsPod(targets[k]) then 
+			ret:AddDamage(SpaceDamage(targets[k], self.Damage, DIR_FLIP)) 
+		elseif Board:GetTerrain(targets[k]) == TERRAIN_SAND then
+			local damage = SpaceDamage(targets[k])
+			damage.iSmoke = 1
+			damage.iTerrain = TERRAIN_ROAD
+			ret:AddDamage(damage)
+		else
+			ret:AddDamage(SpaceDamage(targets[k], DAMAGE_ZERO))	--for UX, otherwise it's hard to understand the area it hits
+		end
+		ret:AddBounce(targets[k], 1 + self.Range * 2 - p2:Manhattan(targets[k]))
+	end
+	return ret
+end
+
+
+Poke_RockThrow=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/RockThrow.png",	
+	Rarity = 3,
+	Name = "Rock Throw",
+	Description = "Throw a rock at a target, pushing it back.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	PathSize = 8,	
+	PowerCost = 0,
+	Upgrades = 1,
+	UpgradeList = {"+1 Damage"},
+	UpgradeCost = {1},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,3),
+		Target = Point(2,1),
+		Enemy = Point(2, 1),
+		CustomPawn = "Poke_Larvitar",
+	}
+}
+
+Poke_RockThrow_A=Poke_RockThrow:new{ UpgradeDescription = "Deals 1 more damage.", Damage = 2 }
+
+function Poke_RockThrow:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	local target = GetProjectileEnd(p1, p1 + DIR_VECTORS[dir])
+	ret:AddProjectile(SpaceDamage(target, self.Damage, dir), "effects/shot_mechrock")
+	return ret
+end
+
+
+Poke_RockSlide=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/RockSlide.png",	
+	Rarity = 3,
+	Name = "Rock Slide",
+	Description = "Causes rocks to fall down on the target and two adjacent tiles.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 2,
+	PathSize = 8,	
+	PowerCost = 0,
+	Upgrades = 2,
+	UpgradeList = {"+1 Damage", "Stealth Rocks"},
+	UpgradeCost = {2, 2},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,3),
+		Target = Point(2,1),
+		Enemy1 = Point(1, 1),
+		Enemy2 = Point(3, 1),
+		CustomPawn = "Poke_Larvitar",
+	}
+}
+
+Poke_RockSlide_A=Poke_RockSlide:new{ UpgradeDescription = "Deals 1 more damage.", Damage = 3 }
+Poke_RockSlide_B=Poke_RockSlide:new{ UpgradeDescription = "Adds Stealth Rocks to hit tiles that are empty. Stealth Rocks deal 1 damage to units moving onto that tile, doubled against flying units.", StealthRocks = true }
+Poke_RockSlide_AB=Poke_RockSlide:new{ Damage = 3, StealthRocks = true }
+
+function Poke_RockSlide:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 2, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+
+function Poke_RockSlide:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	for i = -1, 1 do
+		local curr = p2 + DIR_VECTORS[(dir+1)%4] * i
+		local pawn = Board:GetPawn(curr)
+		local damage = SpaceDamage(curr, self.Damage)
+		if self.StealthRocks and 
+		   (not Board:IsBlocked(curr, PATH_PROJECTILE) or 
+		   (pawn and Board:IsDeadly(damage, pawn) and Board:GetTerrain(curr) ~= TERRAIN_WATER and Board:GetTerrain(curr) ~= TERRAIN_HOLE)) then 
+			if Board:IsTipImage() then
+				damage.sItem = "Poke_StealthRock"
+			else
+				damage.sScript = string.format("modApi:runLater(function() Board:SetItem(%s, %q) end)", curr:GetString(), "Poke_StealthRock")
+			end
+		end
+		ret:AddDropper(damage,"effects/shotdown_rock.png")
+	end
+	return ret
+end
+
+
+Poke_StoneEdge=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/StoneEdge.png",	
+	Rarity = 3,
+	Name = "Stone Edge",
+	Description = "Strikes three tiles with a powerful blade of stone.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,	
+	PowerCost = 0,
+	Range = 1,
+	TwoClick = true,
+	Upgrades = 2,
+	UpgradeList = {"+1 Range", "Stealth Rocks"},
+	UpgradeCost = {2, 2},
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,3),
+		Target = Point(2,1),
+		Enemy1 = Point(1, 1),
+		Enemy2 = Point(3, 1),
+		Second_Origin = Point(2,3),
+		Second_Target = Point(1,1),
+		Second_Click = Point(1,1),
+		CustomPawn = "Poke_Larvitar",
+	}
+}
+
+Poke_StoneEdge_A=Poke_StoneEdge:new{ UpgradeDescription = "Hits up to five tiles.", Range = 2, Description = "Strikes up to five tiles with a powerful blade of stone.", }
+Poke_StoneEdge_B=Poke_StoneEdge:new{ UpgradeDescription = "Adds Stealth Rocks to hit tiles that are empty. Stealth Rocks deal 1 damage to units moving onto that tile, doubled against flying units.", StealthRocks = true }
+Poke_StoneEdge_AB=Poke_StoneEdge:new{ Range = 2, StealthRocks = true, Description = "Strikes up to five tiles with a powerful blade of stone.", }
+
+Emitter_StoneEdgeRocks = Emitter:new{
+	image = "effects/rock.png",
+	variance = 35,
+	y = -1,
+	timer = 1,
+	angle = -90,
+	rot_speed = 0,
+	angle_variance = 0,
+	lifespan = 0.15,
+	birth_rate = 3,
+	speed = 10,
+	seed = 4,
+	min_alpha = 1,
+	max_alpha = 1,
+	gravity = false,
+	layer = LAYER_FRONT,
+}
+
+Emitter_StoneEdgeLines = Emitter:new{
+	image = "effects/stoneedgeline.png",
+	variance = 0,
+	variance_x = 15,
+	variance_y = 5,
+	timer = 0.5,
+	y = 0,
+	angle = 0,
+	rot_speed = 0,
+	angle_variance = 0,
+	lifespan = 0.2,
+	birth_rate = 2,
+	speed = 0.1,
+	seed = 4,
+	min_alpha = 0.3,
+	max_alpha = 0.8,
+	gravity = false,
+	random_rot = false,
+	layer = LAYER_FRONT,
+}
+
+function Poke_StoneEdge:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+
+function Poke_StoneEdge:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	for i = -1 * self.Range, self.Range do
+		local curr = p2 + DIR_VECTORS[(dir+1)%4] * i
+		local pawn = Board:GetPawn(curr)
+		local damage = SpaceDamage(curr, self.Damage)
+		if self.StealthRocks and 
+		   (not Board:IsBlocked(curr, PATH_PROJECTILE) or 
+		   (pawn and Board:IsDeadly(damage, pawn) and Board:GetTerrain(curr) ~= TERRAIN_WATER and Board:GetTerrain(curr) ~= TERRAIN_HOLE)) then 
+			if Board:IsTipImage() then
+				damage.sItem = "Poke_StealthRock"
+			else
+				damage.sScript = string.format("modApi:runLater(function() Board:SetItem(%s, %q) end)", curr:GetString(), "Poke_StealthRock")
+			end
+		end
+		ret:AddDamage(damage)
+		ret:AddEmitter(curr, "Emitter_StoneEdgeLines")
+		ret:AddEmitter(curr, "Emitter_StoneEdgeRocks")
+	end
+	return ret
+end
+
+function Poke_StoneEdge:GetSecondTargetArea(p1, p2)
+	local ret = PointList()
+	local direction = GetDirection(p2 - p1)
+	for i = DIR_START, DIR_END do
+		for j = 1, self.Range do
+			ret:push_back(p2 + DIR_VECTORS[i] * j)
+		end
+	end
+	return ret
+end
+
+function Poke_StoneEdge:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local dir = GetDirection(p3-p2)
+	local dist = p2:Manhattan(p3)
+	for i = -1 * dist, dist do
+		local curr = p2 + DIR_VECTORS[dir] * i
+		local pawn = Board:GetPawn(curr)
+		local damage = SpaceDamage(curr, self.Damage)
+		if self.StealthRocks and (not Board:IsBlocked(curr, PATH_PROJECTILE) or (pawn and Board:IsDeadly(damage, pawn))) then 
+			if Board:IsTipImage() then
+				damage.sItem = "Poke_StealthRock"
+			else
+				damage.sScript = string.format("modApi:runLater(function() Board:SetItem(%s, %q) end)", curr:GetString(), "Poke_StealthRock")
+			end
+		end
+		ret:AddDamage(damage)
+		ret:AddEmitter(curr, "Emitter_StoneEdgeLines")
+		ret:AddEmitter(curr, "Emitter_StoneEdgeRocks")
+	end
+	return ret
+end
+
+
+Poke_Sandstorm=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Sandstorm.png",	
+	Rarity = 3,
+	Name = "Sandstorm",
+	Description = "Creates sand on grounded tiles in a large area.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	PathSize = 8,	
+	PowerCost = 0,
+	SetWeather = false,
+	Range = 2,
+	Upgrades = 1,
+	UpgradeList = { "Set Weather" },
+	UpgradeCost = { 3 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,2),
+		Enemy = Point(2, 2),
+		CustomPawn = "Poke_Larvitar",
+	}
+}
+Poke_Sandstorm_A=Poke_Sandstorm:new{ UpgradeDescription = "For the rest of the battle, damages all Vek for 1 HP at the start of the Vek's turn.", SetWeather = true }
+
+Emitter_PermaWind_1 = Emitter_Wind_0:new{ timer = -1, x = -60, y = 0, angle = 40, burst_count = 200, max_particles = 600, min_alpha = 0.3, max_alpha = 0.5, layer = LAYER_FRONT}  --right
+
+function Poke_Sandstorm:GetTargetArea(p1)
+	local ret = PointList()
+	ret:push_back(p1)
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+
+function Poke_Sandstorm:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local targets = extract_table(general_DiamondTarget(p2, self.Range))
+	for k = 1, #targets do
+		local terrain = Board:GetTerrain(targets[k])
+		if terrain == TERRAIN_ROAD or terrain == TERRAIN_FOREST or terrain == TERRAIN_RUBBLE or terrain == TERRAIN_ACID or terrain == TERRAIN_FIRE or terrain == TERRAIN_ICE then
+			ret:AddScript(string.format("Board:SetTerrain(%s, %s)", targets[k]:GetString(), TERRAIN_SAND))
+		elseif terrain == TERRAIN_MOUNTAIN or terrain == TERRAIN_BUILDING then
+			ret:AddScript(string.format("CustomAnim:add(%s, %q)", targets[k]:GetString(), "sandAnim_front"))
+			ret:AddScript(string.format("CustomAnim:add(%s, %q)", targets[k]:GetString(), "sandAnim_back"))
+		end
+	end
+	if not self.SetWeather then 
+		ret:AddEmitter(Point(3,3), "Emitter_Wind_1")
+	elseif not Board:IsTipImage() then
+		if GetCurrentMission() and (not GetCurrentMission().Weather or not GetCurrentMission().Weather == "Sandstorm") then 
+			ret:AddEmitter(Point(3,3), "Emitter_PermaWind_1") 
+		end
+		ret:AddScript("GetCurrentMission().Weather = \"Sandstorm\"")
+		ret:AddScript("Board:SetWeather(0,RAIN_ACID,Point(0,0),Point(8,8),-1)")
+		ret:AddScript("Board:SetWeather(0,RAIN_NORMAL,Point(0,0),Point(8,8),-1)")
+		ret:AddScript("Board:SetWeather(0,RAIN_SNOW,Point(0,0),Point(8,8),-1)")
+	end
+	return ret
+end

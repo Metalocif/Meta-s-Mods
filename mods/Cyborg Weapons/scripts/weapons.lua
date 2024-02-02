@@ -1029,8 +1029,10 @@ function CyborgWeapons_StickyWeb:GetSkillEffect(p1, p2)
 			if Board:GetTerrain(targets[k]) == TERRAIN_WATER and Board:GetPawn(targets[k]):IsFlying() and not Board:GetPawn(targets[k]):IsMassive() then damage.sAnimation = "" end
 			if Board:GetTerrain(targets[k]) == TERRAIN_HOLE and Board:GetPawn(targets[k]):IsFlying() then damage.sAnimation = "" end
 		elseif self.LeaveItem then
-			if Board:GetTerrain(targets[k]) == TERRAIN_ROAD then damage.sItem = "CyborgWeapons_WebItem" end
-			damage.sAnimation = ""
+			if Board:GetTerrain(targets[k]) == TERRAIN_ROAD then 
+				damage.sItem = "CyborgWeapons_WebItem" 
+				damage.sAnimation = ""
+			end
 		end
 		ret:AddArtillery(damage, self.MyArtillery, NO_DELAY)
 	end

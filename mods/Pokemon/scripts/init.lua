@@ -120,81 +120,87 @@ function mod:load( options, version)
 		"Nature's Guardians", "Protectors of nature, these Pokemon will heal the planet.", 
 		self.resourcePath .. "img/nature_icon.png")
 	end
+	modApi:addSquad(
+	{"Earth's Champions","Poke_Larvitar", "Poke_Beldum", "Poke_Gible", id = "Poke_EarthChampions"}, 
+	"Earth's Champions", "Some of the greatest Pokemon trainers, banded together to stop the Vek threat.", 
+	self.resourcePath .. "img/nature_icon.png")
 		
 	modApi:addMissionEndHook(function()		--revive dead pawns, do evolution stuff
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
         for id = 0, 2 do
             local pawn = Game:GetPawn(id)
-			local pilotLevel = GameData.current["pilot"..id].level
-			if pawn:IsDead() then												--don't evolve if you were dead
-				Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -1))
-            elseif pilotLevel > 0 then											--check whether we should consider evolving
-				if _G[pawn:GetType()].HasEvolutions and 							--check it's a Pokemon that should evolve
-			       _G[pawn:GetType()].HasEvolutions[pilotLevel] and 				--check whether it evolves at this level, it's {true, true} for Abra/Dratini
-			       GAME.Poke_Evolutions[id+1] < pilotLevel then						--hasn't evolved already
-					LOG(pawn:GetType().." is evolving!")
-					Game:TriggerSound("/ui/map/flyin_rewards")
-					if _G[pawn:GetType()].EvoNames then
-						Board:AddAlert(pawn:GetSpace(), _G[pawn:GetType()].EvoNames[pilotLevel].." is evolving into ".._G[pawn:GetType()].EvoNames[pilotLevel+1].."!")
-						pawn:SetCustomAnim("evolutionAnim")								--not working, very annoyed
-						local delayDamage = SpaceDamage(Point(0, 0))					--also not working
-						delayDamage.fDelay = 2
-						Board:DamageSpace(delayDamage)
-					end
-					local doneChecking = false
-					repeat
-					doneChecking = not doneChecking
-					pawn = Game:GetPawn(id)
-					for i = 1, pawn:GetWeaponCount() do								--remove weapon
-						if pawn:GetWeaponCount() < i then break end
-						local weapon = pawn:GetWeaponBaseType(i)
-						if weapon and weapon == _G[pawn:GetType()].EvoForget[pilotLevel] then 
-							pawn:RemoveWeapon(i) 
-							i=i+1
-							LOG("Forgot "..weapon..".") 
-							doneChecking = false
-						elseif weapon then
-							--figure out whether this mech is supposed to have that weapon at all, as otherwise we can't add new weapons
-							local isOwnWeapon = false
-							for j = 1, #_G[pawn:GetType()].SkillList do
-								if weapon == _G[pawn:GetType()].SkillList[j] then isOwnWeapon = true end
-								--if it's natively on the pawn...
-							end
-							for j = 1, #_G[pawn:GetType()].EvoLearn do
-								for k = 1, #_G[pawn:GetType()].EvoLearn[j] do
-									if weapon == _G[pawn:GetType()].EvoLearn[j][k] then isOwnWeapon = true end
-									--...or it's learnt on level-up, don't remove it
+			if pawn then
+				local pilotLevel = GameData.current["pilot"..id].level
+				if pawn:IsDead() then												--don't evolve if you were dead
+					Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -1))
+				elseif pilotLevel > 0 then											--check whether we should consider evolving
+					if _G[pawn:GetType()].HasEvolutions and 							--check it's a Pokemon that should evolve
+					   _G[pawn:GetType()].HasEvolutions[pilotLevel] and 				--check whether it evolves at this level, it's {true, true} for Abra/Dratini
+					   GAME.Poke_Evolutions[id+1] < pilotLevel then						--hasn't evolved already
+						LOG(pawn:GetType().." is evolving!")
+						Game:TriggerSound("/ui/map/flyin_rewards")
+						if _G[pawn:GetType()].EvoNames then
+							Board:AddAlert(pawn:GetSpace(), _G[pawn:GetType()].EvoNames[pilotLevel].." is evolving into ".._G[pawn:GetType()].EvoNames[pilotLevel+1].."!")
+							pawn:SetCustomAnim("evolutionAnim")								--not working, very annoyed
+							local delayDamage = SpaceDamage(Point(0, 0))					--also not working
+							delayDamage.fDelay = 2
+							Board:DamageSpace(delayDamage)
+						end
+						local doneChecking = false
+						repeat
+						doneChecking = not doneChecking
+						pawn = Game:GetPawn(id)
+						for i = 1, pawn:GetWeaponCount() do								--remove weapon
+							if pawn:GetWeaponCount() < i then break end
+							local weapon = pawn:GetWeaponBaseType(i)
+							if weapon and weapon == _G[pawn:GetType()].EvoForget[pilotLevel] then 
+								pawn:RemoveWeapon(i) 
+								i=i+1
+								LOG("Forgot "..weapon..".") 
+								doneChecking = false
+							elseif weapon then
+								--figure out whether this mech is supposed to have that weapon at all, as otherwise we can't add new weapons
+								local isOwnWeapon = false
+								for j = 1, #_G[pawn:GetType()].SkillList do
+									if weapon == _G[pawn:GetType()].SkillList[j] then isOwnWeapon = true end
+									--if it's natively on the pawn...
+								end
+								for j = 1, #_G[pawn:GetType()].EvoLearn do
+									for k = 1, #_G[pawn:GetType()].EvoLearn[j] do
+										if weapon == _G[pawn:GetType()].EvoLearn[j][k] then isOwnWeapon = true end
+										--...or it's learnt on level-up, don't remove it
+									end
+								end
+								if not isOwnWeapon then
+									pawn:RemoveWeapon(i)
+									i=i+1
+									Game:AddWeapon(weapon)
+									LOG("Moved "..weapon..", a non-Pokemon weapon, back to inventory.")
+									doneChecking = false
 								end
 							end
-							if not isOwnWeapon then
-								pawn:RemoveWeapon(i)
-								i=i+1
-								Game:AddWeapon(weapon)
-								LOG("Moved "..weapon..", a non-Pokemon weapon, back to inventory.")
-								doneChecking = false
-							end
 						end
+						until doneChecking
+						for i = 1, #_G[pawn:GetType()].EvoLearn[pilotLevel] do						
+						--add all weapons learnt on evolution
+							local weapon = _G[pawn:GetType()].EvoLearn[pilotLevel][i]
+							pawn:AddWeapon(weapon)
+							LOG(pawn:GetType().." learnt the move "..weapon.."!")
+						end		
+						
+						Game:TriggerSound("/ui/map/flyin_rewards")
+						Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 150))
+						if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[pilotLevel] ~= "" then --update graphics
+							pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[pilotLevel])
+						end 
 					end
-					until doneChecking
-					for i = 1, #_G[pawn:GetType()].EvoLearn[pilotLevel] do						
-					--add all weapons learnt on evolution
-						local weapon = _G[pawn:GetType()].EvoLearn[pilotLevel][i]
-						pawn:AddWeapon(weapon)
-						LOG(pawn:GetType().." learnt the move "..weapon.."!")
-					end		
-					
-					Game:TriggerSound("/ui/map/flyin_rewards")
-					Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 150))
-					if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[pilotLevel] ~= "" then --update graphics
-						pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[pilotLevel])
-					end 
+					GAME.Poke_Evolutions[id+1] = pilotLevel			
+					--remember it evolved so we don't do it again
+					--we set this separately from evolution so that evoless Pokemon can get stuff with levels anyway
 				end
-				GAME.Poke_Evolutions[id+1] = pilotLevel			
-				--remember it evolved so we don't do it again
-				--we set this separately from evolution so that evoless Pokemon can get stuff with levels anyway
-            end
-			pawn:SetPowered(true)	--wake up sleeping pawns, since apparently that carries over into the next mission?
-			if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -7)) end
+				pawn:SetPowered(true)	--wake up sleeping pawns, since apparently that carries over into the next mission?
+				if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -7)) end
+			end
 		end
     end)
 	modApi:addMissionStartHook(function()	--need to reassign graphics at mission start since the game forgets otherwise
@@ -223,6 +229,7 @@ function mod:load( options, version)
 				local evo = GAME.Poke_Evolutions[id + 1]
 				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[evo]) end
 				if _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel <= evo then pawn:SetFlying(true) end
+				if _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel <= evo then pawn:SetFlying(false) end
 				-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
 				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
@@ -242,6 +249,7 @@ function mod:load( options, version)
 				local evo = GAME.Poke_Evolutions[id + 1]
 				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[evo]) end
 				if _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel <= evo then pawn:SetFlying(true) end
+				if _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel <= evo then pawn:SetFlying(false) end
 				-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
 				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
@@ -262,6 +270,18 @@ function mod:load( options, version)
 					pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -7))
 				else
 					CustomAnim:rem(id, "sleepAnim")
+				end
+			end
+		end
+	end)
+	modApi:addPreEnvironmentHook(function(mission)	--handle weathers in here	
+		LOG(mission.Weather)
+		if mission.Weather == "Sandstorm" then
+			for i = 0, 7 do
+				for j = 0, 7 do
+					local pawn = Board:GetPawn(Point(i,j))
+					if pawn and pawn:GetTeam() ~= TEAM_PLAYER and pawn:GetTeam() ~= TEAM_NONE then Board:DamageSpace(SpaceDamage(Point(i,j), 1)) end
+					--don't damage things from TEAM_NONE because 1. they are rocks and rocks are immune to sandstorm 2. autokilling volatile rocks sounds """fun"""
 				end
 			end
 		end

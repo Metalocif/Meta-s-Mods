@@ -14,8 +14,8 @@
 -- EvoLearn: lists the weapons to learn on evolution. You can learn more than one per level; if they overflow into slots 3+ they seem to get removed randomly.
 -- EvoNames: solely here for the alert messages.
 -- KeepAdding: weapons to keep adding to the pawn at the start of each mission, since they seem to get removed otherwise. You can't upgrade these.
--- HealthAtLevel: sets the pawn's base health to that value at that level.
 -- BecomeFlyingAtLevel: makes the pawn flying at that level.
+-- LoseFlyingAtLevel: makes the pawn not flying at that level.
 --   o It would make more sense for the above two to be a table of table of functions to run if we had a ton of such possibilities. 
 
 local mod = modApi:getCurrentMod()
@@ -146,7 +146,68 @@ local files = {
 	"ArmoredMewtwo_h.png",
 	"ArmoredMewtwo_ns.png",
 	
-	"MasterBall.png",
+	"Larvitar.png",
+    "Larvitar_a.png",
+    "Larvitar_w.png",
+    -- "Larvitar_broken.png",
+    "Larvitar_ns.png",
+    "Larvitar_h.png",
+	
+	"Pupitar.png",
+    "Pupitar_a.png",
+    "Pupitar_w.png",
+    -- "Pupitar_broken.png",
+    "Pupitar_ns.png",
+    "Pupitar_h.png",
+	
+	"Tyranitar.png",
+    "Tyranitar_a.png",
+    "Tyranitar_w.png",
+    -- "Tyranitar_broken.png",
+    "Tyranitar_ns.png",
+    "Tyranitar_h.png",
+	
+	"Beldum.png",
+	"Beldum_a.png",
+	"Beldum_h.png",
+	"Beldum_ns.png",
+	
+	"Metang.png",
+	"Metang_a.png",
+	"Metang_h.png",
+	"Metang_ns.png",
+	"Metang_swipe.png",
+	
+	"Metagross.png",
+    "Metagross_a.png",
+    "Metagross_w.png",
+    -- "Metagross_broken.png",
+    "Metagross_ns.png",
+    "Metagross_h.png",
+    "Metagross_hover.png",
+	
+	"Gible.png",
+    "Gible_a.png",
+    "Gible_w.png",
+    -- "Gible_broken.png",
+    "Gible_ns.png",
+    "Gible_h.png",
+	
+	"Gabite.png",
+    "Gabite_a.png",
+    "Gabite_w.png",
+    -- "Gabite_broken.png",
+    "Gabite_ns.png",
+    "Gabite_h.png",
+	
+	"Garchomp.png",
+    "Garchomp_a.png",
+    "Garchomp_w.png",
+    -- "Garchomp_broken.png",
+    "Garchomp_ns.png",
+    "Garchomp_h.png",
+	
+	"HyperBall.png", "MasterBall.png",
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/units/player/".. file, mechPath.. file)
@@ -280,6 +341,66 @@ a.Poke_ArmoredMewtwo_broken = a.MechUnit:new{Image="units/player/MasterBall.png"
 a.Poke_ArmoredMewtwo_ns = a.MechIcon:new{Image="units/player/ArmoredMewtwo_ns.png"}
 
 
+a.Poke_Larvitar =a.MechUnit:new{Image="units/player/Larvitar.png", PosX = -10, PosY = 6}
+a.Poke_Larvitara = a.MechUnit:new{Image="units/player/Larvitar_a.png",  PosX = -15, PosY = 6, NumFrames = 4 }
+a.Poke_Larvitar_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Larvitar_ns = a.MechIcon:new{Image="units/player/Larvitar_ns.png"}
+a.Poke_Larvitarw =a.MechUnit:new{Image="units/player/Larvitar_w.png", PosX = -11, PosY = 8}
+
+a.Poke_Pupitar =a.MechUnit:new{Image="units/player/Pupitar.png", PosX = -10, PosY = -4}
+a.Poke_Pupitara = a.MechUnit:new{Image="units/player/Pupitar_a.png",  PosX = -15, PosY = -4, NumFrames = 5 }
+a.Poke_Pupitar_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Pupitar_ns = a.MechIcon:new{Image="units/player/Pupitar_ns.png"}
+a.Poke_Pupitarw =a.MechUnit:new{Image="units/player/Pupitar_w.png", PosX = -15, PosY = 5}
+
+a.Poke_Tyranitar =a.MechUnit:new{Image="units/player/Tyranitar.png", PosX = -10, PosY = -4}
+a.Poke_Tyranitara = a.MechUnit:new{Image="units/player/Tyranitar_a.png",  PosX = -20, PosY = 0, NumFrames = 5, Frames = {0,1,2,3,0,1,2,3,0,1,2,3,0,4}, }
+a.Poke_Tyranitar_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Tyranitar_ns = a.MechIcon:new{Image="units/player/Tyranitar_ns.png"}
+a.Poke_Tyranitarw =a.MechUnit:new{Image="units/player/Tyranitar_w.png", PosX = -15, PosY = 10}
+
+
+a.Poke_Beldum =a.MechUnit:new{Image="units/player/Beldum.png", PosX = -10, PosY = -4}
+a.Poke_Belduma = a.MechUnit:new{Image="units/player/Beldum_a.png",  PosX = -15, PosY = -10, NumFrames = 8 }
+a.Poke_Beldum_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Beldum_ns = a.MechIcon:new{Image="units/player/Beldum_ns.png"}
+
+a.Poke_Metang =a.MechUnit:new{Image="units/player/Metang.png", PosX = -10, PosY = -4}
+a.Poke_Metanga = a.MechUnit:new{Image="units/player/Metang_a.png",  PosX = -25, PosY = -10, NumFrames = 8 }
+a.Poke_Metang_swipe = a.MechUnit:new{Image="units/player/Metang_swipe.png",  PosX = -25, PosY = -10, NumFrames = 8 }
+a.Poke_Metang_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Metang_ns = a.MechIcon:new{Image="units/player/Metang_ns.png"}
+
+a.Poke_Metagross =a.MechUnit:new{Image="units/player/Metagross.png", PosX = -10, PosY = -4}
+a.Poke_Metagrossa = a.MechUnit:new{Image="units/player/Metagross_a.png",  PosX = -22, PosY = 0, NumFrames = 6, Frames = {2,3,4,5,2,3,4,5,2,3,4,5,0,1}, }
+a.Poke_Metagross_hover = a.MechUnit:new{Image="units/player/Metagross_hover.png",  PosX = -22, PosY = 0, NumFrames = 1 }
+a.Poke_Metagross_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Metagross_ns = a.MechIcon:new{Image="units/player/Metagross_ns.png"}
+a.Poke_Metagrossw =a.MechUnit:new{Image="units/player/Metagross_w.png", PosX = -23, PosY = 9}
+
+
+a.Poke_Gible =a.MechUnit:new{Image="units/player/Gible.png", PosX = -10, PosY = -4}
+a.Poke_Giblea = a.MechUnit:new{Image="units/player/Gible_a.png",  PosX = -15, PosY = 6, NumFrames = 4 }
+a.Poke_Gible_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Gible_ns = a.MechIcon:new{Image="units/player/Gible_ns.png"}
+a.Poke_Giblew =a.MechUnit:new{Image="units/player/Gible_w.png", PosX = -12, PosY = 15}
+
+a.Poke_Gabite =a.MechUnit:new{Image="units/player/Gabite.png", PosX = -10, PosY = -4}
+a.Poke_Gabitea = a.MechUnit:new{Image="units/player/Gabite_a.png",  PosX = -15, PosY = 3, NumFrames = 4 }
+a.Poke_Gabite_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
+a.Poke_Gabite_ns = a.MechIcon:new{Image="units/player/Gabite_ns.png"}
+a.Poke_Gabitew =a.MechUnit:new{Image="units/player/Gabite_w.png", PosX = -15, PosY = 6}
+
+a.Poke_Garchomp =a.MechUnit:new{Image="units/player/Garchomp.png", PosX = -10, PosY = -4}
+a.Poke_Garchompa = a.MechUnit:new{Image="units/player/Garchomp_a.png",  PosX = -20, PosY = -4, NumFrames = 6, Frames = {0,1,2,3,0,1,2,3,0,1,2,3,4,5,4}, }
+a.Poke_Garchomp_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
+a.Poke_Garchomp_ns = a.MechIcon:new{Image="units/player/Garchomp_ns.png"}
+a.Poke_Garchompw =a.MechUnit:new{Image="units/player/Garchomp_w.png", PosX = -20, PosY = 6}
+
+
+
+
+
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Abra.png", path .."img/portraits/pilots/Pilot_Poke_Abra.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dratini.png", path .."img/portraits/pilots/Pilot_Poke_Dratini.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Mew.png", path .."img/portraits/pilots/Pilot_Poke_Mew.png")
@@ -293,6 +414,9 @@ modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Celebi.png", path .."img/por
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Shaymin.png", path .."img/portraits/pilots/Pilot_Poke_Shaymin.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Xerneas.png", path .."img/portraits/pilots/Pilot_Poke_Xerneas.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_ArmoredMewtwo.png", path .."img/portraits/pilots/Pilot_Poke_ArmoredMewtwo.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Larvitar.png", path .."img/portraits/pilots/Pilot_Poke_Larvitar.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Beldum.png", path .."img/portraits/pilots/Pilot_Poke_Beldum.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Gible.png", path .."img/portraits/pilots/Pilot_Poke_Gible.png")
 
 CreatePilot{
 	Id = "Pilot_Poke_Abra",
@@ -411,6 +535,33 @@ CreatePilot{
 	Rarity = 0,
 	Blacklist = {"Invulnerable", "Popular"},
 }
+CreatePilot{
+	Id = "Pilot_Poke_Larvitar",
+	Personality = "Vek",
+	Name = "Karen",
+	Sex = SEX_VEK,
+	Skill = "Survive_Death",
+	Rarity = 0,
+	Blacklist = {"Invulnerable", "Popular"},
+}
+CreatePilot{
+	Id = "Pilot_Poke_Gible",
+	Personality = "Vek",
+	Name = "Cynthia",
+	Sex = SEX_VEK,
+	Skill = "Survive_Death",
+	Rarity = 0,
+	Blacklist = {"Invulnerable", "Popular"},
+}
+CreatePilot{
+	Id = "Pilot_Poke_Beldum",
+	Personality = "Vek",
+	Name = "Steven",
+	Sex = SEX_VEK,
+	Skill = "Survive_Death",
+	Rarity = 0,
+	Blacklist = {"Invulnerable", "Popular"},
+}
 
 Poke_Abra= Pawn:new{
 	Name = "Sabrina",
@@ -430,7 +581,6 @@ Poke_Abra= Pawn:new{
 	EvoForget = { "Poke_Pound", "Poke_Confusion" },
 	EvoLearn = { { "Poke_Confusion", "Poke_Kinesis" }, { "Poke_Psychic" } },
 	EvoNames = { "Abra", "Kadabra", "Alakazam" },
-	HealthAtLevel = { 1, 1 },	--this is an amount added to max health
 	BecomeFlyingAtLevel = 2,
 }
 Poke_Dratini = Pawn:new{
@@ -451,7 +601,6 @@ Poke_Dratini = Pawn:new{
 	EvoLearn = { { "Poke_Twister" }, { "Poke_Fly" } },
 	EvoNames = { "Dratini", "Dragonair", "Dragonite" },
 	KeepAdding = { "", "Poke_HyperBeam" },
-	HealthAtLevel = { 1, 3 },
 	BecomeFlyingAtLevel = 2,
 }
 Poke_Mew = Pawn:new{
@@ -527,7 +676,7 @@ Poke_Mewtwo = Pawn:new{
 	Corpse = true,
 	Image = "Poke_Mewtwo",
 	SkillList = {"Poke_Confusion"},
-	SoundLocation = "/enemy/blobber_1/",
+	SoundLocation = "/enemy/jelly_1/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, true },
@@ -545,7 +694,7 @@ Poke_Darkrai = Pawn:new{
 	GhostMovement = true,
 	Image = "Poke_Darkrai",
 	SkillList = {"Poke_DarkPulse", "Poke_Hypnosis"},
-	SoundLocation = "/enemy/blobber_1/",
+	SoundLocation = "",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { false, true },
@@ -593,7 +742,7 @@ Poke_Shaymin = Pawn:new{
 	IgnoreAcid = true,
 	Image = "Poke_Shaymin",
 	SkillList = {"Poke_Bloom" },
-	SoundLocation = "/enemy/Moltresfly_1/",
+	SoundLocation = "/enemy/firefly_1/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { false, true },
@@ -649,6 +798,62 @@ Poke_ArmoredMewtwo = Pawn:new{
 	SoundLocation = "/mech/prime/punch_mech/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
+}
+Poke_Larvitar = Pawn:new{
+	Name = "Karen",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Image = "Poke_Larvitar",
+	SkillList = {"Poke_RockThrow"},
+	SoundLocation = "/enemy/digger_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_ROCK,
+	HasEvolutions = { true, true },
+	EvoGraphics = { "Poke_Pupitar", "Poke_Tyranitar" },
+	EvoForget = { "Poke_RockThrow", "Poke_RockSlide" },
+	EvoLearn = { { "Poke_RockSlide", "Poke_Sandstorm" }, { "Poke_StoneEdge" } },
+	EvoNames = { "Larvitar", "Pupitar", "Tyranitar" },
+}
+Poke_Beldum = Pawn:new{
+	Name = "Steven",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Flying = true,
+	Image = "Poke_Beldum",
+	SkillList = {"Poke_TakeDown"},
+	SoundLocation = "/enemy/digger_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_METAL,
+	HasEvolutions = { true, true },
+	EvoGraphics = { "Poke_Metang", "Poke_Metagross" },
+	EvoForget = { "Poke_TakeDown", "Poke_MetalClaw" },
+	EvoLearn = { { "Poke_MetalClaw", "Poke_ZenHeadbutt" }, { "Poke_MeteorMash" } },
+	EvoNames = { "Beldum", "Metang", "Metagross" },
+	LoseFlyingAtLevel = 2,
+}
+Poke_Gible = Pawn:new{
+	Name = "Cynthia",
+	Class = "TechnoVek",
+	Health = 2,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	Image = "Poke_Gible",
+	SkillList = {"Poke_Bite"},
+	SoundLocation = "/enemy/burrower_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, true },
+	EvoGraphics = { "Poke_Gabite", "Poke_Garchomp" },
+	EvoForget = { "Poke_Bite" },
+	EvoLearn = { { "Poke_Crunch" }, { "Poke_Earthquake" } },
+	EvoNames = { "Gible", "Gabite", "Garchomp" },
 }
 
 
