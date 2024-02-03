@@ -334,6 +334,7 @@ RMShrapnelCannon = TankDefault:new	{
 	Push = 1,
 	LaunchSound = "/weapons/modified_cannons",
 	ImpactSound = "/impact/generic/explosion",
+	ZoneTargeting = ZONE_DIR,
 	TipImage = {
 		Unit = Point(2,3),
 		Enemy = Point(2,1),
@@ -342,7 +343,6 @@ RMShrapnelCannon = TankDefault:new	{
 		Target = Point(2,1),
 		CustomPawn = "RMMechCharge1",
 	},
-	ZoneTargeting = ZONE_DIR,
 }
 			
 function RMShrapnelCannon:GetSkillEffect(p1,p2)
@@ -468,77 +468,6 @@ function RMPrimeSpear:GetSkillEffect(p1, p2)
 
 	return ret
 end	
-
-
-
--- RMRockLauncher = Skill:new{
-	-- Name = "Rock Launcher",
-	-- Description = "Throw a rock at a chosen target. Rock remains as an obstacle.",
-	-- Class = "Enemy",
-	-- Range = RANGE_PROJECTILE,
-	-- Icon = "weapons/prime_rockmech.png",
-	-- Rarity = 3,
-	-- Explosion = "",
-	-- PathSize = INT_MAX,
-	-- Damage = 4,
-	-- PowerCost = 0, --AE Change
-	-- Push = 0,
-	-- LaunchSound = "/weapons/boulder_throw",
-	-- ImpactSound = "/impact/dynamic/rock",
-	-- TipImage = {
-		-- Unit = Point(2,3),
-		-- Enemy = Point(2,0),
-		-- Target = Point(2,0)
-	-- }
--- }
-
--- function RMRockLauncher:GetSkillEffect(p1,p2)
-	-- local ret = SkillEffect()
-	-- local dir = GetDirection(p2 - p1)
-			
-	-- local target = p1 + DIR_VECTORS[dir]
-	-- local spawnRock = Point(-1,-1)
-	
-	-- for i = 1, 8 do
-		-- target.x == p2. and target.y == p2.y
-		-- if Board:IsBlocked(target,PATH_PROJECTILE) then
-			-- local hitdamage = SpaceDamage(target, self.Damage)
-		
-			-- if target - DIR_VECTORS[dir] ~= p1 then
-			    -- spawnRock = target - DIR_VECTORS[dir]
-				-- hitdamage.sAnimation = "ExploAir1"
-			-- else
-				-- hitdamage.sAnimation = "rock1d" 
-			-- end
-			
-			-- ret:AddQueuedProjectile(hitdamage,"effects/shot_mechrock")
-			-- break
-		-- end
-		
-		-- if target == p2 then
-			-- spawnRock = target
-			-- ret:AddQueuedProjectile(SpaceDamage(spawnRock),"effects/shot_mechrock")
-			-- break
-		-- end
-		
-		-- if not Board:IsValid(target) then
-			-- spawnRock = target - DIR_VECTORS[dir]
-			-- ret:AddQueuedProjectile(SpaceDamage(spawnRock),"effects/shot_mechrock")
-			-- break
-		-- end
-		
-		-- target = target + DIR_VECTORS[dir]
-	-- end
-	
-	-- if Board:IsValid(spawnRock) then
-		-- local damage = SpaceDamage(spawnRock)
-		-- damage.sPawn = "RockThrown"
-		-- ret:AddQueuedDamage(damage)
-		-- target = spawnRock
-	-- end
-	
-	-- return ret
--- end
 
 
 
@@ -816,26 +745,29 @@ end
 
 function RMRepairDrop:GetTargetScore(p1, p2)
 	local mission = GetCurrentMission()
+	local RM1 = Board:GetPawn(mission.Target1)
+	local RM2 = Board:GetPawn(mission.Target2)
+	local RM3 = Board:GetPawn(mission.Target3)
 	local score = 0
-	if Board:GetPawn(mission.Target1) then
-		if Board:GetPawn(mission.Target1):IsDead() then 
+	if RM1 then
+		if RM1:IsDead() then 
 			score = score + 10 
-		elseif Board:GetPawn(mission.Target1):IsDamaged() then 
-			score = score + Board:GetPawn(mission.Target1):GetMaxHealth() - Board:GetPawn(mission.Target1):GetHealth()
+		elseif RM1:IsDamaged() then 
+			score = score + RM1:GetMaxHealth() - RM1:GetHealth()
 		end
 	end
-	if Board:GetPawn(mission.Target2) then
-		if Board:GetPawn(mission.Target2):IsDead() then 
+	if RM2 then
+		if RM2:IsDead() then 
 			score = score + 10 
-		elseif Board:GetPawn(mission.Target2):IsDamaged() then 
-			score = score + Board:GetPawn(mission.Target2):GetMaxHealth() - Board:GetPawn(mission.Target2):GetHealth()
+		elseif RM2:IsDamaged() then 
+			score = score + RM2:GetMaxHealth() - RM2:GetHealth()
 		end
 	end
-	if Board:GetPawn(mission.Target3) then
-		if Board:GetPawn(mission.Target3):IsDead() then 
+	if RM3 then
+		if RM3:IsDead() then 
 			score = score + 10 
-		elseif Board:GetPawn(mission.Target3):IsDamaged() then 
-			score = score + Board:GetPawn(mission.Target3):GetMaxHealth() - Board:GetPawn(mission.Target3):GetHealth()
+		elseif RM3:IsDamaged() then 
+			score = score + RM3:GetMaxHealth() - RM3:GetHealth()
 		end
 	end
 	return score
@@ -930,6 +862,7 @@ RMEMRailgun = TankDefault:new{
 	UpgradeCost = {1,1},
 	TipImage = {
 		Unit = Point(2,4),
+		Building = Point(2,3),
 		Enemy1= Point(2,2),
 		Enemy2 = Point(2,1),
 		Target = Point(2,1),
@@ -1066,9 +999,6 @@ RMHeavyArtillery = ArtilleryDefault:new{
 	BounceAmount = 2,
 	PowerCost = 0, --AE Change
 	Limited = 1,
-	Upgrades = 2,
-	UpgradeCost = {1,2},
-	--UpgradeList = { "+1 Use", "+1 Damage" },
 	LaunchSound = "/weapons/wide_shot",
 	ImpactSound = "/impact/generic/explosion",
 	TipImage = {
@@ -1260,15 +1190,11 @@ function RMAstraBombs:GetSkillEffect(p1, p2)
 		damage.sAnimation = self.AttackAnimation
 		damage.sSound = self.BombSound
 		
-		if k ~= 1 then
-			ret:AddDelay(self.AnimDelay) --was 0.2
-		end
+		if k ~= 1 then ret:AddDelay(self.AnimDelay) end
 		
 		ret:AddDamage(damage)
 		
 		ret:AddBounce(p1 + DIR_VECTORS[dir]*k,3)
-		
-	--	ret:AddSound(self.BombLaunchSound)
 	end
 	
 	return ret
@@ -1343,8 +1269,6 @@ RMMechMinerAtk2 = RMMechMinerAtk1:new{
 		Target = Point(2,1),
 		Enemy = Point(2,0),
 		Enemy2 = Point(3,1),
-		Second_Origin = Point(2,1),
-		Second_Target = Point(2,1),
 		CustomPawn = "RMMechMiner1",
 	},
 }
@@ -1531,7 +1455,6 @@ RMWindTorrent = Skill:new {
 		Unit = Point(2,4),
 		Enemy = Point(2,1),
 		Target = Point(2,2),
-		CustomPawn = "RMMechDStrike1",
 		CustomPawn = "RMMechElec1",
 	}
 }
