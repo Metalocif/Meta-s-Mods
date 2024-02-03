@@ -623,6 +623,8 @@ RMIceGenerator = Skill:new{
 	ImpactSound = "/impact/generic/explosion",
 	ZoneTargeting = ZONE_DIR,
 	ScoreBuilding = -10,
+	ScoreFriendly = 5,
+	ScoreEnemy = 5,
 	TipImage = {
 		Unit = Point(2,2),
 		Enemy = Point(1,2),
@@ -653,11 +655,12 @@ function RMIceGenerator:GetTargetScore(p1,p2)
 	local targets = extract_table(general_DiamondTarget(p1, 3))
 	local score = self.ScoreFriendly	--self-freeze is good
 	for k = 1, #targets do
+		local pawn = Board:GetPawn(targets[k])
 		if Board:IsBuilding(targets[k]) then 
 			score = score + self.ScoreBuilding
-		elseif Board:GetPawn(targets[k]) and Board:GetPawn(targets[k]):GetTeam() == TEAM_ENEMY and not Board:GetPawn(targets[k]):IsQueued() then 
+		elseif pawn and pawn:GetTeam() == TEAM_ENEMY and not pawn:IsQueued() and not pawn:IsDead() then 
 			score = score - self.ScoreFriendly	--we want them to act first, then get frozen
-		elseif Board:GetPawn(targets[k]) and Board:GetPawn(targets[k]):GetTeam() == TEAM_PLAYER then
+		elseif pawn and pawn:GetTeam() == TEAM_PLAYER and not pawn:IsDead() then
 			score = score + self.ScoreEnemy
 		end
 	end

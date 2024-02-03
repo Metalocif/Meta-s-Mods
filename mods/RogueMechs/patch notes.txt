@@ -1,3 +1,8 @@
+v1.2
+- Bug fixes.
+  - Ice Generator should correctly calculate score now.
+- All Rogue Mechs have desaturated palettes compared to vanilla versions, made by Generic.
+
 v1.1
 - Bug fixes.
   - Rogue Mechs are no longer affected by psions.
