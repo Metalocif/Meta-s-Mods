@@ -191,6 +191,7 @@ EVA_Unit_00 = Pawn:new {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	Massive = true,
+	CanBerserk = true,
 }
 AddPawnName("EVA_Unit_00")
 EVA_Unit_01 = Pawn:new {
@@ -205,6 +206,7 @@ EVA_Unit_01 = Pawn:new {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	Massive = true,
+	CanBerserk = true,
 }
 AddPawnName("EVA_Unit_01")
 EVA_Unit_02 = Pawn:new {
@@ -219,6 +221,7 @@ EVA_Unit_02 = Pawn:new {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	Massive = true,
+	CanBerserk = true,
 }
 AddPawnName("EVA_Unit_02")
 
@@ -228,7 +231,7 @@ local function EVENT_onModsLoaded()
 		if mission and not mission.deadEvaList then mission.deadEvaList = {} end
 		for i = 0, 2 do
 			local Eva = Board:GetPawn(i)
-			if (Eva and Eva:IsDead()) or mission.deadEvaList[i] then
+			if (Eva and Eva:IsDead() and _G[Eva:GetType()].CanBerserk) or mission.deadEvaList[i] then
 				mission.deadEvaList[i] = true
 				--if Eva:IsDead() then Eva:SetHealth(10) end
 				--we no longer do that because we just animate a corpse now, Djinn's brilliant idea
