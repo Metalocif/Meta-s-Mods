@@ -64,6 +64,19 @@ function IsDamaging(id)
 	return false
 end
 
+function IsSelfDamaging(id)
+	local p1 = Point(4,4)
+	local targetArea = _G[id]:GetTargetArea(p1)
+	for _, p2 in ipairs(extract_table(targetArea)) do
+		fx = _G[id]:GetSkillEffect(p1,p2)
+		for i = 1, fx.effect:size() do
+			local curr_space_damage = fx.effect:index(i)
+			if curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_ZERO and p1 == p2 then return true end
+		end
+	end
+	return false
+end
+
 function IsPushing(id)
 	local p1 = Point(4,4)
 	local targetArea = _G[id]:GetTargetArea(p1)
@@ -161,7 +174,8 @@ function CanRecoil(id)
 end
 
 function CanReckless(id)
-	return IsDamaging(id) and _G[id].SelfDamage == 0
+	return IsDamaging(id) and _G[id].SelfDamage == 0 and _G[id].Damage < DAMAGE_DEATH and not IsSelfDamaging(id)
+	--Self-Destruct is coded as not having self-damage
 end
 
 function CanDoubled(id)
