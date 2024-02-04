@@ -118,6 +118,7 @@ modApi:appendAsset("img/effects/shot_bloodyStream_U.png", path .."img/effects/sh
 modApi:appendAsset("img/effects/DNA_anim.png", path .."img/effects/DNA_anim.png")
 modApi:appendAsset("img/effects/Goo_emerge.png", path .."img/effects/Goo_emerge.png")
 modApi:appendAsset("img/effects/spiderwebitem.png", path .."img/effects/spiderwebitem.png")
+modApi:appendAsset("img/effects/shotup_vekegg.png", path .."img/effects/shotup_vekegg.png")
 
 for i = 0, 7 do
 	modApi:appendAsset("img/effects/bonespear/bonespear"..i.."_R.png", path .."img/effects/bonespear/bonespear"..i.."_R.png")
@@ -2074,7 +2075,7 @@ CyborgWeapons_Reproduce = Skill:new{
 	Description = "Throw an egg at a location, pushing adjacent tiles. At the end of the enemy turn, the egg hatches into a newborn clone of the user. If it dies before hatching, it enrages allied mechs instead.",
 	Rarity = 3,
 	ImpactSound = "/enemy/scorpion_soldier_1/attack",
-	Damage = 2,
+	Damage = 1,
 	Range = 1, -- Tooltip?
 	PathSize = 1,
 	PushBack = false,
@@ -2085,7 +2086,7 @@ CyborgWeapons_Reproduce = Skill:new{
 	Limited = 1,
 	Push = 0, --Mostly for tooltip, but you could turn it off for some unknown reason
 	PowerCost = 0,	--for testing, should cost 1
-	HealthUp = false,
+	Health = 1,
 	Upgrades = 2,
 	UpgradeList = { "Unlimited uses", "Health Up"  },
 	UpgradeCost = { 2, 2 },
@@ -2104,11 +2105,11 @@ CyborgWeapons_Reproduce_A = CyborgWeapons_Reproduce:new{
 }
 CyborgWeapons_Reproduce_B = CyborgWeapons_Reproduce:new{
 	UpgradeDescription = "The egg has 3 HP; the clone has as much HP as the base version of its user.",
-	HealthUp = true,
+	Health = 3,
 }
 CyborgWeapons_Reproduce_AB = CyborgWeapons_Reproduce:new{
 	Limited = 0,
-	HealthUp = true,
+	Health = 3,
 }
 
 BoostingEgg = 
@@ -2146,24 +2147,30 @@ end
 function BoostingEggHatch:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()	
 	local selfId = Board:GetPawn(p1):GetId()
+	-- ret:AddScript(string.format([[
+	-- local spawn
+	-- local parentId
+	-- for i = 0, 2 do
+		-- if Board:GetPawn(i):GetWeaponBaseType(1) == "CyborgWeapons_Reproduce" or Board:GetPawn(i):GetWeaponBaseType(2) == "CyborgWeapons_Reproduce" then
+			-- spawn = Board:GetPawn(i):GetType()
+			-- parentId = Board:GetPawn(i):GetId()
+			-- LOG(spawn)
+			-- break
+		-- end
+	-- end
+	-- local unit = PAWN_FACTORY:CreatePawn(spawn)
+	-- unit:SetMech(false)
+	-- unit:SetOwner(parentId)
+	-- Board:AddPawn(unit,%s)]], p1:GetString()))
 	ret:AddScript(string.format([[
-	local spawn
-	local parentId
-	for i = 0, 2 do
-		if Board:GetPawn(i):GetWeaponBaseType(1) == "CyborgWeapons_Reproduce" or Board:GetPawn(i):GetWeaponBaseType(2) == "CyborgWeapons_Reproduce" then
-			spawn = Board:GetPawn(i):GetType()
-			parentId = Board:GetPawn(i):GetId()
-			LOG(spawn)
-			break
-		end
-	end
-	local unit = PAWN_FACTORY:CreatePawn(spawn)
+	local parentId = GetCurrentMission().ReproduceUser
+	local unit = PAWN_FACTORY:CreatePawn(Board:GetPawn(parentId):GetType())
 	unit:SetMech(false)
 	unit:SetOwner(parentId)
 	Board:AddPawn(unit,%s)]], p1:GetString()))
 	--if we kill it, it triggers the boosting death effect, so we fake its death
 	ret:AddScript(string.format("Board:RemovePawn(Board:GetPawn(%s))", selfId))
-	if Board:GetPawn(p1):GetMaxHealth() == 1 then ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(1)", p1:GetString())) end
+	ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), GetCurrentMission().ReproduceUpgrade))
 	ret:AddScript(string.format("Board:GetPawn(%s):SetActive(false)", p1:GetString()))
 	ret:AddAnimation(p1, "debris1d")
 	return ret
@@ -2204,7 +2211,7 @@ function CyborgWeapons_Reproduce:GetSkillEffect(p1,p2)
 	end
 	
 	ret:AddBounce(p1, 1)
-	ret:AddArtillery(p1, damage, "advanced/units/mission/egg.png", PROJ_DELAY)
+	ret:AddArtillery(p1, damage, "effects/shotup_vekegg.png", PROJ_DELAY)
 	ret:AddBounce(p2, 3)
 	
 	local damagepush = SpaceDamage(p2 + DIR_VECTORS[(dir+1)%4], 0, (dir+1)%4)
@@ -2222,6 +2229,10 @@ function CyborgWeapons_Reproduce:GetSkillEffect(p1,p2)
 		if self.HealthUp then 
 			ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(3)", p2:GetString()))
 			ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(3)", p2:GetString()))
+		end
+		if not Board:IsTipImage() then 
+			ret:AddScript("GetCurrentMission().ReproduceUser = "..Board:GetPawn(p1):GetId()) 
+			ret:AddScript("GetCurrentMission().ReproduceUpgrade = "..self.Health)
 		end
 	end
 	return ret
