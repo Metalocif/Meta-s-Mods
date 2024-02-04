@@ -42,7 +42,7 @@ a.Meta_splittinggoo2a = a.Meta_splittinggoo:new{ Image = imagepath..name.."2.png
 
 Meta_splittinggooAtk1 = Skill:new{
 	Name = "Splitting Leap",
-	Description = "Leaps to a target location, splitting into as many blobs as this unit had HP left.",
+	Description = "Leaps to a target location, splitting into as many blobs as this unit had HP left. On the last turn, spawns a single blob.",
 	Class = "Enemy",
 	SoundBase = "/enemy/blobber_1",
 	Icon = "weapons/enemy_blobber1.png",
