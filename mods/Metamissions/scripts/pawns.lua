@@ -375,9 +375,16 @@ Meta_StakeBuff = SelfTarget:new{
 }
 function Meta_StakeBuff:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	ret:AddScript(string.format("Board:Ping(%s, COLOR_WHITE)", p1:GetString()))
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "stakeunitrevup"))
 	ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(4)", p1:GetString()))
-	ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
+	if Board:IsTipImage() then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)", p1:GetString()))
+		ret:AddDelay(2)
+	else
+		ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
+	end
+	
 	return ret
 end
 
