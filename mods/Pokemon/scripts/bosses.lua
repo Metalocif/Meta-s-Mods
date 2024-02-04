@@ -261,6 +261,7 @@ Poke_ArticunoBoss = {
 	DefaultTeam = TEAM_ENEMY,
 	IsPortrait = false,
 	Tier = TIER_BOSS,
+	Flying = true,
 	IsDeathEffect = true,
 }
 AddPawn("Poke_ArticunoBoss") 
@@ -429,6 +430,7 @@ Poke_ZapdosBoss = {
 	ImpactMaterial = IMPACT_FLESH,
 	DefaultTeam = TEAM_ENEMY,
 	IsPortrait = false,
+	Flying = true,
 	Tier = TIER_BOSS,
 	IsDeathEffect = true,
 }
@@ -599,6 +601,7 @@ Poke_MoltresBoss = {
 	DefaultTeam = TEAM_ENEMY,
 	IsPortrait = false,
 	Tier = TIER_BOSS,
+	Flying = true,
 	IsDeathEffect = true,
 	IgnoreFire = true,
 }
