@@ -55,7 +55,8 @@ local names = {
 local oldGetSkillInfo = GetSkillInfo
 function GetSkillInfo(skill)
 	if IsEva then
-		if skill == "Survive_Death"    then
+		IsEva = nil
+		if skill == "Survive_Death" then
 			return PilotSkill("Evangelion Pilot", "Normal Pilots cannot be equipped. Loses 25 XP when the unit is disabled.")
 		end
 	end
