@@ -35,8 +35,8 @@ function mod:load( options, version)
 	modApi:addSquad(
 		{
 			"Evangelions",-- title
-			"EVA_Unit_00",-- mech #2
-			"EVA_Unit_01",-- mech #1
+			"EVA_Unit_01",-- mech #2
+			"EVA_Unit_00",-- mech #1
 			"EVA_Unit_02",-- mech #3
 			id="Metalocif_Evangelion_Squad"
 		},
