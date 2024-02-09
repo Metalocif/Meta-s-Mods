@@ -25,59 +25,39 @@ local files = {
     "Abra.png",
     "Abra_a.png",
     "Abra_w.png",
-    -- "Abra_w_broken.png",
-    "Abra_broken.png",
     "Abra_ns.png",
     "Abra_h.png",
 	
 	"Kadabra.png",
     "Kadabra_a.png",
     "Kadabra_w.png",
-    -- "Kadabra_w_broken.png",
-    "Kadabra_broken.png",
     "Kadabra_ns.png",
-    "Kadabra_h.png",
 	
 	"Alakazam.png",
     "Alakazam_a.png",
-    "Alakazam_broken.png",
     "Alakazam_ns.png",
-    "Alakazam_h.png",
 	"MegaAlakazam.png",
     "MegaAlakazam_a.png",
     "MegaAlakazam_ns.png",
-    "MegaAlakazam_h.png",
 	
 	"Dratini.png",
     "Dratini_a.png",
     "Dratini_w.png",
-    -- "Dratini_w_broken.png",
-    "Dratini_broken.png",
     "Dratini_ns.png",
     "Dratini_h.png",
 	
 	"Dragonair.png",
     "Dragonair_a.png",
     "Dragonair_w.png",
-    -- "Dragonair_w_broken.png",
-    "Dragonair_broken.png",
     "Dragonair_ns.png",
-    "Dragonair_h.png",
 	
 	"Dragonite.png",
     "Dragonite_a.png",
-    -- "Dragonite_w.png",
-    -- "Dragonite_w_broken.png",
-    "Dragonite_broken.png",
     "Dragonite_ns.png",
-    "Dragonite_h.png",
 	"Dragonite_sleep.png",	--only here for Hyper Beam & because it's cute
     
     "Mew.png",
     "Mew_a.png",
-    -- "Mew_w.png",
-    -- "Mew_w_broken.png",
-    "Mew_broken.png",
     "Mew_ns.png",
     "Mew_h.png",
 	
@@ -100,9 +80,11 @@ local files = {
 	"Mewtwo_a.png",
 	"Mewtwo_h.png",
 	"Mewtwo_ns.png",
+	"MegaMewtwoX.png",
+	"MegaMewtwoX_a.png",
+	"MegaMewtwoX_ns.png",
 	"MegaMewtwoY.png",
 	"MegaMewtwoY_a.png",
-	"MegaMewtwoY_h.png",
 	"MegaMewtwoY_ns.png",
 	
 	"Darkrai.png",
@@ -155,23 +137,18 @@ local files = {
 	"Larvitar.png",
     "Larvitar_a.png",
     "Larvitar_w.png",
-    -- "Larvitar_broken.png",
     "Larvitar_ns.png",
     "Larvitar_h.png",
 	
 	"Pupitar.png",
     "Pupitar_a.png",
     "Pupitar_w.png",
-    -- "Pupitar_broken.png",
     "Pupitar_ns.png",
-    "Pupitar_h.png",
 	
 	"Tyranitar.png",
     "Tyranitar_a.png",
     "Tyranitar_w.png",
-    -- "Tyranitar_broken.png",
     "Tyranitar_ns.png",
-    "Tyranitar_h.png",
 	
 	"Beldum.png",
 	"Beldum_a.png",
@@ -180,38 +157,30 @@ local files = {
 	
 	"Metang.png",
 	"Metang_a.png",
-	"Metang_h.png",
 	"Metang_ns.png",
 	"Metang_swipe.png",
 	
 	"Metagross.png",
     "Metagross_a.png",
     "Metagross_w.png",
-    -- "Metagross_broken.png",
     "Metagross_ns.png",
-    "Metagross_h.png",
     "Metagross_hover.png",
 	
 	"Gible.png",
     "Gible_a.png",
     "Gible_w.png",
-    -- "Gible_broken.png",
     "Gible_ns.png",
     "Gible_h.png",
 	
 	"Gabite.png",
     "Gabite_a.png",
     "Gabite_w.png",
-    -- "Gabite_broken.png",
     "Gabite_ns.png",
-    "Gabite_h.png",
 	
 	"Garchomp.png",
     "Garchomp_a.png",
     "Garchomp_w.png",
-    -- "Garchomp_broken.png",
     "Garchomp_ns.png",
-    "Garchomp_h.png",
 	"MegaGarchomp.png",
     "MegaGarchomp_a.png",
     "MegaGarchomp_w.png",
@@ -221,16 +190,13 @@ local files = {
 	"Eevee.png",
     "Eevee_a.png",
     "Eevee_w.png",
-    -- "Eevee_broken.png",
     "Eevee_ns.png",
     "Eevee_h.png",
 	
 	"Jolteon.png",
     "Jolteon_a.png",
     "Jolteon_w.png",
-    -- "Jolteon_broken.png",
     "Jolteon_ns.png",
-    "Jolteon_h.png",
     "Jolteon_charge_0.png",
     "Jolteon_charge_1.png",
     "Jolteon_charge_2.png",
@@ -239,110 +205,81 @@ local files = {
 	"Vaporeon.png",
     "Vaporeon_a.png",
     "Vaporeon_w.png",
-    -- "Vaporeon_broken.png",
     "Vaporeon_ns.png",
-    "Vaporeon_h.png",
     "Vaporeon_bubble.png",
 	
 	"Flareon.png",
     "Flareon_a.png",
     "Flareon_w.png",
-    -- "Flareon_broken.png",
     "Flareon_ns.png",
-    "Flareon_h.png",
 	
 	"Espeon.png",
     "Espeon_a.png",
     "Espeon_w.png",
-    -- "Espeon_broken.png",
     "Espeon_ns.png",
-    "Espeon_h.png",
 	
 	"Umbreon.png",
     "Umbreon_a.png",
     "Umbreon_w.png",
-    -- "Umbreon_broken.png",
     "Umbreon_ns.png",
-    "Umbreon_h.png",
 	
 	"Leafeon.png",
     "Leafeon_a.png",
     "Leafeon_w.png",
-    -- "Leafeon_broken.png",
     "Leafeon_ns.png",
-    "Leafeon_h.png",
 	
 	"Glaceon.png",
     "Glaceon_a.png",
     "Glaceon_w.png",
-    -- "Glaceon_broken.png",
     "Glaceon_ns.png",
-    "Glaceon_h.png",
 	
 	"Sylveon.png",
     "Sylveon_a.png",
     "Sylveon_w.png",
-    -- "Sylveon_broken.png",
     "Sylveon_ns.png",
-    "Sylveon_h.png",
 	
 	"Ralts.png",
     "Ralts_a.png",
     "Ralts_w.png",
-    -- "Ralts_broken.png",
     "Ralts_ns.png",
     "Ralts_h.png",
 	
 	"Kirlia.png",
     "Kirlia_a.png",
     "Kirlia_w.png",
-    -- "Kirlia_broken.png",
     "Kirlia_ns.png",
-    "Kirlia_h.png",
 	
 	"Gardevoir.png",
     "Gardevoir_a.png",
-    -- "Gardevoir_w.png",
-    -- "Gardevoir_broken.png",
     "Gardevoir_ns.png",
-    "Gardevoir_h.png",
 	"MegaGardevoir.png",
     "MegaGardevoir_a.png",
     "MegaGardevoir_ns.png",
-    "MegaGardevoir_h.png",
 	
 	"Gallade.png",
     "Gallade_a.png",
     "Gallade_w.png",
-    -- "Gallade_broken.png",
     "Gallade_ns.png",
-    "Gallade_h.png",
 	"MegaGallade.png",
     "MegaGallade_a.png",
     "MegaGallade_w.png",
     "MegaGallade_ns.png",
-    "MegaGallade_h.png",
 
 	"Scyther.png",
     "Scyther_a.png",
     "Scyther_w.png",
-    -- "Scyther_broken.png",
     "Scyther_ns.png",
     "Scyther_h.png",
 	
 	"Scizor.png",
     "Scizor_a.png",
     "Scizor_w.png",
-    -- "Scizor_broken.png",
     "Scizor_ns.png",
-    "Scizor_h.png",
 	
 	"Kleavor.png",
     "Kleavor_a.png",
     "Kleavor_w.png",
-    -- "Kleavor_broken.png",
     "Kleavor_ns.png",
-    "Kleavor_h.png",
 	
 	"PokeBall.png", "HyperBall.png", "MasterBall.png",
 }
@@ -354,20 +291,19 @@ local a=ANIMS
 a.Poke_Abra =a.MechUnit:new{Image="units/player/Abra.png", PosX = -18, PosY = -9}
 a.Poke_Abraa = a.MechUnit:new{Image="units/player/Abra_a.png",  PosX = -13, PosY = -4, NumFrames = 4 }
 a.Poke_Abraw = a.MechUnit:new{Image="units/player/Abra_w.png", PosX = -13, PosY = 12}
-a.Poke_Abra_broken = a.MechUnit:new{Image="units/player/Abra_broken.png", PosX = -15, PosY = -2 }
--- a.Poke_Abraw_broken = a.MechUnit:new{Image="units/player/Abra_w_broken.png", PosX = -18, PosY = -2 }
+a.Poke_Abra_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Abra_ns = a.MechIcon:new{Image="units/player/Abra_ns.png"}
 
 a.Poke_Kadabra =a.MechUnit:new{Image="units/player/Kadabra.png", PosX = -18, PosY = 2}
 a.Poke_Kadabraa = a.MechUnit:new{Image="units/player/Kadabra_a.png",  PosX = -18, PosY = 2, NumFrames = 4 }
 a.Poke_Kadabraw = a.MechUnit:new{Image="units/player/Kadabra_w.png", PosX = -13, PosY = 10}
-a.Poke_Kadabra_broken = a.MechUnit:new{Image="units/player/Kadabra_broken.png", PosX = -15, PosY = -2 }
+a.Poke_Kadabra_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 -- a.Poke_Kadabraw_broken = a.MechUnit:new{Image="units/player/Kadabra_w_broken.png", PosX = -18, PosY = -2 }
 a.Poke_Kadabra_ns = a.MechIcon:new{Image="units/player/Kadabra_ns.png"}
 
 a.Poke_Alakazam =a.MechUnit:new{Image="units/player/Alakazam.png", PosX = -18, PosY = -9}
 a.Poke_Alakazama = a.MechUnit:new{Image="units/player/Alakazam_a.png",  PosX = -18, PosY = -9, NumFrames = 8 }
-a.Poke_Alakazam_broken = a.MechUnit:new{Image="units/player/Alakazam_broken.png", PosX = -15, PosY = -2 }
+a.Poke_Alakazam_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Alakazam_ns = a.MechIcon:new{Image="units/player/Alakazam_ns.png"}
 a.Poke_MegaAlakazam =a.MechUnit:new{Image="units/player/MegaAlakazam.png", PosX = -18, PosY = -9}
 a.Poke_MegaAlakazama = a.MechUnit:new{Image="units/player/MegaAlakazam_a.png",  PosX = -25, PosY = -19, NumFrames = 3, Frames = {0,1,2,1} }
@@ -426,6 +362,10 @@ a.Poke_Mewtwo =a.MechUnit:new{Image="units/player/Mewtwo.png", PosX = -20, PosY 
 a.Poke_Mewtwoa = a.MechUnit:new{Image="units/player/Mewtwo_a.png",  PosX = -25, PosY = -14, NumFrames = 6 }
 a.Poke_Mewtwo_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Mewtwo_ns = a.MechIcon:new{Image="units/player/Mewtwo_ns.png"}
+a.Poke_MegaMewtwoX =a.MechUnit:new{Image="units/player/MegaMewtwoX.png", PosX = -20, PosY = -4}
+a.Poke_MegaMewtwoXa = a.MechUnit:new{Image="units/player/MegaMewtwoX_a.png",  PosX = -25, PosY = -14, NumFrames = 6 }
+a.Poke_MegaMewtwoX_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_MegaMewtwoX_ns = a.MechIcon:new{Image="units/player/MegaMewtwoX_ns.png"}
 a.Poke_MegaMewtwoY =a.MechUnit:new{Image="units/player/MegaMewtwoY.png", PosX = -20, PosY = -4}
 a.Poke_MegaMewtwoYa = a.MechUnit:new{Image="units/player/MegaMewtwoY_a.png",  PosX = -25, PosY = -14, NumFrames = 6 }
 a.Poke_MegaMewtwoY_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
