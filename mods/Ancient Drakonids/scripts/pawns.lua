@@ -108,6 +108,7 @@ Meta_Hydra = Pawn:new{
 	SoundLocation = "/enemy/digger_2/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_INSECT,
+	IsDragon = true,	--cross-mod interaction with Pokemon
 }
 AddPawn("Meta_Hydra")
 
@@ -124,6 +125,7 @@ Meta_Wyvern = Pawn:new{
 	SoundLocation = "/enemy/dung_2/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_INSECT,
+	IsDragon = true,
 }
 AddPawn("Meta_Wyvern")
 
@@ -143,5 +145,6 @@ Meta_Drake = Pawn:new{
 	SoundLocation = "/enemy/moth_2/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_INSECT,
+	IsDragon = true,
 }
 AddPawn("Meta_Drake")
