@@ -3,6 +3,14 @@ modApi:appendAsset("img/effects/bite_0.png", path .."img/effects/bite_0.png")
 modApi:appendAsset("img/effects/bite_1.png", path .."img/effects/bite_1.png")
 modApi:appendAsset("img/effects/bite_2.png", path .."img/effects/bite_2.png")
 modApi:appendAsset("img/effects/bite_3.png", path .."img/effects/bite_3.png")
+modApi:appendAsset("img/effects/redbite_0.png", path .."img/effects/redbite_0.png")
+modApi:appendAsset("img/effects/redbite_1.png", path .."img/effects/redbite_1.png")
+modApi:appendAsset("img/effects/redbite_2.png", path .."img/effects/redbite_2.png")
+modApi:appendAsset("img/effects/redbite_3.png", path .."img/effects/redbite_3.png")
+modApi:appendAsset("img/effects/greenbite_0.png", path .."img/effects/greenbite_0.png")
+modApi:appendAsset("img/effects/greenbite_1.png", path .."img/effects/greenbite_1.png")
+modApi:appendAsset("img/effects/greenbite_2.png", path .."img/effects/greenbite_2.png")
+modApi:appendAsset("img/effects/greenbite_3.png", path .."img/effects/greenbite_3.png")
 modApi:appendAsset("img/weapons/Hydra.png", path .."img/weapons/Hydra.png")
 
 local a = ANIMS
@@ -11,6 +19,16 @@ a.bite_0 = a.explopunch1_0:new{ Image = "effects/bite_0.png", NumFrames = 5, Pos
 a.bite_1 = a.explopunch1_1:new{ Image = "effects/bite_1.png", NumFrames = 5, PosX = -14, PosY = -2,  }
 a.bite_2 = a.explopunch1_2:new{ Image = "effects/bite_2.png", NumFrames = 5, PosX = -10, PosY = -2,  }
 a.bite_3 = a.explopunch1_3:new{ Image = "effects/bite_3.png", NumFrames = 5, PosX = -7, PosY = -5 }
+
+a.redbite_0 = a.bite_0:new{ Image = "effects/redbite_0.png"}
+a.redbite_1 = a.bite_1:new{ Image = "effects/redbite_1.png"}
+a.redbite_2 = a.bite_2:new{ Image = "effects/redbite_2.png"}
+a.redbite_3 = a.bite_3:new{ Image = "effects/redbite_3.png"}
+
+a.greenbite_0 = a.bite_0:new{ Image = "effects/greenbite_0.png"}
+a.greenbite_1 = a.bite_1:new{ Image = "effects/greenbite_1.png"}
+a.greenbite_2 = a.bite_2:new{ Image = "effects/greenbite_2.png"}
+a.greenbite_3 = a.bite_3:new{ Image = "effects/greenbite_3.png"}
 
 Meta_HydraWeapon = Skill:new{  
 	Name = "Triple Strike",
@@ -72,8 +90,8 @@ function Meta_HydraWeapon:GetSkillEffect(p1, p2)
 	damage3.iPush = (dir + 2)%4 damage3.sAnimation = "ExploFirefly1"
 
 	if p1:Manhattan(p2) == 1 then
-		damage1.sAnimation = "bite_"..dir
-		damage2.sAnimation = "bite_"..dir
+		damage1.sAnimation = "greenbite_"..dir
+		damage2.sAnimation = "redbite_"..dir
 		damage3.sAnimation = "bite_"..dir
 		ret:AddDamage(damage1)
 		ret:AddDamage(damage2)
@@ -134,9 +152,19 @@ function Meta_HydraWeapon:GetFinalEffect(p1, p2, p3)
 		damage3.iFire = 1 shotup3 = "effects/shotup_ignite_fireball.png" shot3 = "effects/shot_mechtank" damage3.sAnimation = "explo_fire1"
 	end
 	if isMelee then
-		damage1.sAnimation = "bite_"..dir
-		damage2.sAnimation = "bite_"..dir
-		damage3.sAnimation = "bite_"..dir
+		if offset == 0 then
+			damage1.sAnimation = "greenbite_"..dir
+			damage2.sAnimation = "redbite_"..dir
+			damage3.sAnimation = "bite_"..dir
+		elseif offset == -1 then
+			damage1.sAnimation = "redbite_"..dir
+			damage2.sAnimation = "bite_"..dir
+			damage3.sAnimation = "greenbite_"..dir
+		elseif offset == 1 then
+			damage1.sAnimation = "bite_"..dir
+			damage2.sAnimation = "greenbite_"..dir
+			damage3.sAnimation = "redbite_"..dir
+		end
 		ret:AddDamage(damage1)
 		ret:AddDamage(damage2)
 		ret:AddDamage(damage3)
