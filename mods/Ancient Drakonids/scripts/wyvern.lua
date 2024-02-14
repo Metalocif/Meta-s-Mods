@@ -94,7 +94,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		end
 		damage.sAnimation = "bite_"..dir
 		ret:AddMelee(p1, damage)
-		local amount = math.min(damage.iDamage, 1)
+		local amount = math.max(damage.iDamage, 1)
 		if Board:GetPawn(p2) and not IsTestMechScenario() then
 			local toBoost = false
 			if Board:GetPawn(p1):IsBoosted() then 
