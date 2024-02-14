@@ -65,7 +65,6 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 				if not pawn:IsDamaged() and pawn:GetMaxHealth() == _G[pawn:GetType()].Health then pawn:SetMaxHealth(pawn:GetHealth() + 1) end
 				--if we would heal a full health Vek, increase its max health beforehand unless we already did
 			else
-				-- gunk_damage.sScript = string.format("CustomAnim:add(%s, %q)", Board:GetPawn(second_tar):GetId(), "chillAnim")
 				CustomAnim:add(pawn:GetId(), "gunk")
 				if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 				GetCurrentMission().GunkTable[pawn:GetId()] = 1
