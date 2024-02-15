@@ -62,6 +62,9 @@ function Meta_WyvernWeapon:GetSecondTargetArea(p1, p2)
 	for i = math.max(-(stomach-1), -dist + 2), (stomach-1) do
 		ret:push_back(p2 + DIR_VECTORS[dir] * i)
 	end
+	for i = -math.floor((stomach-1)/2), math.floor((stomach-1)/2) do
+		ret:push_back(p2 + DIR_VECTORS[(dir+1)%4] * i)
+	end
 	ret:push_back(p1)	--target a tile, then the wyvern, to multishoot projectiles instead
 	return ret
 end
@@ -141,7 +144,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 		damage.sImageMark = MultishotLib:getImageMark(self.MinDamage, remainingShots, p1, target)
 		ret:AddSound("/enemy/blobber_1/death")
 		ret:AddProjectile(p1, damage, self.Projectile, NO_DELAY)
-		ret:AddDelay(0.3)
+		ret:AddDelay(0.15)
 		if remainingShots > 1 then
 			remainingShots = remainingShots - 1
 			ret:AddScript(string.format([=[
@@ -154,33 +157,45 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 		end
 		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = 0") end
 		return ret
-	end
-	--do multi-artillery normally
-	local dist1 = p1:Manhattan(p2)
-	local dist2 = p1:Manhattan(p3)
-	if dist2 > dist1 then
-		for i = dist2, dist1, -1 do
-			local curr = p1 + DIR_VECTORS[dir] * i
+	elseif dir2 == (dir+1)%4 or dir2 == (dir-1)%4 then
+		local dist1 = p1:Manhattan(p2)
+		local dist2 = p2:Manhattan(p3)
+		for i = -dist2, dist2 do
+			local curr = p2 + DIR_VECTORS[dir2] * i
 			local damage = SpaceDamage(curr, self.MinDamage, dir)
 			damage.sAnimation = "ExploAcid1"
 			ret:AddSound("/enemy/blobber_1/death")
-			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
+			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.05)
 		end
-	elseif dist2 < dist1 then
-		for i = dist2, dist1, 1 do
-			local curr = p1 + DIR_VECTORS[dir] * i
-			local damage = SpaceDamage(curr, self.MinDamage, dir)
-			damage.sAnimation = "ExploAcid1"
-			ret:AddSound("/enemy/blobber_1/death")
-			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
-		end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..dist2*2 + 1) end
 	else
-		local damage = SpaceDamage(p2, self.MinDamage, dir)
-		damage.sAnimation = "ExploAcid1"
-		ret:AddSound("/enemy/blobber_1/death")
-		ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
+		--do multi-artillery normally
+		local dist1 = p1:Manhattan(p2)
+		local dist2 = p1:Manhattan(p3)
+		if dist2 > dist1 then
+			for i = dist2, dist1, -1 do
+				local curr = p1 + DIR_VECTORS[dir] * i
+				local damage = SpaceDamage(curr, self.MinDamage, dir)
+				damage.sAnimation = "ExploAcid1"
+				ret:AddSound("/enemy/blobber_1/death")
+				ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
+			end
+		elseif dist2 < dist1 then
+			for i = dist2, dist1, 1 do
+				local curr = p1 + DIR_VECTORS[dir] * i
+				local damage = SpaceDamage(curr, self.MinDamage, dir)
+				damage.sAnimation = "ExploAcid1"
+				ret:AddSound("/enemy/blobber_1/death")
+				ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
+			end
+		else
+			local damage = SpaceDamage(p2, self.MinDamage, dir)
+			damage.sAnimation = "ExploAcid1"
+			ret:AddSound("/enemy/blobber_1/death")
+			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
+		end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..dist2 + 1) end
 	end
-	if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..dist2 + 1) end
 	return ret
 end	
 
