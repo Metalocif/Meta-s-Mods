@@ -1,3 +1,11 @@
+v1.2
+- Added an extra mode to the wyvern's weapon.
+- Added new anims to the fire/acid bites of the hydra.
+- Changed hydra weapon icon.
+- New palette with yellow eyes.
+- Changed portraits so they suit the palette.
+- Minor graphical fixes.
+
 v1.1
 - Added a multishot mode to the wyvern's weapon.
   - This is both a way to easily know the amount of stomach and a reason to bite stuff.
