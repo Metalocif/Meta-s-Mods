@@ -97,6 +97,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		end
 		damage.sAnimation = "bite_"..dir
 		ret:AddMelee(p1, damage)
+		-- ret:AddSound("/enemy/scorpion_1/attack")
 		local amount = math.max(damage.iDamage, 1)
 		if Board:GetPawn(p2) and not IsTestMechScenario() then
 			local toBoost = false
@@ -199,23 +200,6 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 	return ret
 end	
 
-
-Meta_WyvernWeapon_A = Meta_WyvernWeapon:new{
-	UpgradeDescription = "Increases damage by 1.",
-	Damage = 3,
-	MinDamage = 2,
-	Self = "Meta_WyvernWeapon_A",
-}
-
-Meta_WyvernWeapon_B = Meta_WyvernWeapon:new{
-	UpgradeDescription = "Increases damage by 1.",
-	Damage = 3,
-	MinDamage = 2,
-	Self = "Meta_WyvernWeapon_B",
-}
-
-Meta_WyvernWeapon_AB = Meta_WyvernWeapon:new{
-	Damage = 4,
-	MinDamage = 3,
-	Self = "Meta_WyvernWeapon_AB",
-}
+Meta_WyvernWeapon_A = Meta_WyvernWeapon:new{UpgradeDescription = "Increases damage by 1.",Damage = 3,MinDamage = 2,Self = "Meta_WyvernWeapon_A",}
+Meta_WyvernWeapon_B = Meta_WyvernWeapon:new{UpgradeDescription = "Increases damage by 1.",Damage = 3,MinDamage = 2,Self = "Meta_WyvernWeapon_B",}
+Meta_WyvernWeapon_AB = Meta_WyvernWeapon:new{Damage = 4,MinDamage = 3,Self = "Meta_WyvernWeapon_AB",}
