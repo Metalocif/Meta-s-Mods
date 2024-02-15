@@ -18,7 +18,7 @@ local mod = {
 
 function mod:init()
 	require(self.scriptPath.."weapons")
-	
+	require(self.scriptPath .."libs/multishot")
 end
 
 function mod:load(options, version)

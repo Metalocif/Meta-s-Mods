@@ -119,6 +119,8 @@ modApi:appendAsset("img/effects/DNA_anim.png", path .."img/effects/DNA_anim.png"
 modApi:appendAsset("img/effects/Goo_emerge.png", path .."img/effects/Goo_emerge.png")
 modApi:appendAsset("img/effects/spiderwebitem.png", path .."img/effects/spiderwebitem.png")
 modApi:appendAsset("img/effects/shotup_vekegg.png", path .."img/effects/shotup_vekegg.png")
+modApi:appendAsset("img/combat/icons/noflyingicon.png", path .."img/combat/icons/noflyingicon.png")
+Location["combat/icons/noflyingicon.png"] = Point(-10, 0)
 
 for i = 0, 7 do
 	modApi:appendAsset("img/effects/bonespear/bonespear"..i.."_R.png", path .."img/effects/bonespear/bonespear"..i.."_R.png")
@@ -418,8 +420,9 @@ function CyborgWeapons_BloodyStream:GetSkillEffect(p1, p2, remainingShots)
 	if remainingShots == nil then 
 		remainingShots = Board:GetPawn(p1):GetHealth() - 1 + self.ExtraShots 
 	end
+	damage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
 	ret:AddProjectile(p1, damage, self.Projectile, NO_DELAY)
-	ret:AddDelay(0.35)
+	ret:AddDelay(0.15)
 	if Board:GetPawn(p1):GetHealth() > 1 then ret:AddSafeDamage(SpaceDamage(p1,1)) end
 	if remainingShots > 1 then
 		remainingShots = remainingShots - 1
@@ -434,19 +437,12 @@ function CyborgWeapons_BloodyStream:GetSkillEffect(p1, p2, remainingShots)
 	return ret
 end	
 
-CyborgWeapons_BloodyStream_A = CyborgWeapons_BloodyStream:new{
-	UpgradeDescription = "Adds an extra shot, independant of remaining health.",
-	ExtraShots = 1,
-}
-
-CyborgWeapons_BloodyStream_B = CyborgWeapons_BloodyStream:new{	
-	UpgradeDescription = "Adds two extra shots, independant of remaining health.",
-	ExtraShots = 2,
-}
-
-CyborgWeapons_BloodyStream_AB = CyborgWeapons_BloodyStream:new{
-	ExtraShots = 3,
-}
+CyborgWeapons_BloodyStream_A = CyborgWeapons_BloodyStream:new{UpgradeDescription = "Adds an extra shot, independant of remaining health.",ExtraShots = 1,Self = "CyborgWeapons_BloodyStream_A",}
+CyborgWeapons_BloodyStream_B = CyborgWeapons_BloodyStream:new{UpgradeDescription = "Adds two extra shots, independant of remaining health.",ExtraShots = 2,Self = "CyborgWeapons_BloodyStream_B",}
+CyborgWeapons_BloodyStream_AB = CyborgWeapons_BloodyStream:new{ExtraShots = 3,Self = "CyborgWeapons_BloodyStream_AB",}
+--you only need to change Self in upgrades if eg. the damage field changes
+--here it doesn't matter if we look at the base version of the weapon on shots past the first since we already have the number of shots, which is all that changes
+--I change Self so that other modders can copy this code with minimal issues
 
 --------------
 --Mite Swarm--
@@ -1025,10 +1021,14 @@ function CyborgWeapons_StickyWeb:GetSkillEffect(p1, p2)
 	for k = 1, #targets do 
 		damage = SpaceDamage(targets[k], 0)
 		damage.sAnimation = "Webland1"
-		if Board:GetPawn(targets[k]) then 
-			damage.sScript=string.format("Board:GetPawn(%s):SetMoveSpeed(-10) Board:GetPawn(%s):SetFlying(false)",Board:GetPawn(targets[k]):GetId(),Board:GetPawn(targets[k]):GetId()) 
-			if Board:GetTerrain(targets[k]) == TERRAIN_WATER and Board:GetPawn(targets[k]):IsFlying() and not Board:GetPawn(targets[k]):IsMassive() then damage.sAnimation = "" end
-			if Board:GetTerrain(targets[k]) == TERRAIN_HOLE and Board:GetPawn(targets[k]):IsFlying() then damage.sAnimation = "" end
+		local pawn = Board:GetPawn(targets[k])
+		if pawn then 
+			damage.sScript=string.format("Board:GetPawn(%s):SetMoveSpeed(-10) Board:GetPawn(%s):SetFlying(false)",pawn:GetId(),pawn:GetId()) 
+			if pawn:IsFlying() then
+				damage.sImageMark  = "combat/icons/noflyingicon.png"
+				if Board:GetTerrain(targets[k]) == TERRAIN_WATER and not pawn:IsMassive() then damage.sAnimation = "" end
+				if Board:GetTerrain(targets[k]) == TERRAIN_HOLE then damage.sAnimation = "" end
+			end
 		elseif self.LeaveItem then
 			if Board:GetTerrain(targets[k]) == TERRAIN_ROAD then 
 				damage.sItem = "CyborgWeapons_WebItem" 
@@ -1043,6 +1043,7 @@ end
 merge_table(TILE_TOOLTIPS, { CyborgWeapons_Web_Text = {"Spider Web", "Prevents units that move onto it from moving and flying."} } )
 
 local webdamage = SpaceDamage(0)
+webdamage.sImageMark  = "combat/icons/noflyingicon.png"
 CyborgWeapons_WebItem = { Image = "effects/spiderwebitem.png", Damage = webdamage, Tooltip = "CyborgWeapons_Web_Text", Icon = "effects/spiderwebitem.png", UsedImage = ""}
 Location["effects/spiderwebitem.png"] = Point(-20,0)
 
@@ -1455,134 +1456,37 @@ function CyborgWeapons_WeakPheromones:GetSkillEffect(p1, p2)
 	return ret
 end
 
-local function EVENT_onModsLoaded()
-	modApi:addPreEnvironmentHook(function(mission)
-		if mission.frightenedTiles then
-			for k = 1, #mission.frightenedTiles do
-				Board:Ping(mission.frightenedTiles[k], COLOR_BLACK)
-				Board:SetDangerous(mission.frightenedTiles[k])	--pretty sure it's not working
-				local pawn = Board:GetPawn(mission.frightenedTiles[k])
-				local wasJustDeleveled = false
-				for _, value in ipairs(mission.deleveledVeks) do
-					if pawn and value == pawn:GetId() then wasJustDeleveled = true end
-				end
-				if pawn and pawn:IsEnemy() and pawn:GetWeaponCount() > 0 and not wasJustDeleveled then
-					local weaponName = pawn:GetWeaponType(1)
-					local weaponID = 1
-					if weaponName:sub(-1, -1) == "2" and _G[weaponName:sub(1, -2).."1"] then
-						pawn:RemoveWeapon(1)
-						pawn:AddWeapon(weaponName:sub(1, -2).."1")
-					elseif weaponName:sub(-1, -1) == "B" and _G[weaponName:sub(1, -2).."2"] then
-						pawn:RemoveWeapon(1)
-						pawn:AddWeapon(weaponName:sub(1, -2).."2")
-					else
-						LOG("there was no weapon to delevel to for "..weaponName)
-					end
-				end
-			end 
-		end
-		mission.deleveledVeks = {}
-	end)
-	--we could also look for the custom anim, but this should run faster
-	--the deleveledVeks table is to make sure we don't delevel a boss twice in one skill (on hit + on start of turn)
-	--we reset the table at the end of the hook so that they can lose a second level eventually
-	modApi:addNextTurnHook(function(mission)
-		if mission.overdrive and Game:GetTeamTurn() == TEAM_PLAYER then
-			for i = 0, 2 do
-				local pawn = Board:GetPawn(i)
-				if pawn then
-					local threshold = 1
-					if pawn:IsAcid() then threshold = 2 end
-					if pawn:GetHealth() > threshold and not pawn:IsBoosted() then
-						pawn:SetBoosted(true)
-						local amount = 1
-						if pawn:IsArmor() and not pawn:IsAcid() then amount = 2 end
-						pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), amount))
-					end
+local function TriggerDelevelingPheromones(mission)
+	if mission.frightenedTiles then
+		for k = 1, #mission.frightenedTiles do
+			Board:Ping(mission.frightenedTiles[k], COLOR_BLACK)
+			Board:SetDangerous(mission.frightenedTiles[k])	--pretty sure it's not working
+			local pawn = Board:GetPawn(mission.frightenedTiles[k])
+			local wasJustDeleveled = false
+			for _, value in ipairs(mission.deleveledVeks) do
+				if pawn and value == pawn:GetId() then wasJustDeleveled = true end
+			end
+			if pawn and pawn:IsEnemy() and pawn:GetWeaponCount() > 0 and not wasJustDeleveled then
+				local weaponName = pawn:GetWeaponType(1)
+				local weaponID = 1
+				if weaponName:sub(-1, -1) == "2" and _G[weaponName:sub(1, -2).."1"] then
+					pawn:RemoveWeapon(1)
+					pawn:AddWeapon(weaponName:sub(1, -2).."1")
+				elseif weaponName:sub(-1, -1) == "B" and _G[weaponName:sub(1, -2).."2"] then
+					pawn:RemoveWeapon(1)
+					pawn:AddWeapon(weaponName:sub(1, -2).."2")
+				else
+					LOG("there was no weapon to delevel to for "..weaponName)
 				end
 			end
-		end
-	end)
-	modApi:addMissionStartHook(function(mission)
-		for i = 0, 2 do
-			if Board:GetPawn(i) then
-				local weapons = Board:GetPawn(i):GetPoweredWeaponTypes()
-				if weapons[1] == "CyborgWeapons_HunterReflexes" or weapons[2] == "CyborgWeapons_HunterReflexes" then mission.giveBonusMove = true end
-				if weapons[1] == "CyborgWeapons_CricketLegs" or weapons[2] == "CyborgWeapons_CricketLegs" then mission.giveJumping = true end
-				if weapons[1] == "CyborgWeapons_PrizeOfTheHunt" or weapons[2] == "CyborgWeapons_PrizeOfTheHunt" then mission.healOnKill = true end
-				if weapons[1] == "CyborgWeapons_OpportunisticHunting" or weapons[2] == "CyborgWeapons_OpportunisticHunting" then mission.opportunity = true end
-				if weapons[1] == "CyborgWeapons_Overdrive" or weapons[2] == "CyborgWeapons_Overdrive" then mission.overdrive = true end
-			end
-		end
-		if mission.giveJumping then
-			for i = 0, 2 do
-				if Board:GetPawn(i) and Board:GetPawn(i):GetClass() == "TechnoVek" and Board:GetPawn(i):GetPathProf() == 18 then Board:GetPawn(i):SetJumper(true) end
-			end
-		end
-	end)
-	modapiext:addSkillEndHook(function(mission, pawn, weaponId, p1, p2)
-		if not mission or not mission.giveBonusMove then return end
-		if pawn:IsDead() or tostring(weaponId) == "Move" or not pawn:GetClass() == "TechnoVek" then return end
-		modApi:runLater(function() 
-			modApi:runLater(function() 
-				if not pawn:IsActive() then
-					pawn:SetBonusMove(pawn:GetBonusMove() + 1)
-					pawn:SetActive(true) 
-				end
-			end)
-		end)
-		--we run this two frames later because some weapons are free actions and make the pawn active again one frame later
-		--if the pawn is given bonus move, it cannot act again, overwriting the free action
-	end)
-	modapiext:addPawnKilledHook(function(mission, pawn)
-		if not mission or not mission.healOnKill then return end
-		if (pawn:GetTeam() == TEAM_ENEMY) and (pawn:GetTeam() ~= TEAM_BOTS) and not (_G[pawn:GetType()].Minor) then
-			local point = pawn:GetSpace()
-			for i = DIR_START, DIR_END do
-				local curr = point + DIR_VECTORS[i]
-				if Board:GetPawn(curr) and Board:GetPawn(curr):GetClass() == "TechnoVek" then Board:DamageSpace(SpaceDamage(curr, -1)) end
-			end
-		end
-	end)
-
-	modapiext:addPawnTrackedHook(function(mission, pawn)
-		if not mission or not mission.opportunity or not pawn then return end
-		--stolen from Tosx's Stranger pilot
-		local p0 = pawn:GetSpace()
-		for dir = DIR_START, DIR_END do
-			local point = p0 + DIR_VECTORS[dir]
-			if Board:IsValid(point) and Board:IsPawnSpace(point) then
-				local pawn2 = Board:GetPawn(point)
-				if not pawn2:IsDead() and pawn2:GetClass() == "TechnoVek" then	
-					local reg = GetCurrentRegion(RegionData)
-					if reg ~= nil then
-						for _, a in ipairs(reg.player.map_data.spawn_ids) do 
-							if a == pawn:GetId() then			
-								local delayed = false
-								for i = DIR_START, DIR_END do
-									local curr = p0 + DIR_VECTORS[i]
-									if Board:GetPawn(curr) and Board:GetPawn(curr):GetClass() == "TechnoVek" then
-										local fx = SkillEffect()
-										local amount = 1
-										if Board:GetPawn(curr):IsBoosted() then amount = 2 end
-										local damage = SpaceDamage(p0, amount)
-										damage.sAnimation="ExploBloodyStream"
-										if not delayed then fx:AddDelay(0.4) delayed = true end
-										fx:AddMelee(curr, damage)
-										Board:AddEffect(fx)
-										if amount == 2 then Board:GetPawn(curr):SetBoosted(false) end
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end)
+		end 
+	end
+	mission.deleveledVeks = {}
 end
+--we could also look for the custom anim, but this should run faster
+--the deleveledVeks table is to make sure we don't delevel a boss twice in one skill (on hit + on start of turn)
+--we reset the table at the end of the hook so that they can lose a second level eventually
 
-modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
 ANIMS.frighteningPheromoneAnim = Animation:new{ 	
 	Image = "effects/frighteningpheromonesanim.png",
@@ -2553,6 +2457,9 @@ CyborgWeapons_HunterReflexes=PassiveSkill:new{
 	Passive="HunterReflexes",		--doesn't do anything, just there so other mods can tell it's a passive
 	Description="Grants one tile of bonus movement after firing a weapon to all Cyborgs.",
 	Icon = "weapons/HunterReflexes.png",
+	Upgrades = 1,
+	UpgradeList = { "+1 Move" },
+	UpgradeCost = { 2 },
 	TipImage = {
 		Unit = Point(2,2),
 		Enemy = Point(2,1),
@@ -2560,6 +2467,7 @@ CyborgWeapons_HunterReflexes=PassiveSkill:new{
 		CustomPawn = "BeetleMech",
 	}
 }
+CyborgWeapons_HunterReflexes_A=CyborgWeapons_HunterReflexes:new{UpgradeDescription="Grants two tiles of bonus movement instead."}
 
 function CyborgWeapons_HunterReflexes:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
@@ -2568,6 +2476,21 @@ function CyborgWeapons_HunterReflexes:GetSkillEffect(p1, p2)
 	ret:AddMelee(Point(2, 2), SpaceDamage(Point(2, 1), 1, DIR_UP))
 	ret:AddCharge(Board:GetSimplePath(Point(2, 2), Point(2, 3)), FULL_DELAY)
 	return ret
+end
+
+local function HunterReflexesBonusMove(mission, pawn, weaponId, p1, p2)
+	if not mission or not mission.giveBonusMove then return end
+	if pawn:IsDead() or tostring(weaponId) == "Move" or not pawn:GetClass() == "TechnoVek" then return end
+	modApi:runLater(function() 
+		modApi:runLater(function() 
+			if not pawn:IsActive() then
+				pawn:SetBonusMove(pawn:GetBonusMove() + mission.giveBonusMove)
+				pawn:SetActive(true) 
+			end
+		end)
+	end)
+	--we run this two frames later because some weapons are free actions and make the pawn active again one frame later
+	--if the pawn is given bonus move, it cannot act again, overwriting the free action
 end
 
 -------------------------
@@ -2582,10 +2505,14 @@ CyborgWeapons_OpportunisticHunting=PassiveSkill:new{
 	Passive="OpportunisticHunting",		--doesn't do anything, just there so other mods can tell it's a passive
 	Description="Vek spawning adjacent to Cyborg mechs take 1 damage upon emerging from each adjacent Cyborg.",
 	Icon = "weapons/OpportunisticHunting.png",
+	Upgrades = 1,
+	UpgradeList = { "+1 Damage" },
+	UpgradeCost = { 2 },
 	TipImage = {
 		Unit = Point(2,2),
 	}
 }
+CyborgWeapons_OpportunisticHunting_A=CyborgWeapons_OpportunisticHunting:new{UpgradeDescription="Spawning Vek take 2 damage instead."}
 
 function CyborgWeapons_OpportunisticHunting:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
@@ -2595,6 +2522,42 @@ function CyborgWeapons_OpportunisticHunting:GetSkillEffect(p1, p2)
 	ret:AddMelee(Point(2, 2), SpaceDamage(Point(2, 1), 1))
 	ret:AddDelay(1)
 	return ret
+end
+
+local function OpportunisticHuntingDamageSpawn(mission, pawn)
+	if not mission or not mission.opportunity or not pawn then return end
+	--stolen from Tosx's Stranger pilot
+	local p0 = pawn:GetSpace()
+	for dir = DIR_START, DIR_END do
+		local point = p0 + DIR_VECTORS[dir]
+		if Board:IsValid(point) and Board:IsPawnSpace(point) then
+			local pawn2 = Board:GetPawn(point)
+			if not pawn2:IsDead() and pawn2:GetClass() == "TechnoVek" then	
+				local reg = GetCurrentRegion(RegionData)
+				if reg ~= nil then
+					for _, a in ipairs(reg.player.map_data.spawn_ids) do 
+						if a == pawn:GetId() then			
+							local delayed = false
+							for i = DIR_START, DIR_END do
+								local curr = p0 + DIR_VECTORS[i]
+								if Board:GetPawn(curr) and Board:GetPawn(curr):GetClass() == "TechnoVek" then
+									local fx = SkillEffect()
+									local amount = mission.opportunity
+									if Board:GetPawn(curr):IsBoosted() then amount = amount+1 end
+									local damage = SpaceDamage(p0, amount)
+									damage.sAnimation="ExploBloodyStream"
+									if not delayed then fx:AddDelay(0.4) delayed = true end
+									fx:AddMelee(curr, damage)
+									Board:AddEffect(fx)
+									if amount == mission.opportunity+1 then Board:GetPawn(curr):SetBoosted(false) end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
 ---------------------
@@ -2609,11 +2572,15 @@ CyborgWeapons_PrizeOfTheHunt=PassiveSkill:new{
 	Passive="PrizeOfTheHunt",		--doesn't do anything, just there so other mods can tell it's a passive
 	Description="When a Vek dies adjacent to a Cyborg mech, that Cyborg heals 1 HP.",
 	Icon = "weapons/PrizeOfTheHunt.png",
+	Upgrades = 1,
+	UpgradeList = { "+1 Healing" },
+	UpgradeCost = { 2 },
 	TipImage = {
 		Unit = Point(2,3),
 		Enemy = Point(2,2),
 	}
 }
+CyborgWeapons_PrizeOfTheHunt_A=CyborgWeapons_PrizeOfTheHunt:new{UpgradeDescription="Cyborgs heal for 2 HP instead."}
 
 function CyborgWeapons_PrizeOfTheHunt:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
@@ -2624,6 +2591,17 @@ function CyborgWeapons_PrizeOfTheHunt:GetSkillEffect(p1, p2)
 	ret:AddDamage(SpaceDamage(Point(2, 3), -1))
 	ret:AddDelay(1)
 	return ret
+end
+
+local function PrizeOfTheHuntHealing(mission, pawn)
+	if not mission or not mission.healOnKill then return end
+	if (pawn:GetTeam() == TEAM_ENEMY) and (pawn:GetTeam() ~= TEAM_BOTS) and not (_G[pawn:GetType()].Minor) then
+		local point = pawn:GetSpace()
+		for i = DIR_START, DIR_END do
+			local curr = point + DIR_VECTORS[i]
+			if Board:GetPawn(curr) and Board:GetPawn(curr):GetClass() == "TechnoVek" then Board:DamageSpace(SpaceDamage(curr, -mission.healOnKill)) end
+		end
+	end
 end
 
 ----------------
@@ -2680,6 +2658,62 @@ function CyborgWeapons_Overdrive:GetSkillEffect(p1, p2)
 	ret:AddDelay(1)
 	return ret
 end
+
+local function OverdriveBoost(mission)
+	if mission.overdrive and Game:GetTeamTurn() == TEAM_PLAYER then
+		for i = 0, 2 do
+			local pawn = Board:GetPawn(i)
+			if pawn then
+				local threshold = 1
+				if pawn:IsAcid() then threshold = 2 end
+				if pawn:GetHealth() > threshold and not pawn:IsBoosted() then
+					pawn:SetBoosted(true)
+					local amount = 1
+					if pawn:IsArmor() and not pawn:IsAcid() then amount = 2 end
+					pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), amount))
+				end
+			end
+		end
+	end
+end
+
+---------
+--Hooks--
+---------
+
+local function CheckCyborgPassives(mission)
+	for i = 0, 2 do
+		if Board:GetPawn(i) then
+			local weapons = Board:GetPawn(i):GetPoweredWeaponTypes()
+			if weapons[1] == "CyborgWeapons_HunterReflexes" or weapons[2] == "CyborgWeapons_HunterReflexes" then mission.giveBonusMove = 1 end
+			if weapons[1] == "CyborgWeapons_HunterReflexes_A" or weapons[2] == "CyborgWeapons_HunterReflexes_A" then mission.giveBonusMove = 2 end
+			if weapons[1] == "CyborgWeapons_CricketLegs" or weapons[2] == "CyborgWeapons_CricketLegs" then mission.giveJumping = true end
+			if weapons[1] == "CyborgWeapons_PrizeOfTheHunt" or weapons[2] == "CyborgWeapons_PrizeOfTheHunt" then mission.healOnKill = 1 end
+			if weapons[1] == "CyborgWeapons_PrizeOfTheHunt_A" or weapons[2] == "CyborgWeapons_PrizeOfTheHunt_A" then mission.healOnKill = 2 end
+			if weapons[1] == "CyborgWeapons_OpportunisticHunting" or weapons[2] == "CyborgWeapons_OpportunisticHunting" then mission.opportunity = 1 end
+			if weapons[1] == "CyborgWeapons_OpportunisticHunting_A" or weapons[2] == "CyborgWeapons_OpportunisticHunting_A" then mission.opportunity = 2 end
+			if weapons[1] == "CyborgWeapons_Overdrive" or weapons[2] == "CyborgWeapons_Overdrive" then mission.overdrive = true end
+		end
+	end
+	if mission.giveJumping then
+		for i = 0, 2 do
+			if Board:GetPawn(i) and Board:GetPawn(i):GetClass() == "TechnoVek" and Board:GetPawn(i):GetPathProf() == 18 then Board:GetPawn(i):SetJumper(true) end
+		end
+	end
+end
+
+local function EVENT_onModsLoaded()
+	modApi:addPreEnvironmentHook(TriggerDelevelingPheromones)
+	modApi:addNextTurnHook(OverdriveBoost)
+	modApi:addMissionStartHook(CheckCyborgPassives)
+	modapiext:addSkillEndHook(HunterReflexesBonusMove)
+	modapiext:addPawnKilledHook(PrizeOfTheHuntHealing)
+	modapiext:addPawnTrackedHook(OpportunisticHuntingDamageSpawn)
+end
+
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+
+
 
 --------------------
 --Confusing Flight--
