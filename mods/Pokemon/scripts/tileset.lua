@@ -4,13 +4,13 @@ local tileset = easyEdit.tileset:add("Pillars", "grass")
 tileset.name = "Spear Pillars" -- Name of tileset
 
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-modApi:appendAsset("img/advanced/combat/looper_on.png", path .."img/advanced/combat/looper_on.png")
-modApi:appendAsset("img/advanced/combat/looper_off.png", path .."img/advanced/combat/looper_off.png")
-modApi:appendAsset("img/advanced/combat/looper_ready.png", path .."img/advanced/combat/looper_ready.png")
+-- modApi:appendAsset("img/advanced/combat/looper_on.png", path .."img/advanced/combat/looper_on.png")
+-- modApi:appendAsset("img/advanced/combat/looper_off.png", path .."img/advanced/combat/looper_off.png")
+-- modApi:appendAsset("img/advanced/combat/looper_ready.png", path .."img/advanced/combat/looper_ready.png")
 modApi:appendAsset("img/combat/looper_on.png", path .."img/combat/looper_on.png")
 modApi:appendAsset("img/combat/looper_off.png", path .."img/combat/looper_off.png")
 modApi:appendAsset("img/combat/looper_ready.png", path .."img/combat/looper_ready.png")
-modApi:appendAsset("img/advanced/combat/tile_looper.png", path .."img/advanced/combat/tile_looper.png")
+-- modApi:appendAsset("img/advanced/combat/tile_looper.png", path .."img/advanced/combat/tile_looper.png")
 
 tileset.tileLoc = { ["mountain_0"] = Point(-28, -32), ["mountain_0_broken"] = Point(-28, -32), ["mountain_explode"] = Point(-28, -42),
 					-- ["mountain_1"] = Point(-28, -24), ["mountain_1_broken"] = Point(-28, -24),
