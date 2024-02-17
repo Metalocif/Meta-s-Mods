@@ -412,7 +412,7 @@ a.Poke_Xerneas =a.MechUnit:new{Image="units/player/Xerneas.png", PosX = -30, Pos
 a.Poke_Xerneasw =a.MechUnit:new{Image="units/player/Xerneas_w.png", PosX = -30, PosY = -24}
 a.Poke_Xerneasa = a.MechUnit:new{Image="units/player/Xerneas_a.png",  PosX = -30, PosY = -34, NumFrames = 6 }
 a.Poke_Xerneas_sleep = a.MechUnit:new{Image="units/player/Xerneas_sleep.png",  PosX = -30, PosY = -44, NumFrames = 2, Time = 1.5 }
-a.Poke_Xerneas_tree_sleep = a.MechUnit:new{Image="units/player/Xerneas_tree.png",  PosX = -40, PosY = -40, NumFrames = 4, Time = 1 }
+a.Poke_Xerneas_special_sleep = a.MechUnit:new{Image="units/player/Xerneas_tree.png",  PosX = -40, PosY = -40, NumFrames = 4, Time = 1 }
 -- we need a separate sleep anim so that when Darkrai puts Xerneas to sleep it doesn't turn into a tree; still suffixed _sleep so it counts for the sleep handling hook
 a.Poke_Xerneas_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Xerneas_ns = a.MechIcon:new{Image="units/player/Xerneas_ns.png"}
@@ -890,6 +890,7 @@ Poke_ArmoredMewtwo = Pawn:new{
 	SoundLocation = "/mech/prime/punch_mech/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
+	SandstormImmune = true,	--redundant with IMPACT_METAL but here for clarity
 }
 Poke_Larvitar = Pawn:new{
 	Name = "Karen",
@@ -908,6 +909,7 @@ Poke_Larvitar = Pawn:new{
 	EvoForget = { "Poke_RockThrow", "Poke_RockSlide" },
 	EvoLearn = { { { "Poke_RockSlide", "Poke_Sandstorm" }, { "Poke_StoneEdge" } } },
 	EvoNames = { { "Larvitar", "Pupitar", "Tyranitar" } },
+	SandstormImmune = true,
 }
 Poke_Beldum = Pawn:new{
 	Name = "Steven",
@@ -928,6 +930,7 @@ Poke_Beldum = Pawn:new{
 	EvoLearn = { { { "Poke_MetalClaw", "Poke_ZenHeadbutt" }, { "Poke_MeteorMash" } } },
 	EvoNames = { { "Beldum", "Metang", "Metagross" } },
 	LoseFlyingAtLevel = {2},
+	SandstormImmune = true,
 }
 Poke_Gible = Pawn:new{
 	Name = "Cynthia",
@@ -950,6 +953,7 @@ Poke_Gible = Pawn:new{
 	MegaEvoMoves = { "Poke_DracoMeteor" },
 	MegaEvoNames = { "Mega Garchomp" },
 	IsDragon = true,
+	SandstormImmune = true,
 }
 Poke_Eevee = Pawn:new{
 	Name = "Bianca",
@@ -1049,6 +1053,9 @@ Poke_Scyther = Pawn:new{
 	EvoNames = { { "Scyther", "Scizor", "Scizor" },
 				 { "Scyther", "Kleavor", "Kleavor" },
 			   },
+	SandstormImmune = { { false, true, true },
+						{ false, true, true },
+					  },
 }
 
 

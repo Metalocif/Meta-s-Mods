@@ -2,7 +2,7 @@ local description = "Adds several Pokemon squads to the game. Gotta catch 'em al
 local mod = {
 	id = "Meta_Pokemon",
 	name = "Pokemon",
-	version = "1.3",
+	version = "1.6",
 	requirements = {},
 	dependencies = { 
 		modApiExt = "1.21",
@@ -15,12 +15,15 @@ local mod = {
 }
 
 function mod:init()
+
 	require(self.scriptPath .."libs/saveData")
 	require(self.scriptPath .."libs/boardEvents")
 	require(self.scriptPath .."libs/multishot")
 	require(self.scriptPath .."weapons")
+	require(self.scriptPath .."items")
 	require(self.scriptPath .."pawns")
 	require(self.scriptPath .."bosses")
+	require(self.scriptPath .."tileset")
 	
 	require(self.scriptPath .."missions/mission_mewtwo")
 	require(self.scriptPath .."missions/mission_mewtwo_dialog")
@@ -189,7 +192,7 @@ function mod:load( options, version)
 					--we set this separately from evolution so that evoless Pokemon can get stuff with levels anyway
 				end
 				pawn:SetPowered(true)	--wake up sleeping pawns, since apparently that carries over into the next mission?
-				if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" then
+				if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" and pilotLevel > 0 then
 					pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][pilotLevel])	--remove sleep anims/deoxys forms/mega evos
 				else
 					pawn:SetCustomAnim(_G[pawn:GetType()].Image)
@@ -300,30 +303,6 @@ function mod:load( options, version)
     end)
 	modApi:addNextTurnHook(function()
 		local mission = GetCurrentMission()
-		if mission.SleepTable == nil then mission.SleepTable = {} end
-		if mission.LeechSeedTable == nil then mission.LeechSeedTable = {} end
-		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
-		--should check team turn == pawn turn
-			local pawn = Board:GetPawn(id)
-			if pawn and sleepTurnsLeft >= 0 then mission.SleepTable[id] = mission.SleepTable[id] - 1 end	
-			--go down to -1 so we don't setpowered things that shouldn't be
-			if sleepTurnsLeft == 1 then 
-				pawn:SetPowered(true)
-				if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then						--some pawns will use a customanim for sleep but most won't
-					pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -7))
-				else
-					CustomAnim:rem(id, "sleepAnim")
-				end
-			end
-		end
-		for id, leecherId in pairs(mission.LeechSeedTable) do
-			local pawn = Board:GetPawn(id)
-			local leecher = Board:GetPawn(leecherId)
-			if pawn and Game:GetTeamTurn() == pawn:GetTeam() and leecher then
-				ret:AddSafeDamage(SpaceDamage(pawn:GetSpace(), 1))
-				ret:AddArtillery(pawn:GetSpace(), SpaceDamage(leecher:GetSpace(), -1), "effects/shotup_grid.png", NO_DELAY)
-			end
-		end
 		for id = 0, 2 do
 			local pawn = Board:GetPawn(id)
 			local pilotLevel = GameData.current["pilot"..id].level
@@ -342,18 +321,6 @@ function mod:load( options, version)
 				mission.MegaEvolved = id	--max once per mission, even if more than one can mega evolve
 			end
 		
-		end
-	end)
-	modApi:addPreEnvironmentHook(function(mission)	--handle weathers in here	
-		LOG(mission.Weather)
-		if mission.Weather == "Sandstorm" then
-			for i = 0, 7 do
-				for j = 0, 7 do
-					local pawn = Board:GetPawn(Point(i,j))
-					if pawn and pawn:GetTeam() ~= TEAM_PLAYER and pawn:GetTeam() ~= TEAM_NONE then Board:DamageSpace(SpaceDamage(Point(i,j), 1)) end
-					--don't damage things from TEAM_NONE because 1. they are rocks and rocks are immune to sandstorm 2. autokilling volatile rocks sounds """fun"""
-				end
-			end
 		end
 	end)
 end

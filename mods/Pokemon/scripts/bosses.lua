@@ -7,6 +7,11 @@ easyEdit.bossList:get("archive"):addBoss("Mission_MoltresBoss")
 
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 
+
+modApi:appendAsset("img/effects/roaroftime.png", resourcePath.."img/effects/roaroftime.png")
+modApi:appendAsset("img/effects/ancientpower.png", resourcePath.."img/effects/ancientpower.png")
+ANIMS.RoarOfTimeAnim = Animation:new{ Image = "effects/roaroftime.png", NumFrames = 6,Time = 0.1,PosX = -42,PosY = -30}
+
 achievements = {
 	Poke_ZapdosCapture = modApi.achievements:add{
 		id = "Poke_ZapdosCapture",
@@ -121,6 +126,14 @@ modApi:appendAsset(writepath .."Celebi.png", readpath .."Celebi.png")
 modApi:appendAsset(writepath .."Celebi_a.png", readpath .."Celebi_a.png")
 modApi:appendAsset(writepath .."Celebi_d.png", readpath .."Celebi_d.png")
 
+modApi:appendAsset(writepath .."PrimalDialga.png", readpath .."PrimalDialga.png")
+modApi:appendAsset(writepath .."PrimalDialga_a.png", readpath .."PrimalDialga_a.png")
+modApi:appendAsset(writepath .."PrimalDialga_d.png", readpath .."PrimalDialga_d.png")
+
+modApi:appendAsset(writepath .."PrimalPalkia.png", readpath .."PrimalPalkia.png")
+modApi:appendAsset(writepath .."PrimalPalkia_a.png", readpath .."PrimalPalkia_a.png")
+modApi:appendAsset(writepath .."PrimalPalkia_d.png", readpath .."PrimalPalkia_d.png")
+
 modApi:appendAsset(writepath .."MasterBall.png", readpath .."MasterBall.png")
 
 local a = ANIMS
@@ -173,6 +186,16 @@ local base = a.EnemyUnit:new{Image = imagepath .."Celebi.png", PosX = -15, PosY 
 a.Celebi_B  =	base
 a.Celebi_Ba =	base:new{ Image = "units/aliens/Celebi_a.png", PosX = -15, NumFrames = 6 }
 a.Celebi_Bd =	base:new{ Image = "units/aliens/Celebi_d.png", NumFrames = 6, Time = 0.2, Loop = false }
+
+base = a.EnemyUnit:new{Image = imagepath .."PrimalDialga.png", PosX = -35, PosY = -31, NumFrames = 1, Height = 1 }
+a.PrimalDialga  =	base
+a.PrimalDialgaa =	base:new{ Image = "units/aliens/PrimalDialga_a.png", NumFrames = 4 }
+a.PrimalDialgad =	base:new{ Image = "units/aliens/PrimalDialga_d.png", NumFrames = 9, Time = 0.2, Loop = false }
+
+base = a.EnemyUnit:new{Image = imagepath .."PrimalPalkia.png", PosX = -35, PosY = -31, NumFrames = 1, Height = 1 }
+a.PrimalPalkia  =	base
+a.PrimalPalkiaa =	base:new{ Image = "units/aliens/PrimalPalkia_a.png", NumFrames = 2 }
+a.PrimalPalkiad =	base:new{ Image = "units/aliens/PrimalPalkia_d.png", NumFrames = 9, Time = 0.2, Loop = false }
 
 a.MasterBall = a.EnemyUnit:new{Image = imagepath .."MasterBall.png", PosX = -8, PosY = 0, NumFrames = 1, Height = 1 }
 
@@ -1165,3 +1188,318 @@ Poke_XerneasHelper = Pawn:new{
 	GrassMovement = true,
 	Portrait = "pilots/Pilot_Poke_Xerneas",
 }
+
+
+
+Poke_DialgaBoss = {
+	Health = 9,
+	MoveSpeed = 4,
+	Image = "PrimalDialga",
+	Name = "Primal Dialga",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_AncientPowerDialga" },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_METAL,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = false,
+	Tier = TIER_BOSS,
+	IsDeathEffect = true,
+	Massive = true,
+}
+AddPawn("Poke_DialgaBoss") 
+
+Poke_PalkiaBoss = {
+	Health = 9,
+	MoveSpeed = 4,
+	Image = "PrimalPalkia",
+	Name = "Primal Palkia",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_AncientPowerPalkia" },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_FLESH,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = false,
+	Tier = TIER_BOSS,
+	IsDeathEffect = true,
+	Massive = true,
+}
+AddPawn("Poke_PalkiaBoss") 
+
+function Poke_DialgaBoss:GetDeathEffect(point)
+	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+	local mission = GetCurrentMission()
+	Board:AddPawn(ball, point)
+	mission.BallID = ball:GetId()
+	return SkillEffect()
+end
+
+
+Poke_AncientPowerDialga = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Ancient Power",
+	User = "Dialga",
+	Description = "Damages all tiles within a large area.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_RoarOfTimeBoss",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(1, 1),
+		Enemy3 = Point(3, 2),
+		CustomPawn = "Poke_DialgaBoss",
+	}
+}
+
+function Poke_AncientPowerDialga:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_AncientPowerDialga:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	local targets = extract_table(general_DiamondTarget(p1, 3))
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	for k = 1, #targets do
+		if targets[k] ~= p1 then ret:AddQueuedArtillery(SpaceDamage(targets[k], self.Damage), "effects/ancientpower.png", NO_DELAY) end
+	end
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+Poke_AncientPowerPalkia = Poke_AncientPowerDialga:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Ancient Power",
+	User = "Palkia",
+	Description = "Damages all tiles within a large area.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_SpatialRendBoss",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(1, 1),
+		Enemy3 = Point(3, 2),
+		CustomPawn = "Poke_PalkiaBoss",
+	}
+}
+
+
+Poke_RoarOfTimeBoss = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Roar of Time",
+	Description = "Damages all other tiles.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 5,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_RecoverBoss",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(2, 5),
+		Enemy3 = Point(0, 2),
+		CustomPawn = "Poke_DialgaBoss",
+	}
+}
+
+function Poke_RoarOfTimeBoss:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_RoarOfTimeBoss:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), "Dialga used "..self.Name.."!"))
+	ret:AddQueuedAnimation(p1, "RoarOfTimeAnim") 
+	for i = 1, 14 do
+		local targets = extract_table(general_DiamondTarget(p1, i))
+		for k = 1, #targets do
+			if p1:Manhattan(targets[k]) == i then
+				ret:AddQueuedDamage(SpaceDamage(targets[k], math.max(self.Damage - i + 1, 1)))
+				ret:AddQueuedBounce(targets[k], math.max(10-i, 1))
+			end
+		end
+		ret:AddQueuedDelay(0.05)
+	end
+	ret:AddScript("GetCurrentMission().RecoverTo = "..Board:GetPawn(p1):GetHealth())
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_RecoverDialga = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Recover",
+	User = "Dialga",
+	Description = "Heals the user to the amount of health they had last turn.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_AncientPowerDialga",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		CustomPawn = "Poke_DialgaBoss",
+	}
+}
+
+function Poke_RecoverDialga:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_RecoverDialga:GetTargetScore(p1,p2)
+	return 100
+end
+
+function Poke_RecoverDialga:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddQueuedDamage(SpaceDamage(p1, math.max(GetCurrentMission().RecoverTo - Board:GetPawn(p1):GetHealth(), 0)))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+Poke_RecoverPalkia = Poke_RecoverDialga:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Recover",
+	User = "Palkia",
+	Description = "Heals the user by 5 HP.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_AncientPowerPalkia",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		CustomPawn = "Poke_PalkiaBoss",
+	}
+}
+
+function Poke_RecoverPalkia:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddQueuedDamage(SpaceDamage(p1, -5))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_SpatialRendBoss = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Spatial Rend",
+	Description = "Dramatically alters terrain.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_RecoverPalkia",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(2, 5),
+		Enemy3 = Point(0, 2),
+		CustomPawn = "Poke_PalkiaBoss",
+	}
+}
+
+
+function Poke_SpatialRendBoss:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_SpatialRendBoss:GetTargetScore(p1,p2)
+	return 100
+end
+
+function Poke_SpatialRendBoss:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	local mountainCount = 0
+	local runeCount = 0
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), "Palkia used "..self.Name.."!"))
+	ret:AddQueuedScript("Board:Fade(0)")
+	-- ret:AddQueuedDelay(-1)
+	for _, p in ipairs(Board) do
+		if Board:GetTerrain(p) == TERRAIN_MOUNTAIN then mountainCount = mountainCount + 1 end
+		if Board:GetTerrain(p) == 17 then runeCount = runeCount + 1 end
+		ret:AddQueuedScript(string.format("Board:SetTerrain(%s, %s)", p:GetString(), TERRAIN_ROAD))
+		ret:AddQueuedDamage(SpaceDamage(p, 0))
+	end
+	
+	for i = 0, 2 do
+		if mountainCount <= 0 then break end
+		local mech = Board:GetPawn(i)
+		if mech then
+			for dir = DIR_START, DIR_END do
+				if mountainCount <= 0 then break end
+				local curr = mech:GetSpace() + DIR_VECTORS[dir]
+				if not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsSpawning(curr)) then
+					ret:AddQueuedScript(string.format("Board:SetTerrain(%s, %s)", curr:GetString(), TERRAIN_MOUNTAIN))
+					ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", curr:GetString(), ""))
+					mountainCount = mountainCount - 1
+				end
+			end
+		end
+	end
+	repeat
+		local curr = Point(math.random(0, 7), math.random(0, 7))
+		if not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsSpawning(curr)) then
+			ret:AddQueuedScript(string.format("Board:SetTerrain(%s, %s)", curr:GetString(), TERRAIN_MOUNTAIN))
+			ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", curr:GetString(), ""))
+			mountainCount = mountainCount - 1
+		end
+	until mountainCount <= 0
+	repeat
+		local curr = Point(math.random(0, 7), math.random(0, 7))
+		if not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsSpawning(curr)) then
+			ret:AddQueuedScript(string.format("Board:SetTerrain(%s, %s)", curr:GetString(), 17))
+			runeCount = runeCount - 1
+		end
+	until runeCount <= 0
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end

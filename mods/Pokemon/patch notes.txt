@@ -1,0 +1,35 @@
+v1.6
+- Added the Spear Pillars tileset, used for boss fights.
+- Added the Primal Dialga and Primal Palkia boss fights.
+- Moved a bunch of code to the status library.
+
+v1.5
+- Added the Adaptive Beasts (Eevee, Scyther, Ralts).
+- Added branching evolutions.
+- Added Mega Evolutions for all Pokemon that have it except Scizor, Metagross, and Tyranitar.
+
+v1.4.1
+- Buffed Gible's Bite attack so it can slam enemies into blocked tiles.
+- Gave Pound to Ralts so it can level up before the fourth island.
+
+v1.4
+- Added Earth's Champions (Larvitar, Beldum, Gible).
+- Gave upgrades to weapons that get forgotten on evolution.
+
+v1.3.1
+- Improved the evolution system: non-Pokemon weapons are sent back to inventory on evolution.
+
+v1.3
+- Added Nature's Guardians (Celebi, Shaymin, Xerneas) and their missions.
+
+v1.2
+- Fixed bugs with the Legendary Birds.
+- Added the Dark minds (Mewtwo, Deoxys, Darkrai) and their missions.
+- Added Armored Mewtwo.
+
+v1.1
+- Added the Legendary Birds as both a squad and bosses. 
+- Evolution bug fixes.
+
+v1.0
+- Release. One squad (Dratini, Abra, Mew).

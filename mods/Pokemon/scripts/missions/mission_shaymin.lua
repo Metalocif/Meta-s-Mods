@@ -7,7 +7,7 @@ Mission_Poke_Shaymin = Mission_Infinite:new{
 	Name = "Tainted Field",
 	-- Objectives = {Objective("Protect Shaymin",1), Objective("Remove all A.C.I.D. on the board",1),},
 	Objectives = Objective("Protect Shaymin",1,1),
-	hasAcid = true,
+	-- hasAcid = true,
 	shayminId = 0,
 }
 
@@ -15,16 +15,16 @@ function Mission_Poke_Shaymin:StartMission()
 	local pawn = PAWN_FACTORY:CreatePawn("Poke_ShayminHelper")
 	self.shayminId = pawn:GetId()
 	Board:SpawnPawn(pawn)
-	local acidCount = 0
-	local i = 0
-	while acidCount <= 10 and i < 100 do
-		local tile = Point(math.random(0, 7), math.random(0, 7))
-		if not Board:IsBlocked(tile, PATH_PROJECTILE) and not Board:GetTerrain(tile) == TERRAIN_WATER and not Board:GetTerrain(tile) == TERRAIN_HOLE and not Board:GetTerrain(tile) == TERRAIN_ACID then
-			Board:SetAcid(tile)
-			acidCount = acidCount + 1
-		end
-		i = i+1
-	end
+	-- local acidCount = 0
+	-- local i = 0
+	-- while acidCount <= 10 and i < 100 do
+		-- local tile = Point(math.random(0, 7), math.random(0, 7))
+		-- if not Board:IsBlocked(tile, PATH_PROJECTILE) and not Board:GetTerrain(tile) == TERRAIN_WATER and not Board:GetTerrain(tile) == TERRAIN_HOLE and not Board:GetTerrain(tile) == TERRAIN_ACID then
+			-- Board:SetAcid(tile)
+			-- acidCount = acidCount + 1
+		-- end
+		-- i = i+1
+	-- end
 end
 
 function Mission_Poke_Shaymin:GetDestroyedCount()
@@ -36,12 +36,12 @@ end
 
 function Mission_Poke_Shaymin:UpdateObjectives()
 	local shayminAlive = Board:IsPawnAlive(self.shayminId) and OBJ_STANDARD or OBJ_FAILED
-	local hasAcid = false
-	for _, tile in ipairs(Board) do
-		if Board:IsAcid(tile) then hasAcid = true break end
-	end
-	if not hasAcid then self.hasAcid = false end
-	local acidStatus = hasAcid and OBJ_COMPLETE or OBJ_STANDARD
+	-- local hasAcid = false
+	-- for _, tile in ipairs(Board) do
+		-- if Board:IsAcid(tile) then hasAcid = true break end
+	-- end
+	-- if not hasAcid then self.hasAcid = false end
+	-- local acidStatus = hasAcid and OBJ_COMPLETE or OBJ_STANDARD
 	Game:AddObjective("Protect Shaymin", shayminAlive)	
 	-- Game:AddObjective("Remove 8 tiles of A.C.I.D.", acidStatus)	
 end
