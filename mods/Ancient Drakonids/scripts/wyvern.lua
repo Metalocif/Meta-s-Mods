@@ -195,7 +195,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 			ret:AddSound("/enemy/blobber_1/death")
 			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
 		end
-		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..dist2 + 1) end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..p2:Manhattan(p3) + 1) end
 	end
 	return ret
 end	
