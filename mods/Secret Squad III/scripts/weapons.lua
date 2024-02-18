@@ -996,6 +996,18 @@ function Meta_Geomancy:DoStuff(ret, p1, p2)
 			damage.sAnimation = "explo_fire1"
 			ret:AddArtillery(p2, damage, "effects/shotup_fireball.png", NO_DELAY)
 		end
+	elseif Board:GetCustomTile(p2) == "tosx_whirlpool_0.png" then		--clockwise push; must be above water
+		for i = DIR_START, DIR_END do
+			local tile = p2 + DIR_VECTORS[i]
+			local damage = SpaceDamage(tile, 0, (i+1)%4)
+			ret:AddDamage(damage)
+		end
+	elseif Board:GetCustomTile(p2) == "tosx_rocks_0.png" then			--projectiles
+		for i = DIR_START, DIR_END do
+			local target = GetProjectileEnd(p2, p2 + DIR_VECTORS[i], PATH_PROJECTILE)
+			local damage = SpaceDamage(target, 1)
+			ret:AddProjectile(p2, damage, shrapnel..math.random(1,5), NO_DELAY)
+		end
 	elseif terrain == TERRAIN_WATER then							   --rain/acid rain: put out fires, replacing with smoke
 		if Board:IsAcid(p2) then
 			ret:AddAnimation(p2, "SplashAcid")
