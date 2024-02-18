@@ -1,3 +1,7 @@
+v1.6.1
+- Fixed the status lib not working on the second phase of the final mission, with disastrous results.
+- Added the Dry, Wet, and Shatterburst status.
+
 v1.6
 - Added the Spear Pillars tileset, used for boss fights.
 - Added the Primal Dialga and Primal Palkia boss fights.

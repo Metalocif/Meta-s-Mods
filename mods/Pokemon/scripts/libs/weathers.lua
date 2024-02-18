@@ -200,10 +200,12 @@ end
 local function EVENT_onModsLoaded()
 	modapiext:addPawnIsFireHook(SunDamage)
 	modApi:addPreEnvironmentHook(function(mission)
+		if mission.Weather == nil or mission.Weather == "" then return end
 		if mission.Weather == "Sun" then
 			for _, p in ipairs(Board) do
 				local pawn = Board:GetPawn(p)
 				if pawn and pawn:IsFrozen() then pawn:SetFrozen(false) end
+				Status:RemoveStatus(pawn:GetId(), "Wet")
 				if Board:IsFrozen(p) then Board:SetFrozen(false) end
 				if Board:GetTerrain(p) == TERRAIN_ICE then Board:SetTerrain(p, TERRAIN_WATER) end
 				if pawn and _G[pawn:GetType()].FunctionInWeatherSun ~= nil then _G[pawn:GetType()].FunctionInWeatherSun(pawn:GetId()) end
@@ -233,6 +235,7 @@ local function EVENT_onModsLoaded()
 					if Board:IsFire(Point(i,j)) or (pawn and pawn:IsFire()) then
 						Board:SetSmoke(Point(i,j), true, false)
 					end
+					if pawn then Status:RemoveStatus(pawn:GetId(), "Dry") end
 				elseif mission.Weather == "Snow" then
 					if pawn and (not pawn:IsFire()) and not CustomAnim:get(pawn:GetId(), "StatusChill") then
 						Status.ApplyChill(pawn:GetId())
