@@ -705,7 +705,7 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		damage.loc = p2 + DIR_VECTORS[(direction + 3)%4]
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
-	Status.ApplyVirus(Board:GetPawn(p2):GetId())
+	-- Status.ApplyVirus(Board:GetPawn(p2):GetId())
 	return ret
 end
 
