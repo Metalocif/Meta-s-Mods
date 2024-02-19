@@ -3,7 +3,7 @@ local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."li
 local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
 local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
 local weathers = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
-local status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+local Status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
 
 local files = {
     "Pound.png",
@@ -705,7 +705,7 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		damage.loc = p2 + DIR_VECTORS[(direction + 3)%4]
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
-	
+	Status.ApplyVirus(Board:GetPawn(p2):GetId())
 	return ret
 end
 
@@ -4048,11 +4048,11 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 	if pawn1:IsAcid() or pawn2:IsAcid() then synchro.iAcid = 1 end
 	if pawn1:IsFrozen() or pawn2:IsFrozen() then synchro.iFrozen = 1 end
 	
-	if GetStatus(id1, "Sleep") or GetStatus(id2, "Sleep") then 
-		sleepTurns = math.max(GetStatus(id1, "Sleep"), GetStatus(id2, "Sleep")) 
+	if Status.GetStatus(id1, "Sleep") or Status.GetStatus(id2, "Sleep") then 
+		sleepTurns = math.max(Status.GetStatus(id1, "Sleep"), Status.GetStatus(id2, "Sleep")) 
 	end
-	if GetStatus(id1, "LeechSeed") or GetStatus(id2, "LeechSeed") then
-		leechSeedSource = GetStatus(id1, "LeechSeed") or GetStatus(id2, "LeechSeed")
+	if Status.GetStatus(id1, "LeechSeed") or Status.GetStatus(id2, "LeechSeed") then
+		leechSeedSource = Status.GetStatus(id1, "LeechSeed") or Status.GetStatus(id2, "LeechSeed")
 	end
 	if CustomAnim:get(pawn1:GetId(), "StatusChill") and (not CustomAnim:get(pawn2:GetId(), "StatusChill")) and not pawn2:IsFire() then
 		ret:AddScript(string.format("CustomAnim:add(%s, %q)", pawn2:GetId(), "StatusChill"))
@@ -4061,12 +4061,12 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 		ret:AddScript(string.format("CustomAnim:add(%s, %q)", pawn1:GetId(), "StatusChill"))
 	end
 	if sleepTurns then 
-		ret:AddScript(string.format("Status:ApplySleep(%s, %s)", pawn1:GetId(), sleepTurns))
-		ret:AddScript(string.format("Status:ApplySleep(%s, %s)", pawn2:GetId(), sleepTurns))
+		ret:AddScript(string.format("Status.ApplySleep(%s, %s)", pawn1:GetId(), sleepTurns))
+		ret:AddScript(string.format("Status.ApplySleep(%s, %s)", pawn2:GetId(), sleepTurns))
 	end
 	if leechSeedSource then
-		ret:AddScript(string.format("Status:ApplyLeechSeed(%s, %s)", pawn1:GetId(), Board:GetPawn(p1):GetId()))
-		ret:AddScript(string.format("Status:ApplyLeechSeed(%s, %s)", pawn2:GetId(), Board:GetPawn(p1):GetId()))
+		ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", pawn1:GetId(), Board:GetPawn(p1):GetId()))
+		ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", pawn2:GetId(), Board:GetPawn(p1):GetId()))
 	end
 	ret:AddSafeDamage(synchro)
 	synchro.loc = p3
