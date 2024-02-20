@@ -64,10 +64,12 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 			Board:DamageSpace(rockDamage)
 		end
 	elseif removed_item == "Poke_Puddle" then
-		if pawn and pawn:IsFire() or Board:IsFire(loc) then
+		if (pawn and pawn:IsFire()) or Board:IsFire(loc) then
 			local smokeDamage = SpaceDamage(loc)
 			smokeDamage.iSmoke = 1
 			Board:DamageSpace(smokeDamage)
+		elseif pawn then
+			Status.ApplyWet(pawn:GetId())
 		end
 	elseif removed_item == "Poke_TimeRune" then
 		Board:SetTerrain(loc, TERRAIN_ROAD)
