@@ -3,7 +3,8 @@ local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."li
 local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
 local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
 local weathers = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
-local Status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+-- local Status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+local test = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
 
 local files = {
     "Pound.png",
@@ -706,6 +707,7 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
 	-- Status.ApplyVirus(Board:GetPawn(p2):GetId())
+	-- ret:AddScript(string.format("Weathers.AddWeather(%q, %s)", "Rain", 20))
 	return ret
 end
 
@@ -975,7 +977,7 @@ function Poke_HyperBeam:GetSkillEffect(p1,p2)
 	ret:AddDelay(1)
 	ret:AddScript("Board:StartShake(2)")
 	self:AddLaser(ret, target, direction)
-	ret:AddScript(string.format("Status:ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
+	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
 	return ret
 end
 
@@ -1018,7 +1020,8 @@ function Poke_IcyWind:GetSkillEffect(p1,p2)
 		local damage = SpaceDamage(second_tar, self.Damage)
 		damage.iFire = EFFECT_REMOVE
 		if Board:GetPawn(second_tar) then
-			damage.sScript = string.format("modApi:runLater(function() Status:ApplyChill(%s, %s) end)", Board:GetPawn(second_tar):GetId(), tostring(true))
+			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", Board:GetPawn(second_tar):GetId(), tostring(true))
+			-- damage.sScript = string.format("Status.ApplyChill(%s, %s)", Board:GetPawn(second_tar):GetId(), tostring(true))
 		elseif self.FreezeBuildings and Board:IsBuilding(second_tar) then
 			damage.iDamage = 0
 			damage.iFrozen = 1
@@ -1030,7 +1033,8 @@ function Poke_IcyWind:GetSkillEffect(p1,p2)
 		local first_damage = SpaceDamage(first_tar, self.Damage)
 		first_damage.iFire = EFFECT_REMOVE
 		if Board:GetPawn(first_tar) then
-			first_damage.sScript = string.format("modApi:runLater(function() Status:ApplyChill(%s, %s) end)", Board:GetPawn(first_tar):GetId(), tostring(true))
+			first_damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", Board:GetPawn(first_tar):GetId(), tostring(true))
+			-- first_damage.sScript = string.format("Status.ApplyChill(%s, %s)", Board:GetPawn(first_tar):GetId(), tostring(true))
 		elseif self.FreezeBuildings and Board:IsBuilding(first_tar) then
 			first_damage.iDamage = 0
 			first_damage.iFrozen = 1
@@ -1040,7 +1044,8 @@ function Poke_IcyWind:GetSkillEffect(p1,p2)
 		local damage = SpaceDamage(first_tar, self.Damage)
 		damage.iFire = EFFECT_REMOVE
 		if Board:GetPawn(first_tar) then
-			damage.sScript = string.format("modApi:runLater(function() Status:ApplyChill(%s, %s) end)", Board:GetPawn(first_tar):GetId(), tostring(true))
+			-- damage.sScript = string.format("Status.ApplyChill(%s, %s)", Board:GetPawn(first_tar):GetId(), tostring(true))
+			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", Board:GetPawn(first_tar):GetId(), tostring(true))
 		elseif self.FreezeBuildings and Board:IsBuilding(first_tar) then
 			damage.iDamage = 0
 			damage.iFrozen = 1
@@ -1083,7 +1088,7 @@ function Poke_Blizzard:GetSkillEffect(p1,p2)		--do chill
 	for _, tile in ipairs(Board) do
 		if Board:GetPawn(tile) and Board:GetPawn(tile):GetTeam() == TEAM_ENEMY then
 			local damage = SpaceDamage(tile, self.Damage)
-			damage.sScript = string.format("modApi:runLater(function() Status:ApplyChill(%s, %s) end)", pawn:GetId(), tostring(true))
+			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", pawn:GetId(), tostring(true))
 			ret:AddDamage(damage)
 		end
 	end
@@ -1140,13 +1145,11 @@ function Poke_Shockwave:GetSkillEffect(p1,p2)
 		ret:AddScript("Game:ModifyPowerGrid(-1)")
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 255, 200))", p1:GetString()))
 		ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", p1:GetString()))
-		
 	elseif p1 ~= p2 then
 		local target = GetProjectileEnd(p1, p2)
 		local damage = SpaceDamage(target, self.Damage + 1)
 		damage.sAnimation = "LightningBolt0"
 		ret:AddProjectile(damage, self.ProjectileArt, NO_DELAY)
-	
 	else
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
@@ -1154,7 +1157,6 @@ function Poke_Shockwave:GetSkillEffect(p1,p2)
 			local damage = SpaceDamage(target, self.Damage)
 			damage.sAnimation = "LightningBolt0"
 			ret:AddProjectile(damage, self.ProjectileArt, NO_DELAY)
-		
 		end
 	end
 	return ret
@@ -1537,8 +1539,8 @@ function Poke_DarkPulse:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(curr)
 		if pawn then 
 			ret:AddDamage(SpaceDamage(curr, self.Damage)) 
-			if Status:GetStatus(pawn:GetId(), "Sleep") and self.ExtendSleep then
-				ret:AddScript(string.format("Status:ApplySleep(%s, %s, %s)", pawn:GetId(), 1, tostring(true)))
+			if Status.GetStatus(pawn:GetId(), "Sleep") and self.ExtendSleep then
+				ret:AddScript(string.format("Status.ApplySleep(%s, %s, %s)", pawn:GetId(), 1, tostring(true)))
 			end
 		end
 	end
@@ -1547,8 +1549,8 @@ function Poke_DarkPulse:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(curr)
 		if pawn then 
 			ret:AddDamage(SpaceDamage(curr, self.Damage)) 
-			if Status:GetStatus(pawn:GetId(), "Sleep") and self.ExtendSleep then
-				ret:AddScript(string.format("Status:ApplySleep(%s, %s, %s)", pawn:GetId(), 1, tostring(true)))
+			if Status.GetStatus(pawn:GetId(), "Sleep") and self.ExtendSleep then
+				ret:AddScript(string.format("Status.ApplySleep(%s, %s, %s)", pawn:GetId(), 1, tostring(true)))
 			end
 		end
 	end
@@ -1730,14 +1732,14 @@ end
 function Poke_Hypnosis:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_ENEMY then
-		ret:AddScript(string.format("Status:ApplySleep(%s, %s)", Board:GetPawn(p2):GetId(), self.SleepTurns))
+		ret:AddScript(string.format("Status.ApplySleep(%s, %s)", Board:GetPawn(p2):GetId(), self.SleepTurns))
 	end
 	if self.LargeArea then
 		ret:AddAnimation(p2, "darkpulseAnim", ANIM_REVERSE)
 		for i = DIR_START, DIR_END do
 			local curr = p2 + DIR_VECTORS[i]
 			if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then
-				ret:AddScript(string.format("Status:ApplySleep(%s, %s)", Board:GetPawn(curr):GetId(), self.SleepTurns))		
+				ret:AddScript(string.format("Status.ApplySleep(%s, %s)", Board:GetPawn(curr):GetId(), self.SleepTurns))		
 			end
 		end
 	end
@@ -2258,7 +2260,7 @@ function Poke_EternalLife:GetSkillEffect(p1, p2)
 		ret:AddDelay(0.1)
 	end
 	ret:AddDelay(1)
-	ret:AddScript(string.format("Status:ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
+	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Xerneas_special_sleep"))
 	return ret
 end
@@ -3198,7 +3200,7 @@ function Poke_Sandstorm:GetSkillEffect(p1, p2)
 		-- ret:AddScript("Board:SetWeather(0,RAIN_ACID,Point(0,0),Point(8,8),-1)")
 		-- ret:AddScript("Board:SetWeather(0,RAIN_NORMAL,Point(0,0),Point(8,8),-1)")
 		-- ret:AddScript("Board:SetWeather(0,RAIN_SNOW,Point(0,0),Point(8,8),-1)")
-		ret:AddScript(string.format("weathers:AddWeather(%q, %s)", "Sun", 1))
+		ret:AddScript(string.format("weathers:AddWeather(%q, %s)", "Sandstorm", 1))
 	end
 	return ret
 end
@@ -3437,7 +3439,7 @@ Poke_BouncyBubble=Skill:new{
 	Icon = "weapons/BouncyBubble.png",	
 	Rarity = 3,
 	Name = "Bouncy Bubble",
-	Description = "Leap to a tile, splashing adjacent tiles with water, turning fires into smoke and making puddles on empty tiles. Can leap again if the target is a puddle or water. Removes fire from the user.",
+	Description = "Leap to a tile, splashing adjacent tiles with water, turning fires into smoke and making puddles on empty tiles. Wets pawns. Can leap again if the target is a puddle, water, or wet. Removes fire from the user.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	
@@ -3450,12 +3452,12 @@ Poke_BouncyBubble=Skill:new{
 	TipImage = {
 		Unit = Point(2,4),
 		Target = Point(2,1),
-		Water = Point(2,1),
+		-- Water = Point(2,1),
 		Enemy1 = Point(2,2),
 		Enemy2 = Point(2,3),
-		Second_Origin = Point(2,1),
-		Second_Target = Point(2,4),
-		Second_Click = Point(2,4),
+		-- Second_Origin = Point(2,1),
+		-- Second_Target = Point(2,4),
+		-- Second_Click = Point(2,4),
 		CustomPawn = "Poke_Eevee",
 	}
 }
@@ -3491,7 +3493,11 @@ function Poke_BouncyBubble:GetSkillEffect(p1, p2)
 	for i = DIR_START, DIR_END do
 		local curr = p2 + DIR_VECTORS[i]
 		local damage = SpaceDamage(curr, self.Damage)
-		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then damage.iSmoke = 1 end
+		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then 
+			damage.iSmoke = 1 
+		elseif Board:GetPawn(curr) then
+			ret:AddScript(string.format("Status.ApplyWet(%s)", Board:GetPawn(curr):GetId()))
+		end
 		if not Board:IsBlocked(curr, PATH_GROUND) then damage.sItem = "Poke_Puddle" end
 		
 		ret:AddSafeDamage(damage)
@@ -3530,12 +3536,17 @@ function Poke_BouncyBubble:GetFinalEffect(p1, p2, p3)
 	for i = DIR_START, DIR_END do
 		local curr = p2 + DIR_VECTORS[i]
 		local damage = SpaceDamage(curr, self.Damage)
-		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then damage.iSmoke = 1 end
+		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then 
+			damage.iSmoke = 1
+		elseif Board:GetPawn(curr) then
+			ret:AddScript(string.format("Status.ApplyWet(%s)", Board:GetPawn(curr):GetId()))
+		end
 		if not Board:IsBlocked(curr, PATH_GROUND) then damage.sItem = "Poke_Puddle" end
 		
 		ret:AddSafeDamage(damage)
 	end
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim))
+	ret:AddAnimation(p2, "Splash")
 	ret:AddDelay(0.5)
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Vaporeon_bubble"))
 	move = PointList()
@@ -3545,7 +3556,11 @@ function Poke_BouncyBubble:GetFinalEffect(p1, p2, p3)
 	for i = DIR_START, DIR_END do
 		local curr = p3 + DIR_VECTORS[i]
 		local damage = SpaceDamage(curr, self.Damage)
-		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then damage.iSmoke = 1 end
+		if Board:IsFire(curr) or (Board:GetPawn(curr) and Board:GetPawn(curr):IsFire()) then 
+			damage.iSmoke = 1
+		elseif Board:GetPawn(curr) then
+			ret:AddScript(string.format("Status.ApplyWet(%s)", Board:GetPawn(curr):GetId()))
+		end
 		if not Board:IsBlocked(curr, PATH_GROUND) then damage.sItem = "Poke_Puddle" end
 		
 		ret:AddSafeDamage(damage)
@@ -3836,7 +3851,7 @@ function Poke_SappySeed:GetSkillEffect(p1, p2)
 		damage.loc = curr
 		ret:AddDamage(damage)
 		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then 
-			ret:AddScript(string.format("Status:ApplyLeechSeed(%s, %s)", Board:GetPawn(p2):GetId(), Board:GetPawn(p1):GetId())) 
+			ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", Board:GetPawn(p2):GetId(), Board:GetPawn(p1):GetId())) 
 		end
 		if i ~= DIR_NONE then curr = p2 + DIR_VECTORS[i] end
 	end
@@ -3897,7 +3912,7 @@ function Poke_FreezyFrost:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(curr)
 		damage.iFire = EFFECT_REMOVE
 		if pawn then
-			damage.sScript = string.format("modApi:runLater(function() Status:ApplyChill(%s, %s) end)", pawn:GetId(), tostring(true))
+			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", pawn:GetId(), tostring(true))
 		end
 		if self.FreezeBuildings and Board:IsBuilding(curr) then
 			damage.iDamage = 0
