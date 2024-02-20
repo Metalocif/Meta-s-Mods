@@ -1,6 +1,7 @@
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/artilleryArc")
 local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
+local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
 local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
 local weathers = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
 -- local Status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")

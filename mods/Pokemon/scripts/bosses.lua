@@ -5,6 +5,8 @@ easyEdit.bossList:get("archive"):addBoss("Mission_MoltresBoss")
 -- easyEdit.bossList:get("finale1"):addBoss("Mission_DarkraiBoss")
 -- easyEdit.bossList:get("detritus"):addBoss("Mission_DeoxysBoss")
 
+local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
+
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 
 
@@ -80,6 +82,28 @@ achievements = {
 		img = resourcePath.."img/units/player/Xerneas.png",
 		global = "Pokemon",
 	},
+	
+	Poke_DialgaCapture = modApi.achievements:add{
+		id = "Poke_DialgaCapture",
+		name = "Captured Dialga",
+		tip = "Capture the lord of time Dialga.",
+		img = resourcePath.."img/units/aliens/PrimalDialga.png",
+		global = "Pokemon",
+	},
+	Poke_PalkiaCapture = modApi.achievements:add{
+		id = "Poke_PalkiaCapture",
+		name = "Captured Palkia",
+		tip = "Capture the lord of space Palkia.",
+		img = resourcePath.."img/units/aliens/PrimalPalkia.png",
+		global = "Pokemon",
+	},
+	Poke_GiratinaCapture = modApi.achievements:add{
+		id = "Poke_GiratinaCapture",
+		name = "Captured Giratina",
+		tip = "Capture the savage Giratina.",
+		img = resourcePath.."img/units/aliens/Giratina.png",
+		global = "Pokemon",
+	},
 }
 
 
@@ -133,6 +157,10 @@ modApi:appendAsset(writepath .."PrimalDialga_d.png", readpath .."PrimalDialga_d.
 modApi:appendAsset(writepath .."PrimalPalkia.png", readpath .."PrimalPalkia.png")
 modApi:appendAsset(writepath .."PrimalPalkia_a.png", readpath .."PrimalPalkia_a.png")
 modApi:appendAsset(writepath .."PrimalPalkia_d.png", readpath .."PrimalPalkia_d.png")
+
+modApi:appendAsset(writepath .."Giratina.png", readpath .."Giratina.png")
+modApi:appendAsset(writepath .."Giratina_a.png", readpath .."Giratina_a.png")
+modApi:appendAsset(writepath .."Giratina_d.png", readpath .."Giratina_d.png")
 
 modApi:appendAsset(writepath .."MasterBall.png", readpath .."MasterBall.png")
 
@@ -196,6 +224,11 @@ base = a.EnemyUnit:new{Image = imagepath .."PrimalPalkia.png", PosX = -35, PosY 
 a.PrimalPalkia  =	base
 a.PrimalPalkiaa =	base:new{ Image = "units/aliens/PrimalPalkia_a.png", NumFrames = 2 }
 a.PrimalPalkiad =	base:new{ Image = "units/aliens/PrimalPalkia_d.png", NumFrames = 9, Time = 0.2, Loop = false }
+
+base = a.EnemyUnit:new{Image = imagepath .."Giratina.png", PosX = -31, PosY = -13, NumFrames = 1, Height = 1 }
+a.Giratina  =	base
+a.Giratinaa =	base:new{ Image = "units/aliens/Giratina_a.png", NumFrames = 4 }
+a.Giratinad =	base:new{ Image = "units/aliens/Giratina_d.png", NumFrames = 9, Time = 0.2, Loop = false }
 
 a.MasterBall = a.EnemyUnit:new{Image = imagepath .."MasterBall.png", PosX = -8, PosY = 0, NumFrames = 1, Height = 1 }
 
@@ -1208,6 +1241,14 @@ Poke_DialgaBoss = {
 }
 AddPawn("Poke_DialgaBoss") 
 
+function Poke_DialgaBoss:GetDeathEffect(point)
+	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+	local mission = GetCurrentMission()
+	Board:AddPawn(ball, point)
+	mission.BallID = ball:GetId()
+	return SkillEffect()
+end
+
 Poke_PalkiaBoss = {
 	Health = 9,
 	MoveSpeed = 4,
@@ -1225,7 +1266,32 @@ Poke_PalkiaBoss = {
 }
 AddPawn("Poke_PalkiaBoss") 
 
-function Poke_DialgaBoss:GetDeathEffect(point)
+function Poke_PalkiaBoss:GetDeathEffect(point)
+	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+	local mission = GetCurrentMission()
+	Board:AddPawn(ball, point)
+	mission.BallID = ball:GetId()
+	return SkillEffect()
+end
+
+Poke_GiratinaBoss = {
+	Health = 9,
+	MoveSpeed = 4,
+	Image = "Giratina",
+	Name = "Giratina",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_Hex" },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_FLESH,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = false,
+	Tier = TIER_BOSS,
+	IsDeathEffect = true,
+	Massive = true,
+}
+AddPawn("Poke_GiratinaBoss") 
+
+function Poke_GiratinaBoss:GetDeathEffect(point)
 	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
 	local mission = GetCurrentMission()
 	Board:AddPawn(ball, point)
@@ -1499,6 +1565,170 @@ function Poke_SpatialRendBoss:GetSkillEffect(p1, p2)
 			runeCount = runeCount - 1
 		end
 	until runeCount <= 0
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_Hex = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Hex",
+	User = "Giratina",
+	Description = "Damages all allies and prevents them from healing.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_ShadowForce",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_GiratinaBoss",
+	}
+}
+
+function Poke_Hex:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_Hex:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn then
+			local damage = SpaceDamage(pawn:GetSpace(), self.Damage)
+			damage.sScript = string.format("Status.ApplyNecrosis(%s)", i)
+			ret:AddQueuedDamage(damage)
+			ret:AddQueuedAnimation(pawn:GetSpace(), "darkpulseAnim", ANIM_REVERSE)
+		end
+	end
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_ShadowForce = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Shadow Force",
+	User = "Giratina",
+	Description = "Disappears, then strikes a location.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = DAMAGE_DEATH,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_DevourLight",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_GiratinaBoss",
+	}
+}
+
+function Poke_ShadowForce:GetTargetArea(point)
+	local ret = PointList()
+	for _, p in ipairs(Board) do
+		ret:push_back(p)
+	end
+	return ret
+end
+
+function Poke_ShadowForce:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	-- ret:AddScript("GetCurrentMission().ShadowForceTarget = "..p2:GetString())
+	GetCurrentMission().ShadowForceTarget = p2
+	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(Point(-1,-1))", p1:GetString()))
+	-- local target = GetCurrentMission().ShadowForceTarget or p2
+	ret:AddQueuedDamage(SpaceDamage(p2, DAMAGE_DEATH))
+	-- weaponPreview:AddDamage(SpaceDamage(p2, DAMAGE_DEATH))
+	for i = DIR_START, DIR_END do
+		local curr = p2 + DIR_VECTORS[i]
+		ret:AddQueuedDamage(SpaceDamage(curr, DAMAGE_DEATH))
+		-- weaponPreview:AddDamage(SpaceDamage(curr, DAMAGE_DEATH))
+	end
+	
+	-- ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetSpace(%s)", GetCurrentMission().Target, GetCurrentMission().ShadowForceTarget:GetString()))
+	-- ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	-- ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+SkillEffect["New_AddQueuedArtillery"] = function(self, origin, damage, graphics, delay) -- add our own queued artillery that can start from anywhere
+	local fx = SkillEffect()
+	fx["AddArtillery"](fx, origin, damage, graphics, delay)
+	self.q_effect:AppendAll(fx.effect)
+end
+
+Poke_DevourLight = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Devour Light",
+	User = "Giratina",
+	Description = "Leeches health from all pawns in a large area.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_Hex",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(1, 1),
+		Enemy3 = Point(3, 2),
+		CustomPawn = "Poke_GiratinaBoss",
+	}
+}
+
+function Poke_DevourLight:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_DevourLight:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	local targets = extract_table(general_DiamondTarget(p1, 3))
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	for k = 1, #targets do
+		if targets[k] ~= p1 then 
+			local pawn = Board:GetPawn(targets[k])
+			if pawn and not pawn:IsDead() then
+				local damageAmount = self.Damage
+				if pawn:IsAcid() then 
+					damageAmount = damageAmount * 2
+				elseif pawn:IsArmor() then 
+					damageAmount = damageAmount - 1 
+				end
+				local damageDealt = math.min(pawn:GetHealth(), damageAmount)
+				local leechEffect = SpaceDamage(p1, damageDealt)
+				leechEffect.bHide = true
+				ret:New_AddQueuedArtillery(targets[k], leechEffect, "effects/shotup_grid.png", NO_DELAY) 
+			end
+			ret:AddQueuedDamage(SpaceDamage(targets[k], self.Damage))
+		end
+	end
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
 	return ret

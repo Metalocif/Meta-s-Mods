@@ -72,7 +72,8 @@ function ScorePositioning(point, pawn)
 	local mission = GetCurrentMission()
 	if mission.BlindTable[pawn:GetId()] and point:Manhattan(pawn:GetSpace()) > 2 then return -100 end
 	--if the pawn is blind, don't move beyond 2 spaces
-	return oldScorePositioning(point, pawn) + mission.AdjScoreTable[point:GetString()]
+	return oldScorePositioning(point, pawn) + (mission.AdjScoreTable[point:GetString()] or 0)
+	--nil check for Vek outside the board
 end
 
 function Skill:ScoreList(list, queued)
