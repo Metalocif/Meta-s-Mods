@@ -7,7 +7,8 @@
 -- See the wiki for info: https://github.com/Metalocif/Meta-s-Mods/wiki
 
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-local Status = {}
+-- local Status = {}
+Status = {}
 
 
 modApi:appendAsset("img/libs/status/alluring.png", path .."img/libs/status/alluring.png")
@@ -61,7 +62,7 @@ ANIMS.StatusRooted = Animation:new{ Image = "libs/status/rooted.png", PosX = -7,
 ANIMS.StatusTargeted = Animation:new{ Image = "libs/status/targeted.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusVirus = Animation:new{ Image = "libs/status/virus.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusWeaken = Animation:new{ Image = "libs/status/weaken.png", PosX = -15, PosY = 0, NumFrames = 6, Time = 0.1, Loop = true}
-ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 0, NumFrames = 5, Time = 0.2, Loop = true}
+ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 5, Time = 0.2, Loop = true}
 
 
 
@@ -210,6 +211,8 @@ end
 function Status.ApplyChill(id, clearQueued)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
 	if pawn:IsFire() then CustomAnim:rem(id, "StatusChill") return end
 	if CustomAnim:get(id, "StatusChill") then
 		CustomAnim:rem(id, "StatusChill")
@@ -381,7 +384,7 @@ function Status.ApplySleep(id, turns, addTurns)
 	if turns > 0 then
 		pawn:SetPowered(false)
 		pawn:ClearQueued()
-		if ANIMS[pawn:GetCustomAnim().."_sleep"] then
+		if ANIMS[pawn:GetCustomAnim().."_sleep"] ~= nil then
 			pawn:SetCustomAnim(_G[pawn:GetType()].Image.."_sleep")
 		elseif not CustomAnim:get(id, "StatusSleep") then
 			CustomAnim:add(id, "StatusSleep")
@@ -504,7 +507,7 @@ function Status.RemoveStatus(id, status)
 	CustomAnim:rem(id, "Status"..status)
 	local mission = GetCurrentMission()
 	if not mission then return end
-	if not mission[Status.."Table"][id] then return end
+	if not mission[status.."Table"][id] then return end
 	if status == "Rooted" then 
 		pawn:SetPushable(mission["RootedTable"][id].wasPushable) 
 		pawn:SetMoveSpeed(mission["RootedTable"][id].oldMoveSpeed)
@@ -539,7 +542,7 @@ function Status.GetStatus(id, status)
 end
 
 function Status.List()
-	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Hemorrhage","Infested","LeechSeed","Necrosis","Poison","Powder","Regen","Rooted","Shatterburst","Sleep","Targeted","Virus","Weaken","Wet",}
+	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Hemorrhage","Infested","LeechSeed","Necrosis","Poison","Powder","Regen","Rooted","Shatterburst","Sleep","Targeted","Virus","Weaken","Wet"}
 end
 
 function Status.Count(id)
@@ -565,7 +568,7 @@ local function getWeaponKey(id, key)		--helper function to generate the extra We
 	return _G[id] and _G[id][key] or id
 end
 
-function GenerateWeakenWeapons()
+local function GenerateWeakenWeapons()
 	for id, weapon in pairs(_G) do
 		if weapon and type(weapon) == "table" and weapon.Damage and weapon.Class and weapon.Damage > 0 and weapon.Class == "Enemy" and weapon.Original == nil then
 			local i = 1
@@ -587,16 +590,20 @@ function GenerateWeakenWeapons()
 	end
 end
 
-function PrepareTables()						--setup all status tables here so we don't need to check everywhere
+local function PrepareTables()						--setup all status tables here so we don't need to check everywhere
 	modApi:conditionalHook(function()			--we need the conditional hook for some reason
-		return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil
+		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
 	end, 
 	function()
 		local mission = GetCurrentMission()
-		local tablesList = merge_table(Status.List, {"AdjScore"})
+		-- if mission == nil then return end
+		LOG("status tables are ready")
+		-- local tablesList = merge_table(Status.List(), {"AdjScore"})
+		local tablesList = Status.List()
 		for i = 1, #tablesList do
 			mission[tablesList[i].."Table"] = {}
 		end
+		mission["AdjScoreTable"] = {}
 	end)
 end
 
@@ -620,14 +627,14 @@ local function EVENT_onModsLoaded()
 		local id = pawn:GetId()
 		if mission.WetTable[id] ~= nil then
 			pawn:SetFire(false)
-			Status.RemoveStatus(id, "StatusWet")
+			Status.RemoveStatus(id, "Wet")
 		end
 		if mission.DryTable[id] ~= nil then
 			Board:DamageSpace(point, 1)
-			Status.RemoveStatus(id, "StatusDry")
+			Status.RemoveStatus(id, "Dry")
 		end
 		if mission.PowderTable[id] then
-			Status.RemoveStatus(id, "StatusPowder")
+			Status.RemoveStatus(id, "Powder")
 			local point = pawn:GetSpace()
 			Board:DamageSpace(point, 1)
 			Board:AddAnimation(point, "ExploAir1", 1)
@@ -636,16 +643,16 @@ local function EVENT_onModsLoaded()
 				Board:AddAnimation(point, "explopush1_"..i, 1)
 			end
 		end
-		Status.RemoveStatus(id, "StatusHemorrhage")
-		Status.RemoveStatus(id, "StatusChill")
-		Status.RemoveStatus(id, "StatusRooted")
+		Status.RemoveStatus(id, "Hemorrhage")
+		Status.RemoveStatus(id, "Chill")
+		Status.RemoveStatus(id, "Rooted")
 	end)
 	modapiext:addPawnIsFrozenHook(function(mission, pawn, isFrozen)		--chill/shatterburst
 		if not (mission and pawn and isFrozen) then return end
 		local id = pawn:GetId()
-		Status.RemoveStatus(id, "StatusChill")
+		Status.RemoveStatus(id, "Chill")
 		if mission.ShatterburstTable[id] then
-			Status.RemoveStatus(id, "StatusShatterburst")
+			Status.RemoveStatus(id, "Shatterburst")
 			local point = pawn:GetSpace()
 			Board:DamageSpace(point, 1)
 			Board:AddAnimation(point, "ExplIce1", 1)
@@ -719,9 +726,9 @@ local function EVENT_onModsLoaded()
 		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
 			local pawn = Board:GetPawn(id)
 			if pawn then
+				LOG(pawn:GetType().." has "..sleepTurnsLeft)
 				if sleepTurnsLeft <= 1 then 
 					--delete the anims a turn early to make it clear the pawn is waking up soon
-					if sleepTurnsLeft <= 0 then pawn:SetPowered(true) end
 					if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then
 						if pawn:GetCustomAnim():sub(-13, -1) == "special_sleep" then
 						--this lets pawns have two different anims for sleeping
@@ -732,10 +739,13 @@ local function EVENT_onModsLoaded()
 					else
 						CustomAnim:rem(id, "StatusSleep")
 					end
-					mission.SleepTable[id] = nil
-				else --if Game:GetTeamTurn() == pawn:GetTeam() then
-					mission.SleepTable[id] = sleepTurnsLeft - 1
 				end
+				mission.SleepTable[id] = sleepTurnsLeft - 1
+				if sleepTurnsLeft < 0 then 
+					pawn:SetPowered(true) 
+					mission.SleepTable[id] = nil
+				end
+				
 			end
 		end
 		local fx = SkillEffect()
@@ -847,4 +857,5 @@ end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
-return Status
+-- return Status
+return true
