@@ -1082,7 +1082,6 @@ local oldMove = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2, ...)
 	local ret = SkillEffect()
 	local mover = Board:GetPawn(p1)
-	local willBoost
 	if mover and _G[mover:GetType()].GhostMovement then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", p1:GetString(), p2:GetString()))
 		return ret
