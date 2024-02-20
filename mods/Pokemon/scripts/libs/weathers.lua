@@ -11,7 +11,7 @@
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 local customEmitter = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customEmitter")
 local status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
-local this = {}
+Weathers = {}
 
 modApi:appendAsset("img/libs/weather/sun.png", path .."img/libs/weather/sun.png")
 ANIMS.WeatherSun = Animation:new{ Image = "libs/weather/sun.png",PosX = -35, PosY = -20, NumFrames = 1, Time = 1, Loop = true}
@@ -96,7 +96,7 @@ local function SetWeatherOverwriter(BoardClass, board)
     end
 end
 
-local function AddWeather(self, weather, intensity, startLoc, endLoc)
+function Weathers.AddWeather(weather, intensity, startLoc, endLoc)
 	mission = GetCurrentMission()
 	if not mission then return end
 	intensity = intensity or 1
@@ -156,7 +156,7 @@ local function AddWeather(self, weather, intensity, startLoc, endLoc)
 	mission.WeatherLoc2 = endLoc
 end
 
-local function ClearWeather(self)
+function Weathers.ClearWeather()
 	mission = GetCurrentMission()
 	if not mission then return end
 	for i = 1, 5 do
@@ -205,7 +205,7 @@ local function EVENT_onModsLoaded()
 			for _, p in ipairs(Board) do
 				local pawn = Board:GetPawn(p)
 				if pawn and pawn:IsFrozen() then pawn:SetFrozen(false) end
-				Status:RemoveStatus(pawn:GetId(), "Wet")
+				Status.RemoveStatus(pawn:GetId(), "Wet")
 				if Board:IsFrozen(p) then Board:SetFrozen(false) end
 				if Board:GetTerrain(p) == TERRAIN_ICE then Board:SetTerrain(p, TERRAIN_WATER) end
 				if pawn and _G[pawn:GetType()].FunctionInWeatherSun ~= nil then _G[pawn:GetType()].FunctionInWeatherSun(pawn:GetId()) end
@@ -235,7 +235,7 @@ local function EVENT_onModsLoaded()
 					if Board:IsFire(Point(i,j)) or (pawn and pawn:IsFire()) then
 						Board:SetSmoke(Point(i,j), true, false)
 					end
-					if pawn then Status:RemoveStatus(pawn:GetId(), "Dry") end
+					if pawn then Status.RemoveStatus(pawn:GetId(), "Dry") end
 				elseif mission.Weather == "Snow" then
 					if pawn and (not pawn:IsFire()) and not CustomAnim:get(pawn:GetId(), "StatusChill") then
 						Status.ApplyChill(pawn:GetId())
@@ -269,13 +269,13 @@ end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
-local function onModsInitialized()
-	Weathers = Weathers or {}
-	Weathers.AddWeather = AddWeather
-	Weathers.ClearWeather = ClearWeather
-end
+-- local function onModsInitialized()
+	-- Weathers = Weathers or {}
+	-- Weathers.AddWeather = AddWeather
+	-- Weathers.ClearWeather = ClearWeather
+-- end
 
 modApi.events.onBoardClassInitialized:subscribe(SetWeatherOverwriter)
-modApi.events.onModsInitialized:subscribe(onModsInitialized)
+-- modApi.events.onModsInitialized:subscribe(onModsInitialized)
 
-return Weathers
+-- return Weathers
