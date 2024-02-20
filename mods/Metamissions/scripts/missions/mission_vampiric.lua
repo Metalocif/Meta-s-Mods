@@ -7,7 +7,7 @@ local corpMissions = require(path .."corpMissions")
 
 Mission_Meta_Vampiric = Mission_Infinite:new{
 	Name = "Vampiric Vek",
-	Objectives = Objective("Kill the Vampiric Vek",1,1),
+	Objectives = Objective("Finish off the Vampiric Vek using the Vek Impaler.",1,1),
 	Target = 0
 }
 
@@ -19,29 +19,20 @@ function Mission_Meta_Vampiric:StartMission()
 end
 
 function Mission_Meta_Vampiric:NextTurn()
-	LOG("next turn")
 	if Game:GetTeamTurn() == TEAM_ENEMY then
-		LOG("enemy turn")
 		if Board:IsPawnAlive(self.Target) then
 			local vampire = Board:GetPawn(self.Target)
 			local space = vampire:GetSpace()
 			local targets = extract_table(general_DiamondTarget(space, 3))
 			local totalHealing = 0
 			local neededHealing = vampire:GetMaxHealth() - vampire:GetHealth()
-			-- LOG(neededHealing)
 			local ret = SkillEffect()
 			for k = 1, #targets do
-				-- Board:Ping(targets[k], COLOR_RED)
 				local pawn = Board:GetPawn(targets[k])
-				-- if pawn then LOG(targets[k]:GetString(), tostring(pawn:GetTeam() == TEAM_ENEMY), totalHealing, neededHealing, tostring(pawn:IsDead())) end
 				if pawn and pawn:GetTeam() == TEAM_ENEMY and totalHealing < neededHealing and not pawn:IsDead() and pawn:GetId() ~= self.Target then
-					-- LOG("found pawn in "..targets[k]:GetString())
-					-- Board:DamageSpace(targets[k], 1)
-					-- Board:DamageSpace(space, -1)
-					-- Board:Ping(targets[k], COLOR_BLACK)
+					-- leeches from enemies, only if it still needs to heal, it not a corpse, and doesn't leech from itself
 					ret:AddDamage(SpaceDamage(targets[k], 1))
 					ret:AddArtillery(targets[k], SpaceDamage(space, -1), "effects/leechedblood.png", NO_DELAY)
-					
 					totalHealing = totalHealing + 1
 				end
 			end
