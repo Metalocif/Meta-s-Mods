@@ -15,6 +15,7 @@ Mission_Poke_Palkia = Mission_Infinite:new{
 	CustomTile = "tiles_Pillars",
 	MapTags = { "Poke_Boss_Pillars_Palkia" },
 	BlockSecret = true,
+	BonusPool = { BONUS_KILL_FIVE, BONUS_MECHS, BONUS_PACIFIST },
 	BossPawn = "Poke_PalkiaBoss",
 }
 

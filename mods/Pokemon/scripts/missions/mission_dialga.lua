@@ -15,6 +15,7 @@ Mission_Poke_Dialga = Mission_Infinite:new{
 	CustomTile = "tiles_Pillars",
 	MapTags = { "Poke_Boss_Pillars_Dialga" },
 	BlockSecret = true,
+	BonusPool = { BONUS_KILL_FIVE, BONUS_MECHS, BONUS_PACIFIST },
 	BossPawn = "Poke_DialgaBoss",
 }
 
