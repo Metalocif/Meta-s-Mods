@@ -28,6 +28,7 @@ modApi:appendAsset("img/libs/status/poison1.png", path .."img/libs/status/poison
 modApi:appendAsset("img/libs/status/poison2.png", path .."img/libs/status/poison2.png")
 modApi:appendAsset("img/libs/status/poison3.png", path .."img/libs/status/poison3.png")
 modApi:appendAsset("img/libs/status/powder.png", path .."img/libs/status/powder.png")
+modApi:appendAsset("img/libs/status/reactive.png", path .."img/libs/status/reactive.png")
 modApi:appendAsset("img/libs/status/rooted.png", path .."img/libs/status/rooted.png")
 modApi:appendAsset("img/libs/status/shatterburst.png", path .."img/libs/status/shatterburst.png")
 modApi:appendAsset("img/libs/status/sleep.png", path .."img/libs/status/sleep.png")
@@ -48,7 +49,7 @@ ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful.png", PosX =
 ANIMS.StatusDry = Animation:new{ Image = "libs/status/dry.png", PosX = 0, PosY = 0, NumFrames = 3, Time = 0.3, Loop = true}
 ANIMS.StatusDoomed = Animation:new{ Image = "combat/icons/icon_tentacle.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusHemorrhage = Animation:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 0, NumFrames = 5, Time = 0.2, Loop = true}
+ANIMS.StatusHemorrhage = Animation:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
 ANIMS.StatusLeechSeed = Animation:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusNecrosis = Animation:new{ Image = "libs/status/necrosis.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusPoison1 = Animation:new{ Image = "libs/status/poison1.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
@@ -58,11 +59,12 @@ ANIMS.StatusShatterburst = Animation:new{ Image = "libs/status/shatterburst.png"
 ANIMS.StatusSleep = Animation:new{ Image = "libs/status/sleep.png", PosX = -30, PosY = -20, NumFrames = 7, Time = 0.3, Loop = true}
 ANIMS.StatusPowder = Animation:new{ Image = "libs/status/powder.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusRegen = Animation:new{ Image = "combat/icons/icon_regen.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusReactive = Animation:new{ Image = "libs/status/reactive.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusRooted = Animation:new{ Image = "libs/status/rooted.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusTargeted = Animation:new{ Image = "libs/status/targeted.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusVirus = Animation:new{ Image = "libs/status/virus.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusWeaken = Animation:new{ Image = "libs/status/weaken.png", PosX = -15, PosY = 0, NumFrames = 6, Time = 0.1, Loop = true}
-ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 5, Time = 0.2, Loop = true}
+ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
 
 
 
@@ -423,6 +425,15 @@ function Status.ApplyRegen(id, amount)
 	CustomAnim:add(id, "StatusRegen")
 end
 
+function Status.ApplyReactive(id)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	mission.ReactiveTable[id] = true
+	CustomAnim:add(id, "StatusReactive")
+end
+
 function Status.ApplyRooted(id, amount)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
@@ -543,7 +554,7 @@ function Status.GetStatus(id, status)
 end
 
 function Status.List()
-	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Hemorrhage","Infested","LeechSeed","Necrosis","Poison","Powder","Regen","Rooted","Shatterburst","Sleep","Targeted","Virus","Weaken","Wet"}
+	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Hemorrhage","Infested","LeechSeed","Necrosis","Poison","Powder","Reactive","Regen","Rooted","Shatterburst","Sleep","Targeted","Virus","Weaken","Wet"}
 end
 
 function Status.Count(id)
@@ -648,6 +659,19 @@ local function EVENT_onModsLoaded()
 		Status.RemoveStatus(id, "Chill")
 		Status.RemoveStatus(id, "Rooted")
 	end)
+	modapiext:addPawnIsAcidHook(function(mission, pawn, isAcid)			--reactive
+		if not (mission and pawn and isAcid) then return end
+		local id = pawn:GetId()
+		if mission.ReactiveTable[id] then
+			Status.RemoveStatus(id, "Reactive")
+			local point = pawn:GetSpace()
+			for i = DIR_START, DIR_END do
+				local damage = SpaceDamage(point + DIR_VECTORS[i])
+				damage.iSmoke = 1
+				Board:DamageSpace(damage)
+			end
+		end
+	end)
 	modapiext:addPawnIsFrozenHook(function(mission, pawn, isFrozen)		--chill/shatterburst
 		if not (mission and pawn and isFrozen) then return end
 		local id = pawn:GetId()
@@ -679,8 +703,8 @@ local function EVENT_onModsLoaded()
 		if not (mission and pawn) then return end
 		local id = pawn:GetId()
 		if mission.DoomedTable[id] then
-			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab")
-			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab_Front")
+			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab", ANIM_NO_DELAY)
+			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab_Front", ANIM_NO_DELAY)
 			Board:SetTerrain(pawn:GetSpace(), TERRAIN_LAVA)
 		end
 	end)
@@ -720,8 +744,8 @@ local function EVENT_onModsLoaded()
 			if pawn then
 				local damage = SpaceDamage(pawn:GetSpace(), 1)
 				damage.sAnimation = "PsionAttack_Back"
-				Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front")
-				pawn:ApplyDamage(damage	)
+				Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
+				pawn:ApplyDamage(damage)
 			end
 		end
 		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
