@@ -3,9 +3,8 @@ local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."li
 local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
 local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
 local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
-local weathers = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
--- local Status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
-local test = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
+require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
 
 local files = {
     "Pound.png",
@@ -87,6 +86,7 @@ modApi:appendAsset("img/effects/shotup_dragonrage.png", resourcePath.."img/effec
 modApi:appendAsset("img/effects/shotup_psystrike.png", resourcePath.."img/effects/shotup_psystrike.png")
 modApi:appendAsset("img/effects/twister.png", resourcePath.."img/effects/twister.png")
 modApi:appendAsset("img/effects/darkpulse.png", resourcePath.."img/effects/darkpulse.png")
+modApi:appendAsset("img/effects/explo_viridian.png", resourcePath.."img/effects/explo_viridian.png")
 modApi:appendAsset("img/effects/moonblastanim.png", resourcePath.."img/effects/moonblastanim.png")
 modApi:appendAsset("img/effects/petalblizzardanim.png", resourcePath.."img/effects/petalblizzardanim.png")
 modApi:appendAsset("img/effects/clockanim.png", resourcePath.."img/effects/clockanim.png")
@@ -195,13 +195,8 @@ ANIMS.twisterAnim = Animation:new{
 	Loop = false,
 }
 
-ANIMS.darkpulseAnim = Animation:new{
-	Image = "effects/darkpulse.png",
-	NumFrames = 8,
-	Time = 0.1,
-	PosX = -32,
-	PosY = -20
-}
+ANIMS.darkpulseAnim = Animation:new{Image = "effects/darkpulse.png",NumFrames = 8,Time = 0.1,PosX = -32,PosY = -20}
+ANIMS.explo_viridian = Animation:new{Image = "effects/explo_viridian.png",NumFrames = 8,Time = 0.06,PosX = -22,PosY = 1}
 ANIMS.moonblastAnim = Animation:new{
 	Image = "effects/moonblastanim.png",
 	NumFrames = 3,
@@ -210,13 +205,7 @@ ANIMS.moonblastAnim = Animation:new{
 	PosX = -27,
 	PosY = -15
 }
-ANIMS.petalblizzardAnim = Animation:new{
-	Image = "effects/petalblizzardanim.png",
-	NumFrames = 5,
-	Time = 0.1,
-	PosX = -42,
-	PosY = -30
-}
+ANIMS.petalblizzardAnim = Animation:new{Image = "effects/petalblizzardanim.png",NumFrames = 5,Time = 0.1,PosX = -42,PosY = -30}
 
 ANIMS.clockAnim = Animation:new{
 	Image = "effects/clockanim.png",
@@ -707,8 +696,9 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		damage.loc = p2 + DIR_VECTORS[(direction + 3)%4]
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
-	-- Status.ApplyVirus(Board:GetPawn(p2):GetId())
+	-- Status.ApplyShocked(Board:GetPawn(p2):GetId())
 	-- ret:AddScript(string.format("Weathers.AddWeather(%q, %s)", "Rain", 20))
+	-- Weathers.AddWeather("Sandstorm", 1)
 	return ret
 end
 
@@ -1961,11 +1951,10 @@ Poke_Bloom=Skill:new{
 	Description = "Creates forests in an area, pushing pawns on the edge. Forests already present bloom with Gracidea, which empower Grass-type allied Pokemon.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
-	Healing = 0,
 	PathSize = 8,	
 	PowerCost = 0,
 	Upgrades = 2,
-	UpgradeList = { "Forest's Mercy", "Forest's Wrath" },
+	UpgradeList = { "Forest's Roots", "Forest's Wrath" },
 	UpgradeCost = { 1, 2 },
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -1979,9 +1968,9 @@ Poke_Bloom=Skill:new{
 		CustomPawn = "Poke_Shaymin",
 	}
 }
-Poke_Bloom_A=Poke_Bloom:new{ UpgradeDescription = "Heals allies on forests.", Healing = -1 }
-Poke_Bloom_B=Poke_Bloom:new{ UpgradeDescription = "Damages enemies on forests.", Damage = 2 }
-Poke_Bloom_AB=Poke_Bloom:new{ Healing = -1, Damage = 2 }
+Poke_Bloom_A=Poke_Bloom:new{ UpgradeDescription = "An enemy on the center tile becomes rooted.", Roots = true }
+Poke_Bloom_B=Poke_Bloom:new{ UpgradeDescription = "Damages enemies on forests. Will passively damage rooted enemies with both upgrades enabled.", Damage = 2 }
+Poke_Bloom_AB=Poke_Bloom:new{ Roots = true, Damage = 2 }
 
 function Poke_Bloom:GetTargetArea(p1)
 	local ret = PointList()
@@ -1997,11 +1986,10 @@ end
 function Poke_Bloom:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
+	if self.Roots and Board:GetPawn(p2) then damage.sScript = string.format("Status.ApplyRooted(%s, %s)", Board:GetPawn(p2):GetId(), self.Damage) end
 	if Board:GetTerrain(p2) == TERRAIN_FOREST then 
-		if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_ENEMY and self.Damage > 0 then
+		if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_ENEMY and self.Damage > 0 then 
 			ret:AddSafeDamage(SpaceDamage(p2, self.Damage))
-		elseif Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_PLAYER and self.Healing < 0 then
-			ret:AddDamage(SpaceDamage(p2, self.Healing))
 		elseif not Board:GetPawn(p2) and Board:GetItem(p2) == "" then
 			damage.sItem = "Poke_Gracidea" 
 		end
@@ -2009,6 +1997,7 @@ function Poke_Bloom:GetSkillEffect(p1, p2)
 	else
 		damage.iTerrain = TERRAIN_FOREST
 	end
+	damage.sAnimation = "explo_viridian"
 	ret:AddDamage(damage)
 	for i = DIR_START, DIR_END do
 		local curr = p2 + DIR_VECTORS[i]
@@ -3374,13 +3363,12 @@ function Poke_ZippyZap:GetSkillEffect(p1, p2)
 	move:push_back(p1)
 	move:push_back(p2)
 	ret:AddCharge(move, NO_DELAY)
-	local temp = p1 
-	while temp ~= p2  do 
-		temp = temp + DIR_VECTORS[dir]
+	local temp = p1 + DIR_VECTORS[dir]
+	while temp ~= p2 do 
 		ret:AddDamage(SpaceDamage(temp, self.Damage))
+		temp = temp + DIR_VECTORS[dir]
 		if temp ~= p2 then ret:AddDelay(0.06) end
 	end
-	ret:AddDamage(SpaceDamage(p2, self.Damage))
 	return ret
 end
 
@@ -3409,11 +3397,16 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 	ret:AddCharge(move, NO_DELAY)
 	local temp = p1 + DIR_VECTORS[dir]
 	while temp ~= p2 do
-		ret:AddDamage(SpaceDamage(temp, self.Damage))
+		local damage = SpaceDamage(temp, self.Damage)
+		damage.sAnimation = "Lightning_Attack_"..dir
+		local pawn = Board:GetPawn(temp)
+		if pawn then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
+		ret:AddDamage(damage)
 		tilesHit[temp:GetString()] = true
 		temp = temp + DIR_VECTORS[dir]
 		if temp ~= p2 then ret:AddDelay(0.06) end
 	end
+	ret:AddAnimation(p2, "Lightning_Attack_"..dir)
 	-- ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim))
 	ret:AddDelay(0.3)
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Jolteon_charge_"..dir2))
@@ -3421,14 +3414,19 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 	move:push_back(p2)
 	move:push_back(p3)
 	ret:AddCharge(move, NO_DELAY)
+	ret:AddAnimation(p2, "Lightning_Attack_"..dir2)
 	temp = p2 + DIR_VECTORS[dir2]
 	while temp ~= p3 do 
 		local damage = SpaceDamage(temp, self.Damage)
+		damage.sAnimation = "Lightning_Attack_"..dir2
 		if tilesHit[temp:GetString()] then damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p3, temp) end
+		local pawn = Board:GetPawn(temp)
+		if pawn then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
 		ret:AddDamage(damage)
 		temp = temp + DIR_VECTORS[dir2]
 		if temp ~= p3 then ret:AddDelay(0.06) end
 	end
+	ret:AddAnimation(p3, "Lightning_Attack_"..dir2)
 	ret:AddDelay(0.3)
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p3:GetString(), anim))
 	return ret
@@ -4255,9 +4253,9 @@ Poke_FuryCutter = Skill:new{
 	Damage = 1,
 	PathSize = 1,	--automatically makes a target area?
 	PowerCost = 0, --AE Change
-	Upgrades = 1,
-	UpgradeList = { "+1 Damage" },
-	UpgradeCost = { 3 },
+	Upgrades = 2,
+	UpgradeList = { "Hemorrhage", "+1 Damage" },
+	UpgradeCost = { 1, 3 },
 	TwoClick = true,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -4267,7 +4265,9 @@ Poke_FuryCutter = Skill:new{
 		CustomPawn = "Poke_Scyther",
 	}
 }
-Poke_FuryCutter_A=Poke_FuryCutter:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_FuryCutter_A=Poke_FuryCutter:new{ UpgradeDescription = "When an enemy would be healed, it takes damage instead. Removed when set on fire.", Hemorrhage = true }
+Poke_FuryCutter_B=Poke_FuryCutter:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_FuryCutter_AB=Poke_FuryCutter:new{ Hemorrhage = true, Damage = 2 }
 
 function Poke_FuryCutter:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
@@ -4288,7 +4288,9 @@ function Poke_FuryCutter:GetSkillEffect(p1,p2)
 	local damage = SpaceDamage(p2, self.Damage)
 	damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p1, p2)
 	damage.sSound = "/weapons/sword"
+	ret:AddAnimation(p2, "Swipe2Claw1", ANIM_NO_DELAY)
 	ret:AddMelee(p1, damage)
+	if Board:GetPawn(p2) and self.Hemorrhage then damage.sScript = string.format("Status.ApplyHemorrhage(%s)", Board:GetPawn(p2):GetId()) end
 	ret:AddMelee(p1, damage)
 	return ret
 end
@@ -4297,8 +4299,11 @@ function Poke_FuryCutter:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2, self.Damage)
 	damage.sSound = "/weapons/sword"
+	damage.sAnimation = "SwipeClaw1"
+	if Board:GetPawn(p2) and self.Hemorrhage then damage.sScript = string.format("Status.ApplyHemorrhage(%s)", Board:GetPawn(p2):GetId()) end
 	ret:AddMelee(p1, damage)
 	damage.loc = p3
+	if Board:GetPawn(p3) and self.Hemorrhage then damage.sScript = string.format("Status.ApplyHemorrhage(%s)", Board:GetPawn(p3):GetId()) end
 	ret:AddMelee(p1, damage)
 	return ret
 end
@@ -4314,9 +4319,9 @@ Poke_XScissor = Skill:new{
 	Damage = 2,
 	PathSize = 1,	--automatically makes a target area?
 	PowerCost = 0, --AE Change
-	Upgrades = 1,
-	UpgradeList = { "+1 Damage" },
-	UpgradeCost = { 2 },
+	Upgrades = 2,
+	UpgradeList = { "Hemorrhage", "+1 Damage" },
+	UpgradeCost = { 1, 2 },
 	LaunchSound = "/weapons/sword",
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -4326,15 +4331,22 @@ Poke_XScissor = Skill:new{
 		CustomPawn = "Poke_Scyther",
 	}
 }
-Poke_XScissor_A=Poke_XScissor:new{ UpgradeDescription = "Increases damage by 1.", Damage = 3 }
+
+Poke_XScissor_A=Poke_XScissor:new{ UpgradeDescription = "When an enemy would be healed, it takes damage instead. Removed when set on fire.", Hemorrhage = true }
+Poke_XScissor_B=Poke_XScissor:new{ UpgradeDescription = "Increases damage by 1.", Damage = 3 }
+Poke_XScissor_AB=Poke_XScissor:new{ Damage = 3, Hemorrhage = true }
 
 function Poke_XScissor:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2, self.Damage)
-	-- damage.sSound = self.LaunchSound
+	damage.sAnimation = "SwipeClaw2"
+	if Board:GetPawn(p2) and self.Hemorrhage then damage.sScript = string.format("Status.ApplyHemorrhage(%s)", Board:GetPawn(p2):GetId()) end
 	ret:AddMelee(p1, damage)
 	for i = DIR_START, DIR_END do
-		ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4], self.Damage))
+		damage = SpaceDamage(p2 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4], self.Damage)
+		damage.sAnimation = "SwipeClaw2"
+		ret:AddDamage(damage)
+		if Board:GetPawn(p2) and self.Hemorrhage then ret:AddScript(string.format("Status.ApplyHemorrhage(%s)", Board:GetPawn(p2):GetId())) end
 	end
 	return ret
 end
