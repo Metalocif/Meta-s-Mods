@@ -711,9 +711,11 @@ local function EVENT_onModsLoaded()
 		if not (mission and pawn) then return end
 		local id = pawn:GetId()
 		if mission.DoomedTable[id] then
-			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab", ANIM_NO_DELAY)
-			Board:AddAnimation(pawn:GetSpace(), "Tentacle_Grab_Front", ANIM_NO_DELAY)
-			Board:SetTerrain(pawn:GetSpace(), TERRAIN_LAVA)
+			local damage = SpaceDamage(pawn:GetSpace(), DAMAGE_DEATH)
+			damage.sAnimation = "tentacles"
+			damage.iTerrain = TERRAIN_LAVA
+			damage.sSound = "/props/tentacle"
+			Board:DamageSpace(damage)
 		end
 		for doomedID, source in pairs(mission.DoomedTable) do
 			if id == source then Status.RemoveStatus(doomedID, "Doomed") end
@@ -753,14 +755,22 @@ local function EVENT_onModsLoaded()
 		end
 		for id, source in pairs(mission.DoomedTable) do
 			local pawn = Board:GetPawn(id)
-			if not Board:GetPawn(source) then			--doublechecking with pawnIsKilled, but something could have removed the pawn without killing
+			if source ~= -1 and not Board:GetPawn(source) then			--doublechecking with pawnIsKilled, but something could have removed the pawn without killing
 				Status.RemoveStatus(id, "Doomed")
 			elseif pawn then
 				local damage = SpaceDamage(pawn:GetSpace(), 1)
 				damage.sAnimation = "PsionAttack_Back"
-				Board:Ping(Board:GetPawn(source):GetSpace(), GL_Color(100, 100, 0))		--here to let the player visualise the source of the effect
 				Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
+				if Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER and Board:IsAcid(pawn:GetSpace()) then
+					Board:AddAnimation(pawn:GetSpace(), "Splash_acid", ANIM_NO_DELAY)
+				elseif Board:IsTerrain(pawn:GetSpace(),TERRAIN_LAVA) then
+					Board:AddAnimation(pawn:GetSpace(), "Splash_lava", ANIM_NO_DELAY)
+				elseif Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER then
+					Board:AddAnimation(pawn:GetSpace(), "Splash", ANIM_NO_DELAY)
+				end
 				pawn:ApplyDamage(damage)
+				if Board:GetPawn(source) then Board:Ping(Board:GetPawn(source):GetSpace(), GL_Color(100, 100, 0)) end
+				--here to let the player visualise the source of the effect
 			end
 		end
 		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
