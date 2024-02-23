@@ -246,8 +246,7 @@ local function EVENT_onModsLoaded()
 					if pawn and pawn:GetTeam() == TEAM_ENEMY and not pawn:IsShield() then Status.ApplyBlind(pawn:GetId(), 1, true) end
 				elseif mission.Weather == "Smog" then
 					if pawn and pawn:GetTeam() ~= TEAM_BOTS and not pawn:IsShield() then 
-						Status.ApplyPoison(pawn:GetId(), 1, false) 
-						Status.TriggerPoison(pawn:GetId()) 
+						Status.ApplyToxin(pawn:GetId())
 					end
 				end
 				if pawn and _G[pawn:GetType()]["FunctionInWeather"..mission.Weather] ~= nil then _G[pawn:GetType()]["FunctionInWeather"..mission.Weather](pawn:GetId()) end
