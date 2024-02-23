@@ -86,11 +86,11 @@ modApi:addPalette{
     PlateHighlight = {255,233,25},
     PlateLight     = {108,178,126},
     PlateMid       = {63,72,71},
-    PlateDark      = {28,35,34},
-    PlateOutline   = {12,11,13},
+    PlateDark      = {43,50,49},
+    PlateOutline   = {12,21,13},
     BodyHighlight  = {102,103,93},
     BodyColor      = {58,58,54},
-    PlateShadow    = {20,20,20},
+    PlateShadow    = {35,35,35},
 }
 
 Meta_Hydra = Pawn:new{
