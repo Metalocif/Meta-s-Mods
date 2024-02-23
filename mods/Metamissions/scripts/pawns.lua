@@ -153,7 +153,7 @@ function Meta_UndyingVekAtk:GetTargetScore(p1,p2)
 	local targetScore = 1
 	for i = DIR_START, DIR_END do
 		local p = p2 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
-		if Board:GetPawnTeam(p) == TEAM_PLAYER and not Board:GetPawn(p):IsDead() then targetScore = targetScore + 10 end
+		if Board:GetPawn(p) and Board:GetPawn(p):GetTeam() == TEAM_PLAYER and not Board:GetPawn(p):IsDead() then targetScore = targetScore + 10 end
 		if Board:IsBuilding(p) then targetScore = targetScore + 10 end
 		local curr = p2 + DIR_VECTORS[i]
 		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_VEK then 
