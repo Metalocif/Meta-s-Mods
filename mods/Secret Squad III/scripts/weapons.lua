@@ -317,7 +317,10 @@ end
 
 function Meta_TechnoDiggerWeapon:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
-	
+	if Board:IsTipImage() and self.EncaseBuildings then
+		ret:AddScript("Board:SetTerrain(Point(1, 2), 0)")
+		ret:AddScript("Board:AddPawn(\"Wall\", Point(1, 2))")
+	end
 	for dir = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[dir]
 		local damage = SpaceDamage(curr)
@@ -345,7 +348,7 @@ function Meta_TechnoDiggerWeapon:GetSkillEffect(p1,p2)
 				for n in pairs(mission.EncasedBuildings) do 
 					encasedCount = encasedCount + 1 
 				end
-				if encasedCount >= 4 then ret:AddScript("completeGaiasCradle()") end
+				if encasedCount >= 4 and not IsTestMechScenario() then ret:AddScript("completeGaiasCradle()") end
 				local freezeRock = false
 				if Board:IsFrozen(curr) then freezeRock = true end
 				damage.iFrozen = EFFECT_REMOVE
@@ -361,18 +364,18 @@ function Meta_TechnoDiggerWeapon:GetSkillEffect(p1,p2)
 			end        
 		end
 	end	
-	
-	if not self.Shrapnel then return ret end
-	--check for rocks and do shrapnel
-	ret:AddDelay(0.35)
-	for dir = DIR_START, DIR_END do
-		local curr = p1 + DIR_VECTORS[dir]
-		if Board:GetPawn(curr) and _G[Board:GetPawn(curr):GetType()].ImpactMaterial == IMPACT_ROCK and (curr == p2 or p1 == p2) then
-		--we only fire shrapnel if the rock is targeted or the Digger is targeted
-			for dir2 = DIR_START, DIR_END do
-				if curr + DIR_VECTORS[dir2] ~= p1 and not Board:IsBuilding(curr + DIR_VECTORS[dir2]) then ret:AddProjectile(curr, SpaceDamage(curr + DIR_VECTORS[dir2], 2), "effects/shrapnel"..math.random(1, 5), NO_DELAY) end
-				--we fire from rocks towards tiles that are neither the Digger nor buildings
-				--random projectiles graphics because so many are fired at once, although they are barely visible
+	if self.Shrapnel then
+		--check for rocks and do shrapnel
+		ret:AddDelay(0.35)
+		for dir = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[dir]
+			if Board:GetPawn(curr) and _G[Board:GetPawn(curr):GetType()].ImpactMaterial == IMPACT_ROCK and (curr == p2 or p1 == p2) then
+			--we only fire shrapnel if the rock is targeted or the Digger is targeted
+				for dir2 = DIR_START, DIR_END do
+					if curr + DIR_VECTORS[dir2] ~= p1 and not Board:IsBuilding(curr + DIR_VECTORS[dir2]) then ret:AddProjectile(curr, SpaceDamage(curr + DIR_VECTORS[dir2], 2), "effects/shrapnel"..math.random(1, 5), NO_DELAY) end
+					--we fire from rocks towards tiles that are neither the Digger nor buildings
+					--random projectiles graphics because so many are fired at once, although they are barely visible
+				end
 			end
 		end
 	end
@@ -394,26 +397,13 @@ Meta_TechnoDiggerWeapon_A = Meta_TechnoDiggerWeapon:new{
 		Building = Point(1,2),
 		Building2 = Point(3,1),
 		CustomEnemy = "Wall2",
-		CustomPawn = "Meta_TechnoDigger",
+		CustomPawn = "Meta_TechnoDigger"
 	}
 }
 
 Meta_TechnoDiggerWeapon_B = Meta_TechnoDiggerWeapon:new{
 	EncaseBuildings = true,
 	UpgradeDescription = "Can now encase buildings in stone to protect them.",
-	TipImage = {
-		Unit = Point(2,2),
-		Enemy = Point(2,1),
-		--Enemy2 = Point(2,3),
-		Enemy3 = Point(1,1),
-		Enemy4 = Point(1,0),
-		Target = Point(1,2),
-		Water = Point(3,2),
-		Building = Point(1,2),
-		Building2 = Point(3,1),
-		CustomEnemy = "Wall",
-		CustomPawn = "Meta_TechnoDigger",
-	}
 }
 			
 Meta_TechnoDiggerWeapon_AB = Meta_TechnoDiggerWeapon:new{
@@ -423,17 +413,15 @@ Meta_TechnoDiggerWeapon_AB = Meta_TechnoDiggerWeapon:new{
 	TipImage = {
 		Unit = Point(2,2),
 		Enemy = Point(2,1),
-		Enemy2 = Point(2,3),
+		--Enemy2 = Point(2,3),
 		Enemy3 = Point(1,1),
 		Enemy4 = Point(1,0),
 		Target = Point(2,1),
-		Second_Origin = Point(2,2),
-		Second_Target = Point(1,2),
 		Water = Point(3,2),
 		Building = Point(1,2),
 		Building2 = Point(3,1),
 		CustomEnemy = "Wall2",
-		CustomPawn = "Meta_TechnoDigger",
+		CustomPawn = "Meta_TechnoDigger"
 	}
 }
 
