@@ -282,7 +282,7 @@ function Status.ApplyGlory(id, turns)
 				if _G[string.sub(weapon, 1, -2).."B"] ~= nil then 
 					weapon = string.sub(weapon, 1, -2).."B"
 				elseif _G[string.sub(weapon, 1, -2).."2"] ~= nil then 
-					weapon = string.sub(weapon, 1, -2).."B"
+					weapon = string.sub(weapon, 1, -2).."2"
 				end
 			end
 			pawn:AddWeapon(weapon, true)
@@ -958,5 +958,67 @@ local function EVENT_onModsLoaded()
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+
+--fixes for Glory: replaces junk leaper boss weapon from vanilla, adds weapons to Moth and Burrower
+--we check whether another mod added boss versions of Moth and Burrower first though
+
+LeaperAtkB = LeaperAtk1:new{ --just a weaker mosquito boss
+	Damage = DAMAGE_DEATH,
+	Class = "Enemy",
+	Name = "Vorpal Fangs",
+	Description = "Web a target, preparing to stab it with a devastating attack. Kills target.",
+}
+
+if _G["MothAtkB"] == nil then
+	MothAtkB = MothAtk1:new{
+		Class = "Enemy",
+		Name = "Abhorrent Pellets",
+		Description = "Launch an artillery attack at three tiles in a row, pushing shooter and targets.",
+	}
+	function MothAtkB:GetSkillEffect(p1, p2)
+		local ret = SkillEffect()
+		local dir = GetDirection(p2-p1)
+		local dirback = GetDirection(p1-p2)
+		
+		local damage = SpaceDamage(p1, 0, dirback)
+		damage.sAnimation = "airpush_"..dirback
+		ret:AddQueuedDamage(damage)
+		
+		damage = SpaceDamage(p2, self.Damage, dir)
+		--damage.iSmoke = 1
+		ret:AddQueuedArtillery(damage, self.Projectile)
+		damage = SpaceDamage(p2 + DIR_VECTORS[(dir+1)%4], self.Damage, dir)
+		ret:AddQueuedArtillery(damage, self.Projectile)
+		damage = SpaceDamage(p2 + DIR_VECTORS[(dir-1)%4], self.Damage, dir)
+		ret:AddQueuedArtillery(damage, self.Projectile)
+		return ret
+	end
+end
+
+if _G["BurrowerAtkB"] == nil and _G["BurrowerAtk2"] ~= nil then
+	BurrowerAtkB = BurrowerAtk2:new{
+		Class = "Enemy",
+		Name = "Eviscerating Carapace",
+		Description = "Slam against 5 tiles in a row, hitting each for 2 damage.",
+	}
+
+	function BurrowerAtkB:GetSkillEffect(p1,p2)
+		local ret = SkillEffect()
+		local direction = GetDirection(p2 - p1)
+		local damage = SpaceDamage(p2,self.Damage)
+		damage.sSound = self.SoundBase.."attack"
+		
+		ret:AddQueuedDamage(damage)
+		damage.loc = p2 + DIR_VECTORS[(direction + 1)% 4]
+		ret:AddQueuedDamage(damage)
+		damage.loc = p2 + DIR_VECTORS[(direction + 1)% 4] * 2
+		ret:AddQueuedDamage(damage)
+		damage.loc = p2 - DIR_VECTORS[(direction + 1)% 4]
+		ret:AddQueuedDamage(damage)
+		damage.loc = p2 - DIR_VECTORS[(direction + 1)% 4] * 2
+		ret:AddQueuedDamage(damage)
+		return ret
+	end
+end
 
 return true
