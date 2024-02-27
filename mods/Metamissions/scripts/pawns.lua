@@ -253,26 +253,23 @@ function Meta_VampiricVek:GetDeathEffect(point)
 	local pawn = Board:GetPawn(point)
 	if not (mission and pawn) then return ret end
 	mission.VampiricVekSlain = mission.VampiricVekSlain or 0
-	
-	Board:GetPawn(point):SetHealth(2)
-	local isFlying = Board:GetPawn(point):IsFlying()
-	--we revive the pawn so we can check whether it can fly; if not and it's on water/hole we kill it
+	pawn:SetHealth(2)
+	-- local isFlying = pawn:IsFlying()
+	-- we revive the pawn so we can check whether it can fly; if not and it's on water/hole we kill it
 	
 	if not pawn:IsFlying() and (Board:GetTerrain(point) == TERRAIN_WATER or Board:GetTerrain(point) == TERRAIN_HOLE) then 
-		-- Board:GetPawn(point):SetCorpse(false)
-		Board:RemovePawn(point)
-		Board:AddAnimation("vampiricvekd")
+		pawn:SetMinor(true)
+		pawn:Kill(false)
 		return ret
 	end
 	if mission.VampiricVekSlain <= 5 and not mission.Staked then
-	--failsafe; can also be killed 5 times in a row
-	--this should (uglily) avoid interactions where it dies once per frame forever
+	-- failsafe; can also be killed 5 times in a row
+	-- this should (uglily) avoid interactions where it dies once per frame forever
 		-- Board:GetPawn(point):SetHealth(2)
 		mission.VampiricVekSlain = mission.VampiricVekSlain + 1
 	else
-		-- Board:GetPawn(point):SetCorpse(false)
-		Board:RemovePawn(point)
-		Board:AddAnimation("vampiricvekd")
+		pawn:SetMinor(true)
+		pawn:Kill(false)
 	end
 	return ret
 end
@@ -338,6 +335,8 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 			Board:GetPawn(target):IsFrozen() or
 			Board:GetPawn(target):IsShield() or
 			Board:GetCustomTile(target) == "tosx_rocks_0.png" or
+			Board:GetPawn(target):IsCorpse() or
+			Board:GetPawn(target):IsDead() or
 			(Board:GetPawn(target):IsAcid() and Board:GetPawn(target):GetHealth() > damageAmount * 2)) then break end
 		if not Board:IsValid(target + DIR_VECTORS[direction]) then break end
 		target = target + DIR_VECTORS[direction]
@@ -346,7 +345,16 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 	
 	if not Board:IsBlocked(target,pathing) then target = target + DIR_VECTORS[direction] end
 	if distance == 1 then --and doDamage 
-		ret:AddMelee(p1,SpaceDamage(target, 1), NO_DELAY)
+		local pawn = Board:GetPawn(target)
+		if pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
+		   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2)) then 
+		   --check this is enough damage
+			if not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(target) == "tosx_rocks_0.png") then
+			--check target is not immune to damage
+				ret:AddScript("GetCurrentMission().Staked = true") 
+			end
+		end
+		ret:AddMelee(p1,SpaceDamage(target, 1))
 	else
 		local move = PointList()
 		move:push_back(p1)
@@ -354,23 +362,23 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 		ret:AddCharge(move, NO_DELAY)
 
 		local temp = p1 
-		while temp ~= target  do 
+		while p1:Manhattan(temp) <= p1:Manhattan(target) do 
 			local pawn = Board:GetPawn(temp)
 			if pawn and temp ~= p1 then
-				ret:AddDamage(SpaceDamage(temp, 1))
-				if pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount) or
-				   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2) then 
+				if pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
+				   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2)) then 
 				   --check this is enough damage
 					if not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(temp) == "tosx_rocks_0.png") then
 					--check target is not immune to damage
 						ret:AddScript("GetCurrentMission().Staked = true") 
 					end
 				end
+				ret:AddDamage(SpaceDamage(temp, 1))
 			end
 			temp = temp + DIR_VECTORS[direction]
 			if temp ~= target then ret:AddDelay(0.06) end
 		end
-		ret:AddDamage(SpaceDamage(target, 1))
+		-- ret:AddDamage(SpaceDamage(target, 1))
 	end
 	return ret
 end
