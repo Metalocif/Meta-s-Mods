@@ -42,9 +42,11 @@ function Mission_Poke_Giratina:NextTurn()
 	if self.ShadowForceTarget ~= nil and Game:GetTeamTurn() == TEAM_ENEMY then
 		local ret = SkillEffect()
 		Board:DamageSpace(SpaceDamage(self.ShadowForceTarget, DAMAGE_DEATH))
+		CustomAnim:rem(self.ShadowForceTarget, "QueuedShot")
 		for i = DIR_START, DIR_END do
 			local curr = self.ShadowForceTarget + DIR_VECTORS[i]
 			Board:DamageSpace(SpaceDamage(curr, DAMAGE_DEATH))
+			CustomAnim:rem(curr, "QueuedShot")
 		end
 		Board:AddAnimation(self.ShadowForceTarget, "darkpulseAnim", ANIM_NO_DELAY)
 		Board:AddEffect(ret)
