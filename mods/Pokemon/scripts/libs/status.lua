@@ -271,9 +271,10 @@ function Status.ApplyGlory(id, turns)
 		mission.GloryTable[id] = {turns=turns,weapons = pawn:GetEquippedWeapons()}
 		CustomAnim:add(id, "StatusGlory")
 		Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 100))
-		for i = pawn:GetWeaponCount(), 1, -1 do
-			local weapon = pawn:GetWeaponBaseType(pawn:GetWeaponCount())
-			pawn:RemoveWeapon(pawn:GetWeaponCount())
+		local weaponCount = pawn:GetWeaponCount()
+		for i = weaponCount, 1, -1 do
+			local weapon = pawn:GetWeaponBaseType(i)
+			pawn:RemoveWeapon(i)
 			if _G[weapon].Upgrades == 2 and _G[weapon.."_AB"] ~= nil then
 				weapon = weapon.."_AB"
 			elseif _G[weapon].Upgrades == 1 and _G[weapon.."_A"] ~= nil then
