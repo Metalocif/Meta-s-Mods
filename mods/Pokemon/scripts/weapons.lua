@@ -964,10 +964,10 @@ function Poke_HyperBeam:GetSkillEffect(p1,p2)
 	local direction = GetDirection(p2 - p1)
 	local target = p1 + DIR_VECTORS[direction]
 	ret:AddAnimation(p1, "PulseBlast", ANIM_REVERSE)
-	-- ret:AddScript(string.format("Game:TriggerSound(%q)", self.LaunchSound))
 	ret:AddDelay(1)
 	ret:AddScript("Board:StartShake(2)")
 	self:AddLaser(ret, target, direction)
+	ret:AddDelay(1)
 	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
 	return ret
 end

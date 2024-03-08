@@ -358,6 +358,9 @@ function Status.ApplySleep(id, turns, addTurns)
 		pawn:SetPowered(false)
 		pawn:ClearQueued()
 		if ANIMS[pawn:GetCustomAnim().."_sleep"] ~= nil then
+		--this is to make it work with Pokemon evolutions and similar things
+			pawn:SetCustomAnim(pawn:GetCustomAnim().."_sleep")
+		elseif ANIMS[_G[pawn:GetType()].Image.."_sleep"] ~= nil then
 			pawn:SetCustomAnim(_G[pawn:GetType()].Image.."_sleep")
 		elseif not CustomAnim:get(id, "StatusSleep") then
 			CustomAnim:add(id, "StatusSleep")
