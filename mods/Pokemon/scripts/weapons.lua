@@ -4271,9 +4271,10 @@ Poke_FuryCutter_AB=Poke_FuryCutter:new{ Hemorrhage = true, Damage = 2 }
 
 function Poke_FuryCutter:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
+	if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, self.Damage), Board:GetPawn(p2)) then return ret end 
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		ret:push_back(curr)
+		if curr ~= p2 then ret:push_back(curr) end
 	end
 	return ret
 end
@@ -4286,7 +4287,9 @@ end
 function Poke_FuryCutter:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2, self.Damage)
-	damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p1, p2)
+	if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, self.Damage), Board:GetPawn(p2)) then
+		damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p1, p2) 
+	end
 	damage.sSound = "/weapons/sword"
 	ret:AddAnimation(p2, "Swipe2Claw1", ANIM_NO_DELAY)
 	ret:AddMelee(p1, damage)
