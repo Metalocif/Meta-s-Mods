@@ -102,7 +102,7 @@ function Weathers.AddWeather(weather, intensity, startLoc, endLoc)
 	intensity = intensity or 1
 	startLoc = startLoc or Point(0, 0)
 	endLoc = endLoc or Point(8, 8)
-	local isGlobal = endLoc - startLoc == Point(8, 8)
+	local isGlobal = endLoc == Point(8, 8)
 	if weather ~= "Rain" and weather ~= "Sandstorm" and weather ~= "Sun" and weather ~= "Acid Rain" and weather ~= "Snow" and weather ~= "Hail" and weather ~= "Fog" and weather ~= "Smog" then 
 		LOG("Incorrect weather type used in AddWeather, must be Rain/Sandstorm/Sun/Acid Rain/Snow/Hail/Fog/Smog.") 
 		return

@@ -3190,7 +3190,7 @@ function Poke_Sandstorm:GetSkillEffect(p1, p2)
 		-- ret:AddScript("Board:SetWeather(0,RAIN_ACID,Point(0,0),Point(8,8),-1)")
 		-- ret:AddScript("Board:SetWeather(0,RAIN_NORMAL,Point(0,0),Point(8,8),-1)")
 		-- ret:AddScript("Board:SetWeather(0,RAIN_SNOW,Point(0,0),Point(8,8),-1)")
-		ret:AddScript(string.format("weathers:AddWeather(%q, %s)", "Sandstorm", 1))
+		ret:AddScript(string.format("Weathers.AddWeather(%q, %s)", "Sandstorm", 1))
 	end
 	return ret
 end
