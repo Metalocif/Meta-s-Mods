@@ -727,6 +727,7 @@ local function EVENT_onModsLoaded()
 	modApi:addPreLoadGameHook(GenerateWeakenWeapons)					--also do it on reload otherwise the game is not happy
 	modApi:addMissionStartHook(PrepareTables)							--create tables for all statuses so we don't have to check everywhere
 	modApi:addMissionNextPhaseCreatedHook(PrepareTables)				--also do it on next phase otherwise it won't work
+	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
 	modApi:addPreEnvironmentHook(function(mission)						--this is for status that triggers before Vek actions
 		for _, p in ipairs(Board) do
 			mission.AdjScoreTable[p:GetString()] = 0
@@ -970,7 +971,7 @@ LeaperAtkB = LeaperAtk1:new{ --just a weaker mosquito boss
 	Description = "Web a target, preparing to stab it with a devastating attack. Kills target.",
 }
 
-if _G["MothAtkB"] == nil then
+if _G["MothAtkB"] == nil then --ranged bouncer boss attack
 	MothAtkB = MothAtk1:new{
 		Class = "Enemy",
 		Name = "Abhorrent Pellets",
