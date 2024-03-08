@@ -191,12 +191,6 @@ function mod:load( options, version)
 					--remember it evolved so we don't do it again
 					--we set this separately from evolution so that evoless Pokemon can get stuff with levels anyway
 				end
-				pawn:SetPowered(true)	--wake up sleeping pawns, since apparently that carries over into the next mission?
-				if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" and pilotLevel > 0 then
-					pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][pilotLevel])	--remove sleep anims/deoxys forms/mega evos
-				else
-					pawn:SetCustomAnim(_G[pawn:GetType()].Image)
-				end
 			end
 		end
     end)

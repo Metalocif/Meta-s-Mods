@@ -606,6 +606,10 @@ local function GenerateWeakenWeapons()
 end
 
 local function PrepareTables()						--setup all status tables here so we don't need to check everywhere
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn then pawn:SetPowered(true) end		--cancels out the sleep status that carries over for some reason
+	end
 	modApi:conditionalHook(function()			--we need the conditional hook for some reason
 		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
 	end, 
@@ -622,6 +626,11 @@ local function PrepareTables()						--setup all status tables here so we don't n
 	end)
 end
 
+local function WakeUp()
+	for i = 0, 2 do
+		Status.RemoveStatus(i, "Sleep")
+	end
+end
 
 local function EVENT_onModsLoaded()
 	modapiext:addPawnHealedHook(function(mission, pawn, healingTaken)	--necrosis/hemorrhage/toxin
@@ -726,11 +735,16 @@ local function EVENT_onModsLoaded()
 		end
 		
 	end)
+	
 	modApi:addPostStartGameHook(GenerateWeakenWeapons)					--generate the weapons Weaken replaces Vek weapons by
 	modApi:addPreLoadGameHook(GenerateWeakenWeapons)					--also do it on reload otherwise the game is not happy
+	
 	modApi:addMissionStartHook(PrepareTables)							--create tables for all statuses so we don't have to check everywhere
 	modApi:addMissionNextPhaseCreatedHook(PrepareTables)				--also do it on next phase otherwise it won't work
 	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
+	
+	modApi:addMissionEndHook(WakeUp)									--remove sleep status because unpowered carries over
+	
 	modApi:addPreEnvironmentHook(function(mission)						--this is for status that triggers before Vek actions
 		for _, p in ipairs(Board) do
 			mission.AdjScoreTable[p:GetString()] = 0
