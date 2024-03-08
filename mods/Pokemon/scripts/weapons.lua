@@ -696,7 +696,7 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		damage.loc = p2 + DIR_VECTORS[(direction + 3)%4]
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
-	-- Status.ApplyShocked(Board:GetPawn(p2):GetId())
+	-- Status.ApplyDoomed(Board:GetPawn(p2):GetId())
 	-- ret:AddScript(string.format("Weathers.AddWeather(%q, %s)", "Rain", 20))
 	-- Weathers.AddWeather("Sandstorm", 1)
 	return ret
@@ -4450,7 +4450,7 @@ function Poke_StoneAxe:GetSkillEffect(p1, p2)
 		if Board:GetPawn(p2) and Board:IsDeadly(damage, Board:GetPawn(p2)) then
 			ret:AddDelay(1)
 			ret:AddScript(string.format("modApi:runLater(function() Board:SetItem(%s, %q) end)", p2:GetString(), "Poke_StealthRock"))
-		elseif not Board:IsBlocked(p2) then 
+		elseif not Board:IsBlocked(p2, PATH_PROJECTILE) then 
 			ret:AddScript(string.format("modApi:runLater(function() Board:SetItem(%s, %q) end)", p2:GetString(), "Poke_StealthRock"))
 		end
 	end
