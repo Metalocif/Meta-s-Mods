@@ -4444,6 +4444,7 @@ function Poke_StoneAxe:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	
 	local damage = SpaceDamage(p2, self.Damage)
+	if Board:IsTipImage() then damage.sItem = "Poke_StealthRock" end
 	ret:AddArtillery(p1, damage, "effects/stoneaxe.png", FULL_DELAY)
 	
 	if not Board:IsTipImage() then
