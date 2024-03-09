@@ -2632,7 +2632,7 @@ function Poke_MetalClaw:GetSkillEffect(p1,p2)
 		strikes = self.Strikes + GetCurrentMission().MetalClawUses
 	end
 	local anim = Board:GetPawn(p1):GetCustomAnim()
-	if not Board:IsTipImage() then 
+	if anim == "Poke_Metang" and not Board:IsTipImage() then 
 		-- Board:GetPawn(p1):SetCustomAnim("Poke_Metang_swipe") 
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Metang_swipe"))
 	end
@@ -2643,7 +2643,7 @@ function Poke_MetalClaw:GetSkillEffect(p1,p2)
 		ret:AddMelee(p1, damage)
 	end
 	if GetCurrentMission() and not Board:IsTipImage() then ret:AddScript("GetCurrentMission().MetalClawUses = "..GetCurrentMission().MetalClawUses + 1) end
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), anim))
+	if anim == "Poke_Metang" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), anim)) end
 	return ret
 end
 
@@ -2693,7 +2693,6 @@ function Poke_MeteorMash:GetSkillEffect(p1,p2)
 		if not GetCurrentMission().MeteorMashUses then GetCurrentMission().MeteorMashUses = 0 end
 		strikes = self.Strikes + GetCurrentMission().MeteorMashUses
 	end
-	local anim = Board:GetPawn(p1):GetCustomAnim()
 	if p1 ~= p2 then
 		local direction = GetDirection(p2 - p1)
 		for i = 1, strikes do
@@ -3390,7 +3389,7 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 	local dir = GetDirection(p2-p1)
 	local anim = Board:GetPawn(p1):GetCustomAnim()
 	local tilesHit = {}
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Jolteon_charge_"..dir))
+	if anim == "Poke_Jolteon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Jolteon_charge_"..dir)) end
 	local move = PointList()
 	move:push_back(p1)
 	move:push_back(p2)
@@ -3407,9 +3406,8 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 		if temp ~= p2 then ret:AddDelay(0.06) end
 	end
 	ret:AddAnimation(p2, "Lightning_Attack_"..dir)
-	-- ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim))
 	ret:AddDelay(0.3)
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Jolteon_charge_"..dir2))
+	if anim == "Poke_Jolteon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Jolteon_charge_"..dir2)) end
 	move = PointList()
 	move:push_back(p2)
 	move:push_back(p3)
@@ -3428,7 +3426,7 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 	end
 	ret:AddAnimation(p3, "Lightning_Attack_"..dir2)
 	ret:AddDelay(0.3)
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p3:GetString(), anim))
+	if anim == "Poke_Jolteon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p3:GetString(), anim)) end
 	return ret
 end
 
@@ -3484,7 +3482,7 @@ function Poke_BouncyBubble:GetSkillEffect(p1, p2)
 		noFire.iFire = EFFECT_REMOVE
 		ret:AddDamage(noFire)
 	end
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Vaporeon_bubble"))
+	if anim == "Poke_Vaporeon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Vaporeon_bubble")) end
 	local move = PointList()
 	move:push_back(p1)
 	move:push_back(p2)
@@ -3501,7 +3499,7 @@ function Poke_BouncyBubble:GetSkillEffect(p1, p2)
 		
 		ret:AddSafeDamage(damage)
 	end
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim))
+	if anim == "Poke_Vaporeon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim)) end
 	return ret
 end
 
@@ -3522,7 +3520,7 @@ end
 function Poke_BouncyBubble:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local anim = Board:GetPawn(p1):GetCustomAnim()
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Vaporeon_bubble"))
+	if anim == "Poke_Vaporeon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Vaporeon_bubble")) end
 	if Board:GetPawn(p1):IsFire() then
 		local noFire = SpaceDamage(p1)
 		noFire.iFire = EFFECT_REMOVE
@@ -3547,7 +3545,7 @@ function Poke_BouncyBubble:GetFinalEffect(p1, p2, p3)
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), anim))
 	ret:AddAnimation(p2, "Splash")
 	ret:AddDelay(0.5)
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Vaporeon_bubble"))
+	if anim == "Poke_Vaporeon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p2:GetString(), "Poke_Vaporeon_bubble")) end
 	move = PointList()
 	move:push_back(p2)
 	move:push_back(p3)
@@ -3564,7 +3562,7 @@ function Poke_BouncyBubble:GetFinalEffect(p1, p2, p3)
 		
 		ret:AddSafeDamage(damage)
 	end
-	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p3:GetString(), anim))
+	if anim == "Poke_Vaporeon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p3:GetString(), anim)) end
 	return ret
 end
 
