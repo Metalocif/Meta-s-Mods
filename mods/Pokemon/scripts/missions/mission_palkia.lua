@@ -20,10 +20,6 @@ Mission_Poke_Palkia = Mission_Infinite:new{
 }
 
 function Mission_Poke_Palkia:StartMission()
-	-- local pawn = PAWN_FACTORY:CreatePawn("Poke_PalkiaBoss")
-	-- self.Target = pawn:GetId()
-	-- Board:SpawnPawn(pawn)
-	--the stuff below should only be done on this custom tileset
 	for _, p in ipairs(Board) do
 		--prevent items from spawning on deployment area as we can't deploy on items
 		local drop_zone = extract_table(Board:GetZone("deployment"))
@@ -31,10 +27,6 @@ function Mission_Poke_Palkia:StartMission()
 		for _, p2 in pairs(drop_zone) do
 			if p == p2 then isDeploymentTile = true break end
 		end
-		-- if Board:GetTerrain(p) == 17 then
-		--tileset doesn't actually seem to generate terrain 17 on its own despite me asking nicely
-			-- if Board:IsBlocked(p, PATH_PROJECTILE) then Board:SetTerrain(p, TERRAIN_ROAD) else Board:SetItem(p, "Poke_TimeRune") end
-		-- end
 		if Board:GetPawn(p) and Board:GetPawn(p):GetType() == self.BossPawn then self.Target = Board:GetPawn(p):GetId() end
 		if Board:GetTerrain(p) == TERRAIN_ROAD and not isDeploymentTile then
 			if math.random() > 0.93 and not Board:IsBlocked(p, PATH_PROJECTILE) then 
@@ -53,12 +45,21 @@ function Mission_Poke_Palkia:GetDestroyedCount()
 end
 
 function Mission_Poke_Palkia:UpdateObjectives()
-	local status = (not Board:IsPawnAlive(self.Target)) and Board:IsPawnAlive(self.BallID) and OBJ_COMPLETE or OBJ_STANDARD
+	local status = OBJ_STANDARD
+	if not Board:IsPawnAlive(self.Target) then 
+		if not Board:IsPawnAlive(self.BallID) then 
+			status = OBJ_FAILED 
+		else
+			status = OBJ_COMPLETE 
+		end
+	end
 	Game:AddObjective("Capture Palkia",status)
 end
 
 function Mission_Poke_Palkia:GetCompletedObjectives()
-	if Board:IsPawnAlive(self.Target) then return self.Objectives:Failed() end
+	if Board:IsPawnAlive(self.Target) or not Board:IsPawnAlive(self.BallID) then
+		return self.Objectives:Failed()
+	end
 	return self.Objectives
 end
 

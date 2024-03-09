@@ -24,12 +24,19 @@ function Mission_Poke_Darkrai:GetDestroyedCount()
 end
 
 function Mission_Poke_Darkrai:UpdateObjectives()
-	local status = (not Board:IsPawnAlive(self.Target)) and Board:IsPawnAlive(self.BallID) and OBJ_COMPLETE or OBJ_STANDARD
+	local status = OBJ_STANDARD
+	if not Board:IsPawnAlive(self.Target) then 
+		if not Board:IsPawnAlive(self.BallID) then 
+			status = OBJ_FAILED 
+		else
+			status = OBJ_COMPLETE 
+		end
+	end
 	Game:AddObjective("Capture Darkrai",status)
 end
 
 function Mission_Poke_Darkrai:GetCompletedObjectives()
-	if Board:IsPawnAlive(self.Target) then
+	if Board:IsPawnAlive(self.Target) or not Board:IsPawnAlive(self.BallID) then
 		return self.Objectives:Failed()
 	end
 	return self.Objectives
