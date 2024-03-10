@@ -1,3 +1,18 @@
+v1.6.3
+- Removed Poison and Virus; added Toxin, Reactive, Glory, and Shocked.
+- Improved animations for Hemorrhage and Wet.
+- Leech Seed is now prevented and removed by fire.
+- Doomed now has an optional source; if the source pawn is killed, the status stops.
+- Sleep now gets removed by damage.
+- Powder comboes with dry; the explosion inflicts 2 damage if the target is also dry.
+- Mechs afflicted with confusion now move to a random location at the start of the player's turn.
+- All status effects now check whether the pawn is immune to them on application.
+
+- Removed unfitting secondary objectives from boss fights.
+- Added cool animations to Scyther's attacks. They apply Hemorrhage with an upgrade.
+- Added cool animations to Jolteon's attack. It applies Shocked.
+- Shaymin's first skill upgrade now roots instead of healing allies.
+
 v1.6.2
 - Added the Giratina boss fight.
 - A bunch of bug fixes in status, weathers, and some weapons.
