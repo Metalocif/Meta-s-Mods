@@ -4055,30 +4055,33 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 		return ret
 	end
 	local synchro = SpaceDamage(p2)
-	local sleepTurns, leechSeedSource
 	if pawn1:IsFire() or pawn2:IsFire() then synchro.iFire = 1 end
 	if pawn1:IsAcid() or pawn2:IsAcid() then synchro.iAcid = 1 end
 	if pawn1:IsFrozen() or pawn2:IsFrozen() then synchro.iFrozen = 1 end
 	
-	if Status.GetStatus(id1, "Sleep") or Status.GetStatus(id2, "Sleep") then 
-		sleepTurns = math.max(Status.GetStatus(id1, "Sleep"), Status.GetStatus(id2, "Sleep")) 
-	end
-	if Status.GetStatus(id1, "LeechSeed") or Status.GetStatus(id2, "LeechSeed") then
-		leechSeedSource = Status.GetStatus(id1, "LeechSeed") or Status.GetStatus(id2, "LeechSeed")
-	end
-	if CustomAnim:get(pawn1:GetId(), "StatusChill") and (not CustomAnim:get(pawn2:GetId(), "StatusChill")) and not pawn2:IsFire() then
-		ret:AddScript(string.format("CustomAnim:add(%s, %q)", pawn2:GetId(), "StatusChill"))
-	end
-	if CustomAnim:get(pawn2:GetId(), "StatusChill") and (not CustomAnim:get(pawn1:GetId(), "StatusChill")) and not pawn1:IsFire() then
-		ret:AddScript(string.format("CustomAnim:add(%s, %q)", pawn1:GetId(), "StatusChill"))
-	end
-	if sleepTurns then 
-		ret:AddScript(string.format("Status.ApplySleep(%s, %s)", pawn1:GetId(), sleepTurns))
-		ret:AddScript(string.format("Status.ApplySleep(%s, %s)", pawn2:GetId(), sleepTurns))
-	end
-	if leechSeedSource then
-		ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", pawn1:GetId(), Board:GetPawn(p1):GetId()))
-		ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", pawn2:GetId(), Board:GetPawn(p1):GetId()))
+	for _, status in ipairs(Status.List()) do
+		if Status.GetStatus(pawn1:GetId(), status) then
+			if status == "Rooted" then 
+				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyRooted", pawn2:GetId(), Status.GetStatus(pawn2:GetId(), "Rooted").amount))
+			elseif status == "Weaken" then 
+				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyWeaken", pawn2:GetId(), tonumber(string.sub(pawn2:GetWeaponBaseType(1),1,1))))
+			elseif status == "Chill" then
+				ret:AddScript(string.format("Status[%q](%s)", "ApplyRooted", pawn2:GetId()))
+			else
+				ret:AddScript(string.format("Status[%q](%s, %s)", "Apply"..status, pawn2:GetId(), tostring(Status.GetStatus(pawn2:GetId(), status))))
+			end
+		end
+		if Status.GetStatus(pawn2:GetId(), status) then
+			if status == "Rooted" then 
+				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyRooted", pawn1:GetId(), Status.GetStatus(pawn1:GetId(), "Rooted").amount))
+			elseif status == "Weaken" then 
+				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyWeaken", pawn1:GetId(), tonumber(string.sub(pawn1:GetWeaponBaseType(1),1,1))))
+			elseif status == "Chill" then
+				ret:AddScript(string.format("Status[%q](%s)", "ApplyRooted", pawn1:GetId()))
+			else
+				ret:AddScript(string.format("Status[%q](%s, %s)", "Apply"..status, pawn1:GetId(), tostring(Status.GetStatus(pawn1:GetId(), status))))
+			end
+		end
 	end
 	ret:AddSafeDamage(synchro)
 	synchro.loc = p3
@@ -4465,7 +4468,7 @@ Poke_SacredSword=Skill:new{
 	Icon = "weapons/SacredSword.png",	
 	Rarity = 3,
 	Name = "Sacred Sword",
-	Description = "Drains the health of the user and its adjacent allies to 1. Then, unleash a wave of energy that pierces through units, dealing damage increased by the total health drained. The amount dealt is reduced by the health of units pierced by the shockwave.",
+	Description = "Drains the health of the user and its adjacent allies to 1, then unleash a wave of energy that pierces through units, dealing damage increased by the total health drained. The amount dealt is reduced by the health of units pierced by the shockwave.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 3,
 	PathSize = 8,	
