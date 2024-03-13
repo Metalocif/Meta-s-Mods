@@ -1948,7 +1948,7 @@ Poke_Bloom=Skill:new{
 	Icon = "weapons/Bloom.png",	
 	Rarity = 3,
 	Name = "Bloom",
-	Description = "Creates forests in an area, pushing pawns on the edge. Forests already present bloom with Gracidea, which empower Grass-type allied Pokemon.",
+	Description = "Creates forests in an area, pushing pawns on the edge. Forests already present bloom with Gracidea, which empower allied units.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	PathSize = 8,	
@@ -3509,9 +3509,11 @@ end
 
 function Poke_BouncyBubble:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
-	for dir = DIR_START, DIR_END do
-		for j = 2, 8 do
-			if not Board:IsBlocked(p2+DIR_VECTORS[dir] * j, PATH_MASSIVE) then ret:push_back(p2+DIR_VECTORS[dir] * j) end
+	if Board:GetItem(p2) == "Poke_Puddle" or (Board:IsTerrain(p2, TERRAIN_WATER) and not Board:IsTerrain(p2, TERRAIN_ACID) and not Board:IsTerrain(p2, TERRAIN_LAVA)) then
+		for dir = DIR_START, DIR_END do
+			for j = 2, 8 do
+				if not Board:IsBlocked(p2+DIR_VECTORS[dir] * j, PATH_MASSIVE) then ret:push_back(p2+DIR_VECTORS[dir] * j) end
+			end
 		end
 	end
 	return ret

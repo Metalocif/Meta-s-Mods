@@ -52,7 +52,7 @@ Poke_FutureSightItem7 = { Image = "", Damage = SpaceDamage(0), Tooltip = "", Ico
 BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
     local pawn = Board:GetPawn(loc)
 	if removed_item == "Poke_Gracidea" then
-        if pawn then
+        if pawn and pawn:GetTeam() == TEAM_PLAYER then
 			local gracidea_damage = SpaceDamage(loc)
 			gracidea_damage.sScript = "Board:GetPawn("..loc:GetString().."):SetBoosted(true)"
 			Board:DamageSpace(gracidea_damage)
@@ -71,7 +71,7 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 		elseif pawn then
 			Status.ApplyWet(pawn:GetId())
 		end
-	elseif removed_item == "Poke_TimeRune" then
+	elseif removed_item == "Poke_TimeRune" and Board:GetTerrain(loc) ~= TERRAIN_HOLE and Board:GetTerrain(loc) ~= TERRAIN_WATER then
 		Board:SetTerrain(loc, TERRAIN_ROAD)
 	elseif string.sub(removed_item, 1, -2) == "Poke_FutureSightItem" then 
 		if pawn and Game:GetTeamTurn() == TEAM_ENEMY then 
