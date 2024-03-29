@@ -1,8 +1,8 @@
 local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
-local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/artilleryArc")
-local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath .."libs/customAnim")
+local artilleryArc = require(mod_loader.mods.meta_mods.scriptPath .."libs/artilleryArc")
+local weaponArmed = require(mod_loader.mods.meta_mods.scriptPath .."libs/weaponArmed")
 
 modApi:appendAsset("img/effects/shotup_stickybomb.png", path .."img/effects/shotup_stickybomb.png")
 modApi:appendAsset("img/effects/stickybomb2.png", path .."img/effects/stickybomb2.png")

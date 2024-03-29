@@ -3,7 +3,7 @@ modApi:appendAsset("img/effects/shotup_wyvern.png", path .."img/effects/shotup_w
 modApi:appendAsset("img/effects/shot_wyvern_R.png", path .."img/effects/shot_wyvern_R.png")
 modApi:appendAsset("img/effects/shot_wyvern_U.png", path .."img/effects/shot_wyvern_U.png")
 modApi:appendAsset("img/weapons/Wyvern.png", path .."img/weapons/Wyvern.png")
-local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
+local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath .."libs/weaponPreview")
 
 Meta_WyvernWeapon = Skill:new{  
 	Name = "Voracious Hunger",

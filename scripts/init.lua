@@ -14,6 +14,20 @@ local mod =  {
 }
 
 function mod:init(options)
+	require(self.scriptPath.."libs/artilleryArc")
+	require(self.scriptPath.."libs/astar")
+	require(self.scriptPath .."libs/boardEvents")
+	require(self.scriptPath .."libs/clip")
+	require(self.scriptPath.."libs/customAnim")
+	require(self.scriptPath.."libs/customEmitter")
+	require(self.scriptPath.."libs/multishot")
+	require(self.scriptPath.."libs/saveData")
+	require(self.scriptPath.."libs/spaceDamageObjects")
+	require(self.scriptPath.."libs/status")
+	require(self.scriptPath.."libs/weaponArmed")
+	require(self.scriptPath.."libs/weaponPreview")
+	require(self.scriptPath.."libs/weathers")
+	require(self.scriptPath .."libs/worldConstants")
 end
 
 return mod

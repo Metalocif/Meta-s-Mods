@@ -16,9 +16,9 @@ local mod = {
 
 function mod:init()
 
-	require(self.scriptPath .."libs/saveData")
-	require(self.scriptPath .."libs/boardEvents")
-	require(self.scriptPath .."libs/multishot")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/saveData")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/boardEvents")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
 	require(self.scriptPath .."weapons")
 	require(self.scriptPath .."items")
 	require(self.scriptPath .."pawns")

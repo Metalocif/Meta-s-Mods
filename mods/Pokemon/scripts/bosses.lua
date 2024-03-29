@@ -5,7 +5,7 @@ easyEdit.bossList:get("archive"):addBoss("Mission_MoltresBoss")
 -- easyEdit.bossList:get("finale1"):addBoss("Mission_DarkraiBoss")
 -- easyEdit.bossList:get("detritus"):addBoss("Mission_DeoxysBoss")
 
-local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
+local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
 
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 
