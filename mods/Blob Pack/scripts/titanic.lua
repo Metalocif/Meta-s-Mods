@@ -66,15 +66,13 @@ end
 
 
 function Mission_TitanicGooBoss:NextTurn() 
-	if Game:GetTeamTurn() == TEAM_ENEMY then
-		if Board:IsPawnAlive(self.Target) then
-			local offsets = { Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1) }
-			local boss = Board:GetPawn(self.Target)
-			local tile = boss:GetSpace()
-			for _, offset in ipairs(offsets) do
-				local curr = tile + offset
-				if Board:IsSmoke(tile) then Board:SetSmoke(tile, false, false) end
-			end
+	if Board:IsPawnAlive(self.Target) then
+		local offsets = { Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1) }
+		local boss = Board:GetPawn(self.Target)
+		local tile = boss:GetSpace()
+		for _, offset in ipairs(offsets) do
+			local curr = tile + offset
+			if Board:IsSmoke(tile) then Board:SetSmoke(tile, false, true) end
 		end
 	end
 end
@@ -173,7 +171,6 @@ function Mission_TitanicGooBoss:UpdateMission()
 			else
 				Board:SetTerrain(tile, TERRAIN_ROAD)
 			end
-			-- Board:SetFire(tile, false)
 		end
 	end
 end
@@ -187,6 +184,7 @@ Meta_TitanicGooBoss = {
 	Supermassive = true,	--uses a tweaked Tosx code to make it immune to holes/liquids
 	Flying = true,			--here for Tosx's code
 	IgnoreFlip = true,
+	IgnoreFire = true,		--there's a weird issue if you use SetFire(false) on an extra space
 	Image = "titanicgoo",
 	Name = "Titanic Goo",
 	ExtraSpaces = { Point(0,1), Point(1,0), Point(1,1) },			--chonky boy
