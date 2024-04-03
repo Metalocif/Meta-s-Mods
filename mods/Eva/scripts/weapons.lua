@@ -336,7 +336,7 @@ function EVA_SniperRifle:GetTargetArea(p1)
 end
 
 local path = mod_loader.mods[modApi.currentMod].scriptPath
-local worldConstants = require(path .."libs/worldConstants")
+local worldConstants = require(mod_loader.mods.meta_mods.scriptPath .."libs/worldConstants")
 
 function EVA_SniperRifle:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()

@@ -1,6 +1,6 @@
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/artilleryArc")
-local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
+local artilleryArc = require(mod_loader.mods.meta_mods.scriptPath .."libs/artilleryArc")
+local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath .."libs/weaponPreview")
 modApi:appendAsset("img/weapons/Drake.png", path .."img/weapons/Drake.png")
 
 

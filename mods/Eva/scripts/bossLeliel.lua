@@ -87,7 +87,7 @@ local readpath = resourcePath .. writepath
 local imagepath = writepath:sub(5,-1)
 local a = ANIMS
 
-local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath .."libs/customAnim")
 
 modApi:appendAsset("img/units/aliens/EVA_LelielBoss.png", readpath.."EVA_LelielBoss.png")
 modApi:appendAsset("img/units/aliens/EVA_LelielBossa.png", readpath.."EVA_LelielBossa.png")
@@ -136,7 +136,7 @@ EVA_LelielBossAtk1 = Skill:new{
 }
 
 local path = mod_loader.mods[modApi.currentMod].scriptPath
-local worldConstants = require(path .."libs/worldConstants")
+local worldConstants = require(mod_loader.mods.meta_mods.scriptPath .."libs/worldConstants")
 
 function EVA_LelielBossAtk1:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()

@@ -24,9 +24,9 @@ function mod:init()
 	require(self.scriptPath .."bossRamiel")
 	require(self.scriptPath .."bossLeliel")
 	require(self.scriptPath .."bossSeries")
-	require(self.scriptPath .."libs/worldConstants")
-	CustomAnim = require(self.scriptPath .."libs/customAnim")
-	require(self.scriptPath .."libs/boardEvents")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/worldConstants")
+	CustomAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/boardEvents")
 	
 end
 

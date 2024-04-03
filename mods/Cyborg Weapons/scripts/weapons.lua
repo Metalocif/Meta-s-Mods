@@ -79,7 +79,8 @@
 
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 
-local BoardEvents = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/boardEvents")
+local BoardEvents = require(mod_loader.mods.meta_mods.scriptPath.."libs/boardEvents")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 
 -- add assets from our mod so the game can find them.
 modApi:appendAsset("img/weapons/BloodyStream.png", path .."img/weapons/BloodyStream.png")
@@ -1411,8 +1412,6 @@ CyborgWeapons_WeakPheromones=Skill:new{
 		Target = Point(2,2),
 	}
 }
-
-local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
 
 function CyborgWeapons_WeakPheromones:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()

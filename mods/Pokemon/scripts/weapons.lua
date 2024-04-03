@@ -1,10 +1,10 @@
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
-local artilleryArc = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/artilleryArc")
-local weaponArmed = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponArmed")
-local weaponPreview = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weaponPreview")
-local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
-require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/weathers")
-require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+local artilleryArc = require(mod_loader.mods.meta_mods.scriptPath.."libs/artilleryArc")
+local weaponArmed = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponArmed")
+local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
+require(mod_loader.mods.meta_mods.scriptPath.."libs/weathers")
+require(mod_loader.mods.meta_mods.scriptPath.."libs/status")
 
 local files = {
     "Pound.png",

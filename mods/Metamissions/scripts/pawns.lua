@@ -623,7 +623,7 @@ function Meta_SleepTossAtk:GetTargetArea(point)
 	return ret
 end
 
-local customAnim = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customAnim")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 
 function Meta_SleepTossAtk:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()

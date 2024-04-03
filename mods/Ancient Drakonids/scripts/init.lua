@@ -22,7 +22,7 @@ function mod:init()
 	require(self.scriptPath .."wyvern")
 	require(self.scriptPath .."drake")
 	require(self.scriptPath .."pawns")
-	require(self.scriptPath.."libs/multishot")
+	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
 end
 
 function mod:load( options, version)
