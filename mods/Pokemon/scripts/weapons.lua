@@ -3333,7 +3333,7 @@ Poke_ZippyZap=Skill:new{
 		Target = Point(2,1),
 		Enemy1 = Point(2,2),
 		Enemy1 = Point(2,3),
-		Second_Origin = Point(2,1),
+		-- Second_Origin = Point(2,1),
 		Second_Target = Point(2,4),
 		Second_Click = Point(2,4),
 		CustomPawn = "Poke_Eevee",
@@ -3388,6 +3388,7 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 	local dir2 = GetDirection(p3-p2)
 	local dir = GetDirection(p2-p1)
 	local anim = Board:GetPawn(p1):GetCustomAnim()
+	local userId = Board:GetPawn(p1):GetId()
 	local tilesHit = {}
 	if anim == "Poke_Jolteon" then ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Poke_Jolteon_charge_"..dir)) end
 	local move = PointList()
@@ -3399,8 +3400,8 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 		local damage = SpaceDamage(temp, self.Damage)
 		damage.sAnimation = "Lightning_Attack_"..dir
 		local pawn = Board:GetPawn(temp)
-		if pawn then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
 		ret:AddDamage(damage)
+		if pawn and pawn:GetId() ~= userId then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
 		tilesHit[temp:GetString()] = true
 		temp = temp + DIR_VECTORS[dir]
 		if temp ~= p2 then ret:AddDelay(0.06) end
@@ -3419,8 +3420,8 @@ function Poke_ZippyZap:GetFinalEffect(p1, p2, p3)
 		damage.sAnimation = "Lightning_Attack_"..dir2
 		if tilesHit[temp:GetString()] then damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p3, temp) end
 		local pawn = Board:GetPawn(temp)
-		if pawn then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
 		ret:AddDamage(damage)
+		if pawn and pawn:GetId() ~= userId then ret:AddScript(string.format("Status.ApplyShocked(%s)", pawn:GetId())) end
 		temp = temp + DIR_VECTORS[dir2]
 		if temp ~= p3 then ret:AddDelay(0.06) end
 	end
