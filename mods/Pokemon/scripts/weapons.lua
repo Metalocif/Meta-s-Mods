@@ -3450,12 +3450,12 @@ Poke_BouncyBubble=Skill:new{
 	TipImage = {
 		Unit = Point(2,4),
 		Target = Point(2,1),
-		-- Water = Point(2,1),
+		Water = Point(2,1),
 		Enemy1 = Point(2,2),
 		Enemy2 = Point(2,3),
 		-- Second_Origin = Point(2,1),
-		-- Second_Target = Point(2,4),
-		-- Second_Click = Point(2,4),
+		Second_Target = Point(2,4),
+		Second_Click = Point(2,4),
 		CustomPawn = "Poke_Eevee",
 	}
 }
