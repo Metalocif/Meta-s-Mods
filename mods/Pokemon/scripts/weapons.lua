@@ -3812,7 +3812,6 @@ Poke_SappySeed=Skill:new{
 	Damage = 1,
 	PathSize = 8,	
 	PowerCost = 0,
-	TwoClick = true,
 	Upgrades = 2,
 	UpgradeList = {"+1 Damage", "+1 Damage"},
 	UpgradeCost = {2, 2},
@@ -3844,15 +3843,18 @@ function Poke_SappySeed:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	
 	local damage = SpaceDamage(p2, self.Damage)
-	ret:AddArtillery(p1, damage, "effects/SappySeed.png", PROJ_DELAY)
+	ret:AddArtillery(damage, "effects/shotup_seedflare.png")
 	local curr = p2
-	for i = DIR_START, DIR_NONE do
+	if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then 
+		ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", Board:GetPawn(curr):GetId(), Board:GetPawn(p1):GetId())) 
+	end
+	for i = DIR_START, DIR_END do
+		curr = p2 + DIR_VECTORS[i]
 		damage.loc = curr
 		ret:AddDamage(damage)
 		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then 
-			ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", Board:GetPawn(p2):GetId(), Board:GetPawn(p1):GetId())) 
+			ret:AddScript(string.format("Status.ApplyLeechSeed(%s, %s)", Board:GetPawn(curr):GetId(), Board:GetPawn(p1):GetId())) 
 		end
-		if i ~= DIR_NONE then curr = p2 + DIR_VECTORS[i] end
 	end
 	
 	return ret
@@ -4180,7 +4182,7 @@ function Poke_FutureSight:GetSkillEffect(p1, p2)
 	local amount = self.Damage
 	if Board:GetPawn(p1):IsBoosted() then amount = amount + 1 end
 	if Board:IsSpawning(p2) then 
-		damage = SpaceDamage(p2 + DIR_VECTORS[i], DAMAGE_ZERO)
+		damage = SpaceDamage(p2, DAMAGE_ZERO)
 		damage.sItem = "Poke_FutureSightItem"..math.min(amount,5)
 		damage.sAnimation = "" 
 	end
