@@ -281,6 +281,25 @@ local files = {
     "Kleavor_w.png",
     "Kleavor_ns.png",
 	
+	"Dialga.png",
+	"Dialga_w.png",
+	"Dialga_a.png",
+	"Dialga_h.png",
+	"Dialga_ns.png",
+	"Dialga_sleep.png",
+	
+	"Palkia.png",
+	"Palkia_w.png",
+	"Palkia_a.png",
+	"Palkia_h.png",
+	"Palkia_ns.png",
+	"Palkia_sleep.png",
+	
+	"Giratina.png",
+	"Giratina_a.png",
+	"Giratina_h.png",
+	"Giratina_ns.png",
+	
 	"PokeBall.png", "HyperBall.png", "MasterBall.png",
 }
 for _, file in ipairs(files) do
@@ -417,11 +436,11 @@ a.Poke_Xerneas_special_sleep = a.MechUnit:new{Image="units/player/Xerneas_tree.p
 a.Poke_Xerneas_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Xerneas_ns = a.MechIcon:new{Image="units/player/Xerneas_ns.png"}
 
-a.Poke_ArmoredMewtwo =a.MechUnit:new{Image="units/player/ArmoredMewtwo.png", PosX = -20, PosY = 0}
-a.Poke_ArmoredMewtwow =a.MechUnit:new{Image="units/player/ArmoredMewtwo_w.png", PosX = -20, PosY = 0}
-a.Poke_ArmoredMewtwoa = a.MechUnit:new{Image="units/player/ArmoredMewtwo_a.png",  PosX = -20, PosY = 0, NumFrames = 2, }
-a.Poke_ArmoredMewtwo_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
-a.Poke_ArmoredMewtwo_ns = a.MechIcon:new{Image="units/player/ArmoredMewtwo_ns.png"}
+a.Poke_Palkia =a.MechUnit:new{Image="units/player/Palkia.png", PosX = -20, PosY = 0}
+a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -20, PosY = 0}
+a.Poke_Palkiaa = a.MechUnit:new{Image="units/player/Palkia_a.png",  PosX = -20, PosY = 0, NumFrames = 2, }
+a.Poke_Palkia_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
 
 
 a.Poke_Larvitar =a.MechUnit:new{Image="units/player/Larvitar.png", PosX = -10, PosY = 6}
@@ -601,6 +620,27 @@ a.Poke_Kleavor_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX =
 a.Poke_Kleavor_ns = a.MechIcon:new{Image="units/player/Kleavor_ns.png"}
 a.Poke_Kleavorw =a.MechUnit:new{Image="units/player/Kleavor_w.png", PosX = -12, PosY = 10}
 
+a.Poke_Dialga =a.MechUnit:new{Image="units/player/Dialga.png", PosX = -10, PosY = -4}
+a.Poke_Dialgaa = a.MechUnit:new{Image="units/player/Dialga_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_Dialga_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Dialga_ns = a.MechIcon:new{Image="units/player/Dialga_ns.png"}
+a.Poke_Dialgaw =a.MechUnit:new{Image="units/player/Dialga_w.png", PosX = -12, PosY = 10}
+a.Poke_Dialga_sleep = a.MechUnit:new{Image="units/player/Dialga_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
+
+
+a.Poke_Palkia =a.MechUnit:new{Image="units/player/Palkia.png", PosX = -10, PosY = -4}
+a.Poke_Palkiaa = a.MechUnit:new{Image="units/player/Palkia_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_Palkia_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
+a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -12, PosY = 10}
+a.Poke_Palkia_sleep = a.MechUnit:new{Image="units/player/Palkia_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
+
+
+a.Poke_Giratina =a.MechUnit:new{Image="units/player/Giratina.png", PosX = -10, PosY = -4}
+a.Poke_Giratinaa = a.MechUnit:new{Image="units/player/Giratina_a.png",  PosX = -35, PosY = -30, NumFrames = 16 }
+a.Poke_Giratina_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Giratina_ns = a.MechIcon:new{Image="units/player/Giratina_ns.png"}
+
 
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Abra.png", path .."img/portraits/pilots/Pilot_Poke_Abra.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dratini.png", path .."img/portraits/pilots/Pilot_Poke_Dratini.png")
@@ -621,6 +661,9 @@ modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Gible.png", path .."img/port
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Eevee.png", path .."img/portraits/pilots/Pilot_Poke_Eevee.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Ralts.png", path .."img/portraits/pilots/Pilot_Poke_Ralts.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Scyther.png", path .."img/portraits/pilots/Pilot_Poke_Scyther.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dialga.png", path .."img/portraits/pilots/Pilot_Poke_Dialga.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Palkia.png", path .."img/portraits/pilots/Pilot_Poke_Palkia.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Giratina.png", path .."img/portraits/pilots/Pilot_Poke_Giratina.png")
 
 
 CreatePilot{Id = "Pilot_Poke_Abra", Personality = "Vek", Name = "Sabrina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
@@ -643,6 +686,9 @@ CreatePilot{Id = "Pilot_Poke_Eevee", Personality = "Vek", Name = "Bianca", Sex =
 CreatePilot{Id = "Pilot_Poke_Ralts", Personality = "Vek", Name = "Wally", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Scyther", Personality = "Vek", Name = "Aaron", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
+CreatePilot{Id = "Pilot_Poke_Dialga", Personality = "Vek", Name = "Dialga", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Palkia", Personality = "Vek", Name = "Palkia", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Giratina", Personality = "Vek", Name = "Giratina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 
@@ -1058,6 +1104,67 @@ Poke_Scyther = Pawn:new{
 					  },
 }
 
+Poke_Dialga = Pawn:new{
+	Name = "Dialga",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	IsDragon = true,
+	Image = "Poke_Dialga",
+	SkillList = {"Poke_MetalClaw" },
+	SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_METAL,
+	HasEvolutions = { true, true },
+	EvoForget = { "", "Poke_MetalClaw" },
+	EvoLearn = { { { "Poke_TimeTravel" }, { "Poke_FlashCannon" } } },
+	KeepAdding = { "", "Poke_RoarOfTime" },
+}
+
+Poke_Palkia = Pawn:new{
+	Name = "Palkia",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	FastTeleporter = true,	--custom movement that only does the teleport anim if can't walk there
+	IsDragon = true,
+	Image = "Poke_Palkia",
+	-- SkillList = {"Poke_BreakingSwipe" },
+	SkillList = {"Poke_MetalClaw" },
+	SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_METAL,
+	HasEvolutions = { true, false },
+	EvoForget = { "", "" },
+	EvoLearn = { { { "Poke_Teleport" }, { "" } } },
+	-- KeepAdding = { "", "Poke_SpatialRend" },
+}
+
+Poke_Giratina = Pawn:new{
+	Name = "Giratina",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	GhostMovement = true,
+	Flying = true,
+	IsDragon = true,
+	Image = "Poke_Giratina",
+	SkillList = {"Poke_ConfuseRay" },
+	SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_METAL,
+	HasEvolutions = { true, false },
+	EvoForget = { "", "" },
+	EvoLearn = { { { "Poke_DarkPulse" }, { "" } } },
+	-- KeepAdding = { "", "Poke_ShadowForce" },
+}
+
 
 
 local oldMove = Move.GetTargetArea
@@ -1074,6 +1181,17 @@ function Move:GetTargetArea(p, ...)
 			end
 		end
 		return ret
+	elseif mover and _G[mover:GetType()].FastTeleporter then
+		local pathType
+		local area = extract_table(general_DiamondTarget(p, mover:GetMoveSpeed()))
+		local ret = PointList()
+		for _, v in ipairs(area) do
+			local terrain = Board:GetTerrain(v)
+			if not Board:IsBlocked(v, mover:GetPathProf()) then
+				ret:push_back(v)
+			end
+		end
+		return ret
 	end
 	return oldMove(self, p, ...)
 end
@@ -1084,6 +1202,9 @@ function Move:GetSkillEffect(p1, p2, ...)
 	local mover = Board:GetPawn(p1)
 	if mover and _G[mover:GetType()].GhostMovement then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", p1:GetString(), p2:GetString()))
+		return ret
+	elseif mover and _G[mover:GetType()].FastTeleporter and Board:GetDistance(p1, p2, mover:GetPathProf()) > mover:GetMoveSpeed() then
+		ret:AddTeleport(p1, p2, FULL_DELAY)
 		return ret
 	end
 	return oldMove(self, p1, p2, ...)
