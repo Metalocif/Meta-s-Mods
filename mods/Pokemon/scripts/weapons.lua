@@ -176,7 +176,7 @@ ANIMS.evolutionAnim = Animation:new{
 	PosX = -10, PosY = -5,
 	NumFrames = 4,
 	Time = 0.2,
-	Loop = true,
+	Loop = false,
 	Frames = {0, 1, 2, 3, 2, 1, 0}
 }
 
@@ -1866,10 +1866,13 @@ Poke_TimeTravel_A=Poke_TimeTravel:new{ UpgradeDescription = "Can be used one mor
 
 function Poke_TimeTravel:GetTargetArea(p1)
 	local ret = PointList()
-	ret:push_back(p1)
-	for dir = DIR_START, DIR_END do
-		ret:push_back(p1+DIR_VECTORS[dir])
-	end
+	ret:push_back(Point(7, 0))
+	ret:push_back(Point(6, 0))
+	ret:push_back(Point(7, 1))
+	
+	ret:push_back(Point(0, 7))
+	ret:push_back(Point(1, 7))
+	ret:push_back(Point(0, 6))
 	return ret
 end
 
@@ -1878,7 +1881,7 @@ function Poke_TimeTravel:GetSkillEffect(p1, p2)
 	if Board:GetSize() == Point(6,6) then
 		ret:AddAnimation(p1, "clockAnim")
 	elseif GetCurrentMission() then
-		if p1==p2 then
+		if p2==Point(0, 7) or p2==Point(1, 7) or p2==Point(0, 6) then
 			ret:AddScript("GetCurrentMission().TurnLimit = GetCurrentMission().TurnLimit + 1")
 			ret:AddAnimation(p1, "clockAnimRev")
 		else
@@ -4913,28 +4916,22 @@ Poke_MindOverMatter = Skill:new{
 }
 
 function Poke_MindOverMatter:GetTargetArea(point)
-
 	local ret = PointList()
-	
 	for i = 0, 7 do
 		for j = 0, 7 do
 			if not Board:IsBuilding(Point(i, j)) then ret:push_back(Point(i,j)) end
 		end
 	end
-	
 	return ret
 end
 
 function Poke_MindOverMatter:GetSecondTargetArea(p1,p2)
-
 	local ret = PointList()
-	
 	for i = 0, 7 do
 		for j = 0, 7 do
 			if not (Board:IsBuilding(Point(i, j)) or Point(i,j)==p1 or Board:GetTerrain(Point(i,j)) == Board:GetTerrain(p2)) then ret:push_back(Point(i,j)) end
 		end
 	end
-	
 	return ret
 end
 	
@@ -5072,7 +5069,7 @@ function Poke_DracoMeteor_Boost:GetSkillEffect(p1, p2)
 	--reverse mega evo
 	local user = Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
-		if user:GetWeaponBaseType(i) == "Poke_LightOfRuin" then 
+		if user:GetWeaponBaseType(i) == "Poke_DracoMeteor" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
 			break 
 		end
@@ -5081,5 +5078,287 @@ function Poke_DracoMeteor_Boost:GetSkillEffect(p1, p2)
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
 	end	
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+	return ret
+end
+
+
+Poke_DragonBreath = LineArtillery:new{
+	Class = "TechnoVek",
+	Icon = "weapons/DragonRage.png",	
+	Rarity = 3,
+	Name = "Dragon Rage",
+	Description = "Throw a damaging projectile.",
+	TwoClick=true,
+	Push = 1,--TOOLTIP HELPER
+	Damage = 1,
+	PathSize = 8,	--automatically makes a target area?
+	PowerCost = 0, --AE Change
+	Upgrades = 2,
+	UpgradeList = { "+1 Damage", "+1 Damage" },
+	UpgradeCost = { 2,3 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Building = Point(2,2),
+		Target = Point(2,1),
+		Enemy = Point(2,1),
+		CustomPawn = "Poke_Dialga",
+	}
+}
+Poke_DragonBreath_A=Poke_DragonBreath:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_DragonBreath_B=Poke_DragonBreath:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_DragonBreath_AB=Poke_DragonBreath:new{ Damage = 3 }
+
+function Poke_DragonBreath:GetSecondTargetArea(p1,p2)
+	local ret = PointList()
+	local dir = GetDirection(p2 - p1)
+	for i = DIR_START, DIR_END do
+		ret:push_back(p2 + DIR_VECTORS[i])
+	end
+	ret:push_back(p2)
+	return ret
+end
+
+function Poke_DragonBreath:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	damage.sAnimation = "ExploArt1"
+	ret:AddArtillery(p1, damage, "effects/shotup_dragonrage.png", PROJ_DELAY)
+	return ret
+end
+
+function Poke_DragonBreath:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	
+	damage.sAnimation = "ExploArt1"
+	
+	if p2 ~= p3 then
+		local dir2 = GetDirection(p3 - p2)
+		damage.loc = p2 + DIR_VECTORS[dir2]
+		ret:AddArtillery(p1, damage, "effects/shotup_dragonrage.png", NO_DELAY)
+		damage.loc = p2 - DIR_VECTORS[dir2]
+		ret:AddArtillery(p1, damage, "effects/shotup_dragonrage.png", NO_DELAY)
+	else
+		damage.iDamage = damage.iDamage + 1
+	end
+	damage.loc = p2
+	ret:AddArtillery(p1, damage, "effects/shotup_dragonrage.png", PROJ_DELAY)
+	return ret
+end
+
+Poke_FlashCannon = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/FlashCannon.png",
+	Description = "Strikes a distant target with a bright flash of blinding light.",
+	Name = "Flash Cannon",
+	Damage = 2,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	-- Upgrades = 2,
+	-- make blind AoE
+	-- +damage
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Enemy2 = Point(3,2),
+		Enemy3 = Point(0,2),
+		Mountain = Point(3,1),
+		Friendly = Point(1,2),
+		Target = Point(3,2),
+		CustomPawn = "Poke_Dialga",
+	}
+}
+
+function Poke_FlashCannon:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+	
+function Poke_FlashCannon:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	local dir = GetDirection(p2-p1)
+	local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
+	local damage = SpaceDamage(target, self.Damage, dir)
+	ret:AddSound(self.LaunchSound)
+	ret:AddProjectile(p1, damage, "effects/flashcannon", PROJ_DELAY)
+	ret:AddAnimation(target, "evolutionAnim")
+	if Board:GetPawn(target) then ret:AddScript(string.format("Status.ApplyBlind(%s, 2)", Board:GetPawn(target):GetId())) end
+	return ret
+end
+
+
+Poke_RoarOfTime = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Roar of Time",
+	Description = "Damages all other tiles, except buildings and allies. Closer tiles take more damage. The user spends a turn recovering.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 5,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(2, 5),
+		Enemy3 = Point(0, 2),
+		Building = Point(2,1),
+		CustomPawn = "Poke_Dialga",
+	}
+}
+
+function Poke_RoarOfTime:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_RoarOfTime:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	for i = 1, 14 do
+		local targets = extract_table(general_DiamondTarget(p1, i))
+		for k = 1, #targets do
+			if p1:Manhattan(targets[k]) == i then
+				if (not Board:IsBlocked(targets[k], PATH_PROJECTILE)) or (Board:GetPawn(targets[k]) and Board:GetPawn(targets[k]):IsEnemy()) then ret:AddDamage(SpaceDamage(targets[k], math.max(self.Damage - i + 1, 1))) end
+				ret:AddBounce(targets[k], math.max(10-i, 1))
+			end
+		end
+		ret:AddQueuedDelay(0.05)
+	end
+	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
+	return ret
+end
+
+
+Poke_Warpstrike = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Warpstrike.png",
+	Description = "Swaps two adjacent terrains. Strikes units before teleporting them.",
+	Name = "Warpstrike",
+	Damage = 1,
+	Range = 1,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	Upgrades = 2,
+	UpgradeList = { "+1 Range", "+1 Damage" },
+	UpgradeCost = { 1,2 },
+	TwoClick = true,
+	ZoneTargeting = ZONE_CUSTOM,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Enemy2 = Point(3,2),
+		Enemy3 = Point(0,2),
+		Mountain = Point(3,1),
+		Friendly = Point(1,2),
+		Target = Point(3,2),
+	}
+}
+Poke_Warpstrike_A=Poke_Warpstrike:new{ UpgradeDescription = "Increases range by 1.", Range = 2 }
+Poke_Warpstrike_B=Poke_Warpstrike:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
+Poke_Warpstrike_AB=Poke_Warpstrike:new{ Range=2, Damage = 2 }
+
+function Poke_Warpstrike:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		if not Board:IsBuilding(p1+DIR_VECTORS[dir]) then ret:push_back(p1+DIR_VECTORS[dir]) end
+	end
+	return ret
+end
+
+function Poke_Warpstrike:GetSecondTargetArea(p1,p2)
+	local ret = PointList()
+	local targets = extract_table(general_DiamondTarget(p2, self.Range))
+	for k = 1, #targets do
+		if not Board:IsBuilding(targets[k]) then ret:push_back(targets[k]) end
+	end
+	return ret
+end
+	
+function Poke_Warpstrike:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	ret:AddDamage(SpaceDamage(p2, 0))
+	return ret
+end
+
+function Poke_Warpstrike:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local terrain1 = Board:GetTerrain(p2)
+	local terrain2 = Board:GetTerrain(p3)
+	local damage1 = SpaceDamage(p2)
+	local damage2 = SpaceDamage(p3)
+	local pawn1 = Board:GetPawn(p2)
+	local pawn2 = Board:GetPawn(p3)
+	local dir = GetDirection(p2 - p1)
+	damage1.iTerrain = terrain2
+	damage2.iTerrain = terrain1
+	damage1.sAnimation = "UnitRift"
+	damage2.sAnimation = "UnitRift"
+	damage1.sImageMark = "combat/rift.png"
+	damage2.sImageMark = "combat/rift.png"
+	if pawn1 then
+		damage1.iDamage = self.Damage
+		ret:AddAnimation(p2, "sacredswordanim_"..dir, 1)
+	end
+	ret:AddDamage(damage1)
+	ret:AddDamage(damage2)
+	local delay = Board:IsPawnSpace(p2) and 0 or FULL_DELAY
+	ret:AddTeleport(p2,p3, delay)
+	
+	if delay ~= FULL_DELAY then
+		ret:AddTeleport(p3,p2, FULL_DELAY)
+	end
+	return ret
+end
+
+
+Poke_ConfuseRay = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/ConfuseRay.png",
+	Description = "Confuses a distant target.",
+	Name = "Confuse Ray",
+	Damage = 0,
+	PathSize = 1,
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Enemy2 = Point(3,2),
+		Enemy3 = Point(0,2),
+		Mountain = Point(3,1),
+		Friendly = Point(1,2),
+		Target = Point(3,2),
+	}
+}
+
+function Poke_ConfuseRay:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(p1+DIR_VECTORS[dir] * j)
+		end
+	end
+	return ret
+end
+	
+function Poke_ConfuseRay:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	local dir = GetDirection(p2-p1)
+	local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
+	local damage = SpaceDamage(target, self.Damage, DIR_FLIP)
+	ret:AddSound(self.LaunchSound)
+	ret:AddProjectile(p1, damage, "effects/flashcannon", PROJ_DELAY)
+	if Board:GetPawn(target) then ret:AddScript(string.format("Status.ApplyConfusion(%s, 2)", Board:GetPawn(target):GetId())) end
 	return ret
 end
