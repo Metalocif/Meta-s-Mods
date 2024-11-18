@@ -9,6 +9,7 @@ Mission_Poke_Mewtwo = Mission_Infinite:new{
 	Target = 0,
 	BallID = -1,
 	CustomTile = "tiles_lava",
+	BonusPool = { BONUS_KILL_FIVE, BONUS_MECHS, BONUS_PACIFIST },
 	MapTags = { "final_cave" },	--should take care of eg. sand on RST looking ugly with this tileset
 }
 
