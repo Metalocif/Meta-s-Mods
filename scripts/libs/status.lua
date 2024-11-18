@@ -795,13 +795,13 @@ local function EVENT_onModsLoaded()
 		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
 			local pawn = Board:GetPawn(id)
 			if pawn then
-				LOG(pawn:GetType().." has "..sleepTurnsLeft)
-				if sleepTurnsLeft <= 1 then 
-					--delete the anims a turn early to make it clear the pawn is waking up soon
+				LOG(pawn:GetType().." has "..sleepTurnsLeft.." turn(s) left to sleep.")
+				if sleepTurnsLeft <= 0 then 
 					if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then
 						if pawn:GetCustomAnim():sub(-13, -1) == "special_sleep" then
 						--this lets pawns have two different anims for sleeping
-							pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -14))
+							LOG(pawn:GetCustomAnim():sub(1, -15))
+							pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -15))
 						else
 							pawn:SetCustomAnim(pawn:GetCustomAnim():sub(1, -7))
 						end
