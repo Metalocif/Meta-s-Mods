@@ -110,6 +110,15 @@ function mod:load( options, version)
 		"Nature's Guardians", "Protectors of nature, these Pokemon will heal the planet.", 
 		self.resourcePath .. "img/nature_icon.png")
 	end
+	-- if modApi.achievements:isComplete(mod.id,"Poke_DialgaCapture") and 
+	   -- modApi.achievements:isComplete(mod.id,"Poke_PalkiaCapture") and 
+	   -- modApi.achievements:isComplete(mod.id,"Poke_GiratinaCapture") then 
+
+		modApi:addSquad(
+		{"Dragons of Myth","Poke_Dialga", "Poke_Palkia", "Poke_Giratina", id = "Poke_MythSquad"}, 
+		"Dragons of Myth", "The dragons who rule over the universe.", 
+		self.resourcePath .. "img/redchain_icon.png")
+	-- end
 	modApi:addSquad(
 	{"Earth's Champions","Poke_Beldum", "Poke_Larvitar", "Poke_Gible", id = "Poke_EarthChampions"}, 
 	"Earth's Champions", "Some of the greatest Pokemon trainers, banded together to stop the Vek threat.", 
