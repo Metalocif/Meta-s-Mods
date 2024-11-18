@@ -31,7 +31,7 @@ function Mission_Poke_Xerneas:GetDestroyedCount()
 end
 
 function Mission_Poke_Xerneas:UpdateObjectives()
-	local status = Board:IsPawnAlive(self.XerneasId) and OBJ_COMPLETE or OBJ_STANDARD
+	local status = Board:IsPawnAlive(self.XerneasId) and OBJ_STANDARD
 	Game:AddObjective("Protect Xerneas",status)
 end
 
