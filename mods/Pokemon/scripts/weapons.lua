@@ -74,6 +74,8 @@ local files = {
 	"BulletPunch.png",
 	"StoneAxe.png",
 	"XScissor.png",
+	"ConfuseRay.png",
+	"FlashCannon.png"
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/weapons/"..file, resourcePath.."img/weapons/"..file)
@@ -155,6 +157,9 @@ modApi:appendAsset("img/effects/sacredsword.png", resourcePath.."img/effects/sac
 modApi:appendAsset("img/effects/DracoMeteor.png", resourcePath.."img/effects/DracoMeteor.png")
 modApi:appendAsset("img/units/player/DracoMeteor.png", resourcePath.."img/units/player/DracoMeteor.png")
 modApi:appendAsset("img/units/player/DracoMeteor_death.png", resourcePath.."img/units/player/DracoMeteor_death.png")
+
+modApi:appendAsset("img/effects/confuseray_R.png", resourcePath.."img/effects/confuseray_R.png")
+modApi:appendAsset("img/effects/confuseray_U.png", resourcePath.."img/effects/confuseray_U.png")
 
 local effects = {
 	"laser_hyperbeam_R.png",
@@ -3762,8 +3767,10 @@ function Reflect(point)
 					elseif spaceDamage:GetType() == 1 then		--artillery
 						ret:AddArtillery(point, reflectDamage, spaceDamage:GetProjectileArt(), PROJ_DELAY)
 					elseif spaceDamage:GetMoveType() == 3 then	--melee
+						reflectDamage.sAnimation = spaceDamage.sAnimation
 						ret:AddDamage(reflectDamage)
 					else
+						reflectDamage.sAnimation = spaceDamage.sAnimation
 						ret:AddDamage(reflectDamage)
 					end
 					ret:AddScript(string.format("Board:GetPawn(%s):ClearQueued()", id))
@@ -3897,7 +3904,7 @@ function Poke_FreezyFrost:GetTargetArea(p1)
 	local ret = PointList()
 	for dir = DIR_START, DIR_END do
 		for j = 2, 8 do
-			ret:push_back(p1+DIR_VECTORS[dir] * j)
+			if not Board:IsBlocked(p1+DIR_VECTORS[dir] * j, PATH_PROJECTILE) then ret:push_back(p1+DIR_VECTORS[dir] * j) end
 		end
 	end
 	return ret
@@ -3961,7 +3968,7 @@ function Poke_SparklySwirl:GetTargetArea(p1)
 	local ret = PointList()
 	for dir = DIR_START, DIR_END do
 		for j = 2, 8 do
-			ret:push_back(p1+DIR_VECTORS[dir] * j)
+			if not Board:IsBlocked(p1+DIR_VECTORS[dir] * j, PATH_PROJECTILE) then ret:push_back(p1+DIR_VECTORS[dir] * j) end
 		end
 	end
 	return ret
@@ -4074,7 +4081,7 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 			elseif status == "Weaken" then 
 				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyWeaken", pawn2:GetId(), tonumber(string.sub(pawn2:GetWeaponBaseType(1),1,1))))
 			elseif status == "Chill" then
-				ret:AddScript(string.format("Status[%q](%s)", "ApplyRooted", pawn2:GetId()))
+				ret:AddScript(string.format("Status[%q](%s)", "ApplyChill", pawn2:GetId()))
 			else
 				ret:AddScript(string.format("Status[%q](%s, %s)", "Apply"..status, pawn2:GetId(), tostring(Status.GetStatus(pawn2:GetId(), status))))
 			end
@@ -4085,7 +4092,7 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 			elseif status == "Weaken" then 
 				ret:AddScript(string.format("Status[%q](%s, %s)", "ApplyWeaken", pawn1:GetId(), tonumber(string.sub(pawn1:GetWeaponBaseType(1),1,1))))
 			elseif status == "Chill" then
-				ret:AddScript(string.format("Status[%q](%s)", "ApplyRooted", pawn1:GetId()))
+				ret:AddScript(string.format("Status[%q](%s)", "ApplyChill", pawn1:GetId()))
 			else
 				ret:AddScript(string.format("Status[%q](%s, %s)", "Apply"..status, pawn1:GetId(), tostring(Status.GetStatus(pawn1:GetId(), status))))
 			end
