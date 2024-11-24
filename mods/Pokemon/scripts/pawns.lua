@@ -21,7 +21,7 @@
 
 local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-local tileToScreen = require(path .."scripts/libs/tileToScreen")
+-- local tileToScreen = require(path .."scripts/libs/tileToScreen")
 local mechPath = mod_loader.mods[modApi.currentMod].resourcePath .."img/units/player/"
 local files = {
     "Abra.png",
@@ -384,7 +384,7 @@ a.Poke_Mewtwoa = a.MechUnit:new{Image="units/player/Mewtwo_a.png",  PosX = -25, 
 a.Poke_Mewtwo_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Mewtwo_ns = a.MechIcon:new{Image="units/player/Mewtwo_ns.png"}
 a.Poke_MegaMewtwoX =a.MechUnit:new{Image="units/player/MegaMewtwoX.png", PosX = -20, PosY = -4}
-a.Poke_MegaMewtwoXa = a.MechUnit:new{Image="units/player/MegaMewtwoX_a.png",  PosX = -25, PosY = -14, NumFrames = 6 }
+a.Poke_MegaMewtwoXa = a.MechUnit:new{Image="units/player/MegaMewtwoX_a.png",  PosX = -25, PosY = -14, NumFrames = 12 }
 a.Poke_MegaMewtwoX_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_MegaMewtwoX_ns = a.MechIcon:new{Image="units/player/MegaMewtwoX_ns.png"}
 a.Poke_MegaMewtwoY =a.MechUnit:new{Image="units/player/MegaMewtwoY.png", PosX = -20, PosY = -4}
@@ -815,6 +815,7 @@ Poke_Mewtwo = Pawn:new{
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, true },
+	EvoGraphics = { { "Poke_Mewtwo", "Poke_Mewtwo" } },		--necessary because mega evo retransforms
 	MegaEvos = { "Poke_MegaMewtwoX", "Poke_MegaMewtwoY" },
 	MegaEvoMoves = { "Poke_VanishingStrikes", "Poke_ShatteredPsyche" },
 	MegaEvoNames = { "Mega Mewtwo X", "Mega Mewtwo Y" },
@@ -1115,13 +1116,13 @@ Poke_Dialga = Pawn:new{
 	Corpse = true,
 	IsDragon = true,
 	Image = "Poke_Dialga",
-	SkillList = {"Poke_FlashCannon", "Poke_TimeTravel" },
+	SkillList = {"Poke_DragonBreath", "Poke_TimeTravel" },
 	SoundLocation = "/enemy/bouncer_1/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
 	HasEvolutions = { true, true },
 	EvoForget = { "Poke_DragonBreath", "" },
-	EvoLearn = { { { "Poke_DragonBreath" }, { "" } } },
+	EvoLearn = { { { "Poke_FlashCannon" }, { "" } } },
 	KeepAdding = { "", "Poke_RoarOfTime" },
 }
 
@@ -1138,7 +1139,7 @@ Poke_Palkia = Pawn:new{
 	SkillList = {"Poke_Warpstrike" },
 	SoundLocation = "/enemy/bouncer_1/",
 	DefaultTeam = TEAM_PLAYER,
-	ImpactMaterial = IMPACT_METAL,
+	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_Teleport" }, { "" } } },
@@ -1159,7 +1160,7 @@ Poke_Giratina = Pawn:new{
 	SkillList = {"Poke_ConfuseRay" },
 	SoundLocation = "/enemy/bouncer_1/",
 	DefaultTeam = TEAM_PLAYER,
-	ImpactMaterial = IMPACT_METAL,
+	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_DarkPulse" }, { "" } } },
@@ -1197,6 +1198,8 @@ function Move:GetTargetArea(p, ...)
 	return oldMove(self, p, ...)
 end
 
+local lingering
+
 local oldMove = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2, ...)
 	local ret = SkillEffect()
@@ -1204,61 +1207,57 @@ function Move:GetSkillEffect(p1, p2, ...)
 	if mover and _G[mover:GetType()].GhostMovement then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", p1:GetString(), p2:GetString()))
 		
-		local data = _G[mover:GetType()]
-		local anim = a[data.Image]
-		if not (anim and mover and GetCurrentMission() and Board) then return end
-
-		lingering = Ui()
-			:width(1)
-			:height(1)
-			:addTo(sdlext.getUiRoot())
-		lingering.translucent = true
-		lingering.age = 1
-
-		lingering.draw = function(self, ...)
-			if Board and self.age < 60 then
-				Ui.draw(self, ...)
-				LOG(age)
-				self.age = self.age+1
-			else
-				lingering:detach()
-				lingering = nil
-			end
-		end
+		-- local data = _G[mover:GetType()]
+		-- local anim = a[data.Image]
+		-- if not (anim and mover and GetCurrentMission() and Board) then return end
 		
-		local scale = GetBoardScale() * GetUiScale()
-		local deco = DecoSurface(sdl.scaled(scale, sdlext.surface("img/".. anim.Image)))
-		local surface = deco.surface
-		local loc = tileToScreen(p1)
+		-- if not lingering then
+			-- lingering = Ui()
+				-- :width(1)
+				-- :height(1)
+				-- :addTo(sdlext.getUiRoot())
+			-- lingering.visible = true
+			-- lingering.age = 1
 
-		local icon = Ui()
-			:widthpx(surface:w())
-			:heightpx(surface:h())
-			:decorate({ deco })
-			:addTo(lingering)
-			:pospx(loc.x, loc.y)
-		icon.translucent = true
-		icon.visible = true
-		icon.transformations  = {
-			-- { scale = 2 },
-			-- { outline = { border = 2 } },
-			-- { colormap = {
-				-- { sdl.rgb(136, 126, 68), sdl.rgb(0, 255, 0) }
-			-- } },
-			{ multiply = sdl.rgba(128, 128, 128, 196) }
-		}
+			-- lingering.draw = function(self, ...)
+				-- if Board and self.age < 60 then
+					-- Ui.draw(self, ...)
+					-- self.age = self.age+1
+				-- else
+					-- self:detach()
+					-- self = nil
+				-- end
+			-- end
+		-- end
+		
+		-- local scale = GetBoardScale() * GetUiScale()
+		-- local deco = DecoSurface(sdl.scaled(scale, sdlext.surface("img/".. anim.Image)))
+		-- local surface = deco.surface
+		-- local loc = tileToScreen(p1)
 
-		local w = math.floor(surface:w() / (anim.NumFrames or 1))
-		local h = math.floor(surface:h() / (anim.Height or 1))
-		icon.x = icon.x + anim.PosX * scale
-		icon.y = icon.y - h * data.ImageOffset + (anim.PosY - 15) * scale
-		icon.cliprect = sdl.rect(icon.x, icon.y + h * data.ImageOffset, w, h)
+		-- local icon = Ui()
+			-- :widthpx(surface:w())
+			-- :heightpx(surface:h())
+			-- :decorate({ deco })
+			-- :addTo(lingering)
+			-- :pospx(loc.x, loc.y)
+		-- icon.translucent = true
+		-- icon.visible = true
+		-- icon.transformations  = {
+			-- { multiply = sdl.rgba(128, 128, 128, 196) }
+		-- }
 
-		deco.draw = function(self, screen, widget)
-			screen:clip(widget.cliprect)
-			DecoSurface.draw(self, screen, widget)
-			screen:unclip()
-		end
+		-- local w = math.floor(surface:w() / (anim.NumFrames or 1))
+		-- local h = math.floor(surface:h() / (anim.Height or 1))
+		-- icon.x = icon.x + anim.PosX * scale
+		-- icon.y = icon.y - h * data.ImageOffset + (anim.PosY - 15) * scale
+		-- icon.cliprect = sdl.rect(icon.x, icon.y + h * data.ImageOffset, w, h)
+
+		-- deco.draw = function(self, screen, widget)
+			-- screen:clip(widget.cliprect)
+			-- DecoSurface.draw(self, screen, widget)
+			-- screen:unclip()
+		-- end
 		
 		return ret
 	elseif mover and _G[mover:GetType()].FastTeleporter and Board:GetDistance(p1, p2, mover:GetPathProf()) > mover:GetMoveSpeed() then
