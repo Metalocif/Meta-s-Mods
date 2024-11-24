@@ -326,10 +326,33 @@ function mod:load( options, version)
 		
 		end
 	end)
+	modApi.events.onPawnSelectedForDeployment:subscribe(function(pawnId)
+		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
+		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
+		if options["PokemonDeployment"] and options["PokemonDeployment"].enabled then
+			local pilotLevel = GameData.current["pilot"..pawnId].level
+			local branch = GAME.BranchingEvos[pawnId+1]
+			if _G[Board:GetPawn(pawnId):GetType()].EvoNames ~= nil and branch ~= nil then
+				LOG(_G[Board:GetPawn(pawnId):GetType()].EvoNames[branch][pilotLevel+1])
+				Board:AddAlert(Point(1, 1), _G[Board:GetPawn(pawnId):GetType()].EvoNames[branch][pilotLevel+1])
+			else
+				Board:AddAlert(Point(1, 1), Board:GetPawn(pawnId):GetMechName())
+			end
+		end
+	end)
 end
 
 local function init(self)
 	meta_missions_modApiExt = require(self.scriptPath.."modApiExt/modApiExt"):init()
+end
+
+function mod:metadata()
+	modApi:addGenerationOption(
+		"PokemonDeployment",
+		"Display name on deployment",
+		"Pick whether to display the name of the Pokemon you are currently deploying.",
+		{ enabled = false }
+	)
 end
 
 return mod
