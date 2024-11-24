@@ -10,14 +10,17 @@ modApi:addMap(resourcePath .."maps/Poke_Boss_Pillars_Arceus.map")
 Mission_Poke_Arceus = Mission_Infinite:new{
 	Name = "Spear Pillars",
 	Objectives = Objective("Capture Arceus",1,1),
-	Target = 0,
+	Target = -1,
 	BallID = -1,
+	TurnLimit = 10,
 	CustomTile = "tiles_Pillars",
 	MapTags = { "Poke_Boss_Pillars_Arceus" },
 	BlockSecret = true,
 	BonusPool = { BONUS_KILL_FIVE, BONUS_MECHS, BONUS_PACIFIST },
 	BossPawn = "Poke_ArceusBoss",
 }
+
+--remove psions from spawner, because they reset max HP boost on death for Arceus second form
 
 function Mission_Poke_Arceus:StartMission()
 	for _, p in ipairs(Board) do
@@ -36,11 +39,21 @@ function Mission_Poke_Arceus:StartMission()
 			end
 		end
 	end
+	for name, maxCount in ipairs(self:GetSpawner().max_pawns) do
+		if string.find(name, "Jelly") then self.GetSpawner().max_pawns.name = 0 LOG("blocked "..name) end
+	end
 end
 
 function Mission_Poke_Arceus:NextTurn()
+	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
+		local pawn = Board:GetPawn(id)		
+		if id ~= self.Target and not Status.GetStatus(id, "Glory") then Status.ApplyGlory(id, 99) end
+	end
+	DoSaveGame()
+	--seems necessary
 	if self.ShadowForceTarget ~= nil and Game:GetTeamTurn() == TEAM_ENEMY then
 		local ret = SkillEffect()
+		LOG("shadow force trigger")
 		Board:DamageSpace(SpaceDamage(self.ShadowForceTarget, DAMAGE_DEATH))
 		CustomAnim:rem(self.ShadowForceTarget, "QueuedShot")
 		for i = DIR_START, DIR_END do
@@ -52,7 +65,7 @@ function Mission_Poke_Arceus:NextTurn()
 		Board:AddEffect(ret)
 		Board:GetPawn(self.Target):SetSpace(self.ShadowForceTarget)
 		Board:GetPawn(self.Target):RemoveWeapon(1)
-		Board:GetPawn(self.Target):AddWeapon("Poke_DevourLight")
+		Board:GetPawn(self.Target):AddWeapon("Poke_RoarOfTimeArceus")
 		-- weaponPreview:ClearMarks()
 		self.ShadowForceTarget = nil
 	end

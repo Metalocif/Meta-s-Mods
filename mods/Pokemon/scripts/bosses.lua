@@ -12,6 +12,7 @@ local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 
 modApi:appendAsset("img/effects/roaroftime.png", resourcePath.."img/effects/roaroftime.png")
 modApi:appendAsset("img/effects/ancientpower.png", resourcePath.."img/effects/ancientpower.png")
+modApi:appendAsset("img/effects/judgment.png", resourcePath.."img/effects/judgment.png")
 ANIMS.RoarOfTimeAnim = Animation:new{ Image = "effects/roaroftime.png", NumFrames = 6,Time = 0.1,PosX = -42,PosY = -30}
 
 achievements = {
@@ -162,6 +163,16 @@ modApi:appendAsset(writepath .."Giratina.png", readpath .."Giratina.png")
 modApi:appendAsset(writepath .."Giratina_a.png", readpath .."Giratina_a.png")
 modApi:appendAsset(writepath .."Giratina_d.png", readpath .."Giratina_d.png")
 
+modApi:appendAsset(writepath .."Arceus.png", readpath .."Arceus.png")
+modApi:appendAsset(writepath .."Arceus_a.png", readpath .."Arceus_a.png")
+modApi:appendAsset(writepath .."Arceus_attack.png", readpath .."Arceus_attack.png")
+modApi:appendAsset(writepath .."Arceus_d.png", readpath .."Arceus_d.png")
+modApi:appendAsset(writepath .."Arceus2.png", readpath .."Arceus2.png")
+modApi:appendAsset(writepath .."Arceus2_a.png", readpath .."Arceus2_a.png")
+modApi:appendAsset(writepath .."Arceus2_d.png", readpath .."Arceus2_d.png")
+modApi:appendAsset(writepath .."star.png", readpath .."star.png")
+modApi:appendAsset(writepath .."star_a.png", readpath .."star_a.png")
+
 modApi:appendAsset(writepath .."MasterBall.png", readpath .."MasterBall.png")
 
 local a = ANIMS
@@ -229,6 +240,18 @@ base = a.EnemyUnit:new{Image = imagepath .."Giratina.png", PosX = -31, PosY = -1
 a.Giratina  =	base
 a.Giratinaa =	base:new{ Image = "units/aliens/Giratina_a.png", NumFrames = 4 }
 a.Giratinad =	base:new{ Image = "units/aliens/Giratina_d.png", NumFrames = 9, Time = 0.2, Loop = false }
+
+base = a.EnemyUnit:new{Image = imagepath .."Arceus.png", PosX = -26, PosY = -23, NumFrames = 1, Height = 1 }
+a.ArceusBoss  =	base
+a.Arceus2 = a.EnemyUnit:new{Image = imagepath .."Arceus2.png", PosX = -31, PosY = -13, NumFrames = 1, Height = 1 }
+a.ArceusBossa =	base:new{ Image = "units/aliens/Arceus_a.png", NumFrames = 8 }
+a.Arceus2a =	base:new{ Image = "units/aliens/Arceus2_a.png", NumFrames = 8 }
+a.Arceus_Judgment =	base:new{ Image = "units/aliens/Arceus_attack.png", NumFrames = 11, Time = 0.2, PosY = -23, }
+a.ArceusBossd =	base:new{ Image = "units/aliens/Arceus_d.png", NumFrames = 11, Time = 0.2, Loop = false }
+a.Arceus2d =	base:new{ Image = "units/aliens/Arceus2_d.png", NumFrames = 9, Time = 0.2, Loop = false }
+
+a.Poke_StarbirthStar = a.EnemyUnit:new{Image = imagepath .."star.png", PosX = 0, PosY = 0, NumFrames = 1, Height = 1 }
+a.Poke_StarbirthStara = a.EnemyUnit:new{Image = imagepath .."star_a.png", PosX = 0, PosY = 0, NumFrames = 2, Height = 1 }
 
 a.MasterBall = a.EnemyUnit:new{Image = imagepath .."MasterBall.png", PosX = -8, PosY = 0, NumFrames = 1, Height = 1 }
 
@@ -1372,6 +1395,7 @@ Poke_RoarOfTimeBoss = Skill:new{
 	Rarity = 3,
 	Name = "Roar of Time",
 	Description = "Damages all other tiles. Switches to another move next turn.",
+	User = "Dialga",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 5,
 	PathSize = 8,
@@ -1493,6 +1517,7 @@ Poke_SpatialRendBoss = Skill:new{
 	Rarity = 3,
 	Name = "Spatial Rend",
 	Description = "Dramatically alters terrain. Switches to another move next turn.",
+	User = "Palkia",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	PathSize = 8,
@@ -1731,5 +1756,416 @@ function Poke_DevourLight:GetSkillEffect(p1, p2)
 	end
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+
+
+
+
+
+
+Poke_ArceusBoss = {
+	Health = 12,
+	MoveSpeed = 6,
+	Image = "ArceusBoss",
+	Name = "Arceus",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_Judgment" },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_FLESH,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = false,
+	Tier = TIER_BOSS,
+	IsDeathEffect = true,
+	Massive = true,
+	Flying = true,
+	IgnoreSmoke = true,
+	ChillImmune = true,
+	SleepImmune = true,
+	InfestedImmune = true,
+	IsDeathEffect = true,
+}
+AddPawn("Poke_ArceusBoss") 
+
+function Poke_ArceusBoss:GetDeathEffect(point)
+	local mission = GetCurrentMission()
+	if mission.ArceusRevived then 
+		local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+		Board:AddPawn(ball, point)
+		mission.BallID = ball:GetId()
+		for _, p in ipairs(Board) do
+			if Board:GetPawn(p) and Board:GetPawn(p):GetType() == "Poke_StarbirthStar" then
+				Board:GetPawn(p):Kill()
+			end
+		end
+		GetCurrentMission().TurnLimit = 1
+		return SkillEffect()
+	end
+	mission.ArceusRevived = true
+	
+	local arceus = Board:GetPawn(mission.Target)
+	-- Board:RemovePawn(arceus)
+	-- Board:AddPawn(arceus, point)
+	arceus:SetMaxHealth(30)
+	arceus:SetHealth(30)
+	arceus:SetCustomAnim("Arceus2")
+	Board:Ping(point, GL_Color(255, 255, 150))
+	arceus:RemoveWeapon(1)
+	arceus:AddWeapon("Poke_Unmake")
+	return SkillEffect()
+end
+
+Poke_Judgment = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Judgment",
+	User = "Arceus",
+	Description = "Damages all allies.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 2,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ArtilleryHeight = 50,
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_SpatialRendArceus",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+function Poke_Judgment:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_Judgment:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	if not Board:IsTipImage() then ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Arceus_Judgment")) end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddQueuedDelay(1.2)
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn and pawn:GetSpace() ~= p2 then
+			local damage = SpaceDamage(pawn:GetSpace(), self.Damage)
+			damage.sAnimation = "ExploArt3"
+			ret:AddQueuedArtillery(damage, "effects/judgment.png", NO_DELAY)
+		end
+	end
+	ret:AddQueuedDelay(1)
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "ArceusBoss"))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_SpatialRendArceus = Poke_SpatialRendBoss:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Spatial Rend",
+	User = "Arceus",
+	Description = "Dramatically alters terrain.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_ShadowForceArceus",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(2, 5),
+		Enemy3 = Point(0, 2),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+Poke_ShadowForceArceus = Poke_ShadowForce:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Shadow Force",
+	User = "Arceus",
+	Description = "Disappears, then strikes a location.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = DAMAGE_DEATH,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_RoarOfTimeArceus",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+Poke_RoarOfTimeArceus = Poke_RoarOfTimeBoss:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Roar of Time",
+	User = "Arceus",
+	Description = "Damages all other tiles.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 5,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_Judgment",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(1, 2),
+		Enemy2 = Point(2, 5),
+		Enemy3 = Point(0, 2),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+
+Poke_Unmake = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Unmake",
+	User = "Arceus",
+	Description = "Unmakes half of the board, killing anything there.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = DAMAGE_DEATH,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_AstralBarrage",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+function Poke_Unmake:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_Unmake:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddQueuedDelay(1)
+	local iStart, iEnd = 0, 7
+	local jStart, jEnd = 4, 7
+	if GetCurrentMission().UnmadeStuff then iEnd = 3 jStart = 0 else GetCurrentMission().UnmadeStuff = 0 end
+	for i = iStart, iEnd do
+		for j = jStart, jEnd do
+			local p = Point(i, j)
+			-- local bounceIt = false
+			-- weaponPreview:AddAnimation(p, "Emitter_Crack_Start", ANIM_DELAY)
+			-- ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
+			-- ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
+			if p ~= p1 then
+				local damage = SpaceDamage(p, DAMAGE_DEATH)
+				if Board:IsCrackable(p) and not Board:GetTerrain(p) == TERRAIN_MOUNTAIN then
+					local crackDamage = SpaceDamage(p)
+					crackDamage.iCrack = 1
+					ret:AddQueuedDamage(crackDamage)
+				else
+					damage.iTerrain = TERRAIN_HOLE
+				end
+				if Board:GetTerrain(p) == 17 then damage.iTerrain = TERRAIN_HOLE end
+				ret:AddQueuedDamage(damage)
+			else
+				local damage = SpaceDamage(p, DAMAGE_ZERO)
+				damage.iTerrain = TERRAIN_HOLE
+				ret:AddQueuedDamage(damage)
+			end
+			-- if bounceIt then ret:AddQueuedScript(string.format("Board:Bounce(%s, 0)", p:GetString())) end
+			-- ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
+			-- ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
+		end
+	end
+	ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1")
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+
+Poke_AstralBarrage = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Astral Barrage",
+	User = "Arceus",
+	Description = "Fires projectiles from one edge of the board, damaging the first thing hit and healing the user.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 2,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_Starbirth",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+function Poke_AstralBarrage:GetTargetArea(point)
+	local ret = PointList()
+	ret:push_back(point)
+	return ret
+end
+
+function Poke_AstralBarrage:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddQueuedDelay(1)
+	for i = 0, 7 do
+		local p = Point(0, i)
+		local target = GetProjectileEnd(p, p + DIR_VECTORS[DIR_RIGHT], PATH_PROJECTILE)
+		local damage = SpaceDamage(target, self.Damage)
+		if target == p1 then damage.iDamage = self.Damage * -1 end
+		ret:New_AddQueuedProjectile(p, damage, "effects/laser2", NO_DELAY)
+	end
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	return ret
+end
+
+Poke_StarbirthStar = {
+	Health = 1,
+	MoveSpeed = 0,
+	Image = "Poke_StarbirthStar",
+	Name = "Star",
+	-- ImageOffset = 2,
+	SkillList = { },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_NONE,
+	DefaultTeam = TEAM_NONE,
+	IsPortrait = false,
+	GloryImmune = true,	--mostly for flavor
+	Flying = true,
+}
+AddPawn("Poke_StarbirthStar")
+
+Poke_Starbirth = Skill:new{
+	Class = "Enemy",
+	Icon = "weapons/NaturePower.png",	
+	Rarity = 3,
+	Name = "Starbirth",
+	User = "Arceus",
+	Description = "Prepares to create and explode a star at a location by spawning five star fragments. The explosion will damage everything on the board by an amount equal to the number of star fragments left alive.",
+	Push = 1,--TOOLTIP HELPER
+	MinDamage = 0,
+	Damage = 5,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	ArtilleryHeight = 0,
+	ZoneTargeting = ZONE_DIR,
+	NextWeapon = "Poke_Unmake",
+	TipImage = {
+		Unit = Point(2,2),
+		Target = Point(2,2),
+		Enemy1 = Point(0,0),
+		Enemy2 = Point(3,4),
+		CustomPawn = "Poke_ArceusBoss",
+	}
+}
+
+function Poke_Starbirth:GetTargetArea(point)
+	local ret = PointList()
+	for _, p in ipairs(Board) do
+		ret:push_back(p)
+	end
+	return ret
+end
+
+function Poke_Starbirth:GetTargetScore(p1, p2)
+	local score = 0
+	local targets = extract_table(general_DiamondTarget(p2, 2))
+	for k = 1, #targets do
+		if not Board:IsBlocked(targets[k], PATH_PROJECTILE) then
+			score = score + 10 - p2:Manhattan(targets[k]) * 4
+			--this gives a higher score to tiles for which adjacents are not blocked so we can spawn all five
+			--also an even higher score to tiles that are far away from everything to make the player move more
+		end
+	end
+	return score
+end
+
+function Poke_Starbirth:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local mission = GetCurrentMission()
+	if not Board:GetPawn(p1) then return ret end
+	ret:AddScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddDelay(1)
+	local damage = SpaceDamage(p2)
+	damage.sPawn = "Poke_StarbirthStar"
+	if not Board:IsBlocked(p2, PATH_PROJECTILE) then ret:AddDamage(damage) end
+	for i = DIR_START, DIR_END do
+		local curr = p2 + DIR_VECTORS[i]
+		damage.loc = curr
+		if not Board:IsBlocked(curr, PATH_PROJECTILE) then ret:AddDamage(damage) end
+	end
+	local count = 0
+	for _, p in ipairs(Board) do
+		if Board:GetPawn(p) and Board:GetPawn(p):GetType() == "Poke_StarbirthStar" then
+			count = count + 1
+			ret:AddQueuedScript(string.format([[local move = PointList()
+			move:push_back(%s)
+			move:push_back(%s)
+			local fx = SkillEffect()
+			fx:AddQueuedLeap(move, NO_DELAY)
+			Board:AddEffect(fx)]], p:GetString(), p1:GetString()))
+			--queued leaps are ugly so we hide them in a script
+		end
+	end
+	if count > 0 then 
+		ret:AddQueuedDelay(1)
+		for _, id in ipairs(extract_table(Board:GetPawns(TEAM_NONE))) do
+			local pawn = Board:GetPawn(id)		
+			if pawn:GetType() == "Poke_StarbirthStar" then 
+				ret:AddQueuedScript(string.format("Board:GetPawn(%s):Kill(true)", pawn:GetId()))
+			end
+		end
+		for i = 1, 15 do
+			local targets = extract_table(general_DiamondTarget(p1, i))
+			for k = 1, #targets do
+				if p1:Manhattan(targets[k]) == i then
+					ret:AddQueuedDamage(SpaceDamage(targets[k], count))
+					ret:AddQueuedBounce(targets[k], 3)
+				end
+			end
+			ret:AddQueuedDelay(0.1)
+		end
+	end
+	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
+	if mission.UnmadeStuff < 2 then
+		ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
+	else
+		ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), "Poke_AstralBarrage"))
+	end
 	return ret
 end
