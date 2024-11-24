@@ -221,6 +221,8 @@ local function EVENT_onModsLoaded()
 					if pawn then
 						if _G[pawn:GetType()].ImpactMaterial == IMPACT_ROCK or _G[pawn:GetType()].ImpactMaterial == IMPACT_METAL then
 							isImmune = true
+						elseif pawn:IsPlayer() and not pawn:IsMech() then
+							isImmune = true		--otherwise the bomb gets damaged, airplanes in Meridia, stuff like that
 						elseif _G[pawn:GetType()].SandstormImmune ~= nil and type(_G[pawn:GetType()].SandstormImmune) == "boolean" and _G[pawn:GetType()].SandstormImmune then 
 							isImmune = true
 						elseif _G[pawn:GetType()].SandstormImmune ~= nil and type(_G[pawn:GetType()].SandstormImmune) == "table" and (pawn:GetId() == 0 or pawn:GetId() == 1 or pawn:GetId() == 2) then
