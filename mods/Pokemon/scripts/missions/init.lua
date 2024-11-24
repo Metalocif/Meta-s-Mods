@@ -14,6 +14,7 @@ local missions = {
 	"mission_dialga",
 	"mission_palkia",
 	"mission_giratina",
+	"mission_arceus",
 }
 
 local function loadMissionDialog(missionId, file)
