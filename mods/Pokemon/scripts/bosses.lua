@@ -446,7 +446,7 @@ function Env_LightningZapdos:GetAttackEffect(location)
 	effect:AddDelay(1)
 	if Board:GetPawn(location) and Board:GetPawn(location):GetId() == GetCurrentMission().BossID then
 		damage.iDamage = DAMAGE_ZERO
-		damage.sScript = string.format("Board:GetPawn(%s):SetBoosted(true)", location:GetString())
+		damage.sScript = string.format("Board:GetPawn(%s):SetBoosted(true)", Board:GetPawn(location):GetId())
 	end
 	effect:AddDamage(damage)
 	return effect
