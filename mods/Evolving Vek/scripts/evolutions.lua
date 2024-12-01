@@ -115,6 +115,7 @@ end
 --Hook stuff
 
 local function HOOK_MissionStart(mission)
+modApi:runLater(function()
 	if GAME.EvolvedVeks == nil then return false end
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["PrefixStartCount"] and options["PrefixStartCount"] == 0 then return false end
@@ -136,18 +137,20 @@ local function HOOK_MissionStart(mission)
 			end
 		end
 	end
+end)
 end
 
 local function HOOK_VekSpawnAdded(mission, spawnData)
+modApi:runLater(function()
 	if GAME.EvolvedVeks == nil then return false end
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["PrefixSpawns"] and not options["PrefixSpawns"].enabled then return false end
 	for i = 1, #GAME.EvolvedVeks do
 		if GAME.EvolvedVeks[i].Type == spawnData.type and GAME.EvolvedVeks[i].Remaining > 0 and _G[GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type].Name ~= "Missing Mod" then
-			GetCurrentMission():RemoveSpawnPoint(spawnData.location)
+			mission:RemoveSpawnPoint(spawnData.location)
 			
 			modApi:runLater(function()
-				GetCurrentMission():SpawnPawn(spawnData.location, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type)
+				mission:SpawnPawn(spawnData.location, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type)
 				Board:Ping(spawnData.location, COLOR_BLACK)
 			end)
 			local fx = SkillEffect()
@@ -157,6 +160,7 @@ local function HOOK_VekSpawnAdded(mission, spawnData)
 			break
 		end
 	end
+end)
 end
 
 local function HOOK_ProcessVekRetreat(mission, endFx, pawn)
