@@ -433,7 +433,10 @@ Mission_ZapdosBoss = Mission_Boss:new{
 	BallID = -1,
 }
 
-Env_LightningZapdos = Env_Lightning		--only difference is it boosts Zapdos
+Env_LightningZapdos = Env_Lightning:new{		--only difference is it boosts Zapdos
+
+	Locations = nil,							--initialize or it affects the base class for some reason
+}
 
 function Env_LightningZapdos:GetAttackEffect(location)
 	local effect = SkillEffect()
