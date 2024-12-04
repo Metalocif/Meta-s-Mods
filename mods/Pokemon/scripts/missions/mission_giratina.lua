@@ -38,7 +38,23 @@ function Mission_Poke_Giratina:StartMission()
 	end
 end
 
+
 function Mission_Poke_Giratina:NextTurn()
+	local totalHP = 0
+	for i = 0, 2 do
+		if Board:GetPawn(i) then totalHP = totalHP + Board:GetPawn(i):GetHealth() end
+	end
+	if totalHP == 0 then --mission will end soon
+		modApi:conditionalHook(function()
+			return modApi.deployment:isDeploymentPhase()
+		end,
+		function()
+			for i = 0, 2 do
+				Board:GetPawn(i):SetHealth(1)
+			end
+		end)
+	end
+	
 	if self.ShadowForceTarget ~= nil and Game:GetTeamTurn() == TEAM_ENEMY then
 		local ret = SkillEffect()
 		Board:DamageSpace(SpaceDamage(self.ShadowForceTarget, DAMAGE_DEATH))

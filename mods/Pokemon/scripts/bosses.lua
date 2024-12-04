@@ -105,6 +105,14 @@ achievements = {
 		img = resourcePath.."img/units/aliens/Giratina.png",
 		global = "Pokemon",
 	},
+	
+	Poke_ArceusCapture = modApi.achievements:add{
+		id = "Poke_ArceusCapture",
+		name = "Captured Arceus",
+		tip = "Capture Arceus, who rules over all.",
+		img = resourcePath.."img/units/aliens/Arceus.png",
+		global = "Pokemon",
+	},
 }
 
 
@@ -341,6 +349,7 @@ Poke_ArticunoBoss = {
 	IsPortrait = false,
 	Tier = TIER_BOSS,
 	Flying = true,
+	ChillImmune = true,
 	IsDeathEffect = true,
 }
 AddPawn("Poke_ArticunoBoss") 
@@ -514,6 +523,7 @@ Poke_ZapdosBoss = {
 	IsPortrait = false,
 	Flying = true,
 	Tier = TIER_BOSS,
+	ShockedImmune = true,
 	IsDeathEffect = true,
 }
 AddPawn("Poke_ZapdosBoss") 
@@ -558,6 +568,7 @@ function Poke_ShockwaveBoss:GetSkillEffect(p1,p2)
 		damage.sAnimation = "LightningBolt0"
 		ret:AddQueuedProjectile(damage, self.ProjectileArt, NO_DELAY)
 	end
+	ret:AddSound("/props/lightning_strike")
 	return ret
 end
 
@@ -1816,11 +1827,11 @@ function Poke_ArceusBoss:GetDeathEffect(point)
 	arceus:SetCustomAnim("Arceus2")
 	Board:Ping(point, GL_Color(255, 255, 150))
 	arceus:RemoveWeapon(1)
-	arceus:AddWeapon("Poke_Unmake")
+	arceus:AddWeapon("Poke_UnmakeBoss")
 	return SkillEffect()
 end
 
-Poke_Judgment = Skill:new{
+Poke_JudgmentBoss = Skill:new{
 	Class = "Enemy",
 	Icon = "weapons/NaturePower.png",	
 	Rarity = 3,
@@ -1843,13 +1854,13 @@ Poke_Judgment = Skill:new{
 	}
 }
 
-function Poke_Judgment:GetTargetArea(point)
+function Poke_JudgmentBoss:GetTargetArea(point)
 	local ret = PointList()
 	ret:push_back(point)
 	return ret
 end
 
-function Poke_Judgment:GetSkillEffect(p1, p2)
+function Poke_JudgmentBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	if not Board:GetPawn(p1) then return ret end
 	if not Board:IsTipImage() then ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Arceus_Judgment")) end
@@ -1940,7 +1951,7 @@ Poke_RoarOfTimeArceus = Poke_RoarOfTimeBoss:new{
 }
 
 
-Poke_Unmake = Skill:new{
+Poke_UnmakeBoss = Skill:new{
 	Class = "Enemy",
 	Icon = "weapons/NaturePower.png",	
 	Rarity = 3,
@@ -1962,13 +1973,13 @@ Poke_Unmake = Skill:new{
 	}
 }
 
-function Poke_Unmake:GetTargetArea(point)
+function Poke_UnmakeBoss:GetTargetArea(point)
 	local ret = PointList()
 	ret:push_back(point)
 	return ret
 end
 
-function Poke_Unmake:GetSkillEffect(p1, p2)
+function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	
 	if not Board:GetPawn(p1) then return ret end
@@ -2087,7 +2098,7 @@ Poke_Starbirth = Skill:new{
 	PowerCost = 0, --AE Change
 	ArtilleryHeight = 0,
 	ZoneTargeting = ZONE_DIR,
-	NextWeapon = "Poke_Unmake",
+	NextWeapon = "Poke_UnmakeBoss",
 	TipImage = {
 		Unit = Point(2,2),
 		Target = Point(2,2),

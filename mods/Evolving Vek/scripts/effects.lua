@@ -236,7 +236,9 @@ function Meta_FrenziedWeapon:GetSkillEffect(p1, p2)
 		local new_damage_list = DamageList()
 		for i = 1, fx.q_effect:size() do
 			local curr_space_damage = fx.q_effect:index(i)
-			if curr_space_damage.iDamage > 0 then curr_space_damage.iDamage = curr_space_damage.iDamage + 2 end
+			if curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_DEATH and curr_space_damage.iDamage ~= DAMAGE_ZERO then 
+				curr_space_damage.iDamage = curr_space_damage.iDamage + 2 
+			end
 			new_damage_list:push_back(curr_space_damage)
 		end
 
@@ -271,8 +273,18 @@ function Meta_WrathfulWeapon:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
 	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
-		ret = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
-		ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
+		local fx = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
+		local new_damage_list = DamageList()
+		for i = 1, fx.q_effect:size() do
+			local curr_space_damage = fx.q_effect:index(i)
+			if curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_DEATH and curr_space_damage.iDamage ~= DAMAGE_ZERO then 
+				curr_space_damage.iDamage = curr_space_damage.iDamage + 1
+			end
+			new_damage_list:push_back(curr_space_damage)
+		end
+
+		fx.q_effect = new_damage_list
+		ret = fx
 	end
 	return ret
 end
@@ -606,6 +618,27 @@ function Oozing()
 	end
 	return 1
 end
+
+function StartWet()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyWet(Pawn:GetId()) end
+	return 1
+end
+
+function StartPowder()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyPowder(Pawn:GetId()) end
+	return 1
+end
+
+function StartGlory()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyGlory(Pawn:GetId()) end
+	return 1
+end
+
+function StartShocked()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyShocked(Pawn:GetId()) end
+	return 1
+end
+
 
 -------------------------
 --Extra Weapon prefixes--

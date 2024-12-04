@@ -247,6 +247,24 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Flammable",
+		"Enable the Flammable prefix",
+		"Check to allow Vek to be given the Flammable prefix, making them take 1 damage and deal 1 damage to their surroundings when set on fire (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Wet",
+		"Enable the Wet prefix",
+		"Check to allow Vek to be given the Wet prefix, making them spawn wet and unable to catch fire (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Blessed",
+		"Enable the Blessed prefix",
+		"Check to allow Vek to be given the Blessed prefix, making their weapon the boss version (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"resetTutorials",
 		"Reset Tutorial Tooltips",
 		"Check to reset all tutorial tooltips for this profile.",

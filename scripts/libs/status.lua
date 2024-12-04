@@ -365,7 +365,7 @@ function Status.ApplySleep(id, turns, addTurns)
 		elseif not CustomAnim:get(id, "StatusSleep") then
 			CustomAnim:add(id, "StatusSleep")
 		end
-		if addTurns and not mission.SleepTable[id] then 
+		if addTurns and mission.SleepTable[id] then 
 			mission.SleepTable[id] = mission.SleepTable[id] + turns
 		else
 			mission.SleepTable[id] = turns
@@ -388,7 +388,7 @@ function Status.ApplyShatterburst(id)
 	CustomAnim:add(id, "StatusShatterburst")
 end
 
-function Status.ApplyShocked(id)
+function Status.ApplyShocked(id, doFirstFlip)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
@@ -399,7 +399,7 @@ function Status.ApplyShocked(id)
 		Board:AddAnimation(pawn:GetSpace(),"Lightning_Hit",1)
 	else
 		CustomAnim:add(id, "StatusShocked")
-		mission.ShockedTable[id] = true
+		if doFirstFlip then mission.ShockedTable[id] = 1 else mission.ShockedTable[id] = 2 end
 	end
 end
 
@@ -616,7 +616,7 @@ local function PrepareTables()						--setup all status tables here so we don't n
 	function()
 		local mission = GetCurrentMission()
 		-- if mission == nil then return end
-		LOG("status tables are ready")
+		LOG("Status tables are ready!")
 		-- local tablesList = merge_table(Status.List(), {"AdjScore"})
 		local tablesList = Status.List()
 		for i = 1, #tablesList do
@@ -717,7 +717,13 @@ local function EVENT_onModsLoaded()
 			end
 			CustomAnim:add(id, "StatusBondedOff")
 		end
-		if Status.GetStatus(id, "Shocked") then pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), 0, DIR_FLIP)) end
+		if Status.GetStatus(id, "Shocked") then 
+			if Status.GetStatus(id, "Shocked") == 1 then
+				pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), 0, DIR_FLIP)) 
+			else 
+				mission.ShockedTable[id] = 1
+			end
+		end
 		Status.RemoveStatus(id, "Sleep")
 	end)
 	modapiext:addPawnKilledHook(function(mission, pawn)					--doomed
@@ -797,6 +803,8 @@ local function EVENT_onModsLoaded()
 			if pawn then
 				LOG(pawn:GetType().." has "..sleepTurnsLeft.." turn(s) left to sleep.")
 				if sleepTurnsLeft <= 0 then 
+					pawn:SetPowered(true) 
+					mission.SleepTable[id] = nil
 					if pawn:GetCustomAnim():sub(-6, -1) == "_sleep" then
 						if pawn:GetCustomAnim():sub(-13, -1) == "special_sleep" then
 						--this lets pawns have two different anims for sleeping
@@ -808,13 +816,9 @@ local function EVENT_onModsLoaded()
 					else
 						CustomAnim:rem(id, "StatusSleep")
 					end
+					
 				end
 				mission.SleepTable[id] = sleepTurnsLeft - 1
-				if sleepTurnsLeft < 0 then 
-					pawn:SetPowered(true) 
-					mission.SleepTable[id] = nil
-				end
-				
 			end
 		end
 		local fx = SkillEffect()

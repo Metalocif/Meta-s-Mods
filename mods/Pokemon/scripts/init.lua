@@ -15,7 +15,17 @@ local mod = {
 }
 
 function mod:init()
-
+	local options = mod_loader.currentModContent[mod.id].options
+	if options["PokemonCustomSquadName"] then 
+		modApi:setText("SquadName_Filler", options["PokemonCustomSquadName"].value)
+		-- if options["PokemonCustomSquadName"].value ~= "Time Travellers" then
+			modApi:setText("Closing_Dead_9", "The Pokemon wiped them out!")
+			modApi:setText("Opening_10", "The Pokemon have landed!")
+			modApi:setText("Opening_11", "#corp sent Pokemon!")
+			modApi:setText("Opening_17", "The Pokemon!")
+			modApi:setText("Opening_23", "The Pokemon are here!")
+		-- end
+	end
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/saveData")
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/boardEvents")
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
@@ -56,6 +66,7 @@ function mod:init()
 					copy[#copy+1] = v
 				end
 				table.insert(copy, "Poke_ArmoredMewtwo")
+				table.insert(copy, "Poke_Arceus")
 
 				return copy
 			end
@@ -78,7 +89,16 @@ end
 function mod:load( options, version)
 	self.modApiExt:load(self, options, version)
 	self.missions:load(self, options, version)
-	
+	if options["PokemonCustomSquadName"] then 
+		modApi:setText("SquadName_Filler", options["PokemonCustomSquadName"].value)
+		-- if options["PokemonCustomSquadName"].value ~= "Time Travellers" then
+			modApi:setText("Closing_Dead_9", "The Pokemon wiped them out!")
+			modApi:setText("Opening_10", "The Pokemon have landed!")
+			modApi:setText("Opening_11", "#corp sent Pokemon!")
+			modApi:setText("Opening_17", "The Pokemon!")
+			modApi:setText("Opening_23", "The Pokemon are here!")
+		-- end
+	end
 	modApi:addSquad(
 		{"Pokemon Team","Poke_Abra", "Poke_Dratini", "Poke_Mew", id = "Poke_Squad"}, 
 		"Pokemon Team", "A team of Pokemon.", 	--my wife's favorites
@@ -352,6 +372,12 @@ function mod:metadata()
 		"Display name on deployment",
 		"Pick whether to display the name of the Pokemon you are currently deploying.",
 		{ enabled = false }
+	)
+	modApi:addGenerationOption(
+		"PokemonCustomSquadName",
+		"Change the name of the Custom Squad",
+		"Pick a name to give the Custom Squad, instead of the default 'Time Travellers'.",
+		{ values = {"Time Travellers", "Pokemon Team", "Pocket Monsters", "Pokemon Trainers", "Legendary Pokemon"} }
 	)
 end
 

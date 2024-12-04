@@ -302,6 +302,27 @@ local files = {
 	"Giratina_h.png",
 	"Giratina_ns.png",
 	
+	"Arceus.png",
+	"Arceus_a.png",
+	"Arceus_h.png",
+	"Arceus_ns.png",
+	"ArceusElectric.png",
+	"ArceusFairy.png",
+	"ArceusFire.png",
+	"ArceusGrass.png",
+	"ArceusGround.png",
+	"ArceusIce.png",
+	"ArceusPoison.png",
+	"ArceusWater.png",
+	"ArceusElectric_a.png",
+	"ArceusFairy_a.png",
+	"ArceusFire_a.png",
+	"ArceusGrass_a.png",
+	"ArceusGround_a.png",
+	"ArceusIce_a.png",
+	"ArceusPoison_a.png",
+	"ArceusWater_a.png",
+	
 	"PokeBall.png", "HyperBall.png", "MasterBall.png",
 }
 for _, file in ipairs(files) do
@@ -438,11 +459,11 @@ a.Poke_Xerneas_special_sleep = a.MechUnit:new{Image="units/player/Xerneas_tree.p
 a.Poke_Xerneas_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Xerneas_ns = a.MechIcon:new{Image="units/player/Xerneas_ns.png"}
 
-a.Poke_Palkia =a.MechUnit:new{Image="units/player/Palkia.png", PosX = -20, PosY = 0}
-a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -20, PosY = 0}
-a.Poke_Palkiaa = a.MechUnit:new{Image="units/player/Palkia_a.png",  PosX = -20, PosY = 0, NumFrames = 2, }
-a.Poke_Palkia_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
-a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
+a.Poke_ArmoredMewtwo =a.MechUnit:new{Image="units/player/ArmoredMewtwo.png", PosX = -20, PosY = 0}
+a.Poke_ArmoredMewtwow =a.MechUnit:new{Image="units/player/ArmoredMewtwo_w.png", PosX = -20, PosY = 0}
+a.Poke_ArmoredMewtwoa = a.MechUnit:new{Image="units/player/ArmoredMewtwo_a.png",  PosX = -20, PosY = 0, NumFrames = 2, }
+a.Poke_ArmoredMewtwo_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_ArmoredMewtwo_ns = a.MechIcon:new{Image="units/player/ArmoredMewtwo_ns.png"}
 
 
 a.Poke_Larvitar =a.MechUnit:new{Image="units/player/Larvitar.png", PosX = -10, PosY = 6}
@@ -643,6 +664,30 @@ a.Poke_Giratinaa = a.MechUnit:new{Image="units/player/Giratina_a.png",  PosX = -
 a.Poke_Giratina_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Giratina_ns = a.MechIcon:new{Image="units/player/Giratina_ns.png"}
 
+a.Poke_Arceus =a.MechUnit:new{Image="units/player/Arceus.png", PosX = -10, PosY = -4}
+a.Poke_Arceusa = a.MechUnit:new{Image="units/player/Arceus_a.png",  PosX = -25, PosY = -30, NumFrames = 8 }
+
+a.Poke_ArceusElectric =a.Poke_Arceus:new{Image="units/player/ArceusElectric.png"}
+a.Poke_ArceusElectrica = a.Poke_Arceusa:new{Image="units/player/ArceusElectric_a.png"}
+a.Poke_ArceusFairy =a.Poke_Arceus:new{Image="units/player/ArceusFairy.png"}
+a.Poke_ArceusFairya = a.Poke_Arceusa:new{Image="units/player/ArceusFairy_a.png"}
+a.Poke_ArceusFire =a.Poke_Arceus:new{Image="units/player/ArceusFire.png"}
+a.Poke_ArceusFirea = a.Poke_Arceusa:new{Image="units/player/ArceusFire_a.png"}
+a.Poke_ArceusGrass =a.Poke_Arceus:new{Image="units/player/ArceusGrass.png"}
+a.Poke_ArceusGrassa = a.Poke_Arceusa:new{Image="units/player/ArceusGrass_a.png"}
+a.Poke_ArceusGround =a.Poke_Arceus:new{Image="units/player/ArceusGround.png"}
+a.Poke_ArceusGrounda = a.Poke_Arceusa:new{Image="units/player/ArceusGround_a.png"}
+a.Poke_ArceusIce =a.Poke_Arceus:new{Image="units/player/ArceusIce.png"}
+a.Poke_ArceusIcea = a.Poke_Arceusa:new{Image="units/player/ArceusIce_a.png"}
+a.Poke_ArceusPoison =a.Poke_Arceus:new{Image="units/player/ArceusPoison.png"}
+a.Poke_ArceusPoisona = a.Poke_Arceusa:new{Image="units/player/ArceusPoison_a.png"}
+a.Poke_ArceusWater =a.Poke_Arceus:new{Image="units/player/ArceusWater.png"}
+a.Poke_ArceusWatera = a.Poke_Arceusa:new{Image="units/player/ArceusWater_a.png"}
+
+a.Poke_Arceus_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Arceus_ns = a.MechIcon:new{Image="units/player/Arceus_ns.png"}
+
+
 
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Abra.png", path .."img/portraits/pilots/Pilot_Poke_Abra.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dratini.png", path .."img/portraits/pilots/Pilot_Poke_Dratini.png")
@@ -666,6 +711,7 @@ modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Scyther.png", path .."img/po
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dialga.png", path .."img/portraits/pilots/Pilot_Poke_Dialga.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Palkia.png", path .."img/portraits/pilots/Pilot_Poke_Palkia.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Giratina.png", path .."img/portraits/pilots/Pilot_Poke_Giratina.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Arceus.png", path .."img/portraits/pilots/Pilot_Poke_Arceus.png")
 
 
 CreatePilot{Id = "Pilot_Poke_Abra", Personality = "Vek", Name = "Sabrina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
@@ -691,6 +737,7 @@ CreatePilot{Id = "Pilot_Poke_Scyther", Personality = "Vek", Name = "Aaron", Sex 
 CreatePilot{Id = "Pilot_Poke_Dialga", Personality = "Vek", Name = "Dialga", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Palkia", Personality = "Vek", Name = "Palkia", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Giratina", Personality = "Vek", Name = "Giratina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Arceus", Personality = "Vek", Name = "Arceus", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 
@@ -932,7 +979,7 @@ Poke_ArmoredMewtwo = Pawn:new{
 	Massive = true,
 	Corpse = true,
 	Armor = true,
-	Teleporter = true,
+	FastTeleporter = true,
 	Image = "Poke_ArmoredMewtwo",
 	ImageOffset = modApi:getPaletteImageOffset("Poke_ArmoredMewtwo_pal"),
 	SkillList = {"Poke_Reflect", "Poke_Teleport" },
@@ -1122,7 +1169,7 @@ Poke_Dialga = Pawn:new{
 	ImpactMaterial = IMPACT_METAL,
 	HasEvolutions = { true, true },
 	EvoForget = { "Poke_DragonBreath", "" },
-	EvoLearn = { { { "Poke_FlashCannon" }, { "" } } },
+	EvoLearn = { { { "Poke_Wither" }, { "" } } },
 	KeepAdding = { "", "Poke_RoarOfTime" },
 }
 
@@ -1165,6 +1212,26 @@ Poke_Giratina = Pawn:new{
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_DarkPulse" }, { "" } } },
 	-- KeepAdding = { "", "Poke_ShadowForce" },
+}
+
+Poke_Arceus = Pawn:new{
+	Name = "Arceus",
+	Class = "TechnoVek",
+	Health = 4,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	FastTeleporter = true,	--custom movement that only does the teleport anim if pawn can't walk to destination
+	Flying = true,
+	Image = "Poke_Arceus",
+	SkillList = {"Poke_Judgment" },
+	SoundLocation = "/enemy/jelly_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, false },
+	EvoForget = { "", "" },
+	EvoLearn = { { { "Poke_Wormhole" }, { "" } } },
+	KeepAdding = { "", "Poke_Unmake" },
 }
 
 

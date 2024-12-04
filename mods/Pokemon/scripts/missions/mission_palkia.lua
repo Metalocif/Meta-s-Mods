@@ -39,6 +39,26 @@ function Mission_Poke_Palkia:StartMission()
 	end
 end
 
+function Mission_Poke_Palkia:NextTurn()
+	local totalHP = 0
+	for i = 0, 2 do
+		if Board:GetPawn(i) then totalHP = totalHP + Board:GetPawn(i):GetHealth() end
+	end
+	if totalHP == 0 then --mission will end soon
+		modApi:conditionalHook(function()
+			return modApi.deployment:isDeploymentPhase()
+		end,
+		function()
+			for i = 0, 7 do
+				for j = 0, 7 do
+					Board:Crack(Point(i,j))
+					Board:Bounce(Point(i,j), math.random(-10,10))
+				end
+			end
+		end)
+	end
+end
+
 function Mission_Poke_Palkia:GetDestroyedCount()
 	if not Board:IsPawnAlive(self.Target) then return 1 end
 	return 0

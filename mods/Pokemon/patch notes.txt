@@ -1,5 +1,14 @@
+v1.7.0
+- Many bugfixes.
+- Added the Arceus boss fight.
+- Added the Dialga/Palkia/Giratina squad, Dragons of Myth.
+- Added the free agent Arceus.
+- Added a mod option to display the name of the currently deployed unit (for triple Eevee runs).
+- Added a mod option to replace the name of the custom squad with Pokemon-related squad names.
+- Zapdos applies Shocked; Moltres applies Dry. Zapdos is immune to Shocked and Articuno is immune to Chill.
+
 v1.6.3
-- Removed Poison and Virus; added Toxin, Reactive, Glory, and Shocked.
+- Removed Poison and Virus; added Toxin, Glory, Reactive, and Shocked.
 - Improved animations for Hemorrhage and Wet.
 - Leech Seed is now prevented and removed by fire.
 - Doomed now has an optional source; if the source pawn is killed, the status stops.

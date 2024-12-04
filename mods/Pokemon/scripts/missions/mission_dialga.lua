@@ -39,6 +39,21 @@ function Mission_Poke_Dialga:StartMission()
 	end
 end
 
+function Mission_Poke_Dialga:NextTurn()
+	local totalHP = 0
+	for i = 0, 2 do
+		if Board:GetPawn(i) then totalHP = totalHP + Board:GetPawn(i):GetHealth() end
+	end
+	if totalHP == 0 then --mission will end soon
+		modApi:conditionalHook(function()
+			return modApi.deployment:isDeploymentPhase()
+		end,
+		function()
+			self.TurnLimit = self.TurnLimit - 1
+		end)
+	end
+end
+
 function Mission_Poke_Dialga:GetDestroyedCount()
 	if not Board:IsPawnAlive(self.Target) then return 1 end
 	return 0

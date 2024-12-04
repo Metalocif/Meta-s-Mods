@@ -1,3 +1,7 @@
+v1.4.4
+- Added compatibility with Omega Vek.
+- Frozen Vek that get prefixed at the start of a mission no longer get unfrozen or play their spawning animation.
+
 v1.4.3
 - Fixed a bug where prefixes would be added to enemies in a test mission. They still can but won't be removed from the list anymore.
 

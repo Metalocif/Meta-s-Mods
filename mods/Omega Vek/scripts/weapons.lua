@@ -342,14 +342,20 @@ end
 
 function OmegaCentipedeAtk2:GetTargetScore(p1,p2)
 	--Omega Centipede eats acid, so it cares about using this attack adjacent to acid
-	local ret = 0
+	local ret = 1
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
 		if Board:GetTerrain(curr) == TERRAIN_ACID and Board:GetPawn(p1):IsDamaged() then ret = ret + 2 end	--healing 3 > hitting one thing?
 		if Board:GetTerrain(curr) == TERRAIN_BUILDING then ret = ret + 5 end
 		if pawn and pawn:GetTeam() == TEAM_PLAYER then ret = ret + 5 end
-		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:IsAcid() and not pawn:IsQueued() then ret = ret + 2 end	--slurps acid from ally but won't hit it
+		if pawn and pawn:GetTeam() == TEAM_ENEMY then
+			if pawn:IsAcid() and not pawn:IsQueued() then 
+				ret = ret + 2	--slurps acid from ally but won't hit it
+			else
+				ret = ret - 5
+			end
+		end
 	end
     return ret
 end

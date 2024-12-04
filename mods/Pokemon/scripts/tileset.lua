@@ -49,11 +49,6 @@ tileset:setTileTooltip{
 	title = "Shrub Fire",
 	text = "Lights units on Fire. This fire was started when Shrubs were damaged."
 }
-tileset:setTileTooltip{
-	tile = "mountain",
-	title = "Shrubs",
-	text = "If damaged, lights on Fire."
-}
 
 tileset:setTileTooltip{
 	tile = "mountain",
