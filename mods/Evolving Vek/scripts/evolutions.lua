@@ -4,7 +4,7 @@ local mod = modApi:getCurrentMod()
 
 function IsPrefixValidForVek(prefix, vekType)
 	local options = mod_loader.currentModContent[mod.id].options
-	if options["Enable"..prefix] and not options["Enable"..prefix].enabled then return false end
+	if options["Enable_"..prefix] and not options["Enable_"..prefix].enabled then return false end
 	if _G[vekType].Prefixed then return false end									  --prevents double-prefixing
 	if prefix == "Stable" and not _G[vekType].Pushable then return false end
 	if prefix == "Fireproof" and _G[vekType].IgnoreFire then return false end
