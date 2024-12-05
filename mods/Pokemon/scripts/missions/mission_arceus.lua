@@ -40,11 +40,25 @@ function Mission_Poke_Arceus:StartMission()
 		end
 	end
 	for name, maxCount in ipairs(self:GetSpawner().max_pawns) do
-		if string.find(name, "Jelly") then self.GetSpawner().max_pawns.name = 0 LOG("blocked "..name) end
+		if string.find(name, "Jelly") then self:GetSpawner().max_pawns.name = 0 LOG("blocked "..name) end
 	end
 end
 
 function Mission_Poke_Arceus:NextTurn()
+	local totalHP = 0
+	for i = 0, 2 do
+		if Board:GetPawn(i) then totalHP = totalHP + Board:GetPawn(i):GetHealth() end
+	end
+	if totalHP == 0 then --mission will end soon
+		modApi:conditionalHook(function()
+			return modApi.deployment:isDeploymentPhase()
+		end,
+		function()
+			for i = 0, 2 do
+				Status.ApplyGlory(i)
+			end
+		end)
+	end
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
 		local pawn = Board:GetPawn(id)		
 		if id ~= self.Target and not Status.GetStatus(id, "Glory") then Status.ApplyGlory(id, 99) end
