@@ -14,7 +14,6 @@ local missions = {
 	"mission_dialga",
 	"mission_palkia",
 	"mission_giratina",
-	"mission_arceus",
 }
 
 local function loadMissionDialog(missionId, file)
@@ -36,6 +35,12 @@ function this:init(mod)
 			-- LOG("disabled "..mission)
 		-- end
 	end
+	if modApi.achievements:isComplete(mod.id,"Poke_DialgaCapture") and 
+	   modApi.achievements:isComplete(mod.id,"Poke_PalkiaCapture") and 
+	   modApi.achievements:isComplete(mod.id,"Poke_GiratinaCapture") then
+		self["mission_arceus"] = require(path .. "mission_arceus")
+		self["mission_arceus"]:init(mod)
+	end
 end
 
 function this:load(mod, options, version)
@@ -46,7 +51,12 @@ function this:load(mod, options, version)
 			loadMissionDialog(self[mission].id, path .. mission .."_dialog.lua")
 		-- end
 	end
-
+	if modApi.achievements:isComplete(mod.id,"Poke_DialgaCapture") and 
+	   modApi.achievements:isComplete(mod.id,"Poke_PalkiaCapture") and 
+	   modApi.achievements:isComplete(mod.id,"Poke_GiratinaCapture") then 
+		self["mission_arceus"]:load(mod, options, version)
+		loadMissionDialog(self["mission_arceus"].id, path .. "mission_arceus" .."_dialog.lua")
+	end
 end
 
 return this

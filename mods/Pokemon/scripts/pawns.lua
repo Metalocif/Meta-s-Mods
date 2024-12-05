@@ -887,7 +887,7 @@ Poke_Darkrai = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { false, true },
 	EvoForget = { "", "Poke_Hypnosis" },
-	EvoLearn = { { { "" }, { "Poke_DarkVoid" } } },
+	EvoLearn = { { { }, { "Poke_DarkVoid" } } },
 }
 Poke_Deoxys = Pawn:new{
 	Name = "Deoxys",
@@ -936,7 +936,7 @@ Poke_Shaymin = Pawn:new{
 	HasEvolutions = { false, true },
 	EvoGraphics = { { "Poke_Shaymin", "Poke_ShayminAir" } },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "" }, { "Poke_SeedFlare" } } },
+	EvoLearn = { { { }, { "Poke_SeedFlare" } } },
 	GrassMovement = true,
 	BecomeFlyingAtLevel = {2},
 }
@@ -954,7 +954,7 @@ Poke_Xerneas = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "Poke_Moonblast" }, { "" } } },
+	EvoLearn = { { { "Poke_Moonblast" }, { } } },
 	KeepAdding = { "", "Poke_EternalLife" },
 	GrassMovement = true,
 }
@@ -1169,7 +1169,7 @@ Poke_Dialga = Pawn:new{
 	ImpactMaterial = IMPACT_METAL,
 	HasEvolutions = { true, true },
 	EvoForget = { "Poke_DragonBreath", "" },
-	EvoLearn = { { { "Poke_Wither" }, { "" } } },
+	EvoLearn = { { { "Poke_Wither" }, { } } },
 	KeepAdding = { "", "Poke_RoarOfTime" },
 }
 
@@ -1189,7 +1189,7 @@ Poke_Palkia = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "Poke_Teleport" }, { "" } } },
+	EvoLearn = { { { "Poke_Teleport" }, { } } },
 	-- KeepAdding = { "", "Poke_SpatialRend" },
 }
 
@@ -1210,7 +1210,7 @@ Poke_Giratina = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "Poke_DarkPulse" }, { "" } } },
+	EvoLearn = { { { "Poke_DarkPulse" }, { } } },
 	-- KeepAdding = { "", "Poke_ShadowForce" },
 }
 
@@ -1230,7 +1230,7 @@ Poke_Arceus = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "Poke_Wormhole" }, { "" } } },
+	EvoLearn = { { { "Poke_Wormhole" }, { } } },
 	KeepAdding = { "", "Poke_Unmake" },
 }
 

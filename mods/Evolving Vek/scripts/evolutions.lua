@@ -39,6 +39,8 @@ function IsPrefixValidForVek(prefix, vekType)
 	if prefix == "Venomous" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or SEIsArtillery(_G[vekType].SkillList[1])) then return false end
 	if prefix == "Frenzied" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or _G[vekType].Health == 1 or (_G[vekType].SkillList[1].Damage and (_G[vekType].SkillList[1].Damage <= 0 or _G[vekType].SkillList[1].Damage >= 3))) then return false end
 	if prefix == "Freezing" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1) or SEIsFire(_G[vekType].SkillList[1]) or SEIsIce(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Excavating" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1) or SEIsPlusShape(_G[vekType].SkillList[1]) or SEMakesRock(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Nursing" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1)) then return false end
 	if prefix == "Wet" and _G[vekType].IgnoreFire then return false end
 	if prefix == "Flammable" and _G[vekType].IgnoreFire then return false end
 	if prefix == "Blessed" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or _G[vekType].Tier == TIER_BOSS) then return false end
@@ -84,6 +86,8 @@ function CreateEvolvedVek(prefix, vekType)
 	if prefix == "Venomous" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_VenomousWeapon" }, Weapon = 2} end
 	if prefix == "Frenzied" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_FrenziedWeapon" }, Weapon = 2, Health = _G[vekType].Health - 1,} end
 	if prefix == "Freezing" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_FreezingWeapon" }, Weapon = 2, } end
+	if prefix == "Excavating" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_ExcavatingWeapon" }, Weapon = 2, } end
+	if prefix == "Nursing" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_NursingWeapon" }, Weapon = 2, } end
 	if prefix == "Wet" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnWet,} end
 	if prefix == "Flammable" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnPowder,} end
 	if prefix == "Blessed" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnGlory,} end
@@ -107,7 +111,7 @@ function GeneratePrefix(pawn, nondeterministic)
 		if pawn:IsDamaged() and IsPrefixValidForVek("Frenzied", pawn:GetType()) then return "Frenzied" end
 		if GetCurrentMission() == Mission_BlobBoss and IsPrefixValidForVek("Oozing", pawn:GetType()) then return "Oozing" end
 	end
-	local prefixes = {"Stable","Fireproof","Smokeproof","Leaping","Armored","Heavy","Light","Volatile","Massive","Undying","Burrowing","Ruinous","Purifying","Healing","Spiteful","Brood","Splitting","Oozing","Infectious","Regenerating","Wrathful","Webbing","Cannibalistic","CopyingMelee","CopyingRanged","Mirroring","Pushing","Groundbreaking","Venomous","Frenzied","Freezing","Wet","Flammable","Blessed"}
+	local prefixes = {"Stable","Fireproof","Smokeproof","Leaping","Armored","Heavy","Light","Volatile","Massive","Undying","Burrowing","Ruinous","Purifying","Healing","Spiteful","Brood","Splitting","Oozing","Infectious","Regenerating","Wrathful","Webbing","Cannibalistic","CopyingMelee","CopyingRanged","Mirroring","Pushing","Groundbreaking","Venomous","Frenzied","Freezing","Excavating","Nursing","Wet","Flammable","Blessed"}
 	local prefix = ""
 	local i = 0
 	repeat
@@ -133,20 +137,17 @@ modApi:runLater(function()
 			for i = 1, #GAME.EvolvedVeks do
 				if _G[GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type].Name == "Missing Mod" then LOG("prevented missing mod for "..GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type) end
 				if GAME.EvolvedVeks[i].Type == pawn:GetType() and GAME.EvolvedVeks[i].Remaining > 0 and _G[GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type].Name ~= "Missing Mod" then
-					LOG("spawning a "..GAME.EvolvedVeks[i].Prefix..pawn:GetType())
 					Board:RemovePawn(tile)
 					Board:AddPawn(GAME.EvolvedVeks[i].Prefix..pawn:GetType(), tile)
 					Board:Ping(tile, COLOR_BLACK)
 					if wasFrozen then
-						modApi:runLater(function()
-							Board:GetPawn(tile):SetFrozen()
-						end)
+						modApi:runLater(function() Board:GetPawn(tile):SetFrozen() end)
 					else
 						Board:GetPawn(tile):SpawnAnimation()
 					end
 					if not IsTestMechScenario() then GAME.EvolvedVeks[i].Remaining = GAME.EvolvedVeks[i].Remaining - 1 end
 					prefixesApplied = prefixesApplied + 1
-					if options["PrefixStartCount"] and options["PrefixStartCount"] == prefixesApplied then return true end
+					if options["PrefixStartCount"] and options["PrefixStartCount"].value >= prefixesApplied then return true end
 				end
 			end
 		end
@@ -154,8 +155,18 @@ modApi:runLater(function()
 end)
 end
 
+-- local function addSpawnData(self, location, type, id)
+	-- local el = {}
+	-- el.location = location
+	-- el.type = type
+	-- el.id = id
+	-- el.turns = 0
+	-- if not self.QueuedSpawns then self.QueuedSpawns = {} end
+	-- table.insert(self.QueuedSpawns, el)
+-- end
+
 local function HOOK_VekSpawnAdded(mission, spawnData)
-modApi:runLater(function()
+-- modApi:runLater(function()
 	if not GAME or GAME.EvolvedVeks == nil then return false end
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["PrefixSpawns"] and not options["PrefixSpawns"].enabled then return false end
@@ -165,22 +176,16 @@ modApi:runLater(function()
 		if GAME.EvolvedVeks[i].Type == spawnData.type and GAME.EvolvedVeks[i].Remaining > 0 and _G[GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type].Name ~= "Missing Mod" then
 			mission:RemoveSpawnPoint(point)
 			
-			-- modApi:runLater(function()
-				-- LOG("spawning a "..GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type.." at "..point:GetString())
-				-- mission:SpawnPawn(point, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type)
-				-- Board:Ping(point, COLOR_BLACK)
-				-- if Board:GetTerrain(point) ~= terrain then Board:SetTerrain(point, terrain) end
-			-- end)
-			
-			
-			modApi:conditionalHook(function()
-				LOG("checking for holes in "..point:GetString())
-				return Board:GetTerrain(point) ~= TERRAIN_HOLE
-			end,
-			function()
+			modApi:runLater(function()
 				LOG("spawning a "..GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type.." at "..point:GetString())
 				-- mission:SpawnPawn(point, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type)
-				Board:SpawnPawn(GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type, point)
+				LOG(Board:GetTerrain(point), TERRAIN_HOLE)
+				local pawn = PAWN_FACTORY:CreatePawn(GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type)
+				-- Board:SpawnPawn(GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type, point)
+				Board:SpawnPawn(pawn, point)
+				-- if mission:GetSpawnPointData(point) == nil then 
+					-- addSpawnData(mission, point, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type, pawn:GetId())
+				-- end
 				Board:Ping(point, COLOR_BLACK)
 				-- if Board:GetTerrain(point) ~= terrain then Board:SetTerrain(point, terrain) end
 			end)
@@ -191,7 +196,7 @@ modApi:runLater(function()
 			break
 		end
 	end
-end)
+-- end)
 end
 
 local function HOOK_ProcessVekRetreat(mission, endFx, pawn)

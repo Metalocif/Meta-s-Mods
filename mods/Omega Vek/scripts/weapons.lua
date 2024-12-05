@@ -63,7 +63,7 @@ function OmegaBurnbugAtk2:GetSkillEffect(p1,p2)
 		damage = SpaceDamage(target, self.Damage)
 		damage.sSound = self.PullSound
 		ret:AddQueuedDamage(damage)
-		if not valid or (Board:IsPawnSpace(target) and not Board:GetPawn(target):IsGuarding()) then	-- If it's a pawn
+		if Board:IsPawnSpace(target) and not Board:GetPawn(target):IsGuarding() then	-- If it's a pawn
 			ret:AddQueuedCharge(Board:GetSimplePath(target, p1 + DIR_VECTORS[direction]), FULL_DELAY)
 		elseif Board:IsBlocked(target, PATH_GROUND) then     --If it's an obstruction
 			ret:AddQueuedCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), FULL_DELAY)	

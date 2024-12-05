@@ -49,7 +49,7 @@ function Mission_Poke_Dialga:NextTurn()
 			return modApi.deployment:isDeploymentPhase()
 		end,
 		function()
-			self.TurnLimit = self.TurnLimit - 1
+			GetCurrentMission().TurnLimit = GetCurrentMission().TurnLimit - 1
 		end)
 	end
 end

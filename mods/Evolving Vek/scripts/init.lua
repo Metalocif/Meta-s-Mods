@@ -247,6 +247,18 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Excavating",
+		"Enable the Excavating prefix",
+		"Check to allow Vek to be given the Excavating prefix, making their weapon dig up rocks around it before its attack (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Nursing",
+		"Enable the Nursing prefix",
+		"Check to allow Vek to be given the Nursing prefix, making their weapon heal hit allies instead of dealing damage to them (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"Enable_Flammable",
 		"Enable the Flammable prefix",
 		"Check to allow Vek to be given the Flammable prefix, making them take 1 damage and deal 1 damage to their surroundings when set on fire (default: true).",

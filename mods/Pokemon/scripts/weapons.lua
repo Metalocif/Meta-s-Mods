@@ -76,6 +76,7 @@ local files = {
 	"XScissor.png",
 	"ConfuseRay.png",
 	"FlashCannon.png",
+	"Warpstrike.png",
 	"RoarOfTime.png",
 	"SpatialRift.png",
 	"Unmake.png",
@@ -4277,7 +4278,10 @@ function Poke_FutureSight:GetSkillEffect(p1, p2)
 	end
 	if GetCurrentMission() then
 		local spawnData = GetCurrentMission():GetSpawnPointData(p2)
-		if Board:IsSpawning(p2) then Board:AddAlert(p2, spawnData.type) end
+		if Board:IsSpawning(p2) and spawnData and (Pawn:GetWeaponBaseType(1) == "Poke_FutureSight" or Pawn:GetWeaponBaseType(2) == "Poke_FutureSight") then
+		--this is because the game recalculates this queued skill effect whenever something changes so the alert keeps popping up otherwise
+			Board:AddAlert(p2, _G[spawnData.type].Name) 
+		end
 	end
 	return ret
 end
@@ -5319,7 +5323,7 @@ Poke_Warpstrike = Skill:new{
 	Description = "Swaps two adjacent terrains. Strikes units before teleporting them.",
 	Name = "Warpstrike",
 	Damage = 1,
-	Range = 1,
+	Range = 2,
 	PathSize = 1,
 	PowerCost = 0, --AE Change
 	Upgrades = 2,
@@ -5337,9 +5341,9 @@ Poke_Warpstrike = Skill:new{
 		Target = Point(3,2),
 	}
 }
-Poke_Warpstrike_A=Poke_Warpstrike:new{ UpgradeDescription = "Increases range by 1.", Range = 2 }
+Poke_Warpstrike_A=Poke_Warpstrike:new{ UpgradeDescription = "Increases range by 1.", Range = 3 }
 Poke_Warpstrike_B=Poke_Warpstrike:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
-Poke_Warpstrike_AB=Poke_Warpstrike:new{ Range=2, Damage = 2 }
+Poke_Warpstrike_AB=Poke_Warpstrike:new{ Range=3, Damage = 2 }
 
 function Poke_Warpstrike:GetTargetArea(p1)
 	local ret = PointList()

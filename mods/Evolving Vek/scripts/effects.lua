@@ -330,6 +330,99 @@ function Meta_FreezingWeapon:GetSkillEffect(p1, p2)
 end
 
 
+Meta_ExcavatingWeapon = Skill:new{
+	Name="Excavating",
+	Description="Copies the user's other weapon, excavating rocks on all adjacent tiles this Vek wouldn't damage.",
+	Class = "Enemy",
+	Icon = "weapons/enemy_scarab1.png",
+	Projectile = "",
+	Explosion = "",
+	ImpactSound = "",
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,1),
+		Building = Point(2,2),
+		Target = Point(2,1),
+		CustomPawn = "Jelly_Health1"
+	}
+}
+
+function Meta_ExcavatingWeapon:GetTargetArea(point)
+	return _G[Board:GetPawn(point):GetWeaponType(1)]:GetTargetArea(point)
+end
+
+function Meta_ExcavatingWeapon:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local hitTiles = {}
+	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
+		local fx = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
+		local new_damage_list = DamageList()
+		for i = 1, fx.q_effect:size() do
+			local curr_space_damage = fx.q_effect:index(i)
+			hitTiles[curr_space_damage.loc:GetString()] = curr_space_damage.iDamage	--key doesn't actually matter
+			new_damage_list:push_back(curr_space_damage)
+		end
+		local rocks_damage_list = DamageList()
+		for dir = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[dir]
+			if not (Board:IsBlocked(curr, PATH_GROUND) or hitTiles[curr:GetString()]) then
+				local damage = SpaceDamage(curr)
+				damage.sPawn = "Wall"
+				rocks_damage_list:push_back(damage)
+			end
+		end
+		fx.q_effect = new_damage_list
+		fx.effect = rocks_damage_list
+		ret = fx
+	end
+	return ret
+end
+
+Meta_NursingWeapon = Skill:new{
+	Name="Nursing",
+	Description="Copies the user's other weapon, healing hit allies instead of dealing damage.",
+	Class = "Enemy",
+	Icon = "weapons/enemy_scarab1.png",
+	Projectile = "",
+	Explosion = "",
+	ImpactSound = "",
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,1),
+		Building = Point(2,2),
+		Target = Point(2,1),
+		CustomPawn = "Jelly_Health1"
+	}
+}
+
+function Meta_NursingWeapon:GetTargetArea(point)
+	return _G[Board:GetPawn(point):GetWeaponType(1)]:GetTargetArea(point)
+end
+
+function Meta_NursingWeapon:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
+		local fx = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
+		local new_damage_list = DamageList()
+		for i = 1, fx.q_effect:size() do
+			local curr_space_damage = fx.q_effect:index(i)
+			local pawn = Board:GetPawn(curr_space_damage.loc)
+			if pawn and pawn:GetTeam() == Board:GetPawn(p1) and curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_ZERO then
+				if curr_space_damage.iDamage == DAMAGE_DEATH then 
+					curr_space_damage.iDamage = -10
+				else
+					curr_space_damage.iDamage = -curr_space_damage.iDamage
+				end
+			end
+			new_damage_list:push_back(curr_space_damage)
+		end
+		fx.q_effect = new_damage_list
+		ret = fx
+	end
+	return ret
+end
+
+
 -- Meta_GrapplingWeapon = Skill:new{
 	-- Name="Grappling",
 	-- Description="Copies the user's other weapon, grappling first.",
@@ -467,6 +560,32 @@ function SEIsIce(skillName)
 	end
 	return false
 end
+
+function SEIsPlusShape(skillName)
+	local p1 = Point(4,4)
+	local p2 = Point(4,5)
+	local flag0, flag1, flag2, flag3
+	local skillEffect = _G[skillName]:GetSkillEffect(p1,p2)
+	for _, spaceDamage in ipairs(extract_table(skillEffect.q_effect)) do
+		local loc = spaceDamage.loc 
+		if loc.x < p1.x and loc.y == p1.y then flag1 = true end
+		if loc.x > p1.x and loc.y == p1.y then flag2 = true end
+		if loc.x == p1.x and loc.y < p1.y then flag3 = true end
+		if loc.x == p1.x and loc.y > p1.y then flag0 = true end
+	end
+	return flag0 and flag1 and flag2 and flag3
+end
+
+function SEMakesRock(skillName)
+	local p1 = Point(4,4)
+	local p2 = Point(4,5)
+	local skillEffect = _G[skillName]:GetSkillEffect(p1,p2)
+	for _, spaceDamage in ipairs(extract_table(skillEffect.effect)) do
+		if spaceDamage and (string.find(spaceDamage.sPawn, "Wall") or string.find(spaceDamage.sPawn, "Rock")) then return true end
+	end
+	return false
+end
+
 
 ----------------------
 --GetWeapon prefixes--
@@ -619,22 +738,22 @@ function Oozing()
 	return 1
 end
 
-function StartWet()
+function SpawnWet()
 	if Pawn:GetTurnCount() <= 1 then Status.ApplyWet(Pawn:GetId()) end
 	return 1
 end
 
-function StartPowder()
+function SpawnPowder()
 	if Pawn:GetTurnCount() <= 1 then Status.ApplyPowder(Pawn:GetId()) end
 	return 1
 end
 
-function StartGlory()
+function SpawnGlory()
 	if Pawn:GetTurnCount() <= 1 then Status.ApplyGlory(Pawn:GetId()) end
 	return 1
 end
 
-function StartShocked()
+function SpawnShocked()
 	if Pawn:GetTurnCount() <= 1 then Status.ApplyShocked(Pawn:GetId()) end
 	return 1
 end

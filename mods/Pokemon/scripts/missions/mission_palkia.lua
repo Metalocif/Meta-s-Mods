@@ -51,7 +51,7 @@ function Mission_Poke_Palkia:NextTurn()
 		function()
 			for i = 0, 7 do
 				for j = 0, 7 do
-					Board:Crack(Point(i,j))
+					Board:SetCracked(Point(i,j),true)
 					Board:Bounce(Point(i,j), math.random(-10,10))
 				end
 			end

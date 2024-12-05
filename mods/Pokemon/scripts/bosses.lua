@@ -273,7 +273,9 @@ Mission_ArticunoBoss = Mission_Boss:new{
 	BallID = -1,
 }
 
-Env_SnowStormArticuno = Env_SnowStorm		--only difference is it heals Articuno
+Env_SnowStormArticuno = Env_SnowStorm:new{		--only difference is it heals Articuno
+	Locations = nil,							--initialize or it affects the base class for some reason
+}
 
 function Env_SnowStormArticuno:ApplyEffect()
 	
@@ -587,8 +589,9 @@ Mission_MoltresBoss = Mission_Boss:new{
 	BallID = -1,
 }
 
-Env_VolcanoMoltres = Env_Volcano		--only difference is it boosts Moltres
-
+Env_VolcanoMoltres = Env_Volcano:new{		--only difference is it boosts Moltres
+	Locations = nil,							--initialize or it affects the base class for some reason
+}
 
 function Env_VolcanoMoltres:Start()
 	Env_Attack.Start(self)
@@ -633,18 +636,15 @@ end
 
 function Env_VolcanoMoltres:GetAttackEffect(location, effect)
 	local effect = effect or SkillEffect()
-	effect.piOrigin = Point(0, 0)
-	--Board:GetPawn(GetCurrentMission().BossID):GetSpace() or 
-	--change piOrigin to random mountain
 	effect:AddSound("/weapons/fireball")
 	local damage = SpaceDamage(location, DAMAGE_DEATH)
 	if Board:GetPawn(location) and GetCurrentMission().BossID and Board:GetPawn(location):GetId() == GetCurrentMission().BossID then
-		effect:AddArtillery(SpaceDamage(location), "effects/shotup_fireball.png", PROJ_DELAY)
+		effect:AddDropper(SpaceDamage(location), "effects/shotup_fireball.png")
 		effect:AddScript(string.format("Board:GetPawn(%s):AddMoveBonus(2)", location:GetString()))
 	else
 		damage.iFire = 1
 		damage.sAnimation = "explo_fire1"
-		effect:AddArtillery(damage,"effects/shotup_fireball.png", PROJ_DELAY)
+		effect:AddDropper(damage,"effects/shotup_fireball.png")
 	end
 	return effect
 end
@@ -1786,7 +1786,7 @@ Poke_ArceusBoss = {
 	Image = "ArceusBoss",
 	Name = "Arceus",
 	-- ImageOffset = 2,
-	SkillList = { "Poke_Judgment" },
+	SkillList = { "Poke_JudgmentBoss" },
 	SoundLocation = "/enemy/digger_1/",
 	ImpactMaterial = IMPACT_FLESH,
 	DefaultTeam = TEAM_ENEMY,
@@ -1797,6 +1797,7 @@ Poke_ArceusBoss = {
 	Flying = true,
 	IgnoreSmoke = true,
 	ChillImmune = true,
+	ShockedImmune = true,
 	SleepImmune = true,
 	InfestedImmune = true,
 	IsDeathEffect = true,
@@ -1814,7 +1815,7 @@ function Poke_ArceusBoss:GetDeathEffect(point)
 				Board:GetPawn(p):Kill()
 			end
 		end
-		GetCurrentMission().TurnLimit = 1
+		GetCurrentMission().TurnLimit = Game:GetTurnCount()
 		return SkillEffect()
 	end
 	mission.ArceusRevived = true

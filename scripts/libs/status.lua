@@ -275,15 +275,17 @@ function Status.ApplyGlory(id, turns)
 		for i = weaponCount, 1, -1 do
 			local weapon = pawn:GetWeaponBaseType(i)
 			pawn:RemoveWeapon(i)
-			if _G[weapon].Upgrades == 2 and _G[weapon.."_AB"] ~= nil then
-				weapon = weapon.."_AB"
-			elseif _G[weapon].Upgrades == 1 and _G[weapon.."_A"] ~= nil then
-				weapon = weapon.."_A"
-			elseif _G[weapon].Class == "Enemy" then
-				if _G[string.sub(weapon, 1, -2).."B"] ~= nil then 
-					weapon = string.sub(weapon, 1, -2).."B"
-				elseif _G[string.sub(weapon, 1, -2).."2"] ~= nil then 
-					weapon = string.sub(weapon, 1, -2).."2"
+			if _G[weapon] then
+				if _G[weapon].Upgrades == 2 and _G[weapon.."_AB"] ~= nil then
+					weapon = weapon.."_AB"
+				elseif _G[weapon].Upgrades == 1 and _G[weapon.."_A"] ~= nil then
+					weapon = weapon.."_A"
+				elseif _G[weapon].Class == "Enemy" then
+					if _G[string.sub(weapon, 1, -2).."B"] ~= nil then 
+						weapon = string.sub(weapon, 1, -2).."B"
+					elseif _G[string.sub(weapon, 1, -2).."2"] ~= nil then 
+						weapon = string.sub(weapon, 1, -2).."2"
+					end
 				end
 			end
 			pawn:AddWeapon(weapon, true)
@@ -553,7 +555,7 @@ function Status.GetStatus(id, status)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
-	return mission[status.."Table"][id] or false
+	return (mission[status.."Table"] ~= nil and mission[status.."Table"][id]) or false
 end
 
 function Status.List()
@@ -841,35 +843,6 @@ local function EVENT_onModsLoaded()
 			if pawn then mission.ConfusionTable[id] = confusionTurns - 1 end
 			if mission.ConfusionTable[id] < 0 then Status.RemoveStatus(id, "Confusion") end
 		end
-		-- for id, virusTurns in pairs(mission.VirusTable) do
-			-- local pawn = Board:GetPawn(id)
-			-- if pawn then
-				-- mission.VirusTable[id] = virusTurns - 1 end
-				-- if mission.VirusTable[id] < 0 then 
-					-- Status.RemoveStatus(id, "Virus")
-				-- else
-					-- pawn:SetHealth(pawn:GetHealth() - 1)
-					-- Board:Ping(pawn:GetSpace(), GL_Color(150, 50, 150))
-					-- for i = DIR_START, DIR_END do
-						-- local curr = pawn:GetSpace() + DIR_VECTORS[i]
-						-- if Board:GetPawn(curr) and not mission.VirusTable[Board:GetPawn(curr):GetId()] then 
-							-- modApi:runLater(function() mission.VirusTable[Board:GetPawn(curr):GetId()] = 1 end)
-							-- CustomAnim:add(Board:GetPawn(curr):GetId(), "StatusVirus")
-						-- end	
-					-- end
-				-- end
-			-- end
-		-- end
-		-- for id, _ in pairs(mission.PoisonTable) do
-			-- local pawn = Board:GetPawn(id)
-			-- if pawn then
-				-- pawn:SetHealth(pawn:GetHealth() - mission.PoisonTable[id])
-				-- Board:Ping(pawn:GetSpace(), GL_Color(50, 150, 50))
-				-- CustomAnim:rem(id, "StatusPoison"..mission.PoisonTable[id])
-				-- mission.PoisonTable[id] = mission.PoisonTable[id] + 1
-				-- CustomAnim:add(id, "StatusPoison"..mission.PoisonTable[id])	
-			-- end
-		-- end
 		for id, info in pairs(mission.RootedTable) do
 			local pawn = Board:GetPawn(id)
 			if pawn and info.amount ~= 0 then pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), info.amount)) end
@@ -997,6 +970,7 @@ if _G["MothAtkB"] == nil then --ranged bouncer boss attack
 		Class = "Enemy",
 		Name = "Abhorrent Pellets",
 		Description = "Launch an artillery attack at three tiles in a row, pushing shooter and targets.",
+		Damage = 3,
 	}
 	function MothAtkB:GetSkillEffect(p1, p2)
 		local ret = SkillEffect()

@@ -1,10 +1,11 @@
 v1.7.0
 - Many bugfixes.
-- Added the Arceus boss fight.
 - Added the Dialga/Palkia/Giratina squad, Dragons of Myth.
+- Added the Arceus boss fight. It cannot appear unless the above squad is unlocked.
 - Added the free agent Arceus.
+- Added consequences to defeat in boss missions (Dialga, Palkia, Giratina, and Arceus): negative effects will occur at the start of the next mission.
 - Added a mod option to display the name of the currently deployed unit (for triple Eevee runs).
-- Added a mod option to replace the name of the custom squad with Pokemon-related squad names.
+- Added a mod option to replace the name of the custom squad with Pokemon-related squad names (eg. Time Travellers -> Pokemon Team).
 - Zapdos applies Shocked; Moltres applies Dry. Zapdos is immune to Shocked and Articuno is immune to Chill.
 
 v1.6.3
