@@ -2,6 +2,14 @@ local mod = modApi:getCurrentMod()
 
 --This file contains the logic that assigns and maintains prefixes; for prefix effects, see effects.lua
 
+local function HasOneWeapon(vekType)
+	return not (not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or _G[vekType].VoidShockImmune)
+end
+
+local function DealsDamage(vekType)
+	return _G[vekType].SkillList and #_G[vekType].SkillList >= 1 and _G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage >= 0 and _G[vekType].SkillList[1].Damage ~= DAMAGE_ZERO
+end
+
 function IsPrefixValidForVek(prefix, vekType)
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["Enable_"..prefix] and not options["Enable_"..prefix].enabled then return false end
@@ -28,20 +36,20 @@ function IsPrefixValidForVek(prefix, vekType)
 	if prefix == "Oozing" and _G[vekType].MoveSpeed == 0 then return false end	
 	if prefix == "Infectious" and (_G[vekType].Ranged == 1 or _G[vekType].MoveSpeed < 3) then return false end	
 	if prefix == "Regenerating" and _G[vekType].Health == 1 then return false end
-	if prefix == "Wrathful" and _G[vekType].VoidShockImmune then return false end
-	if prefix == "Cannibalistic" and _G[vekType].VoidShockImmune then return false end
-	if prefix == "CopyingMelee" and (_G[vekType].Ranged == 1 or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or _G[vekType].Tier == TIER_BOSS) then return false end
-	if prefix == "CopyingRanged" and (_G[vekType].Ranged == 0 or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or _G[vekType].Tier == TIER_BOSS) then return false end
+	if prefix == "Wrathful" and not HasOneWeapon(vekType) then return false end
+	if prefix == "Cannibalistic" and (not HasOneWeapon(vekType) or not DealsDamage(vekType)) then return false end
+	if prefix == "CopyingMelee" and (_G[vekType].Ranged == 1 or not HasOneWeapon(vekType) or _G[vekType].Tier == TIER_BOSS) then return false end
+	if prefix == "CopyingRanged" and (_G[vekType].Ranged == 0 or not HasOneWeapon(vekType) or _G[vekType].Tier == TIER_BOSS) then return false end
 	if prefix == "Tyrannical" and not string.find(_G[vekType].Name, "Psion") then return false end
-	if prefix == "Mirroring" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1) then return false end
-	if prefix == "Pushing" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or SEPushes(_G[vekType].SkillList[1]) or SEIsMirror(_G[vekType].SkillList[1])) then return false end
-	if prefix == "Groundbreaking" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or SECracks(_G[vekType].SkillList[1])) then return false end
-	if prefix == "Venomous" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or SEIsArtillery(_G[vekType].SkillList[1])) then return false end
-	if prefix == "Frenzied" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or _G[vekType].Health == 1 or (_G[vekType].SkillList[1].Damage and (_G[vekType].SkillList[1].Damage <= 0 or _G[vekType].SkillList[1].Damage >= 3))) then return false end
-	if prefix == "Freezing" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1) or SEIsFire(_G[vekType].SkillList[1]) or SEIsIce(_G[vekType].SkillList[1])) then return false end
-	if prefix == "Excavating" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1) or SEIsPlusShape(_G[vekType].SkillList[1]) or SEMakesRock(_G[vekType].SkillList[1])) then return false end
-	if prefix == "Nursing" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1)) then return false end
-	if prefix == "Electrified" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or #_G[vekType].SkillList ~= 1 or (_G[vekType].SkillList[1].Damage and _G[vekType].SkillList[1].Damage <= 1)) then return false end
+	if prefix == "Mirroring" and (not HasOneWeapon(vekType) or SEisMirror(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Pushing" and (not HasOneWeapon(vekType) or SEPushes(_G[vekType].SkillList[1]) or SEIsMirror(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Groundbreaking" and (not HasOneWeapon(vekType) or SECracks(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Venomous" and (not HasOneWeapon(vekType) or SEIsArtillery(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Frenzied" and (not HasOneWeapon(vekType) or _G[vekType].Health == 1 or (_G[vekType].SkillList[1].Damage and (_G[vekType].SkillList[1].Damage <= 0 or _G[vekType].SkillList[1].Damage >= 3))) then return false end
+	if prefix == "Freezing" and (not HasOneWeapon(vekType) or not DealsDamage(vekType) or SEIsFire(_G[vekType].SkillList[1]) or SEIsIce(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Excavating" and (not HasOneWeapon(vekType) or not DealsDamage(vekType) or SEIsPlusShape(_G[vekType].SkillList[1]) or SEMakesRock(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Nursing" and (not HasOneWeapon(vekType) or not DealsDamage(vekType)) then return false end
+	if prefix == "Electrified" and (not HasOneWeapon(vekType) or not DealsDamage(vekType)) then return false end
 	if prefix == "Wet" and _G[vekType].IgnoreFire then return false end
 	if prefix == "Flammable" and _G[vekType].IgnoreFire then return false end
 	if prefix == "Blessed" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or _G[vekType].Tier == TIER_BOSS) then return false end

@@ -267,7 +267,6 @@ function mod:load( options, version)
 			if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
 			if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
 			if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
-			-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
 			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 				pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
 			end
