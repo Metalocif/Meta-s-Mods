@@ -67,7 +67,7 @@ function mod:init()
 				end
 				if modApi.achievements:isComplete(mod.id,"Poke_MewtwoCapture") then table.insert(copy, "Poke_ArmoredMewtwo") end
 				if modApi.achievements:isComplete(mod.id,"Poke_ArceusCapture") then table.insert(copy, "Poke_Arceus") end
-
+				table.insert(copy, "Poke_Metanitar")
 				return copy
 			end
 
@@ -151,6 +151,7 @@ function mod:load( options, version)
 	modApi:addMissionEndHook(function()		--revive dead pawns, do evolution stuff
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
 		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
+		DoSaveGame()
 		--we have branching evos which lists names, branching evo level which tracks when it happens, and branching evo tables
         for id = 0, 2 do
             local pawn = Game:GetPawn(id)

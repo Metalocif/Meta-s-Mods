@@ -83,6 +83,8 @@ local files = {
 	"Wither.png",
 	"Judgment.png",
 	"Wormhole.png",
+	"Trample.png",
+	"PsychicTerror.png",
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/weapons/"..file, resourcePath.."img/weapons/"..file)
@@ -189,6 +191,19 @@ local effects = {
 	"laser_hyperbeam_U.png",
 	"laser_hyperbeam_U1.png",
 	"laser_hyperbeam_U2.png",
+}
+for _, effect in ipairs(effects) do
+	modApi:appendAsset("img/effects/".. effect, resourcePath .. "img/effects/" .. effect)
+	Location["effects/"..effect] = Point(-12,3)
+end
+local effects = {
+	"laser_SpatialRift_R.png",
+	"laser_SpatialRift_R1.png",
+	"laser_SpatialRift_R2.png",
+	-- "laser_SpatialRift_start.png",
+	"laser_SpatialRift_U.png",
+	"laser_SpatialRift_U1.png",
+	"laser_SpatialRift_U2.png",
 }
 for _, effect in ipairs(effects) do
 	modApi:appendAsset("img/effects/".. effect, resourcePath .. "img/effects/" .. effect)
@@ -5312,7 +5327,19 @@ function Poke_RoarOfTime:GetSkillEffect(p1, p2)
 		end
 		ret:AddDelay(0.05)
 	end
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_RoarOfTime" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
 	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end
 
@@ -5389,12 +5416,85 @@ function Poke_Warpstrike:GetFinalEffect(p1, p2, p3)
 	end
 	ret:AddDamage(damage1)
 	ret:AddDamage(damage2)
-	local delay = Board:IsPawnSpace(p2) and 0 or FULL_DELAY
+	local delay = Board:IsBlocked(p2, PATH_PROJECTILE) and 0 or FULL_DELAY
 	ret:AddTeleport(p2,p3, delay)
 	
 	if delay ~= FULL_DELAY then
 		ret:AddTeleport(p3,p2, FULL_DELAY)
 	end
+	return ret
+end
+
+
+Poke_SpatialRift = LaserDefault:new{
+	Class = "TechnoVek",
+	Icon = "weapons/SpatialRift.png",
+	Name = "Spatial Rift",
+	Description = "Cast a devastating beam of energy, swapping the terrain of the first and tiles hit. Completely exhausts the user; they must spend one turn asleep to recuperate.",
+	Rarity = 4,
+	Explosion = "",
+	LaunchSound = "/props/final_bomb_explode",
+	Damage = 3,
+	PowerCost = 0, --AE Change
+	MinDamage = 3,
+	FriendlyDamage = true,
+	ZoneTargeting = ZONE_DIR,
+	LaserArt = "effects/laser_SpatialRift",
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,2),
+		Friendly = Point(2,1),
+		Target = Point(2,2),
+		Mountain = Point(2,0),
+		CustomPawn = "Poke_Palkia",
+	}
+}
+
+function Poke_SpatialRift:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		if Board:GetTerrain(p1+DIR_VECTORS[dir]) ~= TERRAIN_BUILDING then
+			for j = 1, 8 do
+				if Board:GetTerrain(p1+DIR_VECTORS[dir] * j) ~= TERRAIN_BUILDING then
+					ret:push_back(p1+DIR_VECTORS[dir] * j)
+				end
+			end
+		end
+	end
+	return ret
+end
+	
+
+function Poke_SpatialRift:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	local target = p1 + DIR_VECTORS[direction]
+	ret:AddAnimation(p1, "PulseBlast", ANIM_REVERSE)
+	ret:AddDelay(1)
+	ret:AddScript("Board:StartShake(2)")
+	self:AddLaser(ret, target, direction)
+	local swap1 = SpaceDamage(p2)
+	local swap2 = SpaceDamage(p1 + DIR_VECTORS[direction])
+	swap1.terrain = Board:GetTerrain(swap2)
+	swap2.terrain = Board:GetTerrain(swap1)
+	ret:AddDamage(swap1)
+	ret:AddDamage(swap2)
+	ret:AddDelay(1)
+	
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_SpatialRift" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end
 
@@ -5809,11 +5909,145 @@ function Poke_Unmake:GetTargetArea(p1)
 	return ret
 end
 
-	
 function Poke_Unmake:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2, DAMAGE_DEATH)
 	damage.iTerrain = TERRAIN_HOLE
 	ret:AddDamage(damage)
+	return ret
+end
+
+
+Poke_Trample=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Trample.png",	
+	Rarity = 3,
+	Name = "Trample",
+	Description = "Dash to a location, crushing everything along the way.",
+	Damage = 3,
+	Crack = 0,
+	PathSize = 8,	
+	PowerCost = 0,
+	Upgrades = 2,
+	Push = false,
+	UpgradeList = { "Push Adjacent", "Crack" },
+	UpgradeCost = { 2, 2 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,5),
+		Target = Point(2,1),
+		Enemy = Point(2, 2),
+		Mountain = Point(2,3),
+		Building = Point(2,4),
+		CustomPawn = "Poke_Metanitar",
+	}
+}
+Poke_Trample_A=Poke_Trample:new{ UpgradeDescription = "On stopping, push adjacent tiles.", Push = true }
+Poke_Trample_B=Poke_Trample:new{ UpgradeDescription = "Crack all tiles trampled.", Crack = 1 }
+Poke_Trample_B=Poke_Trample:new{ Push = true, Crack = 1 }
+
+
+function Poke_Trample:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			local curr = p1+DIR_VECTORS[dir] * j
+			if Board:GetTerrain(curr) == TERRAIN_HOLE then break end
+			local pawn = Board:GetPawn(curr)
+			if not ((pawn and (pawn:IsShield() or pawn:GetHealth() > self.Damage)) or (Board:IsBuilding(curr) and Board:GetHealth(curr) > self.Damage) or Board:GetTerrain(curr) == TERRAIN_WATER or Board:GetTerrain(curr) == TERRAIN_MOUNTAIN or Board:GetTerrain(curr) == TERRAIN_BUILDING) then
+				ret:push_back(curr)
+			end
+		end
+	end
+	return ret
+end
+
+function Poke_Trample:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2 - p1)
+	local dist = p1:Manhattan(p2)
+	local curr = p1
+	local targetPawn = Board:GetPawn(p2)
+	local move = PointList()
+	move:push_back(p1)
+	move:push_back(p2)
+	ret:AddCharge(move, NO_DELAY)
+	for i = 0, dist do
+		ret:AddSound("/support/earthmover/attack_first")
+		ret:AddEmitter(curr, "Emitter_Dust")
+		local damage = SpaceDamage(curr, self.Damage)
+		damage.iCrack = self.Crack
+		if i == dist - 1 and self.Push then damage.iPush = (dir+2)%4 end
+		if i > 0 and i < dist then ret:AddDamage(damage) end
+		if i == dist and targetPawn then ret:AddScript(string.format("Board:GetPawn(%s):Kill(false)", targetPawn:GetId())) end
+		ret:AddDelay(0.1)
+		ret:AddBounce(curr, 2)
+		curr = curr + DIR_VECTORS[dir]
+	end
+	if self.Push then
+		for i = DIR_START, DIR_END do
+			local pushDamage = SpaceDamage(p2 + DIR_VECTORS[i], 0, i)
+			pushDamage.sAnimtion = PUSH_ANIMS[i]
+			if i ~= (dir+2)%4 then ret:AddDamage(pushDamage) end
+		end
+	end
+	return ret
+end
+
+
+Poke_PsychicTerror=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/PsychicTerror.png",	
+	Rarity = 3,
+	Name = "Psychic Terror",
+	Description = "Cancel nearby enemies' queued actions if they have less health that the user.",
+	Damage = 0,
+	Range = 2,
+	PathSize = 8,	
+	PowerCost = 0,
+	Upgrades = 2,
+	UpgradeList = { "+1 Range", "Dreadful" },
+	UpgradeCost = { 2, 2 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2, 2),
+		Building = Point(2,4),
+		CustomPawn = "Poke_Metanitar",
+	}
+}
+Poke_PsychicTerror_A=Poke_PsychicTerror:new{ UpgradeDescription = "Affect a larger area.", Range = 3 }
+Poke_PsychicTerror_B=Poke_PsychicTerror:new{ UpgradeDescription = "Gain the Dreadful status, which prevents enemies from queueing actions next to this pawn.", Dreadful = true }
+Poke_PsychicTerror_AB=Poke_PsychicTerror:new{ Range = 3, Dreadful = true }
+
+
+function Poke_PsychicTerror:GetTargetArea(p1)
+	local ret = PointList()
+	ret:push_back(p1)
+	return ret
+end
+
+function Poke_PsychicTerror:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local hitTiles = {}
+	ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 0, 255))", p1:GetString()))
+	for i = 1, self.Range do
+		local targets = extract_table(general_DiamondTarget(p1, i))
+		for k = 1, #targets do	
+			if not hitTiles[targets[k]:GetString()] then
+				ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 0, %s))", targets[k]:GetString(), 255 - 80 * i))
+				local pawn = Board:GetPawn(targets[k])
+				if pawn and pawn:GetHealth() < Board:GetPawn(p1):GetHealth() and pawn:GetTeam() == TEAM_ENEMY and pawn:IsQueued() then
+					local mark = SpaceDamage(targets[k])
+					mark.sImageMark = "combat/icons/icon_mind_glow.png"
+					ret:AddDamage(mark)
+					ret:AddScript(string.format("Board:GetPawn(%s):ClearQueued()", pawn:GetId()))
+				end
+			end
+			hitTiles[targets[k]:GetString()] = true
+		end
+		ret:AddDelay(0.3)
+	end
+	if self.Dreadful then ret:AddScript(string.format("Status.ApplyDreadful(%s)", Board:GetPawn(p1):GetId())) end
 	return ret
 end

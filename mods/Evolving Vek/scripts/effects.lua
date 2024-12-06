@@ -423,6 +423,85 @@ function Meta_NursingWeapon:GetSkillEffect(p1, p2)
 end
 
 
+Meta_ElectrifiedWeapon = Skill:new{
+	Name="Electrified",
+	Description="Copies the user's other weapon, damaging tiles adjacent to damaged tiles.",
+	Class = "Enemy",
+	Icon = "weapons/enemy_scarab1.png",
+	Projectile = "",
+	Explosion = "",
+	ImpactSound = "",
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,1),
+		Building = Point(2,2),
+		Target = Point(2,1),
+		CustomPawn = "Jelly_Health1"
+	}
+}
+
+function Meta_ElectrifiedWeapon:GetTargetArea(point)
+	return _G[Board:GetPawn(point):GetWeaponType(1)]:GetTargetArea(point)
+end
+
+function Meta_ElectrifiedWeapon:GetSkillEffect(p1, p2)	--unholy fusion of the usual skill effect manipulation and Lightning Chain
+	local ret = SkillEffect()
+	local hash = function(point) return point.x + point.y*10 end
+	local explored = {[hash(p1)] = true}
+	local todo = {}
+	local origin = { [hash(p2)] = p1 }
+	
+	
+	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
+		local fx = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
+		local new_damage_list = DamageList()
+		for i = 1, fx.q_effect:size() do
+			local curr_space_damage = fx.q_effect:index(i)
+			new_damage_list:push_back(curr_space_damage)
+			-- explored[hash(curr_space_damage.loc)] = true
+			if curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_ZERO then 
+				-- for i = DIR_START, DIR_END do
+					-- local neighbor = curr_space_damage.loc + DIR_VECTORS[i]
+					-- if Board:IsValid(neighbor) and not explored[hash(neighbor)] then
+						-- todo[#todo + 1] = neighbor
+						-- origin[hash(neighbor)] = curr_space_damage.loc
+					-- end
+				-- end
+				todo[#todo + 1] = curr_space_damage.loc
+				origin[hash(curr_space_damage.loc)] = p1
+			end
+		end
+		LOG(#todo.." spreading points.")
+		while #todo ~= 0 do
+			local current = pop_back(todo)
+			LOG("Electrified hit spreading from "..current:GetString())
+			if not explored[hash(current)] then
+				explored[hash(current)] = true
+				if Board:IsPawnSpace(current) or Board:GetTerrain(current) == TERRAIN_BUILDING then
+					local direction = nil
+					ret:AddAnimation(current,"Lightning_Hit")
+					for i = DIR_START, DIR_END do
+						local neighbor = current + DIR_VECTORS[i]
+						if Board:IsPawnSpace(neighbor) or Board:GetTerrain(neighbor) == TERRAIN_BUILDING then 
+							if not explored[hash(neighbor)] then
+								todo[#todo + 1] = neighbor
+								origin[hash(neighbor)] = current
+								local damage = SpaceDamage(neighbor, 1)
+								damage.sAnimation = "Lightning_Attack_"..i
+								new_damage_list:push_back(damage)
+							end
+						end
+					end
+				end		
+			end
+		end
+		fx.q_effect = new_damage_list
+		ret = fx
+	end
+	return ret
+end
+
+
 -- Meta_GrapplingWeapon = Skill:new{
 	-- Name="Grappling",
 	-- Description="Copies the user's other weapon, grappling first.",
@@ -756,6 +835,16 @@ end
 function SpawnShocked()
 	if Pawn:GetTurnCount() <= 1 then Status.ApplyShocked(Pawn:GetId()) end
 	return 1
+end
+
+function SpawnReactive()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyReactive(Pawn:GetId()) end
+	return 1
+end
+
+function SpawnShocked()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyShocked(Pawn:GetId(), true) end
+	return 2	--used in combination with a SE-modifying weapon, so we want to use it instead of the pawn's normal weapon
 end
 
 

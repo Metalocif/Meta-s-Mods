@@ -259,6 +259,12 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Electrified",
+		"Enable the Electrified prefix",
+		"Check to allow Vek to be given the Electrified prefix, making their weapon cause lightning to chain through hit tiles, but spawning Shocked. (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"Enable_Flammable",
 		"Enable the Flammable prefix",
 		"Check to allow Vek to be given the Flammable prefix, making them take 1 damage and deal 1 damage to their surroundings when set on fire (default: true).",
@@ -274,6 +280,12 @@ function mod:metadata()
 		"Enable_Blessed",
 		"Enable the Blessed prefix",
 		"Check to allow Vek to be given the Blessed prefix, making their weapon the boss version (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Reactive",
+		"Enable the Reactive prefix",
+		"Check to allow Vek to be given the Reactive prefix, making them turn A.C.I.D. into smoke on adjacent tiles (default: true).",
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(

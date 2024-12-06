@@ -323,6 +323,12 @@ local files = {
 	"ArceusPoison_a.png",
 	"ArceusWater_a.png",
 	
+	"Metanitar.png",
+	"Metanitar_a.png",
+	"Metanitar_h.png",
+	"Metanitar_w.png",
+	"Metanitar_ns.png",
+	
 	"PokeBall.png", "HyperBall.png", "MasterBall.png",
 }
 for _, file in ipairs(files) do
@@ -649,6 +655,11 @@ a.Poke_Dialga_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX 
 a.Poke_Dialga_ns = a.MechIcon:new{Image="units/player/Dialga_ns.png"}
 a.Poke_Dialgaw =a.MechUnit:new{Image="units/player/Dialga_w.png", PosX = -12, PosY = 10}
 a.Poke_Dialga_sleep = a.MechUnit:new{Image="units/player/Dialga_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
+a.Poke_DialgaOrigin =a.MechUnit:new{Image="units/player/DialgaOrigin.png", PosX = -10, PosY = -4}
+a.Poke_DialgaOrigina = a.MechUnit:new{Image="units/player/DialgaOrigin_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_DialgaOrigin_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_DialgaOrigin_ns = a.MechIcon:new{Image="units/player/DialgaOrigin_ns.png"}
+a.Poke_DialgaOriginw =a.MechUnit:new{Image="units/player/DialgaOrigin_w.png", PosX = -12, PosY = 10}
 
 
 a.Poke_Palkia =a.MechUnit:new{Image="units/player/Palkia.png", PosX = -10, PosY = -4}
@@ -657,6 +668,11 @@ a.Poke_Palkia_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX 
 a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
 a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -12, PosY = 10}
 a.Poke_Palkia_sleep = a.MechUnit:new{Image="units/player/Palkia_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
+a.Poke_PalkiaOrigin =a.MechUnit:new{Image="units/player/PalkiaOrigin.png", PosX = -10, PosY = -4}
+a.Poke_PalkiaOrigina = a.MechUnit:new{Image="units/player/PalkiaOrigin_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_PalkiaOrigin_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_PalkiaOrigin_ns = a.MechIcon:new{Image="units/player/PalkiaOrigin_ns.png"}
+a.Poke_PalkiaOriginw =a.MechUnit:new{Image="units/player/PalkiaOrigin_w.png", PosX = -12, PosY = 10}
 
 
 a.Poke_Giratina =a.MechUnit:new{Image="units/player/Giratina.png", PosX = -10, PosY = -4}
@@ -687,6 +703,13 @@ a.Poke_ArceusWatera = a.Poke_Arceusa:new{Image="units/player/ArceusWater_a.png"}
 a.Poke_Arceus_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Arceus_ns = a.MechIcon:new{Image="units/player/Arceus_ns.png"}
 
+a.Poke_Metanitar =a.MechUnit:new{Image="units/player/Metanitar.png", PosX = -30, PosY = -21}
+a.Poke_Metanitara = a.MechUnit:new{Image="units/player/Metanitar_a.png",  PosX = -30, PosY = -21, NumFrames = 3, Time = 0.4, Frames = {0,1,2,1} }
+a.Poke_Metanitar_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
+a.Poke_Metanitar_ns = a.MechIcon:new{Image="units/player/Metanitar_ns.png"}
+a.Poke_Metanitarw =a.MechUnit:new{Image="units/player/Metanitar_w.png", PosX = -26, PosY = 0}
+
+
 
 
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Abra.png", path .."img/portraits/pilots/Pilot_Poke_Abra.png")
@@ -712,6 +735,7 @@ modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dialga.png", path .."img/por
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Palkia.png", path .."img/portraits/pilots/Pilot_Poke_Palkia.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Giratina.png", path .."img/portraits/pilots/Pilot_Poke_Giratina.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Arceus.png", path .."img/portraits/pilots/Pilot_Poke_Arceus.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Metanitar.png", path .."img/portraits/pilots/Pilot_Poke_Metanitar.png")
 
 
 CreatePilot{Id = "Pilot_Poke_Abra", Personality = "Vek", Name = "Sabrina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
@@ -738,6 +762,7 @@ CreatePilot{Id = "Pilot_Poke_Dialga", Personality = "Vek", Name = "Dialga", Sex 
 CreatePilot{Id = "Pilot_Poke_Palkia", Personality = "Vek", Name = "Palkia", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Giratina", Personality = "Vek", Name = "Giratina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Arceus", Personality = "Vek", Name = "Arceus", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Metanitar", Personality = "Vek", Name = "Metanitar", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 
@@ -1170,7 +1195,9 @@ Poke_Dialga = Pawn:new{
 	HasEvolutions = { true, true },
 	EvoForget = { "Poke_DragonBreath", "" },
 	EvoLearn = { { { "Poke_Wither" }, { } } },
-	KeepAdding = { "", "Poke_RoarOfTime" },
+	MegaEvos = { "Poke_DialgaOrigin" },
+	MegaEvoMoves = { "Poke_RoarOfTime" },
+	MegaEvoNames = { "Dialga" },
 }
 
 Poke_Palkia = Pawn:new{
@@ -1190,7 +1217,9 @@ Poke_Palkia = Pawn:new{
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_Teleport" }, { } } },
-	-- KeepAdding = { "", "Poke_SpatialRend" },
+	MegaEvos = { "Poke_PalkiaOrigin" },
+	MegaEvoMoves = { "Poke_SpatialRend" },
+	MegaEvoNames = { "Palkia" },
 }
 
 Poke_Giratina = Pawn:new{
@@ -1221,7 +1250,6 @@ Poke_Arceus = Pawn:new{
 	MoveSpeed = 4,
 	Massive = true,
 	Corpse = true,
-	FastTeleporter = true,	--custom movement that only does the teleport anim if pawn can't walk to destination
 	Flying = true,
 	Image = "Poke_Arceus",
 	SkillList = {"Poke_Judgment" },
@@ -1232,6 +1260,23 @@ Poke_Arceus = Pawn:new{
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_Wormhole" }, { } } },
 	KeepAdding = { "", "Poke_Unmake" },
+}
+
+Poke_Metanitar = Pawn:new{
+	Name = "Metanitar",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Armor = true,
+	Image = "Poke_Metanitar",
+	SkillList = {"Poke_Trample" },
+	SoundLocation = "/mech/prime/punch_mech/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_METAL,
+	HasEvolutions = { true, false },
+	EvoLearn = { { { "Poke_PsychicTerror" }, { } } },
 }
 
 
