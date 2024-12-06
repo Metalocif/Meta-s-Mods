@@ -19,6 +19,39 @@ function Mission_Poke_Mewtwo:StartMission()
 	Board:SpawnPawn(pawn)
 end
 
+function Mission_Poke_Mewtwo:NextTurn()
+	local totalHP = 0
+	for i = 0, 2 do
+		if Board:GetPawn(i) then totalHP = totalHP + Board:GetPawn(i):GetHealth() end
+	end
+	if totalHP == 0 then --mission will end soon
+		modApi:conditionalHook(function()
+			return modApi.deployment:isDeploymentPhase()
+		end,
+		function()
+			Status.ApplyConfusion(math.random(0, 2))
+		end)
+	end
+	if Board:IsPawnAlive(self.Target) then
+		local randomMove = math.random(0, 2)
+		if randomMove == 0 and not Board:GetPawn(self.Target):IsDamaged() then randomMove = 1 end
+		if randomMove == 1 and Board:GetPawn(self.Target):IsShield() then randomMove = 2 end
+		local mewtwoPos = Board:GetPawn(self.Target):GetSpace()
+		if randomMove == 0 then	
+			Board:AddAlert(mewtwoPos, "Mewtwo used Recover!")
+			Board:DamageSpace(SpaceDamage(mewtwoPos, -2))
+		elseif randomMove == 1 then
+			Board:AddAlert(mewtwoPos, "Mewtwo used Barrier!")
+			Board:GetPawn(self.Target):SetShield(true)
+		elseif randomMove == 2 then
+			Board:AddAlert(mewtwoPos, "Mewtwo used Gravity!")
+			for i = 0, 2 do
+				Board:GetPawn(i):AddMoveBonus(-1)
+			end
+		end
+	end
+end
+
 function Mission_Poke_Mewtwo:GetDestroyedCount()
 	if not Board:IsPawnAlive(self.Target) then
 		return 1
