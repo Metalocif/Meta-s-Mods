@@ -1,5 +1,6 @@
 v1.7.0
 - Many bugfixes.
+- Pokemon can now evolve, learn, and forget moves even if you didn't reset turn at all this run.
 - Added the Dialga/Palkia/Giratina squad, Dragons of Myth.
 - Added the Arceus boss fight. It cannot appear unless the above squad is unlocked.
 - Added the free agent Arceus.
