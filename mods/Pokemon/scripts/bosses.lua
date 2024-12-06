@@ -570,7 +570,7 @@ function Poke_ShockwaveBoss:GetSkillEffect(p1,p2)
 		damage.sAnimation = "LightningBolt0"
 		ret:AddQueuedProjectile(damage, self.ProjectileArt, NO_DELAY)
 	end
-	ret:AddSound("/props/lightning_strike")
+	ret:AddQueuedSound("/props/lightning_strike")
 	return ret
 end
 
