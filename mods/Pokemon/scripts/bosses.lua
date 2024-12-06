@@ -1622,7 +1622,7 @@ Poke_Hex = Skill:new{
 	PathSize = 8,
 	PowerCost = 0, --AE Change
 	ZoneTargeting = ZONE_DIR,
-	NextWeapon = "Poke_ShadowForce",
+	NextWeapon = "Poke_ShadowForceBoss",
 	TipImage = {
 		Unit = Point(2,2),
 		Target = Point(2,2),
@@ -1657,7 +1657,7 @@ function Poke_Hex:GetSkillEffect(p1, p2)
 end
 
 
-Poke_ShadowForce = Skill:new{
+Poke_ShadowForceBoss = Skill:new{
 	Class = "Enemy",
 	Icon = "weapons/NaturePower.png",	
 	Rarity = 3,
@@ -1679,7 +1679,7 @@ Poke_ShadowForce = Skill:new{
 	}
 }
 
-function Poke_ShadowForce:GetTargetArea(point)
+function Poke_ShadowForceBoss:GetTargetArea(point)
 	local ret = PointList()
 	for _, p in ipairs(Board) do
 		ret:push_back(p)
@@ -1687,12 +1687,14 @@ function Poke_ShadowForce:GetTargetArea(point)
 	return ret
 end
 
-function Poke_ShadowForce:GetSkillEffect(p1, p2)
+function Poke_ShadowForceBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local mission = GetCurrentMission()
 	if not Board:GetPawn(p1) then return ret end
 	ret:AddScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
 	-- ret:AddScript("GetCurrentMission().ShadowForceTarget = "..p2:GetString())
-	GetCurrentMission().ShadowForceTarget = p2
+	
+	if mission then mission.ShadowForceTarget = p2 end
 	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(Point(-1,-1))", p1:GetString()))
 	-- local target = GetCurrentMission().ShadowForceTarget or p2
 	ret:AddQueuedDamage(SpaceDamage(p2, DAMAGE_DEATH))

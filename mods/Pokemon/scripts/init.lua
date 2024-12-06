@@ -224,8 +224,9 @@ function mod:load( options, version)
 			end
 		end
     end)
-	modApi:addMissionStartHook(function()	--need to reassign graphics at mission start since the game forgets otherwise
+	modApi:addMissionStartHook(function(mission)	--need to reassign graphics at mission start since the game forgets otherwise
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
+		DoSaveGame()
 		if GAME.BranchingEvos == nil or #GAME.BranchingEvos < 3 then 	--prepare branching evos in first since the menu doesn't pause the game at mission end before evolution
 			GAME.BranchingEvos = {}
 			for id = 0, 2 do
@@ -264,11 +265,18 @@ function mod:load( options, version)
             local pawn = Game:GetPawn(id)
 			local evo = GAME.Poke_Evolutions[id + 1]
 			local branch = GAME.BranchingEvos[id + 1]
+			while pawn:GetWeaponCount() == 3 do
+				pawn:RemoveWeapon(3) 
+			end
+			
 			if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
 			if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
 			if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
+			
+			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] then LOG(_G[pawn:GetType()].KeepAdding[evo], pawn:GetWeaponCount()) end
 			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 				pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
+				LOG("Gave "..pawn:GetType().." ".._G[pawn:GetType()].KeepAdding[evo])
 			end
         end
     end)
@@ -324,8 +332,8 @@ function mod:load( options, version)
 			end
 		end)
     end)
-	modApi:addNextTurnHook(function()
-		local mission = GetCurrentMission()
+	modApi:addNextTurnHook(function(mission)
+		DoSaveGame()
 		for id = 0, 2 do
 			local pawn = Board:GetPawn(id)
 			local pilotLevel = GameData.current["pilot"..id].level
@@ -333,7 +341,7 @@ function mod:load( options, version)
 			if pawn and pawn:IsDead() and not mission.MegaEvolved and _G[pawn:GetType()].MegaEvos ~= nil and pilotLevel == 2 and Game:GetTeamTurn() == TEAM_PLAYER then
 				Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -10))
 				local rainbowColors = {COLOR_RED, COLOR_GREEN, COLOR_BLUE}
-				for i = 1, 10 do
+				for i = 1, 50 do
 					Board:Ping(pawn:GetSpace(), rainbowColors[(i%3)+1])
 					local delay = SkillEffect()
 					delay:AddDelay(0.1)

@@ -289,6 +289,10 @@ local files = {
 	"Dialga_h.png",
 	"Dialga_ns.png",
 	"Dialga_sleep.png",
+	"DialgaOrigin.png",
+	"DialgaOrigin_a.png",
+	-- "DialgaOrigin_w.png",
+	"DialgaOrigin_ns.png",
 	
 	"Palkia.png",
 	"Palkia_w.png",
@@ -296,6 +300,10 @@ local files = {
 	"Palkia_h.png",
 	"Palkia_ns.png",
 	"Palkia_sleep.png",
+	"PalkiaOrigin.png",
+	"PalkiaOrigin_a.png",
+	-- "PalkiaOrigin_w.png",
+	"PalkiaOrigin_ns.png",
 	
 	"Giratina.png",
 	"Giratina_a.png",
@@ -658,7 +666,7 @@ a.Poke_Dialga_ns = a.MechIcon:new{Image="units/player/Dialga_ns.png"}
 a.Poke_Dialgaw =a.MechUnit:new{Image="units/player/Dialga_w.png", PosX = -12, PosY = 10}
 a.Poke_Dialga_sleep = a.MechUnit:new{Image="units/player/Dialga_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
 a.Poke_DialgaOrigin =a.MechUnit:new{Image="units/player/DialgaOrigin.png", PosX = -10, PosY = -4}
-a.Poke_DialgaOrigina = a.MechUnit:new{Image="units/player/DialgaOrigin_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_DialgaOrigina = a.MechUnit:new{Image="units/player/DialgaOrigin_a.png",  PosX = -35, PosY = -31, NumFrames = 8 }
 a.Poke_DialgaOrigin_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_DialgaOrigin_ns = a.MechIcon:new{Image="units/player/DialgaOrigin_ns.png"}
 a.Poke_DialgaOriginw =a.MechUnit:new{Image="units/player/DialgaOrigin_w.png", PosX = -12, PosY = 10}
@@ -671,7 +679,7 @@ a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
 a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -35, PosY = -21}
 a.Poke_Palkia_sleep = a.MechUnit:new{Image="units/player/Palkia_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
 a.Poke_PalkiaOrigin =a.MechUnit:new{Image="units/player/PalkiaOrigin.png", PosX = -10, PosY = -4}
-a.Poke_PalkiaOrigina = a.MechUnit:new{Image="units/player/PalkiaOrigin_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
+a.Poke_PalkiaOrigina = a.MechUnit:new{Image="units/player/PalkiaOrigin_a.png",  PosX = -35, PosY = -31, NumFrames = 8 }
 a.Poke_PalkiaOrigin_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_PalkiaOrigin_ns = a.MechIcon:new{Image="units/player/PalkiaOrigin_ns.png"}
 a.Poke_PalkiaOriginw =a.MechUnit:new{Image="units/player/PalkiaOrigin_w.png", PosX = -12, PosY = 10}
@@ -681,6 +689,7 @@ a.Poke_Giratina =a.MechUnit:new{Image="units/player/Giratina.png", PosX = -10, P
 a.Poke_Giratinaa = a.MechUnit:new{Image="units/player/Giratina_a.png",  PosX = -35, PosY = -30, NumFrames = 16 }
 a.Poke_Giratina_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Giratina_ns = a.MechIcon:new{Image="units/player/Giratina_ns.png"}
+a.Poke_GiratinaShadow_ns = a.MechIcon:new{Image="units/player/GiratinaShadow.png", PosX = -10, PosY = -4}
 a.Poke_GiratinaShadow =a.MechUnit:new{Image="units/player/GiratinaShadow.png", PosX = -10, PosY = -4}
 a.Poke_GiratinaShadowa = a.MechUnit:new{Image="units/player/GiratinaShadow_a.png",  PosX = -35, PosY = -30, NumFrames = 16 }
 
@@ -1222,7 +1231,7 @@ Poke_Palkia = Pawn:new{
 	EvoForget = { "", "" },
 	EvoLearn = { { { "Poke_Teleport" }, { } } },
 	MegaEvos = { "Poke_PalkiaOrigin" },
-	MegaEvoMoves = { "Poke_SpatialRend" },
+	MegaEvoMoves = { "Poke_SpatialRift" },
 	MegaEvoNames = { "Palkia" },
 }
 

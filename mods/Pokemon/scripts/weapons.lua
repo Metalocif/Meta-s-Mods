@@ -76,6 +76,7 @@ local files = {
 	"XScissor.png",
 	"ConfuseRay.png",
 	"DarkTendrils.png",
+	"ShadowForce.png",
 	"FlashCannon.png",
 	"Warpstrike.png",
 	"RoarOfTime.png",
@@ -5347,7 +5348,9 @@ function Poke_RoarOfTime:GetSkillEffect(p1, p2)
 		end
 	end
 	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+		local image = _G[user:GetType()].Image
+		if _G[user:GetType()].EvoGraphics ~= nil then image = _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2] end
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), image))
 	end	
 	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
@@ -5484,19 +5487,18 @@ function Poke_SpatialRift:GetTargetArea(p1)
 	return ret
 end
 	
-
 function Poke_SpatialRift:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
 	local target = p1 + DIR_VECTORS[direction]
-	ret:AddAnimation(p1, "PulseBlast", ANIM_REVERSE)
+	ret:AddAnimation(p1, "spatialriftAnim")
 	ret:AddDelay(1)
 	ret:AddScript("Board:StartShake(2)")
 	self:AddLaser(ret, target, direction)
 	local swap1 = SpaceDamage(p2)
 	local swap2 = SpaceDamage(p1 + DIR_VECTORS[direction])
-	swap1.terrain = Board:GetTerrain(swap2)
-	swap2.terrain = Board:GetTerrain(swap1)
+	swap1.terrain = Board:GetTerrain(p1 + DIR_VECTORS[direction])
+	swap2.terrain = Board:GetTerrain(p2)
 	ret:AddDamage(swap1)
 	ret:AddDamage(swap2)
 	ret:AddDelay(1)
@@ -5510,7 +5512,9 @@ function Poke_SpatialRift:GetSkillEffect(p1,p2)
 		end
 	end
 	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+		local image = _G[user:GetType()].Image
+		if _G[user:GetType()].EvoGraphics ~= nil then image = _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2] end
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), image))
 	end	
 	ret:AddScript(string.format("Status.ApplySleep(%s, 1)", Board:GetPawn(p1):GetId()))
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
@@ -5542,6 +5546,7 @@ function Poke_ConfuseRay:GetTargetArea(p1)
 	for dir = DIR_START, DIR_END do
 		for j = 1, 8 do
 			ret:push_back(p1+DIR_VECTORS[dir] * j)
+			if Board:IsBlocked(p1+DIR_VECTORS[dir] * j, PATH_PROJECTILE) then break end
 		end
 	end
 	return ret
@@ -5603,11 +5608,10 @@ Poke_ShadowForce = Skill:new{
 	Icon = "weapons/ShadowForce.png",
 	Description = "Creates two shadow clones.",
 	Name = "Shadow Force",
-	Range = 3,
-	PathSize = 1,
+	Damage = 0,
 	PowerCost = 0, --AE Change
 	Upgrades = 0,
-	ZoneTargeting = ZONE_CUSTOM,
+	TwoClick = true,
 	TipImage = {
 		Unit = Point(2,3),
 		Enemy = Point(2,1),
@@ -5648,24 +5652,28 @@ end
 function Poke_ShadowForce:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
-	damage.sPawn = "GiratinaShadow"
+	damage.sPawn = "Poke_GiratinaShadow"
 	ret:AddDamage(damage)
 	damage.loc = p3
 	ret:AddDamage(damage)
 	return ret
 end
 
-Poke_GiratinaShadow = {
+Poke_GiratinaShadow = Pawn:new{
 	Health = 1,
 	MoveSpeed = 3,
 	Image = "Poke_GiratinaShadow",
+	Class = "TechnoVek",
 	Name = "Shadow",
 	GhostMovement = true,
+	Minor = true,
+	Neutral = true,
+	IsPortrait = false,
 	-- ImageOffset = 2,
 	SkillList = { "Poke_ConfuseRay", "Poke_DarkTendrils" },
 	-- SoundLocation = "/enemy/digger_1/",
 	ImpactMaterial = IMPACT_NONE,
-	DefaultTeam = TEAM_NONE,
+	DefaultTeam = TEAM_PLAYER,
 	IsPortrait = false,
 	Flying = true,
 }
