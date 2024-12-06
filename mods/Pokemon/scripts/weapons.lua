@@ -75,6 +75,7 @@ local files = {
 	"StoneAxe.png",
 	"XScissor.png",
 	"ConfuseRay.png",
+	"DarkTendrils.png",
 	"FlashCannon.png",
 	"Warpstrike.png",
 	"RoarOfTime.png",
@@ -141,6 +142,11 @@ modApi:appendAsset("img/effects/metalpunch2_D.png", resourcePath .."img/effects/
 modApi:appendAsset("img/effects/metalpunch2_L.png", resourcePath .."img/effects/metalpunch2_L.png")
 modApi:appendAsset("img/effects/metalpunch2_R.png", resourcePath .."img/effects/metalpunch2_R.png")
 modApi:appendAsset("img/effects/metalpunch2_U.png", resourcePath .."img/effects/metalpunch2_U.png")
+
+modApi:appendAsset("img/effects/tendril_D.png", resourcePath.."img/effects/tendril_D.png")
+modApi:appendAsset("img/effects/tendril_L.png", resourcePath.."img/effects/tendril_L.png")
+modApi:appendAsset("img/effects/tendril_R.png", resourcePath.."img/effects/tendril_R.png")
+modApi:appendAsset("img/effects/tendril_U.png", resourcePath.."img/effects/tendril_U.png")
 
 
 modApi:appendAsset("img/effects/icywind_R.png", resourcePath.."img/effects/icywind_R.png")
@@ -338,6 +344,11 @@ a.sacredswordanim_0 = a.explosmash_0:new{Image = "effects/smash_U.png",NumFrames
 a.sacredswordanim_1 = a.explosmash_1:new{Image = "effects/smash_R.png",NumFrames = 13,Time = 0.07,PosX = -24,PosY = -18,Frames={0,1,2}}
 a.sacredswordanim_2 = a.explosmash_2:new{Image = "effects/smash_D.png",NumFrames = 13,Time = 0.07,PosX = -22,PosY = -18,Frames={0,1,2}}
 a.sacredswordanim_3 = a.explosmash_3:new{Image = "effects/smash_L.png",NumFrames = 13,Time = 0.07,PosX = -22,PosY = -10,Frames={0,1,2}}
+
+a.tendril_0 = Animation:new{Image = "effects/tendril_R.png",NumFrames = 7,Time = 0.1,PosX = -35,PosY = -1,}
+a.tendril_1 = Animation:new{Image = "effects/tendril_D.png",NumFrames = 7,Time = 0.1,PosX = -10,PosY = -3}
+a.tendril_2 = Animation:new{Image = "effects/tendril_L.png",NumFrames = 7,Time = 0.1,PosX = 0,PosY = -1,}
+a.tendril_3 = Animation:new{Image = "effects/tendril_U.png",NumFrames = 7,Time = 0.1,PosX = -6,PosY = 19}
 
 
 
@@ -5347,7 +5358,7 @@ end
 Poke_Warpstrike = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/Warpstrike.png",
-	Description = "Swaps two adjacent terrains. Strikes units before teleporting them.",
+	Description = "Swaps two adjacent tiles, including units, terrain, and spawns. Strikes units before teleporting them.",
 	Name = "Warpstrike",
 	Damage = 1,
 	Range = 2,
@@ -5375,7 +5386,9 @@ Poke_Warpstrike_AB=Poke_Warpstrike:new{ Range=3, Damage = 2 }
 function Poke_Warpstrike:GetTargetArea(p1)
 	local ret = PointList()
 	for dir = DIR_START, DIR_END do
-		if not Board:IsBuilding(p1+DIR_VECTORS[dir]) then ret:push_back(p1+DIR_VECTORS[dir]) end
+		local curr = p1+DIR_VECTORS[dir]
+		local pawn = Board:GetPawn(curr)
+		if not (Board:IsBuilding(curr) or (pawn and pawn:IsGuarding())) then ret:push_back(curr) end
 	end
 	return ret
 end
@@ -5384,7 +5397,8 @@ function Poke_Warpstrike:GetSecondTargetArea(p1,p2)
 	local ret = PointList()
 	local targets = extract_table(general_DiamondTarget(p2, self.Range))
 	for k = 1, #targets do
-		if not Board:IsBuilding(targets[k]) then ret:push_back(targets[k]) end
+		local pawn = Board:GetPawn(targets[k])
+		if not (Board:IsBuilding(targets[k]) or (pawn and pawn:IsGuarding()) or (Board:IsSpawning(targets[k]) and Board:IsSpawning(p2))) then ret:push_back(targets[k]) end
 	end
 	return ret
 end
@@ -5418,8 +5432,13 @@ function Poke_Warpstrike:GetFinalEffect(p1, p2, p3)
 	ret:AddDamage(damage2)
 	local delay = Board:IsBlocked(p2, PATH_PROJECTILE) and 0 or FULL_DELAY
 	ret:AddTeleport(p2,p3, delay)
-	
-	if delay ~= FULL_DELAY then
+	if Board:IsSpawning(p2) then
+		ret:AddScript(string.format("GetCurrentMission():MoveSpawnPoint(%s, %s)", p2:GetString(), p3:GetString()))
+	end
+	if Board:IsSpawning(p3) then
+		ret:AddScript(string.format("GetCurrentMission():MoveSpawnPoint(%s, %s)", p3:GetString(), p2:GetString()))
+	end
+	if pawn2 then
 		ret:AddTeleport(p3,p2, FULL_DELAY)
 	end
 	return ret
@@ -5539,6 +5558,117 @@ function Poke_ConfuseRay:GetSkillEffect(p1, p2)
 	if Board:GetPawn(target) then ret:AddScript(string.format("Status.ApplyConfusion(%s, 2)", Board:GetPawn(target):GetId())) end
 	return ret
 end
+
+
+Poke_DarkTendrils = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/DarkTendrils.png",
+	Description = "Strike all tiles in a cross, blinding enemies hit. Blinds units hit, making Vek unable to target anything more than two tiles away.",
+	Name = "Dark Tendrils",
+	Damage = 1,
+	PathSize = 1,
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(1,2),
+		Enemy2 = Point(3,4),
+		Building = Point(3,2),
+		Target = Point(2,3),
+	}
+}
+
+function Poke_DarkTendrils:GetTargetArea(p1)
+	local ret = PointList()
+	ret:push_back(p1)
+	return ret
+end
+	
+function Poke_DarkTendrils:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
+		local pawn = Board:GetPawn(curr)
+		local damage = SpaceDamage(curr, self.Damage)
+		damage.sAnimation = "tendril_"..i
+		if pawn then damage.sScript = string.format("Status.ApplyBlind(%s)", pawn:GetId()) end
+		--else, add item to tile, define item, make it cancel/recalc weapons?
+		ret:AddDamage(damage)
+	end
+	return ret
+end
+
+
+Poke_ShadowForce = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/ShadowForce.png",
+	Description = "Creates two shadow clones.",
+	Name = "Shadow Force",
+	Range = 3,
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	Upgrades = 0,
+	ZoneTargeting = ZONE_CUSTOM,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Enemy2 = Point(3,2),
+		Enemy3 = Point(0,2),
+		Mountain = Point(3,1),
+		Friendly = Point(1,2),
+		Target = Point(3,2),
+	}
+}
+
+function Poke_ShadowForce:GetTargetArea(p1)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			ret:push_back(Point(i,j))
+		end 
+	end
+	return ret
+end
+
+function Poke_ShadowForce:GetSecondTargetArea(p1, p2)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			if p1 ~= Point(i,j) then ret:push_back(Point(i,j)) end
+		end 
+	end
+	return ret
+end
+	
+function Poke_ShadowForce:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	ret:AddDamage(SpaceDamage(p1, 0))
+	return ret
+end
+
+function Poke_ShadowForce:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2)
+	damage.sPawn = "GiratinaShadow"
+	ret:AddDamage(damage)
+	damage.loc = p3
+	ret:AddDamage(damage)
+	return ret
+end
+
+Poke_GiratinaShadow = {
+	Health = 1,
+	MoveSpeed = 3,
+	Image = "Poke_GiratinaShadow",
+	Name = "Shadow",
+	GhostMovement = true,
+	-- ImageOffset = 2,
+	SkillList = { "Poke_ConfuseRay", "Poke_DarkTendrils" },
+	-- SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_NONE,
+	DefaultTeam = TEAM_NONE,
+	IsPortrait = false,
+	Flying = true,
+}
 
 
 Poke_Wither = LineArtillery:new{
@@ -5944,7 +6074,7 @@ Poke_Trample=Skill:new{
 }
 Poke_Trample_A=Poke_Trample:new{ UpgradeDescription = "On stopping, push adjacent tiles.", Push = true }
 Poke_Trample_B=Poke_Trample:new{ UpgradeDescription = "Crack all tiles trampled.", Crack = 1 }
-Poke_Trample_B=Poke_Trample:new{ Push = true, Crack = 1 }
+Poke_Trample_AB=Poke_Trample:new{ Push = true, Crack = 1 }
 
 
 function Poke_Trample:GetTargetArea(p1)
@@ -5978,6 +6108,7 @@ function Poke_Trample:GetSkillEffect(p1, p2)
 		local damage = SpaceDamage(curr, self.Damage)
 		damage.iCrack = self.Crack
 		if i == dist - 1 and self.Push then damage.iPush = (dir+2)%4 end
+		if Board:GetTerrain(curr) == TERRAIN_MOUNTAIN then ret:AddDamage(SpaceDamage(curr, 1)) end 		--to make sure we oneshot mountains
 		if i > 0 and i < dist then ret:AddDamage(damage) end
 		if i == dist and targetPawn then ret:AddScript(string.format("Board:GetPawn(%s):Kill(false)", targetPawn:GetId())) end
 		ret:AddDelay(0.1)

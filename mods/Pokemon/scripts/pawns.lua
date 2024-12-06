@@ -301,6 +301,8 @@ local files = {
 	"Giratina_a.png",
 	"Giratina_h.png",
 	"Giratina_ns.png",
+	"GiratinaShadow.png",
+	"GiratinaShadow_a.png",
 	
 	"Arceus.png",
 	"Arceus_a.png",
@@ -666,7 +668,7 @@ a.Poke_Palkia =a.MechUnit:new{Image="units/player/Palkia.png", PosX = -10, PosY 
 a.Poke_Palkiaa = a.MechUnit:new{Image="units/player/Palkia_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
 a.Poke_Palkia_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Palkia_ns = a.MechIcon:new{Image="units/player/Palkia_ns.png"}
-a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -12, PosY = 10}
+a.Poke_Palkiaw =a.MechUnit:new{Image="units/player/Palkia_w.png", PosX = -35, PosY = -21}
 a.Poke_Palkia_sleep = a.MechUnit:new{Image="units/player/Palkia_sleep.png",  PosX = -32, PosY = -12, NumFrames = 2, Time = 1.5 }
 a.Poke_PalkiaOrigin =a.MechUnit:new{Image="units/player/PalkiaOrigin.png", PosX = -10, PosY = -4}
 a.Poke_PalkiaOrigina = a.MechUnit:new{Image="units/player/PalkiaOrigin_a.png",  PosX = -35, PosY = -21, NumFrames = 4 }
@@ -679,6 +681,8 @@ a.Poke_Giratina =a.MechUnit:new{Image="units/player/Giratina.png", PosX = -10, P
 a.Poke_Giratinaa = a.MechUnit:new{Image="units/player/Giratina_a.png",  PosX = -35, PosY = -30, NumFrames = 16 }
 a.Poke_Giratina_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Giratina_ns = a.MechIcon:new{Image="units/player/Giratina_ns.png"}
+a.Poke_GiratinaShadow =a.MechUnit:new{Image="units/player/GiratinaShadow.png", PosX = -10, PosY = -4}
+a.Poke_GiratinaShadowa = a.MechUnit:new{Image="units/player/GiratinaShadow_a.png",  PosX = -35, PosY = -30, NumFrames = 16 }
 
 a.Poke_Arceus =a.MechUnit:new{Image="units/player/Arceus.png", PosX = -10, PosY = -4}
 a.Poke_Arceusa = a.MechUnit:new{Image="units/player/Arceus_a.png",  PosX = -25, PosY = -30, NumFrames = 8 }
@@ -1239,8 +1243,8 @@ Poke_Giratina = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
 	EvoForget = { "", "" },
-	EvoLearn = { { { "Poke_DarkPulse" }, { } } },
-	-- KeepAdding = { "", "Poke_ShadowForce" },
+	EvoLearn = { { { "Poke_DarkTendrils" }, { } } },
+	KeepAdding = { "", "Poke_ShadowForce" },
 }
 
 Poke_Arceus = Pawn:new{
@@ -1277,6 +1281,7 @@ Poke_Metanitar = Pawn:new{
 	ImpactMaterial = IMPACT_METAL,
 	HasEvolutions = { true, false },
 	EvoLearn = { { { "Poke_PsychicTerror" }, { } } },
+	EvoForget = { "", "" },
 }
 
 
