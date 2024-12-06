@@ -458,23 +458,13 @@ function Meta_ElectrifiedWeapon:GetSkillEffect(p1, p2)	--unholy fusion of the us
 		for i = 1, fx.q_effect:size() do
 			local curr_space_damage = fx.q_effect:index(i)
 			new_damage_list:push_back(curr_space_damage)
-			-- explored[hash(curr_space_damage.loc)] = true
 			if curr_space_damage.iDamage > 0 and curr_space_damage.iDamage ~= DAMAGE_ZERO then 
-				-- for i = DIR_START, DIR_END do
-					-- local neighbor = curr_space_damage.loc + DIR_VECTORS[i]
-					-- if Board:IsValid(neighbor) and not explored[hash(neighbor)] then
-						-- todo[#todo + 1] = neighbor
-						-- origin[hash(neighbor)] = curr_space_damage.loc
-					-- end
-				-- end
 				todo[#todo + 1] = curr_space_damage.loc
 				origin[hash(curr_space_damage.loc)] = p1
 			end
 		end
-		LOG(#todo.." spreading points.")
 		while #todo ~= 0 do
 			local current = pop_back(todo)
-			LOG("Electrified hit spreading from "..current:GetString())
 			if not explored[hash(current)] then
 				explored[hash(current)] = true
 				if Board:IsPawnSpace(current) or Board:GetTerrain(current) == TERRAIN_BUILDING then
