@@ -42,6 +42,11 @@ ANIMS.StatusToxin = Animation:new{ Image = "libs/status/toxin.png", PosX = 0, Po
 ANIMS.StatusWeaken = Animation:new{ Image = "libs/status/weaken.png", PosX = -15, PosY = 0, NumFrames = 6, Time = 0.1, Loop = true}
 ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
 
+ANIMS.StatusInsanity1 = Animation:new{ Image = "libs/status/Insanity1.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusInsanity2 = Animation:new{ Image = "libs/status/Insanity2.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusInsanity3 = Animation:new{ Image = "libs/status/Insanity3.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusInsanity4 = Animation:new{ Image = "libs/status/Insanity4.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 4, Frames={0,1,2,3,2,1,0}, Time = 0.75, Loop = true}
 
 
 
@@ -94,6 +99,9 @@ function Skill:ScoreList(list, queued)
 			end
 		end
 	else
+	
+		if mission.BlindTable[id] then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
+	
 		for i = 1, list:size() do
 			local spaceDamage = list:index(i)
 			local target = spaceDamage.loc
@@ -129,7 +137,7 @@ function Skill:ScoreList(list, queued)
 					end
 					if Board:IsPawnSpace(target) and mission.TargetedTable[Board:GetPawn(target):GetId()] then score = score + mission.TargetedTable[foundPawn:GetId()] end
 				end
-			end
+			elseif mission.BlindTable[id] then LOG("Blinded to a damage in "..target:GetString()..".") end
 		end
 	end
 	if mission.ConfusionTable[Pawn:GetId()] ~= nil then 
@@ -510,11 +518,38 @@ function Status.ApplyWet(id)
 	end
 end
 
+function Status.ApplyInsanity(id, amount)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	amount = amount or 1
+	if amount == 0 then return end
+	if _G[pawn:GetType()].InsanityImmune then return end
+	if pawn:GetPersonality() == "Artificial" then return end
+	if mission.InsanityTable[id] == nil or mission.InsanityTable[id] == 0 then
+		for i = 1, 5 do		--try to get back the amount of insanity in case it's gone
+			
+			if CustomAnim:get(id, "StatusInsanity"..i) ~= nil then mission.InsanityTable[id] = i LOG(i) break end
+		end
+	end
+	local insanityCount = mission.InsanityTable[id] or 0
+	local newInsanityCount = math.min(amount + insanityCount, 5)
+	if newInsanityCount <= 0 then Status.RemoveStatus(id, "Insanity") return end
+	mission.InsanityTable[id] = newInsanityCount
+	if insanityCount > 0 and CustomAnim:get(id, "StatusInsanity"..insanityCount) then CustomAnim:rem(id, "StatusInsanity"..insanityCount) end
+	CustomAnim:add(id, "StatusInsanity"..newInsanityCount)
+	if newInsanityCount >= 5 then 
+		fx = SkillEffect()
+		fx:AddVoice("Meta_GoingInsane"..math.random(1,14), id)
+		Board:AddEffect(fx)
+	end
+end
+
 
 function Status.RemoveStatus(id, status)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
-	CustomAnim:rem(id, "Status"..status)
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if not mission[status.."Table"][id] then return end
@@ -544,6 +579,11 @@ function Status.RemoveStatus(id, status)
 		end
 		CustomAnim:rem(id, "StatusGlory")
 		mission["GloryTable"][id] = nil 
+	elseif status == "Insanity" then
+		LOG(mission["InsanityTable"][id])
+		CustomAnim:rem(id, "StatusInsanity"..mission["InsanityTable"][id])
+		mission["InsanityTable"][id] = nil 
+	
 	else
 		CustomAnim:rem(id, "Status"..status)
 		mission[status.."Table"][id] = nil 
@@ -559,7 +599,7 @@ function Status.GetStatus(id, status)
 end
 
 function Status.List()
-	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet"}
+	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
 end
 
 function Status.Count(id)
@@ -632,6 +672,33 @@ local function WakeUp()
 	for i = 0, 2 do
 		Status.RemoveStatus(i, "Sleep")
 	end
+end
+
+local function StoreInsanity()
+	LOG("store insanity")
+	local mission = GetCurrentMission()
+	if GAME.InsanityTable == nil then GAME.InsanityTable = {} end
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn and mission.InsanityTable[pawn:GetId()] and mission.InsanityTable[pawn:GetId()] > 0 then
+			GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] = mission.InsanityTable[pawn:GetId()]
+		end
+	end
+end
+
+local function ReaddInsanity()
+	modApi:conditionalHook(function()			--we need the conditional hook to wait for PrepareTables
+		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario()) and GetCurrentMission().InsanityTable ~= nil
+	end, 
+	function()
+		local mission = GetCurrentMission()
+		for i = 0, 2 do
+			local pawn = Board:GetPawn(i)
+			if pawn and GAME.InsanityTable ~= nil and GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] and GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] > 0 then
+				Status.ApplyInsanity(pawn:GetId(), GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)])
+			end
+		end
+	end)
 end
 
 local function EVENT_onModsLoaded()
@@ -748,10 +815,12 @@ local function EVENT_onModsLoaded()
 	modApi:addPreLoadGameHook(GenerateWeakenWeapons)					--also do it on reload otherwise the game is not happy
 	
 	modApi:addMissionStartHook(PrepareTables)							--create tables for all statuses so we don't have to check everywhere
+	modApi:addMissionStartHook(ReaddInsanity)							
 	modApi:addMissionNextPhaseCreatedHook(PrepareTables)				--also do it on next phase otherwise it won't work
 	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
 	
 	modApi:addMissionEndHook(WakeUp)									--remove sleep status because unpowered carries over
+	modApi:addMissionEndHook(StoreInsanity)	
 	
 	modApi:addPreEnvironmentHook(function(mission)						--this is for status that triggers before Vek actions
 		for _, p in ipairs(Board) do
@@ -1018,4 +1087,23 @@ if _G["BurrowerAtkB"] == nil and _G["BurrowerAtk2"] ~= nil then
 	end
 end
 
+--voice lines for reaching insanity 5
+for k, v in pairs(Personality) do
+	if v["Meta_GoingInsane1"] == nil then
+		v["Meta_GoingInsane1"] = "Ïa! Ïa!"
+		v["Meta_GoingInsane2"] = "Cthulhu fhtagn!"
+		v["Meta_GoingInsane3"] = "Impossible shapes and cyclopean obelisks!"
+		v["Meta_GoingInsane4"] = "A billion eyes stare at me from a billion seals!"
+		v["Meta_GoingInsane5"] = "It comes from the gateless gate!"
+		v["Meta_GoingInsane6"] = "The seal is breaking apart!"
+		v["Meta_GoingInsane7"] = "We are nothing!"
+		v["Meta_GoingInsane8"] = "The Deep Ones demand sacrifice!"
+		v["Meta_GoingInsane9"] = "Shatter the buildings! Feed the civilians to the sea!"
+		v["Meta_GoingInsane10"] = "The dreams seep in on the edges of my sight!"
+		v["Meta_GoingInsane11"] = "The light of the North Star, breaking the minds of children!"
+		v["Meta_GoingInsane12"] = "We are like lambs to the slaughter! No - ants trampled underfoot!"
+		v["Meta_GoingInsane13"] = "Doom, ruin, and dust!"
+		v["Meta_GoingInsane14"] = "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!"
+	end
+end
 return true

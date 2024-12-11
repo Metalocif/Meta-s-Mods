@@ -323,12 +323,11 @@ end
 function CyborgWeapons_Quickspit:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2, self.Damage)
-	damage.iAcid = 1		--Wrote true instead of 1, game doesn't like that, thanks Pilot_Arrogant
+	damage.iAcid = 1	
 	damage.sAnimation = "ExploAcid1"
 	local mission = GetCurrentMission()
 	if mission then
 		if not mission.LastQuickspitTurn then mission.LastQuickspitTurn = -1 end
-		local mission = GetCurrentMission()
 		if mission.LastQuickspitTurn ~= Game:GetTurnCount() then
 			damage.sScript = string.format("Board:GetPawn(%s):SetActive(true)",Board:GetPawn(p1):GetId())
 		end

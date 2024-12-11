@@ -1,7 +1,7 @@
 
-local VERSION = "3.1.3"
+local VERSION = "3.2"
 ----------------------------------------------------------------------
--- Weapon Preview v3.1.3 - code library
+-- Weapon Preview v3.2 - code library
 -- https://github.com/Lemonymous/ITB-LemonymousMods/wiki/weaponPreview
 --
 -- by Lemonymous
@@ -181,6 +181,12 @@ local getTargetAreaCallers = {}
 local getSkillEffectCallers = {}
 local oldGetTargetAreas = {}
 local oldGetSkillEffects = {}
+
+local getSecondTargetAreaCallers = {}
+local getFinalEffectCallers = {}
+local oldGetSecondTargetAreas = {}
+local oldGetFinalEffects = {}
+
 local armedTargetAreaTimer = 0
 local armedSkillEffectTimer = 0
 local queuedSkillEffectTimer = 0
@@ -546,6 +552,77 @@ local function getSkillEffect(self, p1, p2, ...)
 	return result or oldGetSkillEffects[skillId](self, p1, p2, ...)
 end
 
+
+
+local function getSecondTargetArea(self, p1, p2, ...)
+	local skillId = getSecondTargetAreaCallers[#getSecondTargetAreaCallers]
+	local pawn = p1 and Board:GetPawn(p1) or Pawn
+	local result = nil
+	if pawn and previewState == STATE_NONE and not Board:IsTipImage() then
+		actingMarker:setArmed(pawn)
+
+		-- if skillId == actingMarker.weapon and actingMarker ~= targetMarker then
+			if targetMarker:isActive() then
+				events.onTargetAreaHidden:dispatch(targetMarker:unpack())
+				targetMarker:clear()
+			end
+			
+			previewState = STATE_TARGET_AREA
+			previewMarks[previewState] = {}
+
+			targetMarker:copy(actingMarker)
+			events.onTargetAreaShown:dispatch(targetMarker:unpack())
+
+			result = oldGetSecondTargetAreas[skillId](self, p1, p2, ...)
+			previewTargetArea = result
+			previewState = STATE_NONE
+		-- end
+	end
+
+	return result or oldGetSecondTargetAreas[skillId](self, p1, p2, ...)
+end
+
+local function getFinalEffect(self, p1, p2, p3, ...)
+	local skillId = getFinalEffectCallers[#getFinalEffectCallers]
+	local pawn = p1 and Board:GetPawn(p1) or Pawn
+	local result = nil
+
+	if pawn and previewState == STATE_NONE and not Board:IsTipImage() then
+
+		actingMarker:setArmed(pawn)
+
+		if skillId == actingMarker.weapon then
+			if effectMarker ~= actingMarker and effectMarker:isActive() then
+				events.onSkillEffectHidden:dispatch(effectMarker:unpack())
+				effectMarker:clear()
+			end
+
+			previewState = STATE_SKILL_EFFECT
+			previewMarks[previewState] = {}
+
+			if effectMarker:isInActive() then
+				effectMarker:copy(actingMarker)
+				events.onSkillEffectShown:dispatch(effectMarker:unpack())
+			end
+
+			result = oldGetFinalEffects[skillId](self, p1, p2, p3, ...)
+			previewState = STATE_NONE
+
+		elseif pawn and skillId == pawn:GetQueuedWeapon() then
+			previewState = STATE_QUEUED_SKILL
+			previewMarks[previewState] = {}
+
+			result = oldGetFinalEffects[skillId](self, p1, p2, p3, ...)
+			queuedPreviewMarks[pawn:GetId()] = previewMarks[previewState]
+			previewState = STATE_NONE
+		end
+	end
+
+	return result or oldGetFinalEffects[skillId](self, p1, p2, ...)
+end
+
+
+
 local function getPreviewLength(marks)
 	local delay = 0
 	local length = 0
@@ -714,6 +791,14 @@ local function overrideAllSkillMethods()
 			oldGetSkillEffects[skillId] = skill.GetSkillEffect
 			skill.__Id = skillId
 		end
+		if type(skill.GetSecondTargetArea) == 'function' then
+			oldGetSecondTargetAreas[skillId] = skill.GetSecondTargetArea
+			skill.__Id = skillId
+		end
+		if type(skill.GetFinalEffect) == 'function' then
+			oldGetFinalEffects[skillId] = skill.GetFinalEffect
+			skill.__Id = skillId
+		end
 	end
 
 	for skillId, _ in pairs(oldGetTargetAreas) do
@@ -721,11 +806,8 @@ local function overrideAllSkillMethods()
 
 		function skill.GetTargetArea(...)
 			getTargetAreaCallers[#getTargetAreaCallers + 1] = skillId
-
 			local result = getTargetArea(...)
-
 			getTargetAreaCallers[#getTargetAreaCallers] = nil
-
 			return result
 		end
 	end
@@ -735,11 +817,30 @@ local function overrideAllSkillMethods()
 
 		function skill.GetSkillEffect(...)
 			getSkillEffectCallers[#getSkillEffectCallers + 1] = skillId
-
 			local result = getSkillEffect(...)
-
 			getSkillEffectCallers[#getSkillEffectCallers] = nil
+			return result
+		end
+	end
+	
+	for skillId, _ in pairs(oldGetSecondTargetAreas) do
+		local skill = _G[skillId]
 
+		function skill.GetSecondTargetArea(...)
+			getSecondTargetAreaCallers[#getSecondTargetAreaCallers + 1] = skillId
+			local result = getSecondTargetArea(...)
+			getSecondTargetAreaCallers[#getSecondTargetAreaCallers] = nil
+			return result
+		end
+	end
+
+	for skillId, _ in pairs(oldGetFinalEffects) do
+		local skill = _G[skillId]
+
+		function skill.GetFinalEffect(...)
+			getFinalEffectCallers[#getFinalEffectCallers + 1] = skillId
+			local result = getFinalEffect(...)
+			getFinalEffectCallers[#getFinalEffectCallers] = nil
 			return result
 		end
 	end
@@ -759,6 +860,11 @@ local function initGlobals()
 	events.onSkillEffectHidden = Event()
 	events.onQueuedSkillEffectShown = Event()
 	events.onQueuedSkillEffectHidden = Event()
+	
+	events.onSecondTargetAreaShown = Event()
+	events.onSecondTargetAreaHidden = Event()
+	events.onFinalEffectShown = Event()
+	events.onFinalEffectHidden = Event()
 end
 
 local function onModsInitialized()
@@ -788,7 +894,6 @@ if isNewestVersion then
 	function WeaponPreview:finalizeInit()
 		overrideAllSkillMethods()
 		initGlobals()
-
 		WeaponPreview.AddAnimation = addAnimation
 		WeaponPreview.AddColor = addColor
 		WeaponPreview.AddDamage = addDamage

@@ -138,7 +138,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 	if mission.WyvernStomach == nil then mission.WyvernStomach = 0 end	--should not be the case at this point
 	
 	if p3 == p1 then	--we do multishot projectiles instead of artillery at several tiles
-		if remainingShots == nil then  remainingShots = mission.WyvernStomach end
+		if remainingShots == nil then remainingShots = mission.WyvernStomach end
 		local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
 		local damage = SpaceDamage(target, self.MinDamage)
 		damage.sAnimation = "ExploAcid1"
