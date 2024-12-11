@@ -5559,7 +5559,7 @@ function Poke_ConfuseRay:GetSkillEffect(p1, p2)
 	local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
 	local damage = SpaceDamage(target, self.Damage, DIR_FLIP)
 	ret:AddSound(self.LaunchSound)
-	ret:AddProjectile(p1, damage, "effects/flashcannon", PROJ_DELAY)
+	ret:AddProjectile(p1, damage, "effects/confuseray", PROJ_DELAY)
 	if Board:GetPawn(target) then ret:AddScript(string.format("Status.ApplyConfusion(%s, 2)", Board:GetPawn(target):GetId())) end
 	return ret
 end
@@ -5595,7 +5595,11 @@ function Poke_DarkTendrils:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(curr)
 		local damage = SpaceDamage(curr, self.Damage)
 		damage.sAnimation = "tendril_"..i
-		if pawn then damage.sScript = string.format("Status.ApplyBlind(%s)", pawn:GetId()) end
+		if pawn then 
+			damage.sScript = string.format("Status.ApplyBlind(%s)", pawn:GetId())
+		elseif not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsFire(curr) or (Board:GetItem(curr) ~= "" and Board:GetItem(curr) ~= "Poke_DarkTendrilsItem")) then
+			damage.sItem = "Poke_DarkTendrilsItem"
+		end
 		--else, add item to tile, define item, make it cancel/recalc weapons?
 		ret:AddDamage(damage)
 	end
@@ -5668,13 +5672,12 @@ Poke_GiratinaShadow = Pawn:new{
 	GhostMovement = true,
 	Minor = true,
 	Neutral = true,
-	IsPortrait = false,
+	IsPortrait = true,
 	-- ImageOffset = 2,
 	SkillList = { "Poke_ConfuseRay", "Poke_DarkTendrils" },
 	-- SoundLocation = "/enemy/digger_1/",
 	ImpactMaterial = IMPACT_NONE,
 	DefaultTeam = TEAM_PLAYER,
-	IsPortrait = false,
 	Flying = true,
 }
 

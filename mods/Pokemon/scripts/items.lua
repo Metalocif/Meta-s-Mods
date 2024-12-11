@@ -4,6 +4,7 @@ modApi:appendAsset("img/effects/item_seedflare.png", resourcePath.."img/effects/
 modApi:appendAsset("img/effects/item_gracidea.png", resourcePath.."img/effects/item_gracidea.png")
 modApi:appendAsset("img/effects/item_stealthrocks.png", resourcePath.."img/effects/item_stealthrocks.png")
 modApi:appendAsset("img/effects/item_puddle.png", resourcePath.."img/effects/item_puddle.png")
+modApi:appendAsset("img/effects/item_shadow.png", resourcePath.."img/effects/item_shadow.png")
 for i = 1,4 do
 modApi:appendAsset("img/effects/item_rubble"..i..".png", resourcePath.."img/effects/item_rubble"..i..".png")
 end
@@ -13,6 +14,7 @@ merge_table(TILE_TOOLTIPS, { Poke_SeedFlare_Text = {"Seed Flare", "Deals 3 Damag
 						     Poke_Gracidea_Text = {"Gracidea", "Boosts units that move onto it."},
 							 Poke_StealthRock_Text = {"Stealth Rocks", "Deals 1 damage to units that move onto it, doubled against flying units."},
 							 Poke_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}, 
+							 Poke_Shadow_Text = {"Shadow", "Blinds pawns that step on it."}, 
 							 Poke_TimeRune_Text = {"Runes", "When a mech performs an action on this tile, it will be able to act again. Limited-use weapons will also be reloaded."}
 						   })	
 
@@ -27,6 +29,8 @@ Poke_StealthRock = { Image = "effects/item_stealthrocks.png", Damage = SpaceDama
 Location["effects/item_stealthrocks.png"] = Point(-15,0)
 Poke_Puddle = { Image = "effects/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Poke_Puddle_Text", Icon = "effects/item_puddle.png", UsedImage = ""}
 Location["effects/item_puddle.png"] = Point(-22,6)
+Poke_DarkTendrilsItem = { Image = "effects/item_shadow.png", Damage = SpaceDamage(0), Tooltip = "Poke_Shadow_Text", Icon = "effects/item_shadow.png", UsedImage = ""}
+Location["effects/item_shadow.png"] = Point(-27,2)
 Poke_Rubble1 = { Image = "effects/item_rubble1.png", Damage = rubbledamage, Tooltip = "", Icon = "effects/item_rubble1.png", UsedImage = "effects/item_rubble_crushed.png"}
 Poke_Rubble2 = { Image = "effects/item_rubble2.png", Damage = rubbledamage, Tooltip = "", Icon = "effects/item_rubble2.png", UsedImage = "effects/item_rubble_crushed.png"}
 Poke_Rubble3 = { Image = "effects/item_rubble3.png", Damage = rubbledamage, Tooltip = "", Icon = "effects/item_rubble3.png", UsedImage = "effects/item_rubble_crushed.png"}
@@ -78,6 +82,19 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 			local damage = SpaceDamage(loc, tonumber(string.sub(removed_item, -1)))
 			damage.sAnimation = "confusionAnim"
 			Board:DamageSpace(damage) 
+		end
+	elseif removed_item == "Poke_DarkTendrilsItem" then
+		if pawn then
+			Status.ApplyBlind(pawn:GetId())
+			--recalc best attack target/cancel attack if target is too far away	(either p2 or all instances of spacedamage)
+			if pawn:IsQueued() then
+				if loc:Manhattan(pawn:GetQueuedTarget()) > 2 then pawn:ClearQueued() Board:AddAlert(loc, "Blinded!") end
+				local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(loc, pawn:GetQueuedTarget())
+				for i = 1, fx.q_effect:size() do
+					local targetLoc = fx.q_effect:index(i).loc
+					if targetLoc:Manhattan(loc) > 2 then pawn:ClearQueued() Board:AddAlert(loc, "Blinded!") end
+				end
+			end
 		end
 	end
 end)

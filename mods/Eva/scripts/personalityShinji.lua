@@ -29,7 +29,7 @@ local tbl = {
 	MissionEnd_Dead = {"Are they cheering for us?"},
 	MissionEnd_Retreat = {"I hope the people are safe."},
 
-	MissionFinal_Start = {"Sorry, but I am not diving in lava again.", "Did we check nothing is inside that volcano?"},
+	MissionFinal_Start = {"Sorry, but I am not diving in lava again.", "Did we check nothing is inside that volcano?", "We need power to fight, I think."},
 	MissionFinal_StartResponse = {"Unit 01 charged!", "I will not run away!"},
 	MissionFinal_FallStart = {},
 	MissionFinal_FallResponse = {"Aaaaaaaaaaaaaaaah!"},
@@ -146,24 +146,12 @@ local tbl = {
 
 	
 	-- Island missions
-	Mission_tosx_Juggernaut_Destroyed = {
-		"I'm sorry.",
-	},
-	Mission_tosx_Juggernaut_Ram = {
-		"Whoa! Be careful, everyone."
-	},
-	Mission_tosx_Zapper_On = {
-		"We can zap them from far away? Great!"
-	},
-	Mission_tosx_Zapper_Destroyed = {
-		"I'm sorry.",
-	},
-	Mission_tosx_Warper_Destroyed = {
-		"I'm sorry.",
-	},
-	Mission_tosx_Battleship_Destroyed = {
-		"I'm sorry."
-	},
+	Mission_tosx_Juggernaut_Destroyed = { "I'm sorry.",},
+	Mission_tosx_Juggernaut_Ram = {"Whoa! Be careful, everyone."},
+	Mission_tosx_Zapper_On = {"We can zap them from far away? Great!"},
+	Mission_tosx_Zapper_Destroyed = {"I'm sorry.",},
+	Mission_tosx_Warper_Destroyed = {"I'm sorry.",},
+	Mission_tosx_Battleship_Destroyed = {"I'm sorry."},
 	
 	
 	

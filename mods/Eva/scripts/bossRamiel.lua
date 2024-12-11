@@ -28,7 +28,6 @@ AddPawnName("EVA_RamielBoss")
 
 local mod = mod_loader.mods[modApi.currentMod]
 local resourcePath = mod.resourcePath
-LOG(resourcePath)
 local writepath = "img/units/aliens/"
 local readpath = resourcePath .. writepath
 local imagepath = writepath:sub(5,-1)
@@ -47,7 +46,7 @@ a.EVA_RamielBosse = baseEmerge
 a.EVA_RamielBossa = base:new{ Image = "units/aliens/EVA_RamielBossa.png", NumFrames = 12, PosX = -23, PosY = -16, Height = 1 }
 a.EVA_RamielBossd = base:new{ Image = "units/aliens/EVA_RamielBoss_death.png", Loop = false, NumFrames = 10, Time = .15, Height = 1 }
 
-modApi:appendAsset("img/portraits/enemy/EVA_RamielBoss.png", resourcePath.."img/portraits/enemy/EVA_RamielBoss.png")
+-- modApi:appendAsset("img/portraits/enemy/EVA_RamielBoss.png", resourcePath.."img/portraits/enemy/EVA_RamielBoss.png")
 
 local effects = {
 	"ramiellaser_hit.png",
@@ -105,7 +104,7 @@ function EVA_RamielBossAtk1:AddLaser(ret,point,direction,queued,forced_end)
 			if queued then
 				ret:AddQueuedDamage(dam)  
 			else
-				ret:AddDamage(dam)   --JUSTIN TEST
+				ret:AddDamage(dam)
 			end
 		end
 		
