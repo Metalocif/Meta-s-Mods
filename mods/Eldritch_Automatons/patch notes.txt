@@ -1,2 +1,6 @@
+v1.0.1
+- Fixed a bug with the Tentacular mech.
+- Added a squad icon.
+
 v1.0
 - Release.

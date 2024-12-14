@@ -46,7 +46,7 @@ function mod:load( options, version)
 		},
 		"Eldritch Mechs",
 		"Based on designs by a mad scientist in a lost timeline, these mechs grant great power to their pilots, but drive them slowly insane.",
-		self.resourcePath .."img/mod_icon.png"
+		self.resourcePath .."mod_icon.png"
 	)
 	-- modApi:addPopEvent("InsanityBuilding", "Ïa! Ïa!")
 	-- modApi:addPopEvent("InsanityBuilding", "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!")

@@ -152,7 +152,7 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2,boosted)
 	if Board:IsPawnSpace(target) and not Board:GetPawn(target):IsGuarding() then	-- If it's a pawn
 		ret:AddCharge(Board:GetSimplePath(target, p1 + DIR_VECTORS[direction]), FULL_DELAY)
 		if not Board:IsPawnTeam(target, TEAM_PLAYER) then
-			if isMelee then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
+			if isMelee and self.Doomed then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
 			ret:AddDamage(SpaceDamage(p1 + DIR_VECTORS[direction],damageAmount))
 		elseif p1:Manhattan(target)>3 then 
 			mission.flag2 = true 
@@ -160,8 +160,8 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2,boosted)
 	elseif Board:IsBlocked(target, Pawn:GetPathProf()) then     --If it's an obstruction
 		if p1:Manhattan(target)>3 then mission.flag1 = true end
 		ret:AddCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), FULL_DELAY)	
-		if not Board:IsPawnTeam(target, TEAM_PLAYER) then
-			if isMelee then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
+		if isInsane or (Board:IsPawnSpace(target) and not Board:IsPawnTeam(target, TEAM_PLAYER)) then
+			if isMelee and self.Doomed and Board:IsPawnSpace(target) then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
 			ret:AddDamage(SpaceDamage(target,damageAmount))
 		end
 	end
@@ -171,7 +171,7 @@ end
 
 local function GetSubsequentLocation(p1,p2)
 	local firstTarget = GetProjectileEnd(p1, p1+DIR_VECTORS[GetDirection(p2-p1)])
-	if (Board:IsPawnSpace(firstTarget) and Board:GetPawn(firstTarget):IsGuarding()) or Board:GetTerrain(firstTarget) == TERRAIN_MOUNTAIN or Board:GetTerrain(firstTarget) == TERRAIN_BUILDING then
+	if Board:IsValid(firstTarget) and (Board:IsPawnSpace(firstTarget) and Board:GetPawn(firstTarget):IsGuarding()) or Board:GetTerrain(firstTarget) == TERRAIN_MOUNTAIN or Board:GetTerrain(firstTarget) == TERRAIN_BUILDING then
 		return firstTarget - DIR_VECTORS[GetDirection(p2-p1)]
 	else
 		return p1
