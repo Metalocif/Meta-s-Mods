@@ -48,7 +48,10 @@ function mod:init()
 	if modApi.achievements:isComplete(mod.id,"Meta_BlownAway") then modApi:addWeaponDrop("Meta_TechnoMothWeapon") end
 	if modApi.achievements:isComplete(mod.id,"Meta_GaiasCradle") then modApi:addWeaponDrop("Meta_TechnoDiggerWeapon") end
 	if modApi.achievements:isComplete(mod.id,"Meta_RenfieldWho") then modApi:addWeaponDrop("Meta_TechnoTumblebugWeapon") end
-	if modApi.achievements:isComplete(mod.id,"Meta_BlownAway") and modApi.achievements:isComplete(mod.id,"Meta_GaiasCradle") and modApi.achievements:isComplete(mod.id,"Meta_RenfieldWho") then modApi:addWeaponDrop("Meta_Geomancy") end
+	if modApi.achievements:isComplete(mod.id,"Meta_BlownAway") and modApi.achievements:isComplete(mod.id,"Meta_GaiasCradle") and modApi.achievements:isComplete(mod.id,"Meta_RenfieldWho") then	
+		require(mod_loader.mods.meta_mods.Meta_Pokemon.scriptPath.."weathers")
+		modApi:addWeaponDrop("Meta_Geomancy") 
+	end
 end
 
 function mod:load( options, version)

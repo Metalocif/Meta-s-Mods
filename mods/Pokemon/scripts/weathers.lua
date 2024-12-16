@@ -9,11 +9,11 @@
 -- See the wiki: https://github.com/Metalocif/Meta-s-Mods/wiki
 
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-local customEmitter = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/customEmitter")
-local status = require(mod_loader.mods[modApi.currentMod].scriptPath .."libs/status")
+local customEmitter = require(mod_loader.mods.meta_mods.scriptPath.."libs/customEmitter")
+local status = require(mod_loader.mods.meta_mods.scriptPath .."libs/status")
 Weathers = {}
 
-modApi:appendAsset("img/libs/weather/sun.png", path .."img/libs/weather/sun.png")
+modApi:appendAsset("img/libs/weather/sun.png", path .."img/weather/sun.png")
 ANIMS.WeatherSun = Animation:new{ Image = "libs/weather/sun.png",PosX = -35, PosY = -20, NumFrames = 1, Time = 1, Loop = true}
 
 Emitter_Sandstorm_1 = Emitter_Wind_0:new{ timer = 1, x = -60, y = 0, angle = 40, burst_count = 50, max_particles = 150, min_alpha = 0.2, max_alpha = 0.3, layer = LAYER_FRONT, fade_in = true,}

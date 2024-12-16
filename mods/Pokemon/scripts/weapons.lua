@@ -3,7 +3,7 @@ local artilleryArc = require(mod_loader.mods.meta_mods.scriptPath.."libs/artille
 local weaponArmed = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponArmed")
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
 local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
-require(mod_loader.mods.meta_mods.scriptPath.."libs/weathers")
+require(mod_loader.mods[modApi.currentMod].scriptPath.."weathers")
 require(mod_loader.mods.meta_mods.scriptPath.."libs/status")
 
 local files = {
