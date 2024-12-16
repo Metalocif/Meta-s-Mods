@@ -2,6 +2,8 @@ local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/weapons/spider.png", path .."img/weapons/spider.png")
 modApi:appendAsset("img/weapons/spiderling.png", path .."img/weapons/spiderling.png")
+modApi:appendAsset("img/effects/technospiderwebitem.png", path .."img/effects/technospiderwebitem.png")
+modApi:appendAsset("img/achievements/WellLaidWeb.png", path .."img/achievements/WellLaidWeb.png")
 
 
 meta_spider=Skill:new{
@@ -17,16 +19,30 @@ meta_spider=Skill:new{
 	OnKill = "Spawn an egg",
 	LaunchSound = "/enemy/scorpion_1/attack",
 	TipImage = {
-		Unit = Point(2,4),
+		Unit = Point(2,3),
 		Enemy = Point(2,2),
-		Enemy2 = Point(2,1),
 		Target = Point(2,2),
 		CustomPawn = "Meta_TechnoSpider",
+		-- CustomEnemy = "Scarab1",
 	}
 }
-meta_spider_A = meta_spider:new{UpgradeDescription = "Adds Deadly Webs on adjacent tiles. Stepping on a Deadly Web causes Techno-Spiders, allied spiderlings, and arachnoids to opportunistically attack the pawn.", WebAdjacent=true}
+meta_spider_A = meta_spider:new{UpgradeDescription = "Adds webs on adjacent tiles. Stepping on a web causes Techno-Spiders, allied spiderlings, and arachnoids to opportunistically attack the pawn.", WebAdjacent=true}
 meta_spider_B = meta_spider:new{UpgradeDescription = "Deals 2 more damage.", Damage = 4}
-meta_spider_AB = meta_spider:new{Damage = 4}
+meta_spider_AB = meta_spider:new{WebAdjacent=true,Damage = 4}
+
+local achievements = {
+	Meta_WellLaidWeb = modApi.achievements:add{
+		id = "Meta_WellLaidWeb",
+		name = "Well-Laid Web",
+		tip = "Use the Techno-Firefly's fully upgraded weapon when it is fully levelled and powered.",
+		img = path.."img/achievements/WellLaidWeb.png",
+		squad = "Meta_SecretSquad4",
+	}, 
+}
+
+function completeWellLaidWeb()
+	if not achievements.Meta_WellLaidWeb:isComplete() then achievements.Meta_WellLaidWeb:addProgress{ complete = true } end
+end
 
 function meta_spider:GetTargetArea(point)
 	local ret = PointList()
@@ -62,20 +78,36 @@ function meta_spider:GetSkillEffect(p1,p2)
 	if self.WebAdjacent then
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
-			if not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsFire(curr) or Board:GetItem(curr) or curr == p2) then
-				ret:AddScript(string.format("Board:SetItem(%q, %s)", "Meta_TechnoSpiderWeb", curr:GetString()))
+			if not (Board:IsBlocked(curr, PATH_GROUND) or Board:IsFire(curr) or Board:GetItem(curr) ~= "" or curr == p2) then
+				ret:AddScript(string.format("Board:SetItem(%s, %q)", curr:GetString(), "TechnoWebItem"))
 			end
 		end
 	end
 	if p1 ~= p2 then
-		local spawn = "meta_SpiderEgg"
+		local spawn = ""
+		if Board:GetPawn(p2) then spawn = "meta_SpiderEgg" end
 		if Board:GetPawn(p2) and (Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") or IsGooey(Board:GetPawn(p2):GetType())) then spawn = "meta_Spiderling" end
 		ret:AddMelee(p1, damage)
-		ret:AddScript(string.format("modApi:runLater(function() if not Board:IsBlocked(%s, PATH_GROUND) then Board:SpawnPawn(%q, %s) end end)", p2:GetString(), spawn, p2:GetString()))
+		ret:AddScript(string.format([[
+		local p2 = %s;
+		local spawn = %q;
+		local queueP2 = %s;
+		if Board:IsTipImage() then
+			Board:AddPawn(spawn, p2) 
+		else
+			modApi:runLater(function() 
+				if not Board:IsBlocked(p2, PATH_GROUND) then 
+					Board:AddPawn(spawn, p2) 
+				end 
+			end)
+		end]], p2:GetString(), spawn, tostring(spawn == "meta_SpiderEgg")))
 	end
 	return ret	
 end
 
+-- if queueP2 then 
+	-- modApi:runLater(function() Board:GetPawn(p2):FireWeapon(p2, 1) end)
+-- end
 
 merge_table(TILE_TOOLTIPS, { TechnoWeb_Text = {"Techno-Spider Web", "Triggers attacks of opportunity from adjacent spiders and spiderlings."} } )
 
@@ -96,15 +128,17 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 				local hunter = Board:GetPawn(curr)
 				if hunter and hunter:GetType()=="Meta_TechnoSpider" then
 					ret:AddMelee(curr, SpaceDamage(loc, 2))
-				elseif hunter and (hunter:GetType() == "meta_Spiderling" or string.match(hunter:GetType(), "DeployUnit_Aracnoid")) then
+					achievementCounter = achievementCounter+1
+				elseif hunter and (hunter:GetType() == "meta_Spiderling" or hunter:GetType() == "SpiderlingZ" or string.match(hunter:GetType(), "DeployUnit_Aracnoid")) then
 					ret:AddMelee(curr, SpaceDamage(loc, 1))
+					achievementCounter = achievementCounter+1
 				end
 			end
 			Board:AddEffect(ret)
         end
     end
-	if achievementCounter >= 3 then
-	
+	if achievementCounter >= 2 then
+		ret:AddScript("completeWellLaidWeb()")
 	end
 end)
 
@@ -129,7 +163,9 @@ meta_SpiderEgg ={
 AddPawn("meta_SpiderEgg")
 
 meta_Hatch1 = SelfTarget:new{ 
-	Class = "",
+	Name = "Hatch",
+	Description = "Hatch into a spiderling.",
+	Class = "TechnoVek",
 	TipImage = {
 		Unit = Point(2,2),
 		Target = Point(2,2),
@@ -141,11 +177,27 @@ function meta_Hatch1:GetTargetScore(p)
 	return 10
 end
 
+function meta_Hatch1:GetTargetArea(p)
+	ret = PointList()
+	ret:push_back(p)
+	return ret
+end
+
 function meta_Hatch1:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
-	local damage = SpaceDamage(p1,DAMAGE_DEATH)
-	damage.sPawn = "meta_Spiderling"
-	ret:AddDamage(damage)
+	ret:AddScript(string.format([[
+	modApi:conditionalHook(
+	function()
+		return Game:GetTeamTurn() == TEAM_PLAYER
+	end,
+	function()
+		local unit = PAWN_FACTORY:CreatePawn(%q)
+		local p1 = %s
+		unit:SetActive(false)
+		if Board:GetPawn(p1) then Board:GetPawn(p1):Kill(false) Board:AddPawn(unit,p1) end
+	end)]], "meta_Spiderling", p1:GetString()))	
+	--dirty hack because if it spawns on enemy turn the game queues it as though it were an enemy???
+	--for some reason just spawning a thing and doing SetActive(false) does not help
 	return ret
 end
 
@@ -155,7 +207,7 @@ meta_Spiderling = {
 	Health = 1,
 	MoveSpeed = 3,
 	Minor = true,
-	Image = "spiderling",
+	Image = "Meta_spiderling",
 	SkillList = { "meta_SpiderlingAtk1" },
 	SoundLocation = "/enemy/spiderling_1/",
 	DefaultTeam = TEAM_PLAYER,

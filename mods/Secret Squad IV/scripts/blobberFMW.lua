@@ -2,6 +2,8 @@ local this = {}
 local path = mod_loader.mods[modApi.currentMod].scriptPath
 local resources = mod_loader.mods[modApi.currentMod].resourcePath
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath .."libs/weaponPreview")
+modApi:appendAsset("img/achievements/GreatestGoo.png", resources .."img/achievements/GreatestGoo.png")
+
 
 
 modApi:appendAsset("img/weapons/blobber.png", resources .."img/weapons/blobber.png")
@@ -16,6 +18,22 @@ a.gooShove_0 = Animation:new{Image = "effects/gooshove_U.png",NumFrames = 5,Time
 a.gooShove_1 = a.gooShove_0:new{Image = "effects/gooshove_R.png",PosX = -23,PosY = -2}
 a.gooShove_2 = a.gooShove_0:new{Image = "effects/gooshove_D.png",PosX = -6,PosY = -3}
 a.gooShove_3 = a.gooShove_0:new{Image = "effects/gooshove_L.png",PosX = -6,PosY = 12}
+
+
+local achievements = {
+	Meta_GreatestGoo = modApi.achievements:add{
+		id = "Meta_GreatestGoo",
+		name = "Greatest Goo",
+		tip = "Have a goo eat enough nutritious gunk to become the greatest goo, dealing at least 5 damage with its attack.",
+		img = resources.."img/achievements/GreatestGoo.png",
+		squad = "Meta_SecretSquad4",
+	}, 
+}
+
+function completeGreatestGoo()
+	if not achievements.Meta_GreatestGoo:isComplete() then achievements.Meta_GreatestGoo:addProgress{ complete = true } end
+end
+
 
 
 meta_blobber = Skill:new{
@@ -59,14 +77,18 @@ end
 function meta_blobber:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
+	local queueP2
 	if p1:Manhattan(p2) > 1 and (p1.x == p2.x or p1.y == p2.y) then 
 		damage.sPawn = "meta_blob"
+		queueP2 = true
 	elseif p1:Manhattan(p2) > 1 then
 		damage.sPawn = "meta_sludge"
 	else
 		damage.sPawn = "meta_goo"
 	end
-	ret:AddArtillery(p1, damage, "effects/shotup_blobber2.png", PROJ_DELAY)
+	ret:AddArtillery(p1, damage, "effects/shotup_blobber2.png", FULL_DELAY)
+	if queueP2 then ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", p2:GetString(), p2:GetString())) end
+
 	return ret
 end
 
@@ -120,7 +142,7 @@ meta_blob = {
 	Health = 1,
 	MoveSpeed = 3,
 	Minor = true,
-	Neutral = true,
+	-- Neutral = true,
 	IgnoreSmoke = true,
 	IsPortrait = false,
 	Image = "blob",
@@ -130,6 +152,7 @@ meta_blob = {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
 	IsDeathEffect = true,
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("meta_blob")  
 
@@ -141,7 +164,7 @@ end
 
 meta_BlobAtk1 = Skill:new{
 	Name = "Volatile Guts",
-	Description = "Explode, killing itself and damaging adjacent tiles for 2 damage.",
+	Description = "Explode, damaging adjacent tiles for 2 damage. Chains off gunk.",
 	Class = "TechnoVek",
 	Icon = "weapons/goo.png",
 	PathSize = 1, 
@@ -167,13 +190,35 @@ end
 
 function meta_BlobAtk1:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local hash = function(point) return point.x + point.y*10 end
+	local explored = {[hash(p1)] = true}
+	local todo = {}
+	local origin = {  }
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		local damage = SpaceDamage(curr, 2)
-		damage.sAnimation = "exploout2_"..i
-		ret:AddQueuedDamage(damage)
+		todo[#todo+1] = curr
+		origin[hash(curr)] = p1
 	end
-	ret:AddQueuedDamage(SpaceDamage(p1, 1))
+	while #todo ~= 0 do
+		local current = pop_back(todo)
+		if not explored[hash(current)] then
+			explored[hash(current)] = true
+			local pawn = Board:GetPawn(current)
+			local damage = SpaceDamage(current, self.Damage)
+			damage.sAnimation = "exploout2_"..GetDirection(current - origin[hash(current)])
+			ret:AddQueuedDamage(damage)
+			if Board:GetItem(current) == "Meta_BlobGunk" or (pawn and Status.GetStatus(pawn:GetId(), "Gunk")) then
+				for i = DIR_START, DIR_END do
+					local curr = current + DIR_VECTORS[i]
+					todo[#todo+1] = curr
+					origin[hash(curr)] = current
+				end
+				ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", current:GetString(), ""))
+				if pawn then ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, %q)", pawn:GetId(), "Gunk")) end
+			end
+		end
+	end
+	ret:AddQueuedDamage(SpaceDamage(p1, self.SelfDamage))
 	return ret
 end
 
@@ -189,7 +234,8 @@ meta_sludge = {
 	SoundLocation = "/enemy/goo_boss/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
-	Portrait = "enemy/BlobBoss"		
+	Portrait = "enemy/BlobBoss",
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("meta_sludge")  
 
@@ -238,7 +284,8 @@ meta_goo = {
 	SoundLocation = "/enemy/goo_boss/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
-	Portrait = "enemy/BlobBoss"		
+	Portrait = "enemy/BlobBoss",
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("meta_goo")  
 
@@ -263,8 +310,7 @@ function meta_gooAtk1:GetTargetArea(point)
 	for i = DIR_START, DIR_END do
 		local curr = point + DIR_VECTORS[i]
 		if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then foundGunk = true end
-		-- if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then foundGunk = true end
-		--if board has gunk item, also fine
+		if Board:GetItem(curr) == "Meta_BlobGunk" then foundGunk = true end
 		ret:push_back(curr)
 	end
 	if foundGunk then ret:push_back(point) end
@@ -276,11 +322,16 @@ function meta_gooAtk1:GetSkillEffect(p1, p2)
 	if p1 == p2 then
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
-			if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then 
+			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
 				local preview = SpaceDamage(p1)
 				preview.sPawn = "meta_goo2"
 				weaponPreview:AddDamage(preview)
-				ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
+				if Board:GetItem(curr) == "Meta_BlobGunk" then
+					LOG("found item")
+					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+				else
+					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
+				end
 				ret:AddScript(string.format("Board:RemovePawn(Board:GetPawn(%s))", p1:GetString()))
 				ret:AddScript(string.format("Board:AddPawn(%q, %s)", "meta_goo2", p1:GetString()))
 				return ret
@@ -302,7 +353,8 @@ meta_goo2 = {
 	SoundLocation = "/enemy/goo_boss/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
-	Portrait = "enemy/BlobBoss"		
+	Portrait = "enemy/BlobBoss",
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("meta_goo2")  
 
@@ -327,8 +379,7 @@ function meta_gooAtk2:GetTargetArea(point)
 	for i = DIR_START, DIR_END do
 		local curr = point + DIR_VECTORS[i]
 		if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then foundGunk = true end
-		-- if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then foundGunk = true end
-		--if board has gunk item, also fine
+		if Board:GetItem(curr) == "Meta_BlobGunk" then foundGunk = true end
 		ret:push_back(curr)
 	end
 	if foundGunk then ret:push_back(point) end
@@ -340,11 +391,16 @@ function meta_gooAtk2:GetSkillEffect(p1, p2)
 	if p1 == p2 then
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
-			if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then 
+			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
 				local preview = SpaceDamage(p1)
-				preview.sPawn = "meta_goo3"
+				preview.sPawn = "meta_goo2"
 				weaponPreview:AddDamage(preview)
-				ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
+				if Board:GetItem(curr) == "Meta_BlobGunk" then
+					LOG("found item")
+					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+				else
+					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
+				end
 				ret:AddScript(string.format("Board:RemovePawn(Board:GetPawn(%s))", p1:GetString()))
 				ret:AddScript(string.format("Board:AddPawn(%q, %s)", "meta_goo3", p1:GetString()))
 				return ret
@@ -366,17 +422,19 @@ meta_goo3 = {
 	SoundLocation = "/enemy/goo_boss/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
-	Portrait = "enemy/BlobBoss"		
+	Portrait = "enemy/BlobBoss",
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("meta_goo3")  
 
 meta_gooAtk3 = Skill:new{
 	Name = "Goo Crush",
-	Description = "Kills an adjacent unit.",
+	Description = "Pushes and damages an adjacent unit. When adjacent to gunk, can self-target to eat the gunk, empowering the user.",
 	Class = "TechnoVek",
 	Icon = "weapons/goo.png",
 	PathSize = 1, 
-	Damage = DAMAGE_DEATH,
+	Damage = 3,
+	MinDamage = 1,
 	TipImage = {
 		Unit = Point(2,2),
 		Enemy = Point(2,1),
@@ -387,16 +445,39 @@ meta_gooAtk3 = Skill:new{
 
 function meta_gooAtk3:GetTargetArea(point)
 	local ret = PointList()
+	local foundGunk
 	for i = DIR_START, DIR_END do
 		local curr = point + DIR_VECTORS[i]
+		if Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk") then foundGunk = true end
+		if Board:GetItem(curr) == "Meta_BlobGunk" then foundGunk = true end
 		ret:push_back(curr)
 	end
+	if foundGunk then ret:push_back(point) end
 	return ret
 end
 
 function meta_gooAtk3:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	ret:AddMelee(p1, SpaceDamage(p2, DAMAGE_DEATH))
+	local HP = Board:GetPawn(p1):GetHealth()
+	if p1 == p2 then
+		for i = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[i]
+			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
+				if Board:GetItem(curr) == "Meta_BlobGunk" then
+					LOG("found item")
+					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+				else
+					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
+				end
+				ret:AddScript(string.format("Status.ApplyGunk(%s)", Board:GetPawn(p1):GetId()))
+				ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetActive(true) end)", Board:GetPawn(p1):GetId()))
+
+				return ret
+			end
+		end
+	end
+	ret:AddMelee(p1, SpaceDamage(p2, HP, GetDirection(p2-p1)))
+	if HP >= 5 then ret:AddScript("completeGreatestGoo()") end
 	return ret
 end
 

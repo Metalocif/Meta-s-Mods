@@ -24,8 +24,8 @@ for _, file in ipairs(files) do
 	modApi:appendAsset("img/units/player/".. file, mechPath .. file)
 end
 local a=ANIMS
-a.Meta_TechnoBlobber =a.MechUnit:new{Image="units/player/Meta_TechnoBlobber.png", PosX = -22, PosY = 4}
-a.Meta_TechnoBlobbera = a.MechUnit:new{Image="units/player/Meta_TechnoBlobbera.png",  PosX = -20, PosY = 4, NumFrames = 4 }
+a.Meta_TechnoBlobber =a.MechUnit:new{Image="units/player/Meta_TechnoBlobber.png", PosX = -32, PosY = 4}
+a.Meta_TechnoBlobbera = a.MechUnit:new{Image="units/player/Meta_TechnoBlobbera.png",  PosX = -30, PosY = 4, NumFrames = 4 }
 a.Meta_TechnoBlobberw = a.MechUnit:new{Image="units/player/Meta_TechnoBlobber_w.png", -22, PosY = 10}
 a.Meta_TechnoBlobber_broken = a.MechUnit:new{Image="units/player/Meta_TechnoBlobber_broken.png", PosX = -22, PosY = 4 }
 a.Meta_TechnoBlobberw_broken = a.MechUnit:new{Image="units/player/Meta_TechnoBlobber_w_broken.png", PosX = -20, PosY = 10 }
@@ -44,6 +44,11 @@ local files = {
 	"Meta_TechnoSpider_broken.png",
 	"Meta_TechnoSpider_ns.png",
 	"Meta_TechnoSpider_h.png",
+	
+	"Meta_spiderling.png",
+	"Meta_spiderlinga.png",
+	"Meta_spiderling_hatch.png",
+	"Meta_spiderling_death.png",
 }
 for _, file in ipairs(files) do
 	modApi:appendAsset("img/units/player/".. file, mechPath .. file)
@@ -55,6 +60,12 @@ a.Meta_TechnoSpider_broken = a.MechUnit:new{Image="units/player/Meta_TechnoSpide
 a.Meta_TechnoSpiderw_broken = a.MechUnit:new{Image="units/player/Meta_TechnoSpider_w_broken.png", PosX = -19, PosY = 6 }
 a.Meta_TechnoSpider_ns = a.MechIcon:new{Image="units/player/Meta_TechnoSpider_ns.png"}
 
+a.Meta_spiderling = 	a.MechUnit:new{ Image = "units/player/Meta_spiderling.png", PosX = -15, PosY = 9 }
+a.Meta_spiderlinga = 	a.Meta_spiderling:new{ Image = "units/player/Meta_spiderlinga.png", PosX = -15, PosY = 9, NumFrames = 6  }
+a.Meta_spiderlinge =	a.BaseEmerge:new{ Image = "units/player/Meta_spiderling_hatch.png", PosX = -15, PosY = 9, NumFrames = 5, Time =0.1, Sound = "/enemy/spiderling_egg/hatch" }
+a.Meta_spiderlingd = 	a.Meta_spiderling:new{ Image = "units/player/Meta_spiderling_death.png", PosX = -21, PosY = 10, NumFrames = 8, Time = 0.14, Loop = false }
+
+
 local files = {
 	"Meta_TechnoFirefly.png",
 	"Meta_TechnoFireflya.png",
@@ -63,6 +74,12 @@ local files = {
 	"Meta_TechnoFirefly_broken.png",
 	"Meta_TechnoFirefly_ns.png",
 	"Meta_TechnoFirefly_h.png",
+	
+	"Meta_TechnoFirefly2.png",
+	"Meta_TechnoFirefly2a.png",
+	"Meta_TechnoFirefly2_w_broken.png",
+	"Meta_TechnoFirefly2_broken.png",
+	"Meta_TechnoFirefly2_ns.png",
 }
 for _, file in ipairs(files) do
 	modApi:appendAsset("img/units/player/".. file, mechPath .. file)
@@ -73,6 +90,12 @@ a.Meta_TechnoFireflyw = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly_w.
 a.Meta_TechnoFirefly_broken = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly_broken.png", PosX = -12, PosY = -10 }
 a.Meta_TechnoFireflyw_broken = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly_w_broken.png", PosX = -12, PosY = -10}
 a.Meta_TechnoFirefly_ns = a.MechIcon:new{Image="units/player/Meta_TechnoFirefly_ns.png"}
+
+a.Meta_TechnoFirefly2 = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly2.png", PosX = -25, PosY = -12}
+a.Meta_TechnoFirefly2a = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly2a.png", PosX = -25, PosY = -12, NumFrames = 4 }
+a.Meta_TechnoFirefly2_broken = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly2_broken.png", PosX = -12, PosY = -10 }
+a.Meta_TechnoFirefly2w_broken = a.MechUnit:new{Image="units/player/Meta_TechnoFirefly2_w_broken.png", PosX = -12, PosY = -10}
+a.Meta_TechnoFirefly2_ns = a.MechIcon:new{Image="units/player/Meta_TechnoFirefly2_ns.png"}
 
 CreatePilot{
 	Id = "Pilot_Meta_TechnoBlobber",
@@ -146,5 +169,6 @@ Meta_TechnoFirefly = Pawn:new{
 	SoundLocation = "/enemy/firefly_2/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_INSECT,
+	MaxLevelFlyingGraphics = "Meta_TechnoFirefly2"
 }
 AddPawn("Meta_TechnoFirefly")

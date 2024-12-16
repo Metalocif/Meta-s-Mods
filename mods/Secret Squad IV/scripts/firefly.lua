@@ -1,6 +1,7 @@
 local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/weapons/firefly.png", path .."img/weapons/firefly.png")
+modApi:appendAsset("img/achievements/PerfectlyUltimateGreatFirefly.png", path .."img/achievements/PerfectlyUltimateGreatFirefly.png")
 
 meta_firefly=TankDefault:new{
 	Name="Spitting Thorax",
@@ -26,7 +27,19 @@ meta_firefly_A = meta_firefly:new{UpgradeDescription = "Deals 1 more damage.", D
 meta_firefly_B = meta_firefly:new{UpgradeDescription = "Deals 1 more damage.", Damage = 2}
 meta_firefly_AB = meta_firefly:new{Damage = 3}
 
+local achievements = {
+	Meta_PerfectlyUltimateGreatFirefly = modApi.achievements:add{
+		id = "Meta_PerfectlyUltimateGreatFirefly",
+		name = "Perfectly Ultimate Great Firefly",
+		tip = "Use the Techno-Firefly's fully upgraded weapon when it is fully levelled and powered.",
+		img = path.."img/achievements/PerfectlyUltimateGreatFirefly.png",
+		squad = "Meta_SecretSquad4",
+	}, 
+}
 
+function completePerfectlyUltimateGreatFirefly()
+	if not achievements.Meta_PerfectlyUltimateGreatFirefly:isComplete() then achievements.Meta_PerfectlyUltimateGreatFirefly:addProgress{ complete = true } end
+end
 
 function meta_firefly:GetTargetArea(point)
 	local ret = PointList()
@@ -49,6 +62,7 @@ end
 
 function meta_firefly:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local userID = Board:GetPawn(p1):GetId()
 	local direction = GetDirection(p2 - p1)
 	local distance = math.max(p1:Manhattan(GetProjectileEnd(p1, p2)), p1:Manhattan(p2))
 	local remainingDamage = self.Damage + 1		--because we always subtract 1?	
@@ -63,16 +77,6 @@ function meta_firefly:GetSkillEffect(p1,p2)
 		end
 		if #dealDamageTo == 0 and (Board:GetTerrain(check) == TERRAIN_MOUNTAIN or Board:GetTerrain(check) == TERRAIN_BUILDING) then dealDamageTo[1] = check end
 	end
-	-- local curr = p1 + DIR_VECTORS[direction]
-	-- while p1:Manhattan(curr) < distance and Board:GetTerrain(curr) ~= TERRAIN_MOUNTAIN and Board:GetTerrain(curr) ~= TERRAIN_BUILDING do
-		-- if Board:IsValid(curr + DIR_VECTORS[direction]) then
-			-- curr = GetProjectileEnd(curr,curr + DIR_VECTORS[direction],PATH_PROJECTILE)
-		-- end
-		-- if not Board:IsValid(curr) then break end
-		-- local damage = SpaceDamage(curr, remainingDamage, direction)
-		-- ret:AddProjectile(last_origin, damage, "effects/proj_firefly2", FULL_DELAY)
-		-- last_origin = curr
-	-- end
 	if #dealDamageTo == 0 then return ret end
 	local damage = SpaceDamage(dealDamageTo[1], remainingDamage, direction)
 	ret:AddProjectile(p1, damage, "effects/shot_firefly2", NO_DELAY)
@@ -80,8 +84,16 @@ function meta_firefly:GetSkillEffect(p1,p2)
 	for i = 1, distance - 1 do
 		local curr = p1 + DIR_VECTORS[direction] * i
 		if Board:GetPawn(curr) and curr ~= dealDamageTo[1] then ret:AddDamage(SpaceDamage(curr, remainingDamage, direction)) end
-		-- ret:AddDelay(0.1)
 	end
 		
+	if saveData ~= nil then
+		local reactorTable = saveData.getPawnKey(userID, "reactor")
+		if reactorTable ~= nil then
+			local reactors = reactorTable["iNormalPower"] + reactorTable["iUsedPower"] + reactorTable["iBonusPower"] + reactorTable["iUsedBonus"]
+			if reactors >= 10 and self.Damage >= 3 and GameData ~= nil and GameData.current["pilot"..userID] ~= nil and GameData.current["pilot"..userID].level == 2 then
+				ret:AddScript("completePerfectlyUltimateGreatFirefly()")
+			end
+		end
+	end
 	return ret	
 end

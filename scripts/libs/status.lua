@@ -632,14 +632,14 @@ end
 function Status.HealFromGunk(id)
 	local blob = Board:GetPawn(id)
 	if not blob then return end
-	if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
+	if not blob:IsDamaged() then
 		blob:SetMaxHealth(blob:GetHealth() + 1)
 	end
 	Board:DamageSpace(SpaceDamage(blob:GetSpace(), -1))
 	if Status.GetStatus(id, "Gunk") then Status.RemoveStatus(id, "Gunk") end
 end
 
-merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Enemy units heal 1 damage. Allied units are inflicted with Gunk. (Gunk: -1 Move. Blobs that melee attack or move next to a unit with Gunk remove Gunk and heal 1 damage.)"},} )
+merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."},} )
 Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = ""}
 Location["libs/status/gunk.png"] = Point(-16,7)
 
@@ -648,7 +648,8 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
         local pawn = Board:GetPawn(loc)
         if pawn then
 			Status.ApplyGunk(pawn:GetId())
-			if pawn:GetTeam() == TEAM_PLAYER then 
+			if pawn:GetTeam() == TEAM_PLAYER and Status.GetStatus(pawn:GetId(), "Gunk") then 
+			--in case of immunity/instant gunk consumption
 				pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
 				pawn:ClearUndoMove()
 			end

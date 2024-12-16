@@ -25,6 +25,17 @@ function mod:init()
 
 end
 
+function doFlyingGraphics()
+	if GetCurrentMission() ~= nil then DoSaveGame() end
+	for id = 0, 2 do
+		local pawn = Game:GetPawn(id)
+		if pawn and _G[pawn:GetType()].MaxLevelFlyingGraphics ~= nil and GameData ~= nil and GameData.current["pilot"..id] ~= nil and GameData.current["pilot"..id].level == 2 then 
+			pawn:SetFlying(true) 
+			pawn:SetCustomAnim(_G[pawn:GetType()].MaxLevelFlyingGraphics)
+		end
+	end
+end
+
 function mod:load(options, version)
 	modApi:addSquad(
 		{
@@ -38,27 +49,23 @@ function mod:load(options, version)
 		"One of many known attempts to combine mech technology and Vek bodies.",
 		self.resourcePath .."mod_icon.png"
 	)
-	-- modApi:addPostLoadGameHook(function()
-		-- modApi:conditionalHook(function()
-			-- return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
-		-- end, 
-		-- function()
-			-- if GetCurrentMission().Meta_GooAnims ~= nil then
-				-- for id, anim in pairs(GetCurrentMission().Meta_GooAnims) do
-					-- if Board:GetPawn(id) then Board:GetPawn(id):SetCustomAnim(anim) end
-				-- end
-			-- end
-			-- if GetCurrentMission().GunkTable ~= nil then
-				-- for id, _ in pairs(GetCurrentMission().GunkTable) do
-					-- local pawn = Board:GetPawn(id)
-					-- if pawn then 
-						-- CustomAnim:add(id, "gunk")
-						-- pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
-					-- end
-				-- end
-			-- end
-		-- end)
-    -- end)
+	modApi:addMissionStartHook(function(mission)	--need to reassign graphics at mission start since the game forgets otherwise
+		doFlyingGraphics()
+    end)
+	modApi:addPostLoadGameHook(function()
+		--We are not immediately in a mission after resetting turn, so I add a temporary hook that'll only trigger once we are
+		modApi:conditionalHook(function()
+			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+		end, 
+		doFlyingGraphics)
+    end)
+	modApi:addMissionNextPhaseCreatedHook(function()
+		--We are not immediately in a mission after falling into the Volcanic Cave, so I add a temporary hook that'll only trigger once we are
+		modApi:conditionalHook(function()
+			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+		end, 
+		doFlyingGraphics)
+    end)
 end
 
 return mod
