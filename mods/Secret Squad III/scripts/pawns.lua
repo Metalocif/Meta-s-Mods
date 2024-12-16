@@ -134,7 +134,6 @@ local oldMove = Move.GetTargetArea
 function Move:GetTargetArea(p, ...)
 	local mover = Board:GetPawn(p)
 	local options = mod_loader.currentModContent[mod.id].options
-	--if options.Meta_BurrowersCanThroughWater and options.Meta_BurrowersCanThroughWater.enabled then moverPathType = mover:GetPathProf() else moverPathType = PATH_GROUND end
 	if mover and (mover:GetType() == "Meta_TechnoDigger" or mover:GetType() == "Meta_TechnoTumblebug") then
 		local pathType
 		if Board:GetTerrain(p) == TERRAIN_WATER or Board:GetTerrain(p) == TERRAIN_ICE then pathType = mover:GetPathProf() else pathType = PATH_FLYER end
