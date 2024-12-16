@@ -27,6 +27,7 @@ ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful.png", PosX =
 ANIMS.StatusDry = Animation:new{ Image = "libs/status/dry.png", PosX = 0, PosY = 0, NumFrames = 3, Time = 0.3, Loop = true}
 ANIMS.StatusDoomed = Animation:new{ Image = "combat/icons/icon_tentacle.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusGunk = Animation:new{ Image = "libs/status/gunk.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusHemorrhage = Animation:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
 ANIMS.StatusLeechSeed = Animation:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusNecrosis = Animation:new{ Image = "libs/status/necrosis.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
@@ -299,6 +300,20 @@ function Status.ApplyGlory(id, turns)
 			pawn:AddWeapon(weapon, true)
 		end
 	end
+end
+
+function Status.ApplyGunk(id)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	if _G[pawn:GetType()].GunkImmune then return end
+	if _G[pawn:GetType()].OnAppliedGunk then
+		_G[pawn:GetType()].OnAppliedGunk(id)
+		return
+	end
+	mission.GunkTable[id] = true
+	CustomAnim:add(id, "StatusGunk")
 end
 
 function Status.ApplyHemorrhage(id, turns)
@@ -599,7 +614,7 @@ function Status.GetStatus(id, status)
 end
 
 function Status.List()
-	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
+	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
 end
 
 function Status.Count(id)
@@ -613,6 +628,33 @@ function Status.Count(id)
 	end
 	return count
 end
+
+function Status.HealFromGunk(id)
+	local blob = Board:GetPawn(id)
+	if not blob then return end
+	if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
+		blob:SetMaxHealth(blob:GetHealth() + 1)
+	end
+	Board:DamageSpace(SpaceDamage(blob:GetSpace(), -1))
+	if Status.GetStatus(id, "Gunk") then Status.RemoveStatus(id, "Gunk") end
+end
+
+merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Enemy units heal 1 damage. Allied units are inflicted with Gunk. (Gunk: -1 Move. Blobs that melee attack or move next to a unit with Gunk remove Gunk and heal 1 damage.)"},} )
+Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = ""}
+Location["libs/status/gunk.png"] = Point(-16,7)
+
+BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
+    if removed_item == "Meta_BlobGunk" then
+        local pawn = Board:GetPawn(loc)
+        if pawn then
+			Status.ApplyGunk(pawn:GetId())
+			if pawn:GetTeam() == TEAM_PLAYER then 
+				pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
+				pawn:ClearUndoMove()
+			end
+        end
+    end
+end)
 
 
 local function getWeaponKey(id, key)		--helper function to generate the extra Weaken weapons
