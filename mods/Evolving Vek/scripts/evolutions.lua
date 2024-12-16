@@ -54,7 +54,7 @@ function IsPrefixValidForVek(prefix, vekType)
 	if prefix == "Flammable" and _G[vekType].IgnoreFire then return false end
 	if prefix == "Blessed" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or _G[vekType].Tier == TIER_BOSS) then return false end
 	if prefix == "Reactive" and _G[vekType].Health == 1 then return false end
-	-- if prefix == "Grappling" and (_G[vekType].VoidShockImmune or #_G[vekType].SkillList ~= 1 or _G[vekType].Ranged == 0 or SEMovesSelf(_G[vekType].SkillList[1]) or SEIsArtillery(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Swarming" and (_G[vekType].Minor or not _G[vekType].SpawnLimit) then return false end
 	return true
 end
 
@@ -103,6 +103,7 @@ function CreateEvolvedVek(prefix, vekType)
 	if prefix == "Flammable" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnPowder,} end
 	if prefix == "Blessed" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnGlory,} end
 	if prefix == "Reactive" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnReactive,} end
+	if prefix == "Swarming" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SpawnLimit = false,} end
 	-- if prefix == "Grappling" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_GrapplingWeapon" }, Weapon = 2} end
 	return false
 end

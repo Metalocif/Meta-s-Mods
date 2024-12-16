@@ -10,6 +10,7 @@ tips:Add{id = "Tip_Leaping",title = "Leaping",text = "The Leaping prefix makes a
 tips:Add{id = "Tip_Armored",title = "Armored",text = "The Armored prefix makes a Vek armored, reducing all incoming weapon damage by 1."}
 tips:Add{id = "Tip_Heavy",title = "Heavy",text = "The Heavy prefix increases the Vek's max HP by 2 and reduces its movement speed by 2."}
 tips:Add{id = "Tip_Light",title = "Light",text = "The Light prefix reduces the Vek's max HP by 1 and increases its movement speed by 1."}
+tips:Add{id = "Tip_Swarming",title = "Swarming",text = "The Swarming prefix makes the Vek not count towards the spawn limit."}
 tips:Add{id = "Tip_Volatile",title = "Volatile",text = "The Volatile prefix makes a Vek explode on death."}
 tips:Add{id = "Tip_Massive",title = "Massive",text = "The Massive prefix makes a Vek immune to death by drowning."}
 tips:Add{id = "Tip_Undying",title = "Undying",text = "The Undying prefix makes a Vek leave a corpse when it dies, unless it was drowned. The corpse can be revived by healing effects."}

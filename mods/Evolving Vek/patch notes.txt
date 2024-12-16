@@ -1,5 +1,5 @@
 v1.5
-- Added the following prefixes: Excavating, Nursing, Electrified, Wet, Flammable, Blessed, Reactive.
+- Added the following prefixes: Excavating, Nursing, Electrified, Wet, Flammable, Blessed, Reactive, Swarming.
 - Added compatibility with Omega Vek.
 - Frozen Vek that get prefixed at the start of a mission no longer get unfrozen or play their spawning animation.
 - Fixed options not properly banning specific prefixes.

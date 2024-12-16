@@ -97,6 +97,12 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Swarming",
+		"Enable the Swarming prefix",
+		"Check to allow Vek to be given the Swarming prefix, making them not count towards the spawn limit (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"Enable_Volatile",
 		"Enable the Volatile prefix",
 		"Check to allow Vek to be given the Volatile prefix, making them explode when killed (default: true).",
@@ -177,7 +183,7 @@ function mod:metadata()
 	modApi:addGenerationOption(
 		"Enable_Wrathful",
 		"Enable the Wrathful prefix",
-		"Check to allow Vek to be given the Wrathful prefix, making them boosted at the start of movement (default: true).",
+		"Check to allow Vek to be given the Wrathful prefix, making them deal 1 more damage (default: true).",
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
