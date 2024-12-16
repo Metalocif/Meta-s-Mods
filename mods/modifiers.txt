@@ -1,0 +1,40 @@
+Modifiers:
+After every... boss? you have to pick 1 in 3 modifiers, which affect the rest of the run.
+- Forests are on fire.
+- Ice is lava.
+- N% tiles are cracked.
+- Tyrant effect every 2nd turn.
+- Add like 50 prefixes to the pool if prefix mod is active.
+- Water is chasms.
+- Receiving ACID damages your pawns.
+- Next time pod contains nothing
+- Pilot $N starts battle confused/with 1 HP/on acid/cannot be healed
+- All Psions have +1 HP.
+- Deployable units die every turn? (would maybe mess with mission units?)
+- All enemies leave a corpse.
+- All missions last +1 turn.
+- All missions last -1 turn.
+
+modifiers = modifiers or {"ForestFire", "IceIsLava", "CrackHalfTile", "Tyrant"}
+modifiersText = modifiersText  or {"All forests are on fire.", "All ice is lava.", "50% of tiles are cracked.", "Every second turn, mechs take 1 damage."}
+
+local hook = function(corporation, island)
+if Game:GetSector() > 1 then 
+GAME.MetaModifiers = GAME.MetaModifiers or {}
+
+for count = 1, 3 do
+ i = math.random(1, #modifiers)
+ chosenModifiers = {}
+ chosenModifiersText = {}
+ chosenModifiers[#chosenModifiers+1] = modifiers[i]
+ same for text, remove from lists
+end
+	
+sdlext.showAlertDialog(
+	"Choose your next modifier.",
+	"Choose which of the following modifiers will apply to the rest of the run.",
+	function(buttonIndex) GAME.MetaModifiers[chosenModifiers[buttonIndex]] = true end, 700, 400, chosenModifiersText[1], chosenModifiersText[2], chosenModifiersText[3]
+)
+end
+
+modApi:addPostIslandSelectionHook(hook)

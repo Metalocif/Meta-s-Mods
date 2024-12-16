@@ -1,0 +1,25 @@
+So it's possible to have banter between pilots.
+We can have a pilot talk to a "target" (if Shinji moving next to Rei triggers a dialog, Rei is the target), an "other" pilot (if Shinji moves next to Rei, Asuka can get pissy about it), or a CEO (Gendo/Misato depending on which we have act as the CEO)
+These can be longer exchanges than in vanilla, you can have A->B->A->B->... talk.
+Dialogs can be unique (only triggering once per playthrough) and have odds (if something is not unique, you don't necessarily want to see it every single time)
+Possible conditions that trigger banter:
+- PawnDamaged, PawnHealed
+- PawnFire, PawnExtinguished
+- PawnAcided, PawnUnacided
+- PawnFrozen, PawnUnfrozen
+- PawnGrappled, PawnUngrappled
+- PawnShielded, PawnUnshielded
+- PawnBoosted, PawnUnboosted
+- PawnSelected, PawnDeselected
+- PawnKilled, PawnRevived
+Possible rules to check:
+- Personality (this is Kai/Shinji/Rei)
+- Weapon (pawn has a Positron Rifle equipped)
+- Mech (pawn is in the Swap Mech; not super relevant here since pilot == mech; I think this can also be used to detect specific enemy types, like "moved next to Kaworu")
+- MechClass (pawn is in a Prime-class mech; not super relevant since they are all Cyborgs)
+- HealthLower, HealthGreater (oh no Rei is hurt; finishing off an angel)
+- Not, And, Or (to combine rules)
+
+Example of possible dialogs to trigger:
+- Shinji moves next to Kaworu, is carrying a prog knife, and Kaworu is no longer unkillable.
+- Rei is carrying the Spear of Longinus and rambles to herself

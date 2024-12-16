@@ -261,17 +261,21 @@ local function EVENT_onModsLoaded()
 					for index, value in ipairs(extract_table(Board:GetReachable(point, 3, Eva:GetPathProf()))) do
 						if value == closestSpace then has_value = true end
 					end
+					local ret = SkillEffect()
 					if not has_value then 
 						Eva:SetJumper(true) 	
 						ret:AddSound("/weapons/boosters")
+						Board:AddEffect(ret)
 					end
 					Eva:SetHealth(1)
 					Eva:SetActive(true)
 					Eva:Move(closestSpace)
 					if not has_value then 
+						ret = SkillEffect()
 						ret:AddBurst(landing,"Emitter_Burst_$tile",DIR_NONE)
 						ret:AddBounce(landing,3)
 						ret:AddSound("/impact/generic/mech")
+						Board:AddEffect(ret)
 					end
 					local damage = 2 + Game:GetSector()
 					-- local reactorTable = saveData.getPawnKey(i, "reactor")

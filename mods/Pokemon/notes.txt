@@ -1,15 +1,178 @@
+To do:
+- Add strike anims for Scyther line
+- Add requires on libs for customEmitter & CustomAnim
+- Zapdos applies shocked
+- Moltres applies dry
+- In Hunting Missions, the Vampire bugs when dropped into a chasm while frozen
+- Do Arceus dialogue
+- Ogerpon: has Ivy Cudgel (can self-target to switch masks, whack adjacent for root/wet/fire/push)
+
+Squads: 
+Martials (Lucario, Urshifu, Tyrogue)
+Lucario: Aura moves stronger if low on health
+- Aura Fist/Combo: multipunch that pushes, turns into auraspheres if no one in front; +1 hit per damage taken
+- Double Team/Extreme Speed: confuse all enemies hitting tile; can dash to a location first as ESpeed
+- Aura Break: Have orbiting auraspheres around Lucario deal 1x4 damage, then become Dreadful
+Urshifu: either massive knockback or multihit
+- Power-up Punch: gain boosted
+- Surging Strikes: 1x3, can dash to a location to hit things along the side
+- Wicked Blow: 3, push to max range
+- Taunt: redirect attacks towards self; apply Bloodthirsty
+Tyrogue:
+- Power-up Punch, Double Kick (hit twice and push on second hit, or hit&push both sides)
+- Elemental Punch (chill/shock/fire)
+- High-Jump Kick (leap in a direction, dealing 4+push; if not hit, take 1 damage)
+- Triple Kick (damage+push; if nothing in tile, move to location; repeat), Spin Kick (damage and push all adjacent clockwise, forget Double Kick)
+XYZ (Xerneas, Yveltal, Zygarde)
+Yveltal: consumes HP
+- laser where max range = HP consumed
+- drain that keeps draining while not full health
+Zygarde:
+- Crunch, Thousand Arrows
+
+local pawn = Board:GetPawn(0) pawn:SetHealth(1) Board:RemovePawn(pawn) Board:AddPawn(pawn, Point(0,0))
+
+This Powershell command helped rename assets
+Get-ChildItem -Path . -OutVariable dirs
+foreach ($i in $dirs) { Rename-Item $i.name ("Omega"+$i.name) }
+
+
+Rewrite sleep so that it has a second value: whether damage wakes up the pawn
+Blind on mechs: can only use first weapon (by removing the second weapon temporarily)?
+
+Make Rain not put out fires on wildfire (Kartoflame) or Archive's forest mission
+
+Remake Spatial Rend (hit any line on the board, leave item that destroys tile when triggered
+
+Horde prefix - does not count against spawn cap, look at swarmer
+
+cool idea: give the player disposable helper units (helis, tank, artillery, whatever) that cannot harm angels (either explicitly coded in their weapons, or just because they deal 1 damage and the angel is armored); same with environments (reuse archive bombers, but the bombs deal 1 damage to Evas and Angels)
+have an environment that drop an N² bomb that takes a turn to explode, you have to force the Angel to stay close to it
+
+Eldritch Mechs
+
+- Popevent when building sees insanity weapon? "Iä! Iä!"
+- Better tipimages
+
+acheter 2 baguettes demain comme ça on fait un sandwich à Yumeko (sauce moutarde miel, jambon?)
+
+- TipImages
+- Tentacles needs Multishot goodness to display damage nicely
+- Tentacles doesn't apply doom
+- Octopus as well but we need some cool looping
+- Need to prevent Abdul's insanity removal check from triggering on pilots... with insanity using weapons?
+
+If faced on maps with no buildings, can give them larger AoEs.
+- Giratina:
+  - Shadow Force: leave board, do a queued attack?
+  - Calamitous Slash
+  - Dark Tendrils: grab from all four directions, damage enemies, pull units
+  - Drag Down: enemy falls and dies
+  - Hex: hit all allies, apply Anti-Heal
+  - Devour Light: leech
+- Dialga:
+  - Roar of Time (set all allies active; Dialga sleeps)
+  - Dragon Claw (damage 3 front/line)
+- Primal Dialga
+  - Ancient Power (rain rocks in a 3 tiles radius)
+  - Dragon Pulse (laser in 4 directions)
+  - Recover (heals back to HP it had one turn before)
+  - Primal Roar of Time (damages all tiles; grants 1 more turn; puts P!Dialga to sleep)
+- Palkia:
+  - Spatial Rend (controllable laser range-wise, swap terrain of first and last tile)
+  - Dragon Claw
+  - Wormhole (TP self+all adjacent to loc)
+- Primal Palkia:
+  - Ancient Power
+  - Dragon Pulse
+  - Recover
+  - Primal Spatial Rend (scramble terrain, cracks all ground tiles)
+- Arceus:
+  - Grants Glory to everything.
+  - Judgment:pew pew
+  - Extreme Speed: zoom zoom
+  - Starbirth: spawn small stars in a + unqueued; fuses them to damage all by the amount of stars left unsnuffed.
+  - Unmake: kill half the board and replace it with chasms; does it again, don't kill if tile has Arceus
+  - Astral Barrage: Projectiles that come from both sides of the map; they heal Arceus and damage everyone else
+  - Trinity, Starbirth, Divine Ray, Altered Creation, Astral Barrage, Focus Blast, Light of Ruin, Draco Meteor, Shadow Force/Roar of Time/Spatial Rend
+  - Dialogue:
+    - "I am that which mankind calls Arceus. You who seek my power, demonstrate your might."
+    - "You have fought well. I have seen your struggles. I have heard the laughter of fate."
+    - "Your bonds are beautiful. I am very proud."
+    - "Take pride in this victory. Find in it the courage to protect your world."
+  - Has like 30 HP in its second form.
+
 Future plans:
+- Have a mod option to make branches random instead.
+- Add Struggle: if a Pokemon goes into battle with no weapons, give it struggle, remove at the end
+
 - Starters squad (Charizard/Blastoise/Venusaur, with triple attack & mega for Charizard)
 - Ghosts squad (Gengar/Dusknoir/Chandelure/Banette+Mega/Mimikyu)
+- Ogerpon
+  - Changes masks in battle: grass/water/fire/rock
+- Tinkaton
+  - Gigaton Hammer: oneshot, can't be used twice in a row
+  - Spin: go from A to B, knocking back all adjacents 
+- Dog Squad (Lycanroc/Houndoom+Mega/Arcanine)
+  - Lycanroc
+    - Midnight is reckless, Midday is cautious, Dusk is both
+      Night Slash/Accelerock/Head Smash
+  - Houndoom
+    - Powered up by being on fire, can cast Crunch/Ember/Flamethrower/Inferno/Payback
+  - Arcanine
+    - Can evolve into Hisui Arcanine or Arcanine
+    - Flare Blitz/Raging Fury/Fire Fang/Extreme Speed/Head Smash
+- Music Squad (Meloetta/Jigglypuff/Noivern)
+  - Relic Song, Pirouette, Sing, Metronome, Supersonic, Boomburst, Echoed Voice, Sonic Bazooka, Resonance
+    - Echoed Voice: damage around area; next time used, also damage from that point as though Meloetta were there
+    - Supersonic: confuses Vek
+    - Boomburst: beam/PBAoE push
+    - Sing: puts to sleep
+    - Metronome: Casts a random move (no upgrade, so KeepAdding?)
+    - Pirouette: Jump over every second/third tile, can two-click to do it in another direction
+    - Relic Song: AoE sleep
+    - Resonance: deals more damage for allies adjacent/on the way?
+    - Chorus: one more shot per adjacent ally? also fires from adjacent ally?
+- Starters:
+  Interplay between water/grass/fire, sun/rain
+  - Venusaur needs water and sun to grow. For each turn in rain, gains damage, for each turn in sun gains shots?
+  - Applying fire is stronger in sun, but smokes enemies in rain.
+  - Skills can self-target to do Sunny Day/Rain Dance, free action once per mission
+  - Venusaur
+    - Bullet Seed/Razor Leaf(like Bullet Seed but stops at a location&returns), Vine Whip (pull), Leech Seed, Roots
+    - Solar Beam (queued, unqueued in sun)
+  - Blastoise
+    - Water Gun/Bubble Beam/Hydro Pump, shell bouncy thing, Hydro Pump
+    - +1 speed in rain
+  - Charizard
+    - boost in sun
+    - Ember/Flame Wheel/Flamethrower, Fly
+    - Mega X: Dragonbreath
+    - Mega Y: Heat Wave (damages all fire tiles and tiles adjacent to fire)
 - Islands (Pokemon as enemies, profs as CEOs)
-  - Two-phase mission where you go to a moon biome to fight Deoxys/Lunarock/Solarock/Minior/Elgyem
+  - Two-phase mission where you go to a moon biome to fight Deoxys/Lunarock/Solarock/Minior/Elgyem/Beelem
+    - Phase 1: 2x2 rocket, protect and be adjacent at end of mission
+      - need custom maps probably
+      - what of shield/ice graphics?
+    - Phase 2: on the moon, no spawns, fight Deoxys & random enemies from list
+      - Rocket is basically big pylon, if dead you lose
+      - Lunarock: 
+      - Solarock:
+      - Minior:
+      - LGM:
+      - BLM:
   - Lavender Tower mission where enemies spawn temp Ghastlies on death/tower spawns them
 - Pokemon enemies:
   - Some are island-specific, can spawn in final island (Magmar/Magmortar, Slugma/Magcargo, Numel/Camerupt, Heatran/Entei as boss)
   - Bug-types can spawn anywhere, others in specific islands/tileset
   - Water-types are massive and heal in water
+- Enemies that have decent sink anims:
+  - Sandshrew/Sandslash
+  - Diglett/Dugtrio
+
 - Missions where your reward is a Mega Stone, which enables Mega-Evo for that Pokemon permanently as an achievement
   - Sprited Megas: Charizard X, Absol, Mewtwo Y, Houndoom, Sceptile, Gardevoir, Branette, Camerupt, Lopunny, Gallade
+- Destroying mountains rolls a fossil you can collect, granting achievement towards fossil squad
 
 
 HM moves

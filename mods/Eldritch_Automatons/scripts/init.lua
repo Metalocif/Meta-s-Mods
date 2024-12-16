@@ -25,12 +25,8 @@ end
 
 function mod:init()
 	require(self.scriptPath .."pilot")
-	-- require(self.scriptPath .."tentacular")
-	-- require(self.scriptPath .."worm")
-	-- require(self.scriptPath .."octopus")
 	require(self.scriptPath .."weapons")
 	require(self.scriptPath .."pawns")
-	-- require(self.scriptPath .."dialog")
 	
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
 end
