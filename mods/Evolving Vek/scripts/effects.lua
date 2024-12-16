@@ -468,7 +468,6 @@ function Meta_ElectrifiedWeapon:GetSkillEffect(p1, p2)	--unholy fusion of the us
 			if not explored[hash(current)] then
 				explored[hash(current)] = true
 				if Board:IsPawnSpace(current) or Board:GetTerrain(current) == TERRAIN_BUILDING then
-					local direction = nil
 					ret:AddAnimation(current,"Lightning_Hit")
 					for i = DIR_START, DIR_END do
 						local neighbor = current + DIR_VECTORS[i]
