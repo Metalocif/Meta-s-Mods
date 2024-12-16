@@ -151,18 +151,12 @@ function Meta_shapeshifterAtkC1:GetSkillEffect(p1,p2)
 	local blob = Board:GetPawn(p1)
 	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
-	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
-			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
-			end
-			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
-			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
-			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 	end
 	
@@ -210,18 +204,12 @@ function Meta_shapeshifterAtkS1_StarfishAtk:GetSkillEffect(p1,p2)
 	local blob = Board:GetPawn(p1)
 	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
-	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
-			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
-			end
-			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
-			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
-			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 	end
 	
@@ -230,12 +218,10 @@ function Meta_shapeshifterAtkS1_StarfishAtk:GetSkillEffect(p1,p2)
 		local damage = SpaceDamage(curr,self.Damage)
 		damage.sAnimation = "explogoostarfish_"..dir
 		damage.sSound = self.SoundBase.."/attack"
-		if Board:GetPawn(curr) and CustomAnim:get(Board:GetPawn(curr):GetId(), "gunk") then
-			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
-			end
-			ret:AddQueuedDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
+		local gunkedPawn = Board:GetPawn(curr)
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 		ret:AddQueuedDamage(damage)
 	end

@@ -43,39 +43,7 @@ a.Meta_sludgegooa = a.Meta_sludgegoo:new{ Image = imagepath..name.."a.png", NumF
 -- a.Meta_sludgegoo2d = a.BaseEmerge:new{Image = imagepath .. "deathgoobig.png", PosX = -23, PosY = 5, NumFrames = 7, Height = 1}
 -- a.Meta_sludgegoo2a = a.Meta_sludgegoo:new{ Image = imagepath..name.."2.png", NumFrames = 1 }
 
-ANIMS.gunk = Animation:new{
-	Image = "effects/gunk.png",
-	NumFrames = 1,
-	Loop = true,
-	PosX = -15,
-	PosY = 0
-}
 
-merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Enemy units heal 1 damage. Allied units are inflicted with Gunk. (Gunk: -1 Move. Blobs that melee attack or move next to a unit with Gunk remove Gunk and heal 1 damage.)"},} )
-Meta_BlobGunk = { Image = "effects/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "effects/gunk.png", UsedImage = ""}
-Location["effects/gunk.png"] = Point(-16,7)
-
-BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
-    if removed_item == "Meta_BlobGunk" then
-        local pawn = Board:GetPawn(loc)
-        if pawn then
-			local gunk_damage = SpaceDamage(loc)
-			if pawn:GetTeam() == TEAM_ENEMY then 
-				gunk_damage.iDamage = -1 
-				if not pawn:IsDamaged() and pawn:GetMaxHealth() == _G[pawn:GetType()].Health then pawn:SetMaxHealth(pawn:GetHealth() + 1) end
-				--if we would heal a full health Vek, increase its max health beforehand unless we already did
-			else
-				CustomAnim:add(pawn:GetId(), "gunk")
-				if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
-				GetCurrentMission().GunkTable[pawn:GetId()] = 1
-				-- pawn:AddMoveBonus(-1)
-				pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
-				pawn:ClearUndoMove()
-			end
-			Board:DamageSpace(gunk_damage)
-        end
-    end
-end)
 
 -------------
 -- Weapons --
@@ -115,18 +83,12 @@ function Meta_sludgegooAtk1:GetSkillEffect(p1,p2)
 	local blob = Board:GetPawn(p1)
 	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
-	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
-			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
-			end
-			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
-			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
-			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 	end
 	
@@ -153,13 +115,12 @@ function Meta_sludgegooAtk1:GetSkillEffect(p1,p2)
 	end
 	if distance == 1 and doDamage then
 		ret:AddQueuedMelee(p1,damage, NO_DELAY)
-		if Board:GetPawn(p2) and CustomAnim:get(Board:GetPawn(p2):GetId(), "gunk") then
+		if Board:GetPawn(p2) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") then
 			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
 				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
 			end
 			ret:AddQueuedDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
-			ret:AddQueuedScript("table.remove(GetCurrentMission().GunkTable,"..pawn:GetId()..")")
+			ret:AddQueuedScript(string.format("Status.Remove(%s, %q)", Board:GetPawn(curr):GetId(), "Gunk"))
 		end
 	else
 		local dest = target - DIR_VECTORS[direction]
@@ -174,12 +135,12 @@ function Meta_sludgegooAtk1:GetSkillEffect(p1,p2)
 		end
 		if doDamage then 
 			ret:AddQueuedDamage(damage) 
-			if Board:GetPawn(p2) and CustomAnim:get(Board:GetPawn(p2):GetId(), "gunk") then
-			if Board:GetPawn(dest) and not Board:GetPawn(dest):IsDamaged() then
-				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", dest:GetString(), Board:GetPawn(dest):GetHealth() + 1))
+			if Board:GetPawn(p2) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") then
+				if Board:GetPawn(dest) and not Board:GetPawn(dest):IsDamaged() then
+					ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", dest:GetString(), Board:GetPawn(dest):GetHealth() + 1))
+				end
+				ret:AddQueuedDamage(SpaceDamage(dest, -1))
 			end
-			ret:AddQueuedDamage(SpaceDamage(dest, -1))
-		end
 		end
 	end
 	

@@ -90,18 +90,12 @@ function Meta_pylongooAtk1:GetSkillEffect(p1,p2)
 	local blob = Board:GetPawn(p1)
 	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
-	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
-			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
-			end
-			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
-			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
-			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 	end
 	
@@ -148,6 +142,7 @@ Meta_pylongoo1 = Pawn:new{
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_BLOB,
 	IsDeathEffect = true,
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("Meta_pylongoo1")
 
@@ -198,6 +193,7 @@ Meta_pylongoo2 = Meta_pylongoo1:new{
 	ImpactMaterial = IMPACT_BLOB,
 	Tier = TIER_ALPHA,
 	IsDeathEffect = true,
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("Meta_pylongoo2")
 

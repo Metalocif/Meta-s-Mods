@@ -82,18 +82,12 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 	local blob = Board:GetPawn(p1)
 	if not blob then return ret end
 	--check for adjacent gunk to eat unqueued, used on all goos
-	if GetCurrentMission().GunkTable == nil then GetCurrentMission().GunkTable = {} end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and CustomAnim:get(gunkedPawn:GetId(), "gunk") then
-			if blob:GetMaxHealth() == _G[blob:GetType()].Health and not blob:IsDamaged() then
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMaxHealth(%s)", p1:GetString(), blob:GetHealth() + 1))
-			end
-			ret:AddDamage(SpaceDamage(p1, -1))
-			ret:AddScript(string.format("CustomAnim:rem(%s, %q)", gunkedPawn:GetId(), "gunk"))
-			ret:AddScript("table.remove(GetCurrentMission().GunkTable,"..gunkedPawn:GetId()..")")
-			ret:AddScript(string.format("Board:GetPawn(%s):SetMoveSpeed(%s)", curr:GetString(), gunkedPawn:GetMoveSpeed() + 1))
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 	end
 	
@@ -105,12 +99,10 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 	if anim == "Meta_nestedgoo2" then tier = 2 end
 	if anim == "Meta_nestedgoo3" then tier = 3 end
 	if tier == 1 or tier == 3 then
-		if Board:GetPawn(p2) and CustomAnim:get(Board:GetPawn(p2):GetId(), "gunk") then
-			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
-			end
-			ret:AddQueuedDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(p2):GetId(), "gunk"))
+		local gunkedPawn = Board:GetPawn(p2)
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 		local damage = SpaceDamage(p2, self.Damage)
 		damage.sAnimation = "explogoomosquito_"..dir
@@ -119,12 +111,10 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 	end
 	if tier >= 2 then
 		local curr = p1 + DIR_VECTORS[(dir+1)%4] + DIR_VECTORS[(dir+2)%4]
-		if Board:GetPawn(curr) and CustomAnim:get(Board:GetPawn(curr):GetId(), "gunk") then
-			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
-			end
-			ret:AddQueuedDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
+		local gunkedPawn = Board:GetPawn(curr)
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 		local damage = SpaceDamage(curr,self.Damage)
 		damage.sAnimation = "explogoostarfish_"..(dir+1)%4
@@ -132,12 +122,10 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 		ret:AddQueuedDamage(damage)
 		
 		curr = p1 + DIR_VECTORS[(dir+2)%4] + DIR_VECTORS[(dir+3)%4]
-		if Board:GetPawn(curr) and CustomAnim:get(Board:GetPawn(curr):GetId(), "gunk") then
-			if Board:GetPawn(p1) and not Board:GetPawn(p1):IsDamaged() then
-				ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetHealth(%s)", p1:GetString(), Board:GetPawn(p1):GetHealth() + 1))
-			end
-			ret:AddQueuedDamage(SpaceDamage(p1, -1))
-			ret:AddQueuedScript(string.format("CustomAnim:rem(%s, %q)", Board:GetPawn(curr):GetId(), "gunk"))
+		gunkedPawn = Board:GetPawn(curr)
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
+			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
 		damage = SpaceDamage(curr,self.Damage)
 		damage.sAnimation = "explogoostarfish_"..(dir+2)%4
@@ -164,6 +152,7 @@ Meta_nestedgoo1 = Pawn:new{
 	ImpactMaterial = IMPACT_BLOB,
 	IsDeathEffect = true,
 	Corpse = true,
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("Meta_nestedgoo1")
 
@@ -206,6 +195,7 @@ Meta_nestedgoo2 = Meta_nestedgoo1:new{
 	Tier = TIER_ALPHA,
 	IsDeathEffect = true,
 	Corpse = true,
+	OnAppliedGunk = Status.HealFromGunk,
 }
 AddPawn("Meta_nestedgoo2")
 
