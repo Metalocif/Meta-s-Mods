@@ -58,7 +58,7 @@ modApi:appendAsset("img/portraits/enemy/OmegaTotem2.png", resourcePath.."img/por
 
 OmegaBurnbug2 = Pawn:new{
 	Name = "Omega Burnbug",
-	Health = 5,
+	Health = 4,
 	MoveSpeed = 3,
 	Image = "Omegaburnbug",
 	ImageOffset = 1,
@@ -75,7 +75,7 @@ AddPawn("OmegaBurnbug2")
 OmegaFirefly2 = Pawn:new{
 	Name = "Omega Firefly",
 	Health = 5,
-	MoveSpeed = 3,
+	MoveSpeed = 2,
 	Image = "Omegafirefly",
 	ImageOffset = 1,
 	Ranged = 1,
@@ -90,7 +90,7 @@ AddPawn("OmegaFirefly2")
 
 OmegaLeaper2 = Pawn:new{
 	Name = "Omega Leaper",
-	Health = 3,
+	Health = 2,
 	MoveSpeed = 4,
 	Image = "Omegaleaper",
 	ImageOffset = 1,
@@ -108,7 +108,7 @@ AddPawn("OmegaLeaper2")
 OmegaScarab2 = Pawn:new{
 	Name = "Omega Scarab",
 	Health = 4,
-	MoveSpeed = 3,
+	MoveSpeed = 2,
 	Image = "Omegascarab",
 	ImageOffset = 1,
 	Ranged = 1,
@@ -170,8 +170,8 @@ AddPawn("OmegaCentipede2")
 
 OmegaBouncer2 = Pawn:new{
 	Name = "Omega Bouncer",
-	Health = 5,
-	MoveSpeed = 4,
+	Health = 4,
+	MoveSpeed = 3,
 	Image = "Omegabouncer",
 	ImageOffset = 1,
 	SkillList = { "OmegaBouncerAtk2" },
@@ -186,7 +186,7 @@ AddPawn("OmegaBouncer2")
 OmegaMoth2 = Pawn:new{
 	Name = "Omega Moth",
 	Health = 5,
-	MoveSpeed = 4,
+	MoveSpeed = 3,
 	Flying = true,
 	Image = "Omegamoth",
 	ImageOffset = 1,
@@ -229,7 +229,7 @@ OmegaHornet2 = Pawn:new{
 	ImpactMaterial = IMPACT_INSECT,
 	Tier = TIER_ALPHA,
 }
-AddPawn("OmegaMosquito2")
+AddPawn("OmegaHornet2")
 
 OmegaBurrower2 = Pawn:new{
 	Name = "Omega Burrower",
@@ -311,7 +311,7 @@ AddPawn("OmegaTotem2")
 OmegaCrab2 = Pawn:new{
 	Name = "Omega Crab",
 	Health = 5,
-	MoveSpeed = 2,
+	MoveSpeed = 3,
 	Image = "Omegacrab",
 	ImageOffset = 1,
 	Ranged = 1,
@@ -327,7 +327,7 @@ AddPawn("OmegaCrab2")
 OmegaBeetle2 = Pawn:new{
 	Name = "Omega Beetle",
 	Health = 5,
-	MoveSpeed = 3,
+	MoveSpeed = 2,
 	Image = "Omegabeetle",
 	ImageOffset = 1,
 	-- Ranged = 1,
@@ -344,7 +344,7 @@ AddPawn("OmegaBeetle2")
 OmegaStarfish2 = Pawn:new{
 	Name = "Omega Starfish",
 	Health = 3,
-	MoveSpeed = 4,
+	MoveSpeed = 3,
 	Image = "Omegastarfish",
 	ImageOffset = 1,
 	Ranged = 1,
@@ -355,11 +355,12 @@ OmegaStarfish2 = Pawn:new{
 	ImpactMaterial = IMPACT_INSECT,
 	Tier = TIER_ALPHA,
 	IsDeathEffect = true,
-	DeathSpawn = "OmegaStarfish1"
+	DeathSpawn = "OmegaStarfish2Spawn"
 }
 AddPawn("OmegaStarfish2")
 
-OmegaStarfish1 = {	--not actually different from Starfish1, I just couldn't get the game to make deathspawns minor and 1 max HP
+OmegaStarfish2Spawn = {	--not actually different from Starfish1, I just couldn't get the game to make deathspawns minor and 1 max HP
+	--if we call it OmegaStarfish1 the game replaces Starfishes with this
 	Name = "Starfish",
 	Health = 1,
 	MoveSpeed = 3,
@@ -371,7 +372,7 @@ OmegaStarfish1 = {	--not actually different from Starfish1, I just couldn't get 
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT
 }
-AddPawn("OmegaStarfish1")
+AddPawn("OmegaStarfish2Spawn")
 
 function OmegaStarfish2:GetDeathEffect(point)
 	local ret = SkillEffect()
@@ -427,7 +428,7 @@ AddPawn("OmegaSpider2")
 OmegaBlobber2 = Pawn:new{
 	Name = "Omega Blobber",
 	Health = 4,
-	MoveSpeed = 3,
+	MoveSpeed = 2,
 	Image = "Omegablobber",
 	ImageOffset = 1,
 	SkillList = { "OmegaBlobberAtk2" },

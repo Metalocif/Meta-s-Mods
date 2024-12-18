@@ -1,0 +1,8 @@
+v1.0.1
+- Omega Leaper has 2 HP, down from 3. Being stable and smartly webbing mechs makes it harder to handle/kill already.
+- Omega Scarab has 2 movement, down from 3. It already autohits all mechs; its main shot should be slightly worse.
+- Brought many Omega statlines in line with the Alpha version.
+- Fixed an issue where some regular, non-Alpha Starfishes would have 1 max HP instead of 2.
+
+v1.0
+- Release. Each Alpha Vek has its Omega version.
