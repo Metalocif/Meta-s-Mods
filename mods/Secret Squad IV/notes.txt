@@ -1,4 +1,2 @@
-- achievements: 
-  - Well-Laid Web: have a Vek get opportunistically attacked by 2+ units at once
-  - Biggest Goo: create the largest goo.
-  - Perfectly Ultimate Great Firefly: Fire firefly_AB, level 2, with HP upgrade and move upgrade.
+- Check achievements (Greatest Goo is fine)
+- Gunk should be fired at the blob as an artillery when eating off the ground/unit?

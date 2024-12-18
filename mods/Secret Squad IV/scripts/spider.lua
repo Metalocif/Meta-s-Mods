@@ -57,6 +57,8 @@ local GooeyPawns = {
 	--all my Blobs
 	"Meta_nestedgoo", "Meta_pylongoo", "Meta_shapeshifter", "Meta_sludgegoo", "Meta_spikygoo", "Meta_splittinggoo", 
 	"Meta_TitanicGooBoss",	
+	--Cyborg Weapons deployables
+	"CyborgWeapons_Deployable_MediumOoze", "CyborgWeapons_Deployable_SmallOoze",	
 	--vanilla
 	"BlobBoss",
 	"Blob1", "Blob2", "BlobB",
@@ -136,10 +138,9 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 			end
 			Board:AddEffect(ret)
         end
+		if achievementCounter >= 2 then completeWellLaidWeb() end
     end
-	if achievementCounter >= 2 then
-		ret:AddScript("completeWellLaidWeb()")
-	end
+	
 end)
 
 

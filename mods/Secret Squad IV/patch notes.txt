@@ -1,0 +1,13 @@
+v0.2
+- Sludges now have 2 HP and self-damage 1 when using their weapon.
+- Goos can no longer move again after evolving.
+- Applying gunk to a goo now evolves it if possible instead of healing it.
+- Evolved goos are now correctly owned by the blobber that spawned the unevolved version.
+- Evolved goos that were grappled before evolving are now grappled again after evolution.
+- When a goo evolves, it now eats all adjacent gunk at once, which makes more sense to the player.
+- Gunk items are correctly removed when eaten by goos.
+- Remade the Techno-Firefly's weapon entirely to be less buggy and confusing.
+- Achievements are go.
+v0.1
+- Initial upload.
+

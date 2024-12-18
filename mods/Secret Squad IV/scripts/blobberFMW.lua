@@ -213,7 +213,7 @@ function meta_BlobAtk1:GetSkillEffect(p1, p2)
 					todo[#todo+1] = curr
 					origin[hash(curr)] = current
 				end
-				ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", current:GetString(), ""))
+				ret:AddQueuedScript(string.format("Board:RemoveItem(%s)", current:GetString()))
 				if pawn then ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, %q)", pawn:GetId(), "Gunk")) end
 			end
 		end
@@ -226,7 +226,7 @@ end
 meta_sludge = {
 	Name = "Sludge",
 	Class = "TechnoVek",
-	Health = 1,
+	Health = 2,
 	MoveSpeed = 3,
 	Minor = true,
 	Image = "meta_sludge",			
@@ -270,7 +270,51 @@ function meta_SludgeAtk1:GetSkillEffect(p1, p2)
 		if Board:GetPawn(curr) then damage.sScript = string.format("Status.ApplyGunk(%s)", Board:GetPawn(curr):GetId()) end
 		ret:AddDamage(damage)
 	end
+	ret:AddDamage(SpaceDamage(p1, self.SelfDamage))
 	return ret
+end
+
+function levelUpGoo(gooId)
+	local goo = Board:GetPawn(gooId)
+	local evolveInto
+	if not goo then return end
+	local p1 = goo:GetSpace()
+	local hadMoved = goo:IsMovementSpent() or not goo:IsActive()
+	local wasGrappledFrom = {}
+	if goo:IsGrappled() then
+		for i = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[i]
+			local pawn = Board:GetPawn(curr)
+			if pawn and pawn:IsQueued() then
+				local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(pawn:GetSpace(), pawn:GetQueuedTarget())
+				for _, spaceDamage in ipairs(extract_table(fx.effect)) do
+					if spaceDamage:GetGrappleTarget() == p1 then wasGrappledFrom[i] = true end
+				end
+			end
+		end	
+	end
+	if goo:GetType() == "meta_goo" then
+		evolveInto = "meta_goo2"
+	elseif goo:GetType() == "meta_goo2" then
+		evolveInto = "meta_goo3"
+	else
+		Status.ApplyGunk(gooId)
+		modApi:runLater(function() goo:FireWeapon(p1, 1) end)
+		return
+	end
+	local unit = PAWN_FACTORY:CreatePawn(evolveInto)
+	unit:SetOwner(goo:GetOwner())
+	unit:SetMovementSpent(hadMoved)
+	Board:RemovePawn(goo)
+	Board:AddPawn(unit, p1)
+	local fx = SkillEffect()
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		if wasGrappledFrom[i] then fx:AddGrapple(curr, p1, "hold") end
+	end
+	Board:AddEffect(fx)
+	modApi:runLater(function() unit:FireWeapon(p1, 1) end)
+	--this bit is to resume eating adjacent gunk all at once
 end
 
 
@@ -285,7 +329,7 @@ meta_goo = {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
 	Portrait = "enemy/BlobBoss",
-	OnAppliedGunk = Status.HealFromGunk,
+	OnAppliedGunk = levelUpGoo,
 }
 AddPawn("meta_goo")  
 
@@ -327,13 +371,11 @@ function meta_gooAtk1:GetSkillEffect(p1, p2)
 				preview.sPawn = "meta_goo2"
 				weaponPreview:AddDamage(preview)
 				if Board:GetItem(curr) == "Meta_BlobGunk" then
-					LOG("found item")
-					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+					ret:AddScript(string.format("Board:RemoveItem(%s)", curr:GetString()))
 				else
 					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
 				end
-				ret:AddScript(string.format("Board:RemovePawn(Board:GetPawn(%s))", p1:GetString()))
-				ret:AddScript(string.format("Board:AddPawn(%q, %s)", "meta_goo2", p1:GetString()))
+				ret:AddScript(string.format("levelUpGoo(%s)", Board:GetPawn(p1):GetId()))
 				return ret
 			end
 		end
@@ -354,7 +396,7 @@ meta_goo2 = {
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,	
 	Portrait = "enemy/BlobBoss",
-	OnAppliedGunk = Status.HealFromGunk,
+	OnAppliedGunk = levelUpGoo,
 }
 AddPawn("meta_goo2")  
 
@@ -396,13 +438,11 @@ function meta_gooAtk2:GetSkillEffect(p1, p2)
 				preview.sPawn = "meta_goo2"
 				weaponPreview:AddDamage(preview)
 				if Board:GetItem(curr) == "Meta_BlobGunk" then
-					LOG("found item")
-					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+					ret:AddScript(string.format("Board:RemoveItem(%s)", curr:GetString()))
 				else
 					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
 				end
-				ret:AddScript(string.format("Board:RemovePawn(Board:GetPawn(%s))", p1:GetString()))
-				ret:AddScript(string.format("Board:AddPawn(%q, %s)", "meta_goo3", p1:GetString()))
+				ret:AddScript(string.format("levelUpGoo(%s)", Board:GetPawn(p1):GetId()))
 				return ret
 			end
 		end
@@ -464,14 +504,12 @@ function meta_gooAtk3:GetSkillEffect(p1, p2)
 			local curr = p1 + DIR_VECTORS[i]
 			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
 				if Board:GetItem(curr) == "Meta_BlobGunk" then
-					LOG("found item")
-					ret:AddScript(string.format("Board:SetItem(%s,'')", curr:GetString()))
+					ret:AddScript(string.format("Board:RemoveItem(%s)", curr:GetString()))
 				else
 					ret:AddScript(string.format("Status.RemoveStatus(Board:GetPawn(%s):GetId(), %q)", curr:GetString(), "Gunk"))
 				end
-				ret:AddScript(string.format("Status.ApplyGunk(%s)", Board:GetPawn(p1):GetId()))
+				ret:AddScript(string.format("levelUpGoo(%s)", Board:GetPawn(p1):GetId()))
 				ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetActive(true) end)", Board:GetPawn(p1):GetId()))
-
 				return ret
 			end
 		end
