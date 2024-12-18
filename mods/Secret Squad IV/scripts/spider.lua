@@ -9,21 +9,21 @@ modApi:appendAsset("img/achievements/WellLaidWeb.png", path .."img/achievements/
 meta_spider=Skill:new{
 	Name="Predating Mandibles",
 	Class="TechnoVek",
-	Description="Damages a target. Spawns a spiderling egg on kill. It hatches instantly if the target was gunked or gooey (Blobs, goos, and sludges are gooey).",
+	Description="Damages a target. Spawns a spiderling on kill. It is boosted if the target was gunked or gooey (Blobs, goos, and sludges are gooey). Can be used on empty tiles to lay a spiderling egg.",
 	Icon="weapons/spider.png",
 	Damage=2,
 	PowerCost=0,
 	Upgrades=2,
-	UpgradeCost={2,3},
+	UpgradeCost={1,3},
 	UpgradeList={"Webs","+2 Damage"},
-	OnKill = "Spawn an egg",
+	OnKill = "Spawn a spiderling",
 	LaunchSound = "/enemy/scorpion_1/attack",
 	TipImage = {
 		Unit = Point(2,3),
 		Enemy = Point(2,2),
 		Target = Point(2,2),
 		CustomPawn = "Meta_TechnoSpider",
-		-- CustomEnemy = "Scarab1",
+		CustomEnemy = "Scarab1",
 	}
 }
 meta_spider_A = meta_spider:new{UpgradeDescription = "Adds webs on adjacent tiles. Stepping on a web causes Techno-Spiders, allied spiderlings, and arachnoids to opportunistically attack the pawn.", WebAdjacent=true}
@@ -57,6 +57,8 @@ local GooeyPawns = {
 	--all my Blobs
 	"Meta_nestedgoo", "Meta_pylongoo", "Meta_shapeshifter", "Meta_sludgegoo", "Meta_spikygoo", "Meta_splittinggoo", 
 	"Meta_TitanicGooBoss",	
+	--Omega Vek
+	"OmegaBlob2",
 	--Cyborg Weapons deployables
 	"CyborgWeapons_Deployable_MediumOoze", "CyborgWeapons_Deployable_SmallOoze",	
 	--vanilla
@@ -75,8 +77,14 @@ end
 
 function meta_spider:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local boost = false
 	local damage = SpaceDamage(p2, self.Damage)
-	damage.sAnimation = "SwipeClaw2"
+	if Board:IsBlocked(p2, PATH_PROJECTILE) then 
+		damage.sAnimation = "SwipeClaw2" 
+	else 
+		damage.iDamage = 0
+		damage.sPawn = "meta_SpiderEgg"
+	end
 	if self.WebAdjacent then
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
@@ -87,29 +95,27 @@ function meta_spider:GetSkillEffect(p1,p2)
 	end
 	if p1 ~= p2 then
 		local spawn = ""
-		if Board:GetPawn(p2) then spawn = "meta_SpiderEgg" end
-		if Board:GetPawn(p2) and (Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") or IsGooey(Board:GetPawn(p2):GetType())) then spawn = "meta_Spiderling" end
+		if Board:GetPawn(p2) then spawn = "meta_Spiderling" end
+		if Board:GetPawn(p2) and (Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") or IsGooey(Board:GetPawn(p2):GetType())) then boost = true end
 		ret:AddMelee(p1, damage)
 		ret:AddScript(string.format([[
+		local userID = %s;
 		local p2 = %s;
-		local spawn = %q;
-		local queueP2 = %s;
+		local spider = PAWN_FACTORY:CreatePawn(%q)
+		spider:SetBoosted(%s)
+		spider:SetOwner(userID)
 		if Board:IsTipImage() then
-			Board:AddPawn(spawn, p2) 
+			Board:AddPawn(spider, p2) 
 		else
 			modApi:runLater(function() 
 				if not Board:IsBlocked(p2, PATH_GROUND) then 
-					Board:AddPawn(spawn, p2) 
+					Board:AddPawn(spider, p2) 
 				end 
 			end)
-		end]], p2:GetString(), spawn, tostring(spawn == "meta_SpiderEgg")))
+		end]], Board:GetPawn(p1):GetId(), p2:GetString(), spawn, tostring(boost)))
 	end
 	return ret	
 end
-
--- if queueP2 then 
-	-- modApi:runLater(function() Board:GetPawn(p2):FireWeapon(p2, 1) end)
--- end
 
 merge_table(TILE_TOOLTIPS, { TechnoWeb_Text = {"Techno-Spider Web", "Triggers attacks of opportunity from adjacent spiders and spiderlings."} } )
 
@@ -144,6 +150,17 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 end)
 
 
+function SpiderEggHatch(id)
+	local unit = PAWN_FACTORY:CreatePawn("meta_Spiderling")
+	local p1 = Board:GetPawn(id):GetSpace()
+	if Board:GetPawn(p1) then 
+		local wasFrozen = Board:GetPawn(p1):IsFrozen()
+		unit:SetOwner(Board:GetPawn(p1):GetOwner())
+		Board:GetPawn(p1):Kill(false) 
+		Board:AddPawn(unit,p1) 
+		if wasFrozen then unit:SetFrozen(true, true) end
+	end
+end
 
 meta_SpiderEgg ={
 	Name = "Spider Egg",
@@ -159,13 +176,14 @@ meta_SpiderEgg ={
 	SkillList = { "meta_Hatch1" },
 	SoundLocation = "/enemy/spiderling_egg/",
 	ImpactMaterial = IMPACT_FLESH,
+	OnAppliedGunk = SpiderEggHatch,
 }
 	
 AddPawn("meta_SpiderEgg")
 
 meta_Hatch1 = SelfTarget:new{ 
 	Name = "Hatch",
-	Description = "Hatch into a spiderling.",
+	Description = "Hatch into a spiderling. Hatches instantly when applied Gunk.",
 	Class = "TechnoVek",
 	TipImage = {
 		Unit = Point(2,2),
@@ -195,7 +213,11 @@ function meta_Hatch1:GetSkillEffect(p1,p2)
 		local unit = PAWN_FACTORY:CreatePawn(%q)
 		local p1 = %s
 		unit:SetActive(false)
-		if Board:GetPawn(p1) then Board:GetPawn(p1):Kill(false) Board:AddPawn(unit,p1) end
+		if Board:GetPawn(p1) then 
+			unit:SetOwner(Board:GetPawn(p1):GetOwner())
+			Board:GetPawn(p1):Kill(false) 
+			Board:AddPawn(unit,p1) 
+		end
 	end)]], "meta_Spiderling", p1:GetString()))	
 	--dirty hack because if it spawns on enemy turn the game queues it as though it were an enemy???
 	--for some reason just spawning a thing and doing SetActive(false) does not help

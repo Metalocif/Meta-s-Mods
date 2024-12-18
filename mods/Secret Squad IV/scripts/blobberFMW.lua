@@ -435,7 +435,7 @@ function meta_gooAtk2:GetSkillEffect(p1, p2)
 			local curr = p1 + DIR_VECTORS[i]
 			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
 				local preview = SpaceDamage(p1)
-				preview.sPawn = "meta_goo2"
+				preview.sPawn = "meta_goo3"
 				weaponPreview:AddDamage(preview)
 				if Board:GetItem(curr) == "Meta_BlobGunk" then
 					ret:AddScript(string.format("Board:RemoveItem(%s)", curr:GetString()))
@@ -503,6 +503,8 @@ function meta_gooAtk3:GetSkillEffect(p1, p2)
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
 			if (Board:GetPawn(curr) and Status.GetStatus(Board:GetPawn(curr):GetId(), "Gunk")) or Board:GetItem(curr) == "Meta_BlobGunk" then 
+				local preview = SpaceDamage(p1, -1)
+				weaponPreview:AddDamage(preview)
 				if Board:GetItem(curr) == "Meta_BlobGunk" then
 					ret:AddScript(string.format("Board:RemoveItem(%s)", curr:GetString()))
 				else

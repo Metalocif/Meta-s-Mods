@@ -1,3 +1,11 @@
+v0.3
+- Spider now spawns a spider on kill and not a spider egg. When killing a gunked/gooey target, the spiderling is boosted.
+- Spider's web upgrade now costs 1 core, down from 2.
+- Spider can target empty tiles to spawn spider eggs.
+- Spider eggs hatch instantly when gunked.
+- Spiderlings are correctly owned by the Techno-Spider.
+- Fixed some previews with goos.
+
 v0.2
 - Sludges now have 2 HP and self-damage 1 when using their weapon.
 - Goos can no longer move again after evolving.
@@ -8,6 +16,7 @@ v0.2
 - Gunk items are correctly removed when eaten by goos.
 - Remade the Techno-Firefly's weapon entirely to be less buggy and confusing.
 - Achievements are go.
+
 v0.1
 - Initial upload.
 
