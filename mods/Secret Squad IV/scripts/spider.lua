@@ -59,6 +59,8 @@ local GooeyPawns = {
 	"Meta_TitanicGooBoss",	
 	--Omega Vek
 	"OmegaBlob2",
+	--Unitsquare's Secret squad
+	"X_Blob",
 	--Cyborg Weapons deployables
 	"CyborgWeapons_Deployable_MediumOoze", "CyborgWeapons_Deployable_SmallOoze",	
 	--vanilla
