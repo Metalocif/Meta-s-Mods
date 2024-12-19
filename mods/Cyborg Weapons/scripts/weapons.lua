@@ -107,11 +107,15 @@ modApi:appendAsset("img/weapons/Reproduce.png", path .."img/weapons/Reproduce.pn
 modApi:appendAsset("img/weapons/ShedTail.png", path .."img/weapons/ShedTail.png")
 modApi:appendAsset("img/weapons/Molt.png", path .."img/weapons/Molt.png")
 modApi:appendAsset("img/weapons/AdaptiveBiology.png", path .."img/weapons/AdaptiveBiology.png")
+modApi:appendAsset("img/weapons/ToxinLance.png", path .."img/weapons/ToxinLance.png")
+modApi:appendAsset("img/weapons/Adrenaline.png", path .."img/weapons/Adrenaline.png")
+
 modApi:appendAsset("img/weapons/OpportunisticHunting.png", path .."img/weapons/OpportunisticHunting.png")
 modApi:appendAsset("img/weapons/HunterReflexes.png", path .."img/weapons/HunterReflexes.png")
 modApi:appendAsset("img/weapons/PrizeOfTheHunt.png", path .."img/weapons/PrizeOfTheHunt.png")
 modApi:appendAsset("img/weapons/CricketLegs.png", path .."img/weapons/CricketLegs.png")
 modApi:appendAsset("img/weapons/Overdrive.png", path .."img/weapons/Overdrive.png")
+modApi:appendAsset("img/weapons/ReactiveFire.png", path .."img/weapons/ReactiveFire.png")
 
 modApi:appendAsset("img/effects/explo_bloodyStream.png", path .."img/effects/explo_bloodyStream.png")
 modApi:appendAsset("img/effects/shot_bloodyStream_R.png", path .."img/effects/shot_bloodyStream_R.png")
@@ -139,6 +143,25 @@ modApi:appendAsset("img/units/player/tail.png", path.."img/units/player/tail.png
 modApi:appendAsset("img/units/player/taila.png", path.."img/units/player/taila.png")
 modApi:appendAsset("img/units/player/tail_death.png", path.."img/units/player/tail_death.png")
 
+for i = 1, 2 do
+	modApi:appendAsset("img/effects/toxinspear"..i.."_R.png", path .."img/effects/toxinspear"..i.."_R.png")
+	modApi:appendAsset("img/effects/toxinspear"..i.."_U.png", path .."img/effects/toxinspear"..i.."_U.png")
+	modApi:appendAsset("img/effects/toxinspear"..i.."_D.png", path .."img/effects/toxinspear"..i.."_D.png")
+	modApi:appendAsset("img/effects/toxinspear"..i.."_L.png", path .."img/effects/toxinspear"..i.."_L.png")
+end
+ANIMS.explotoxinspear1_0 = Animation:new{Image = "effects/toxinspear1_U.png",NumFrames = 5,Time = 0.1,PosX = -18,PosY = -33}
+ANIMS.explotoxinspear2_0 = ANIMS.explotoxinspear1_0:new{ 	Image = "effects/toxinspear2_U.png", }
+
+ANIMS.explotoxinspear1_1 = ANIMS.explotoxinspear1_0:new{Image = "effects/toxinspear1_R.png",PosX = -20,PosY = 0}
+ANIMS.explotoxinspear2_1 = ANIMS.explotoxinspear1_1:new{ 	Image = "effects/toxinspear2_R.png", }
+
+ANIMS.explotoxinspear1_2 = ANIMS.explotoxinspear1_0:new{Image = "effects/toxinspear1_D.png",PosX = -70,PosY = 4}
+ANIMS.explotoxinspear2_2 = ANIMS.explotoxinspear1_2:new{ 	Image = "effects/toxinspear2_D.png", }
+
+ANIMS.explotoxinspear1_3 = ANIMS.explotoxinspear1_0:new{Image = "effects/toxinspear1_L.png",PosX = -68,PosY = -32}
+ANIMS.explotoxinspear2_3 = ANIMS.explotoxinspear1_3:new{ 	Image = "effects/toxinspear2_L.png", }
+
+
 -----------------------
 --Emboldening Screech--
 -----------------------
@@ -159,7 +182,7 @@ CyborgWeapons_Scream_Boost = Science_LocalShield:new{
 	Range = 1,--TOOLTIP HELPER
 	Upgrades = 2,
 	UpgradeCost = { 1,2 },
-	UpgradeList = { "+1 Size",  "+1 Size"  },
+	UpgradeList = { "Enrage",  "+2 Size"  },
 	LaunchSound = "/enemy/beetle_1/hurt",
 	ZoneTargeting = ZONE_ALL,
 }
@@ -172,6 +195,7 @@ function CyborgWeapons_Scream_Boost:GetSkillEffect(p1, p2)
 		local toBoost = Board:GetPawn(targets[k])
 		if toBoost and (toBoost:GetClass() == "TechnoVek" or toBoost:GetTeam() == TEAM_ENEMY) then --or toBoost.GetTeam == TEAM_ENEMY_MAJOR 
 			ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)",toBoost:GetId()))
+			if self.Bloodthirsty and toBoost:GetTeam() == TEAM_ENEMY then ret:AddScript(string.format("Status.ApplyBloodthirsty(%s)",toBoost:GetId())) end
 		end
 	end
 	ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
@@ -179,20 +203,20 @@ function CyborgWeapons_Scream_Boost:GetSkillEffect(p1, p2)
 end
 
 CyborgWeapons_Scream_Boost_A = CyborgWeapons_Scream_Boost:new{
-	UpgradeDescription = "Increases affected radius by 1.",
-	Range = 2,
-	WideArea = 2,
+	UpgradeDescription = "Applies the Bloodthirsty status to enemies hit, which makes them target units over buildings.",
+	Bloodthirsty = true,
 }
 
 CyborgWeapons_Scream_Boost_B = CyborgWeapons_Scream_Boost:new{
 	UpgradeDescription = "Increases affected radius by 1.",
-	Range = 2,
-	WideArea = 2,
+	Range = 3,
+	WideArea = 3,
 }
 
 CyborgWeapons_Scream_Boost_AB = CyborgWeapons_Scream_Boost:new{
 	Range = 3,
 	WideArea = 3,
+	Bloodthirsty = true,
 }
 
 ---------------
@@ -1260,9 +1284,8 @@ end
 --------------
 modApi:addWeaponDrop("CyborgWeapons_Pheromones")
 CyborgWeapons_Pheromones = Skill:new{
-
-	Name="Alluring Pheromones",
-	Description="Pull all Vek and Cyborgs in range towards the user.",
+	Name="Dizzying Pheromones",
+	Description="Pushes all Vek and Cyborgs in range in any direction.",
 	Class = "TechnoVek",
 	Icon = "weapons/Pheromones.png",
 	LaunchSound = "/weapons/wind",
@@ -1270,22 +1293,19 @@ CyborgWeapons_Pheromones = Skill:new{
 	ZoneTargeting = ZONE_ALL,
 	PathSize = 1,
 	Damage = 0,
+	Status = "",
 	PowerCost = 1,
 	Upgrades = 2,
-	UpgradeCost={2,2},	--core sink, but it gives you one extra action; also applies to Blobs from the Ooze weapon
-	UpgradeList={"Quickening","Hypnotic"},--frenzying? confusing?
-	--Limited = 1,
+	UpgradeCost={1,1},	--core sink, but it gives you one extra action; also applies to Blobs from the Ooze weapon
+	UpgradeList={"Alluring","Hypnotic"},--frenzying? confusing?
+	TwoClick=true,
 	TipImage = StandardTips.Surrounded,	--should be a custom to show bots and mechs are not affected
-	--Pull=true,
-	Haste=false,
-	TwoClick=false,
-	Dance=false, --named after Fire Emblem dancers
 
 }
 
-CyborgWeapons_Pheromones_A = CyborgWeapons_Pheromones:new{Name="Quickening Pheromones",Haste=true,UpgradeDescription="Also increases movement range and allows affected units to move again. If both upgrades are enabled, lets affected Cyborg units act again."}
-CyborgWeapons_Pheromones_B = CyborgWeapons_Pheromones:new{Name="Hypnotic Pheromones",TwoClick=true,UpgradeDescription="Instead of pulling, push in any direction. If both upgrades are enabled, lets affected Cyborg units act again."}
-CyborgWeapons_Pheromones_AB = CyborgWeapons_Pheromones:new{Name="Invigorating Pheromones",Haste=true,TwoClick=true,Dance=true}
+CyborgWeapons_Pheromones_A = CyborgWeapons_Pheromones:new{Name="Alluring Pheromones",Status="Alluring",UpgradeDescription="Applies the Alluring status to targets hit, making other units more likely to move next to them. If both upgrades are enabled, instead applies the Confused status."}
+CyborgWeapons_Pheromones_B = CyborgWeapons_Pheromones:new{Name="Hypnotic Pheromones",Status="Targeted",UpgradeDescription="Applies the Targeted status to targets hit, making them more likely to be targeted by enemy attacks. If both upgrades are enabled, instead applies the Confused status."}
+CyborgWeapons_Pheromones_AB = CyborgWeapons_Pheromones:new{Name="Confusing Pheromones",Status="Confusion"}
 
 function CyborgWeapons_Pheromones:GetTargetArea(point)
 	local ret = PointList()
@@ -1295,7 +1315,6 @@ function CyborgWeapons_Pheromones:GetTargetArea(point)
 			ret:push_back(curr)
 			curr = curr + DIR_VECTORS[dir]
 		end
-		
 		if Board:IsValid(curr) then ret:push_back(curr) end
 	end
 	
@@ -1320,19 +1339,11 @@ function CyborgWeapons_Pheromones:GetSkillEffect(p1, p2)
 	for i = 1, 8 do
 		local curr = p1 + DIR_VECTORS[dir] * i
 		if not Board:IsValid(curr) or Board:GetTerrain(curr) == TERRAIN_MOUNTAIN or Board:IsBuilding(curr) then break end
-		local damage = SpaceDamage(curr, 0)
+		local damage = SpaceDamage(curr)
 		local toAffect = Board:GetPawn(curr)
 		if toAffect and (toAffect:GetClass() == "TechnoVek" or toAffect:GetTeam() == TEAM_ENEMY) then
-			if not self.TwoClick then damage.iPush = (dir+2)%4 end
-			if self.Haste then
-				damage.sScript = string.format("Board:GetPawn(%s):AddMoveBonus(1)", Board:GetPawn(curr):GetId())
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMovementSpent(false)", Board:GetPawn(curr):GetId()))
-			end
-			-- if self.TwoClick then 
-			-- end
-			if self.Dance then ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", Board:GetPawn(curr):GetId())) end
+			damage.iPush = (dir+2)%4
 		end
-		damage.sAnimation = "HypnoticPheromone"
 		ret:AddDamage(damage)
 	end
 	return ret
@@ -1361,20 +1372,16 @@ function CyborgWeapons_Pheromones:GetFinalEffect(p1, p2, p3)
 		   curr == p1 then --this stops us when step == -1
 			break 
 		end
-		local damage = SpaceDamage(curr, 0)
+		local damage = SpaceDamage(curr, 0, pushDirection)
 		local toAffect = Board:GetPawn(curr)
 		if toAffect and (toAffect:GetClass() == "TechnoVek" or toAffect:GetTeam() == TEAM_ENEMY) then
-			if not self.TwoClick then damage.iPush = (dir+2)%4 else damage.iPush = pushDirection end	--shouldn't happen?
-			if self.Haste then
-				damage.sScript = string.format("Board:GetPawn(%s):AddMoveBonus(1)", Board:GetPawn(curr):GetId())
-				ret:AddScript(string.format("Board:GetPawn(%s):SetMovementSpent(false)", Board:GetPawn(curr):GetId()))
+			if self.Status ~= "" then 
+				ret:AddScript(string.format("Status.Apply%s(%s)", self.Status, toAffect:GetId())) 
 			end
-			if self.Dance then ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", Board:GetPawn(curr):GetId())) end
+			damage.sAnimation = "HypnoticPheromone"
+			ret:AddDamage(damage)
+			ret:AddDelay(0.15)
 		end
-		damage.sAnimation = "HypnoticPheromone"
-		ret:AddDamage(damage)
-		--ret:AddBurst(curr, "Emitter_Pheromones", dir)
-		if toAffect then ret:AddDelay(0.15) end
 		i=i+step
 	end
 	return ret
@@ -1624,8 +1631,8 @@ CyborgWeapons_Metabolize = Skill:new{
 	Dash = false,
 	Shield = false,
 	Projectile = false,
-	Push = 1, --Mostly for tooltip, but you could turn it off for some unknown reason
-	PowerCost = 0,	--for testing, should cost 1
+	Push = 1, 
+	PowerCost = 0,
 	DamageUp = 0,
 	Upgrades = 2,
 	UpgradeList = { "Digest",  "+1 Damage"  },
@@ -1917,19 +1924,26 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 	local direction = GetDirection(p2-p1)
 	local distance = p1:Manhattan(p2)
 	local mission = GetCurrentMission()
+	local user = Board:GetPawn(p1)
 	if mission then
 		if not mission.AssimilateDamage then mission.AssimilateDamage = SpaceDamage(point) end
 		if self.HealSelf then
-			if Board:GetPawn(p1):IsFire() or Board:IsFire(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end	
+			if user:IsFire() or Board:IsFire(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end	
 			--second check if on a fire space and with Thick Skin
-			if Board:GetPawn(p1):IsAcid() or (Board:IsAcid(p1) and not Board:GetTerrain(p1) == TERRAIN_WATER) then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
+			if user:IsAcid() or (Board:IsAcid(p1) and not Board:GetTerrain(p1) == TERRAIN_WATER) then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
 			--second check is because the pawn might be flying above acid water, in which case it wouldn't make sense to purify it
-			if Board:IsSmoke(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iSmoke = EFFECT_CREATE") end 
+			if Board:IsSmoke(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iSmoke = EFFECT_CREATE") end
 			--only relevant with Camilla?
+			if Status.GetStatus(user:GetId(), "Chill") then ret:AddScript("GetCurrentMission().AssimilateDamage.Chill = true") end
+			if Status.GetStatus(user:GetId(), "Powder") then ret:AddScript("GetCurrentMission().AssimilateDamage.Powder = true") end
+			if Status.GetStatus(user:GetId(), "Toxin") then ret:AddScript("GetCurrentMission().AssimilateDamage.Toxin = true") end
 			local healDamage = SpaceDamage(p1, -1)
 			healDamage.iFire = EFFECT_REMOVE
 			healDamage.iAcid = EFFECT_REMOVE
 			healDamage.iSmoke = EFFECT_REMOVE
+			ret:AddScript(string.format("Status.RemoveStatus(%s, %q)", user:GetId(),"Chill"))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, %q)", user:GetId(),"Powder"))
+			ret:AddScript(string.format("Status.RemoveStatus(%s, %q)", user:GetId(),"Toxin"))
 			ret:AddDamage(healDamage)
 		end
 		
@@ -1954,6 +1968,11 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 				ret:AddScript(string.format("Board:RemoveItem(%s)", p2:GetString()))
 			end
 			ret:AddMelee(p1, damage)
+			if Board:GetPawn(p2) then
+				if mission.AssimilateDamage.Chill then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
+				if mission.AssimilateDamage.Powder then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
+				if mission.AssimilateDamage.Toxin then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
+			end
 			if addFire then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end
 			if addAcid then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
 			if addSmoke then ret:AddScript("GetCurrentMission().AssimilateDamage.iSmoke = EFFECT_CREATE") end
@@ -2278,10 +2297,12 @@ function CyborgWeapons_ShedTail:GetTargetArea(point)
 	if Board:GetTerrain(point) == TERRAIN_WATER or Board:GetTerrain(point) == TERRAIN_HOLE then return ret end
 	--we'll create a pawn on this tile so it has to be standable, only matters for flying mechs
 	for i = DIR_START, DIR_END do
-		local curr = point + DIR_VECTORS[i]
-		if not Board:IsBlocked(curr, PATH_PROJECTILE) and not Board:IsBlocked(curr, Pawn:GetPathProf()) then
-		--we can stand there
-			ret:push_back(curr)
+		for j = 1, 8 do
+			local curr = point + DIR_VECTORS[i] * j
+			if not Board:IsBlocked(curr, PATH_PROJECTILE) then
+			--we can stand there
+				ret:push_back(curr)
+			end
 		end
 	end
 	return ret
@@ -2294,17 +2315,24 @@ function CyborgWeapons_ShedTail:GetSkillEffect(p1, p2)
 	local moveDamage = SpaceDamage(p1, 1, direction) --push ourselves to move one tile
 	local userId = Board:GetPawn(p1):GetId()	
 	moveDamage.fDelay = -1
-	ret:AddSafeDamage(moveDamage)
-	local spawnDamage = SpaceDamage(p1, 0)
+	local loc = p1
+	if distance == 1 then ret:AddSafeDamage(moveDamage) end
+	if distance > 1 then loc = p2 end
+	local spawnDamage = SpaceDamage(loc)
+	
 	spawnDamage.sPawn = "SheddedTail"
-	ret:AddSafeDamage(spawnDamage)
+	if distance > 1 then
+		ret:AddArtillery(spawnDamage, "effects/shotup_spider.png")
+	else
+		ret:AddSafeDamage(spawnDamage)
+	end
 	ret:AddScript(string.format([[
     local palette = Board:GetPawn(%s):GetImageOffset()
     unit:SetOwner(%s)
     unit:SetMaxHealth(%s)
     unit:SetHealth(%s)
-    unit:SetImageOffset(palette))]], userId, userId, self.Health, self.Health))
-	ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", p1:GetString(), p1:GetString()))
+    unit:SetImageOffset(palette)]], userId, userId, self.Health, self.Health))
+	ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", loc:GetString(), loc:GetString()))
 	return ret
 end
 
@@ -2392,6 +2420,7 @@ end
 --------------------
 --Adaptive Biology--
 --------------------
+--Gambling? In MY RNG-free game? It's more likely than you'd think.
 
 modApi:addWeaponDrop("CyborgWeapons_Adapt")
 
@@ -2443,9 +2472,142 @@ function CyborgWeapons_Adapt:GetSkillEffect(p1, p2)
 	return ret
 end	
 
+
+-----------------
+--Toxic Impaler--
+-----------------
+--Deals damage, if the target stays alive it likely dies after its action.
+
+modApi:addWeaponDrop("CyborgWeapons_ToxicImpaler")
+
+CyborgWeapons_ToxicImpaler = Skill:new{  
+	Name = "Toxic Impaler",
+	Class = "TechnoVek",
+	Icon = "weapons/ToxinLance.png",
+	Description = "Deals damage to a target and applies Toxin. If the target is not adjacent, pull it.",
+	Rarity = 3,
+	Damage = 1,
+	PowerCost = 0, --AE Change
+	Upgrades = 1,
+	UpgradeCost={2},
+	UpgradeList={"+1 Damage"},
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Target = Point(2,1),
+	}
+}
+CyborgWeapons_ToxicImpaler_A=CyborgWeapons_ToxicImpaler:new{UpgradeDescription="Deals 1 more damage.", Damage=2}
+
+function CyborgWeapons_ToxicImpaler:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		local curr = point + DIR_VECTORS[i]
+		ret:push_back(curr)
+		if not Board:IsBlocked(curr, PATH_PROJECTILE) then ret:push_back(curr+DIR_VECTORS[i]) end
+	end
+	return ret
+end
+
+function CyborgWeapons_ToxicImpaler:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2-p1)
+	local target = p1 + DIR_VECTORS[direction]
+	if not Board:IsBlocked(target, PATH_PROJECTILE) then target=target+DIR_VECTORS[direction] end
+	local distance = p1:Manhattan(target)
+	local damage = SpaceDamage(target, self.Damage)
+	if distance == 2 then damage.iPush = (direction+2)%4 end
+	local pawn = Board:GetPawn(target)
+	if pawn then damage.sScript = string.format("Status.ApplyToxin(%s)", pawn:GetId()) end
+	ret:AddAnimation(p1+DIR_VECTORS[direction], "explotoxinspear"..distance.."_"..direction)
+	ret:AddDelay(0.2)		--first two frames of anim
+	ret:AddDamage(damage)
+	return ret
+end	
+
+
+--------------
+--Adrenaline--
+--------------
+--Reactivate ally or trigger enemy attack. Second part is mostly there for flavor.
+
+modApi:addWeaponDrop("CyborgWeapons_Adrenaline")
+
+CyborgWeapons_Adrenaline = Skill:new{  
+	Name = "Adrenaline",
+	Class = "TechnoVek",
+	Icon = "weapons/Adrenaline.png",
+	Description = "If the target is a Cyborg, reactivate it. If it is a Vek, perform its queued action instantly.",
+	Rarity = 3,
+	Damage = 1,
+	PowerCost = 0, --AE Change
+	-- Upgrades = 1,
+	-- UpgradeCost={2},
+	-- UpgradeList={"+1 Damage"},
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Target = Point(2,1),
+	}
+}
+-- CyborgWeapons_Adrenaline_A=CyborgWeapons_Adrenaline:new{UpgradeDescription="Deals 1 more damage.", Damage=2}
+
+function CyborgWeapons_Adrenaline:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		local curr = point + DIR_VECTORS[i]
+		local pawn = Board:GetPawn(curr)
+		if (pawn:GetTeam() == TEAM_ENEMY and pawn:IsQueued()) or (pawn:GetTeam() == TEAM_PLAYER and pawn:GetClass() == "TechnoVek" and not pawn:IsActive()) then
+			ret:push_back(curr)
+		end
+	end
+	return ret
+end
+
+function CyborgWeapons_Adrenaline:GetSkillEffect(p1, p2)
+	--probably super wrong with things like Beetles, especially Omega Beetle
+	local ret = SkillEffect()
+	local pawn = Board:GetPawn(p2)
+	ret:AddDamage(SpaceDamage(p2, self.Damage))
+	if pawn:GetClass() == "TechnoVek" then 
+		ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", pawn:GetId()))
+	elseif pawn:IsQueued() then
+		local skillEffect = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(p2,pawn:GetQueuedTarget())
+		for _, spaceDamage in ipairs(extract_table(skillEffect.q_effect)) do
+			if spaceDamage:IsMovement() then
+				if spaceDamage:GetMoveType() == 1 then --leap	
+					ret:AddLeap(Board:GetSimplePath(p2, pawn:GetQueuedTarget()), NO_DELAY)
+					-- p1 = p2
+					-- p2 = p2 + DIR_VECTORS[direction]
+				elseif spaceDamage:GetMoveType() == 2 then --charge
+					ret:AddCharge(Board:GetSimplePath(p2, pawn:GetQueuedTarget()), NO_DELAY)
+					-- p1 = p2
+					-- p2 = p2 + DIR_VECTORS[direction]
+				else
+				end
+			else
+				if spaceDamage.iDamage > 0 and spaceDamage.iDamage ~= DAMAGE_DEATH then spaceDamage.iDamage = spaceDamage.iDamage + self.DamageUp end
+				if spaceDamage:GetType() == 1 then ret:AddArtillery(p2, spaceDamage, spaceDamage:GetProjectileArt(), NO_DELAY) end
+				if spaceDamage:GetType() == 2 then ret:AddProjectile(p2, spaceDamage, spaceDamage:GetProjectileArt(), NO_DELAY) end
+				if spaceDamage:GetType() == 0 then 
+					if spaceDamage.iDamage > 0 and not addedMelee then ret:AddMelee(p2, spaceDamage) addedMelee = true else ret:AddDamage(spaceDamage) end
+				end
+			end
+		end
+	end
+	return ret
+end	
+
+
+--------------
+-- PASSIVES --
+--------------
+
+
 -------------------
 --Hunter Reflexes--
 -------------------
+--Enables a lot of tactics.
 
 modApi:addWeaponDrop("CyborgWeapons_HunterReflexes")
 
@@ -2494,6 +2656,7 @@ end
 -------------------------
 --Opportunistic Hunting--
 -------------------------
+--Pretty solid source of damage.
 
 modApi:addWeaponDrop("CyborgWeapons_OpportunisticHunting")
 
@@ -2561,6 +2724,7 @@ end
 ---------------------
 --Prize of the Hunt--
 ---------------------
+--Healing synergizes with Ichorous Stream and Cannibalize.
 
 modApi:addWeaponDrop("CyborgWeapons_PrizeOfTheHunt")
 
@@ -2605,6 +2769,7 @@ end
 ----------------
 --Cricket Legs--
 ----------------
+--Free mobility! Better in some squads.
 
 modApi:addWeaponDrop("CyborgWeapons_CricketLegs")
 
@@ -2634,6 +2799,7 @@ end
 -------------
 --Overdrive--
 -------------
+--An idea by my wife.
 
 modApi:addWeaponDrop("CyborgWeapons_Overdrive")
 
@@ -2661,7 +2827,7 @@ local function OverdriveBoost(mission)
 	if mission.overdrive and Game:GetTeamTurn() == TEAM_PLAYER then
 		for i = 0, 2 do
 			local pawn = Board:GetPawn(i)
-			if pawn then
+			if pawn and pawn:GetClass() == "TechnoVek" then
 				local threshold = 1
 				if pawn:IsAcid() then threshold = 2 end
 				if pawn:GetHealth() > threshold and not pawn:IsBoosted() then
@@ -2672,6 +2838,74 @@ local function OverdriveBoost(mission)
 				end
 			end
 		end
+	end
+end
+
+
+-----------------
+--Reactive Fire--
+-----------------
+--Named after the library of the same name, obviously. If Vek can have reactive fire, why not Cyborgs?
+
+modApi:addWeaponDrop("CyborgWeapons_ReactiveFire")
+
+CyborgWeapons_ReactiveFire=PassiveSkill:new{
+	Name="Reactive Fire",
+	Class="TechnoVek",
+	Passive="ReactiveFire",		--doesn't do anything, just there so other mods can tell it's a passive
+	Description="At the start of the player's turn, all Cyborgs melee attack all Vek targeting them if possible, dealing 1 damage.",
+	Damage=1,	--only used for the tip image
+	Upgrades=2,
+	UpgradeList={"Ranged Counter","+1 Damage"},
+	UpgradeCost={1,3},
+	Icon = "weapons/ReactiveFire.png",
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,2),
+		CustomEnemy = "Leaper1",
+	}
+}
+CyborgWeapons_ReactiveFire_A=CyborgWeapons_ReactiveFire:new{UpgradeDescription="Can counterattack from afar."}
+CyborgWeapons_ReactiveFire_B=CyborgWeapons_ReactiveFire:new{UpgradeDescription="Deals 1 more damage.", Damage=2}
+CyborgWeapons_ReactiveFire_AB=CyborgWeapons_ReactiveFire:new{Damage=2}
+
+function CyborgWeapons_ReactiveFire:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	if not Board:IsTipImage() then return ret end
+	Board:GetPawn(Point(2,2)):FireWeapon(Point(2,3),1)
+	ret:AddDelay(1)
+	ret:AddMelee(Point(2,3), SpaceDamage(Point(2,2),self.Damage))
+	ret:AddDelay(1)
+	return ret
+end
+
+local function ReactiveFirePassive(mission)
+	ret = SkillEffect()
+	if mission.reactivefirepassive and Game:GetTeamTurn() == TEAM_PLAYER then
+		for i = 0, 2 do
+			local pawn = Board:GetPawn(i)
+			if pawn and pawn:GetClass() == "TechnoVek" and not pawn:IsDead() then
+				for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
+					local vek = Board:GetPawn(id)		
+					local distance = pawn:GetSpace():Manhattan(vek:GetSpace())
+					if vek:IsQueued() and (distance == 1 or mission.reactivefireranged) then
+						local fx = _G[vek:GetQueuedWeapon()]:GetSkillEffect(vek:GetSpace(), vek:GetQueuedTarget())
+						local counter = false
+						for _, spaceDamage in ipairs(extract_table(fx.q_effect)) do
+							if spaceDamage.loc == pawn:GetSpace() then counter = true break end
+						end
+						if counter then
+							if distance == 1 then 
+								ret:AddMelee(pawn:GetSpace(), SpaceDamage(vek:GetSpace(), mission.reactivefirepassive))
+							else
+								ret:AddArtillery(pawn:GetSpace(), "effects/shotup_scarab"..mission.reactivefireranged..".png")
+							end
+						end
+					end
+				end
+			end
+		end
+		Board:AddEffect(ret)
 	end
 end
 
@@ -2691,9 +2925,12 @@ local function CheckCyborgPassives(mission)
 			if weapons[1] == "CyborgWeapons_OpportunisticHunting" or weapons[2] == "CyborgWeapons_OpportunisticHunting" then mission.opportunity = 1 end
 			if weapons[1] == "CyborgWeapons_OpportunisticHunting_A" or weapons[2] == "CyborgWeapons_OpportunisticHunting_A" then mission.opportunity = 2 end
 			if weapons[1] == "CyborgWeapons_Overdrive" or weapons[2] == "CyborgWeapons_Overdrive" then mission.overdrive = true end
+			if weapons[1] == "CyborgWeapons_ReactiveFire" or weapons[2] == "CyborgWeapons_ReactiveFire" then mission.reactivefirepassive = 1 end
+			if weapons[1] == "CyborgWeapons_ReactiveFire_B" or weapons[2] == "CyborgWeapons_ReactiveFire_B" or weapons[1] == "CyborgWeapons_ReactiveFire_AB" or weapons[2] == "CyborgWeapons_ReactiveFire_AB" then mission.reactivefirepassive = 1 end
+			if weapons[1] == "CyborgWeapons_ReactiveFire_A" or weapons[2] == "CyborgWeapons_ReactiveFire_A" or weapons[1] == "CyborgWeapons_ReactiveFire_AB" or weapons[2] == "CyborgWeapons_ReactiveFire_AB" then mission.reactivefireranged = true end
 		end
 	end
-	if mission.giveJumping then
+	if mission and mission.giveJumping then
 		for i = 0, 2 do
 			if Board:GetPawn(i) and Board:GetPawn(i):GetClass() == "TechnoVek" and Board:GetPawn(i):GetPathProf() == 18 then Board:GetPawn(i):SetJumper(true) end
 		end
@@ -2703,6 +2940,7 @@ end
 local function EVENT_onModsLoaded()
 	modApi:addPreEnvironmentHook(TriggerDelevelingPheromones)
 	modApi:addNextTurnHook(OverdriveBoost)
+	modApi:addNextTurnHook(ReactiveFirePassive)
 	modApi:addMissionStartHook(CheckCyborgPassives)
 	modapiext:addSkillEndHook(HunterReflexesBonusMove)
 	modapiext:addPawnKilledHook(PrizeOfTheHuntHealing)
