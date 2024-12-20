@@ -1,5 +1,8 @@
 local mod = modApi:getCurrentMod()
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
+local path = mod_loader.mods[modApi.currentMod].resourcePath
+-- modApi:appendAsset("img/weapons/firefly.png", path .."img/weapons/firefly.png")
+
 
 --------------
 --Slime Slam--
@@ -201,7 +204,7 @@ function Djinn_GunkSpray:GetSkillEffect(p1, p2)
 			ret:AddArtillery(curr, spawnDamage, "units/player/Slimelet.png", NO_DELAY)
 		end
 	end
-
+	if Board == Point(6, 6) then ret:AddDelay(2) end 	--for tip images
 	return ret
 end	
 
