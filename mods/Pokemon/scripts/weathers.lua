@@ -234,10 +234,8 @@ local function EVENT_onModsLoaded()
 						if not isImmune then Board:DamageSpace(SpaceDamage(Point(i,j), 1)) end
 					end
 				elseif mission.Weather == "Rain" or mission.Weather == "Acid Rain" then
-					if Board:IsFire(Point(i,j)) or (pawn and pawn:IsFire()) then
-						Board:SetSmoke(Point(i,j), true, false)
-					end
 					if pawn then Status.RemoveStatus(pawn:GetId(), "Dry") end
+					if pawn then Status.ApplyWet(pawn:GetId()) end
 				elseif mission.Weather == "Snow" then
 					if pawn and (not pawn:IsFire()) and not CustomAnim:get(pawn:GetId(), "StatusChill") then
 						Status.ApplyChill(pawn:GetId())
