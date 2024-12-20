@@ -11,19 +11,18 @@ local mod = {
 		easyEdit = "2.0.6",
 	},
 	modApiVersion = "2.9.2",
-	icon = "img/mod_icon.png",
+	icon = "mod_icon.png",
 	description = description,
 	--metadata = metadata,
+	submodFolders = {"mods/"},
 }
 
 
 function mod:init()
-	require(self.scriptPath.."pawns")
-	require(self.scriptPath.."weapons")
-	require(self.scriptPath.."replaceSpawns")
+	require(self.scriptPath.."replaceSpawns")	--Logic that replaces Alphas with Omegas.
 end
 
-function mod:load( options, version)
+function mod:load(options, version)
 end
 
 function mod:metadata()
