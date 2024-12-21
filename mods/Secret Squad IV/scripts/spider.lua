@@ -26,15 +26,15 @@ meta_spider=Skill:new{
 		CustomEnemy = "Scarab1",
 	}
 }
-meta_spider_A = meta_spider:new{UpgradeDescription = "Adds webs on adjacent tiles. Stepping on a web causes Techno-Spiders, allied spiderlings, and arachnoids to opportunistically attack the pawn.", WebAdjacent=true}
-meta_spider_B = meta_spider:new{UpgradeDescription = "Deals 2 more damage.", Damage = 4}
+meta_spider_A = meta_spider:new{UpgradeDescription = "Adds webs on adjacent tiles. Stepping on a web causes Techno-Spiders, allied spiderlings, and arachnoids to attack the pawn, dealing 1 damage (2 for Techno-Spiders).", WebAdjacent=true}
+meta_spider_B = meta_spider:new{UpgradeDescription = "Deals 2 more damage with its main attack.", Damage = 4}
 meta_spider_AB = meta_spider:new{WebAdjacent=true,Damage = 4}
 
 local achievements = {
 	Meta_WellLaidWeb = modApi.achievements:add{
 		id = "Meta_WellLaidWeb",
 		name = "Well-Laid Web",
-		tip = "Use the Techno-Firefly's fully upgraded weapon when it is fully levelled and powered.",
+		tip = "Have an enemy step into a web and get attacked by at least 2 units at once.",
 		img = path.."img/achievements/WellLaidWeb.png",
 		squad = "Meta_SecretSquad4",
 	}, 
@@ -61,6 +61,8 @@ local GooeyPawns = {
 	"OmegaBlob2",
 	--Unitsquare's Secret squad
 	"X_Blob",
+	--Gunk Creepers
+	"Slimelet",
 	--Cyborg Weapons deployables
 	"CyborgWeapons_Deployable_MediumOoze", "CyborgWeapons_Deployable_SmallOoze",	
 	--vanilla

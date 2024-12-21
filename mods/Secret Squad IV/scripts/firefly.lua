@@ -53,6 +53,8 @@ local GooeyPawns = {
 	"OmegaBlob2",
 	--Unitsquare's Secret squad
 	"X_Blob",
+	--Gunk Creepers
+	"Slimelet",
 	--Cyborg Weapons deployables
 	"CyborgWeapons_Deployable_MediumOoze", "CyborgWeapons_Deployable_SmallOoze",	
 	--vanilla

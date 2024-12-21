@@ -545,7 +545,7 @@ function Status.ApplyInsanity(id, amount)
 	if mission.InsanityTable[id] == nil or mission.InsanityTable[id] == 0 then
 		for i = 1, 5 do		--try to get back the amount of insanity in case it's gone
 			
-			if CustomAnim:get(id, "StatusInsanity"..i) ~= nil then mission.InsanityTable[id] = i LOG(i) break end
+			if CustomAnim:get(id, "StatusInsanity"..i) ~= nil then mission.InsanityTable[id] = i break end
 		end
 	end
 	local insanityCount = mission.InsanityTable[id] or 0
@@ -595,7 +595,6 @@ function Status.RemoveStatus(id, status)
 		CustomAnim:rem(id, "StatusGlory")
 		mission["GloryTable"][id] = nil 
 	elseif status == "Insanity" then
-		LOG(mission["InsanityTable"][id])
 		CustomAnim:rem(id, "StatusInsanity"..mission["InsanityTable"][id])
 		mission["InsanityTable"][id] = nil 
 	
@@ -718,7 +717,6 @@ local function WakeUp()
 end
 
 local function StoreInsanity()
-	LOG("store insanity")
 	local mission = GetCurrentMission()
 	if GAME.InsanityTable == nil then GAME.InsanityTable = {} end
 	for i = 0, 2 do

@@ -122,6 +122,36 @@ CreatePilot{
 	Blacklist = {"Invulnerable", "Popular"},
 }
 
+-- modApi:addPalette({
+    -- ID = "Palette_Meta_SS4",
+    -- Image="units/player/Meta_TechnoBlobber.png",
+    -- Name = "Gunky Vek",
+    -- PlateHighlight = {255, 226, 171},
+    -- PlateLight     = {200, 156, 88},
+    -- PlateMid       = {121, 83, 76},
+    -- PlateDark      = {47, 37, 53},
+    -- PlateOutline   = {12, 19, 31},
+    -- PlateShadow    = {58, 74, 128},
+    -- BodyColor      = {72, 183, 215},
+    -- BodyHighlight  = {248, 249, 193},
+-- })
+
+modApi:addPalette({
+    ID = "Palette_Meta_SS4",
+    Name = "Viridian Metal",
+    Image = "units/player/Meta_TechnoMoth_ns.png",
+    PlateHighlight = {255,226,171},
+    PlateLight     = {139, 121, 164},
+    PlateMid       = {85, 88, 112},
+    PlateDark      = {36, 41, 65},
+    PlateOutline   = {12,19,31},
+    PlateShadow    = {60,87,89},
+    BodyColor      = {69,116,98},
+    BodyHighlight  = {79,146,107},
+    }
+)
+
+
 Meta_TechnoBlobber = Pawn:new{
 	Name = "Techno-Blobber",
 	Class = "TechnoVek",
@@ -130,7 +160,8 @@ Meta_TechnoBlobber = Pawn:new{
 	Massive = true,
 	Corpse = true,
 	Image = "Meta_TechnoBlobber",
-	ImageOffset = 8,
+	ImageOffset = modApi:getPaletteImageOffset("Palette_Meta_SS4"),
+	-- ImageOffset = 8,
 	SkillList = {"meta_blobber"},
 	SoundLocation = "/enemy/blobber_2/",
 	DefaultTeam = TEAM_PLAYER,
@@ -164,7 +195,8 @@ Meta_TechnoFirefly = Pawn:new{
 	Massive = true,
 	Corpse = true,
 	Image = "Meta_TechnoFirefly",
-	ImageOffset = 8,
+	ImageOffset = modApi:getPaletteImageOffset("Palette_Meta_SS4"),
+	-- ImageOffset = 8,
 	SkillList = {"meta_firefly"},
 	SoundLocation = "/enemy/firefly_2/",
 	DefaultTeam = TEAM_PLAYER,

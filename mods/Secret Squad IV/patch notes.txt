@@ -1,3 +1,6 @@
+v1.0
+- Release with cool graphics by Generic.
+
 v0.3
 - Spider now spawns a spider on kill and not a spider egg. When killing a gunked/gooey target, the spiderling is boosted.
 - Spider's web upgrade now costs 1 core, down from 2.
