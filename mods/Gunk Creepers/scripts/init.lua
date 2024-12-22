@@ -1,4 +1,4 @@
-local description = "A squad of mechs that spread shapeless goo to contain the Vek."
+local description = "WIP. A squad of mechs that spread shapeless goo to contain the Vek."
 
 local mod = {
 	id = "Djinn_GunkCreepers",
