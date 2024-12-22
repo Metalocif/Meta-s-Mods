@@ -669,7 +669,7 @@ end
 
 local function GenerateWeakenWeapons()
 	for id, weapon in pairs(_G) do
-		if weapon and type(weapon) == "table" and weapon.Damage and weapon.Class and weapon.Damage > 0 and weapon.Class == "Enemy" and weapon.Original == nil then
+		if weapon and type(weapon) == "table" and weapon.Damage and weapon.Class and weapon.Damage > 0 and (weapon.Class == "Enemy" or weapon.Class == "") and weapon.Original == nil then
 			local i = 1
 			local amount = 1
 			if weapon.Damage == DAMAGE_DEATH then amount = 991 end
