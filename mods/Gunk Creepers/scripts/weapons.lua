@@ -1,9 +1,28 @@
 local mod = modApi:getCurrentMod()
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/weapons/Djinn_GunkSpray.png", path .."img/weapons/Djinn_GunkSpray.png")
 
+local function isDeadlyDamage(damage, pawn)
+--isDeadly doesn't work right with ACID? so I made my own
+--this ignores push, look at Tatu's implementation for that
+if damage.iDamage == DAMAGE_DEATH then return true end
+if damage.iDamage == DAMAGE_ZERO then return false end
+if damage.loc ~= pawn:GetSpace() then return false end
+if ANIMS.tosx_whirlpooltile ~= nil and customAnim:get(pawn:GetSpace(), "tosx_whirlpooltile") then return true end
+if pawn:IsShield() or pawn:IsFrozen() then return false end
+local damageAmount = damage.iDamage
+if Pawn:IsBoosted() then damageAmount = damageAmount + 1 end
+if pawn:IsAcid() then 
+	damageAmount = damageAmount * 2
+elseif pawn:IsArmor() then
+	damageAmount = damageAmount - 1
+end
+if Board:GetCustomTile(damage.loc) == "tosx_rocks_0.png" then damageAmount = damageAmount - 1 end
 
+return damageAmount >= pawn:GetHealth()
+end
 --------------
 --Slime Slam--
 --------------
@@ -68,7 +87,7 @@ function Djinn_SlimeSlam:GetSkillEffect(p1,p2)
 			ret:AddBounce(temp,-3)
 			local itemDamage = SpaceDamage(temp, 0)
 			itemDamage.sItem = "Meta_BlobGunk"
-			if temp ~= p1 or self.ToSpawn == "" then ret:AddDamage(itemDamage) end	--make sure we don't gunk the slimelet
+			if (temp ~= p1 or self.ToSpawn == "") and not Board:IsBlocked(temp, PATH_GROUND) then ret:AddDamage(itemDamage) end	--make sure we don't gunk the slimelet
 			temp = temp + DIR_VECTORS[direction]
 			if temp ~= target then ret:AddDelay(0.06) end
 			if Board:GetTerrain(temp) ~= TERRAIN_WATER and Board:GetTerrain(temp) ~= TERRAIN_HOLE then 
@@ -153,6 +172,7 @@ Djinn_GunkSpray = Skill:new{
 	Icon = "weapons/Djinn_GunkSpray.png",
 	Name = "Gunk Spray",
 	Description = "Spray gunk over targets in a line, applying Gunk and spawning a Slimelet for each killed enemy.",
+	OnKill = "Spawn a slimelet",
 	Explosion = "",
 	PathSize = 2,
 	Damage = 1,
@@ -193,15 +213,15 @@ function Djinn_GunkSpray:GetSkillEffect(p1, p2)
 		local curr = p1 + DIR_VECTORS[direction]*i
 		local damage = SpaceDamage(curr,self.Damage)
 		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetType() == "SlimeBeast" then damage.iDamage = 0 end
-		local spawnDamage = SpaceDamage(curr, 0)
+		if pawn and pawn:GetType() == "SlimeBeast" then damage.iDamage = DAMAGE_ZERO end
+		local spawnDamage = SpaceDamage(curr)
 		spawnDamage.sPawn = "Slimelet"
 		
 		if i == distance then damage.sAnimation = "flamethrower"..distance.."_"..direction end
 		if pawn then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
 		ret:AddDamage(damage)
 		if pawn and pawn:GetType() == "SlimeBeast" then weaponPreview:AddDamage(SpaceDamage(curr, -1)) end
-		if Board:GetPawn(curr) and Board:IsDeadly(damage, Board:GetPawn(curr)) then
+		if Board:GetPawn(curr) and isDeadlyDamage(damage, Board:GetPawn(curr)) then
 			ret:AddArtillery(curr, spawnDamage, "units/player/Slimelet.png", NO_DELAY)
 		end
 	end
