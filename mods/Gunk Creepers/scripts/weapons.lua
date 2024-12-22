@@ -218,7 +218,7 @@ function Djinn_GunkSpray:GetSkillEffect(p1, p2)
 		spawnDamage.sPawn = "Slimelet"
 		
 		if i == distance then damage.sAnimation = "flamethrower"..distance.."_"..direction end
-		if pawn then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
+		if pawn and not isDeadlyDamage(damage, Board:GetPawn(curr)) then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
 		ret:AddDamage(damage)
 		if pawn and pawn:GetType() == "SlimeBeast" then weaponPreview:AddDamage(SpaceDamage(curr, -1)) end
 		if Board:GetPawn(curr) and isDeadlyDamage(damage, Board:GetPawn(curr)) then
