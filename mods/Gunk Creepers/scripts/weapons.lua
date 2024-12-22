@@ -1,7 +1,7 @@
 local mod = modApi:getCurrentMod()
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
 local path = mod_loader.mods[modApi.currentMod].resourcePath
--- modApi:appendAsset("img/weapons/firefly.png", path .."img/weapons/firefly.png")
+modApi:appendAsset("img/weapons/Djinn_GunkSpray.png", path .."img/weapons/Djinn_GunkSpray.png")
 
 
 --------------
@@ -68,11 +68,11 @@ function Djinn_SlimeSlam:GetSkillEffect(p1,p2)
 			ret:AddBounce(temp,-3)
 			local itemDamage = SpaceDamage(temp, 0)
 			itemDamage.sItem = "Meta_BlobGunk"
-			ret:AddDamage(itemDamage)
+			if temp ~= p1 or self.ToSpawn == "" then ret:AddDamage(itemDamage) end	--make sure we don't gunk the slimelet
 			temp = temp + DIR_VECTORS[direction]
 			if temp ~= target then ret:AddDelay(0.06) end
 			if Board:GetTerrain(temp) ~= TERRAIN_WATER and Board:GetTerrain(temp) ~= TERRAIN_HOLE then 
-				ret:AddScript(string.format("Board:AddItem(%s, %q)", temp:GetString(), "Meta_BlobGunk")) 
+				ret:AddScript(string.format("Board:SetItem(%s, %q)", temp:GetString(), "Meta_BlobGunk")) 
 			end
 		end
 		
@@ -82,7 +82,7 @@ function Djinn_SlimeSlam:GetSkillEffect(p1,p2)
 		end
 	
 	end
-	ret:AddScript(string.format("Board:AddPawn(%q, %s)", self.ToSpawn, p1:GetString()))
+	if self.ToSpawn ~= "" and distance > 1 then ret:AddScript(string.format("Board:AddPawn(%q, %s)", self.ToSpawn, p1:GetString())) end
 
 	return ret
 end
@@ -114,7 +114,7 @@ Djinn_SlimeletShove = Skill:new{
 	Rarity = 3,
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
-	SelfDamage = DAMAGE_DEATH,
+	-- SelfDamage = DAMAGE_DEATH,
 	PathSize = 1,	--automatically makes a target area?
 	Cost = "med",
 	PowerCost = 0, --AE Change
@@ -136,7 +136,8 @@ function Djinn_SlimeletShove:GetSkillEffect(p1,p2)
 	damage.sSound = self.ImpactSound
 	--if Board:GetPawn(p2):GetMechName() == "Djinn_SlimeBeast" and (options.Gunk_SlimeletsCanFuse and options.Gunk_SlimeletsCanFuse.enabled) then damage.iDamage = -1 end
 	ret:AddMelee(p1, damage)
-	ret:AddDamage(SpaceDamage(p1, self.SelfDamage))
+	-- ret:AddDamage(SpaceDamage(p1, self.SelfDamage))
+	--removed this so it can attack, then be devoured/used as a target for resonance; it's temp anyway
 	return ret
 end
 
@@ -175,7 +176,7 @@ function Djinn_GunkSpray:GetTargetArea(point)
 		for k = 1, self.PathSize do
 			local curr = DIR_VECTORS[i]*k + point
 			ret:push_back(curr)
-			if not Board:IsValid(curr) or Board:GetTerrain(curr) == TERRAIN_MOUNTAIN then break end
+			if not Board:IsValid(curr) then break end	--or Board:GetTerrain(curr) == TERRAIN_MOUNTAIN
 		end
 	end
 	
@@ -192,19 +193,19 @@ function Djinn_GunkSpray:GetSkillEffect(p1, p2)
 		local curr = p1 + DIR_VECTORS[direction]*i
 		local damage = SpaceDamage(curr,self.Damage)
 		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetType() == "Djinn_SlimeBeast" then damage.iDamage = 0 end
+		if pawn and pawn:GetType() == "SlimeBeast" then damage.iDamage = 0 end
 		local spawnDamage = SpaceDamage(curr, 0)
 		spawnDamage.sPawn = "Slimelet"
 		
 		if i == distance then damage.sAnimation = "flamethrower"..distance.."_"..direction end
 		if pawn then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
 		ret:AddDamage(damage)
-		if pawn and pawn:GetType() == "Djinn_SlimeBeast" then weaponPreview:AddDamage(SpaceDamage(curr, -1)) end
+		if pawn and pawn:GetType() == "SlimeBeast" then weaponPreview:AddDamage(SpaceDamage(curr, -1)) end
 		if Board:GetPawn(curr) and Board:IsDeadly(damage, Board:GetPawn(curr)) then
 			ret:AddArtillery(curr, spawnDamage, "units/player/Slimelet.png", NO_DELAY)
 		end
 	end
-	if Board == Point(6, 6) then ret:AddDelay(2) end 	--for tip images
+	-- if Board:GetSize() == Point(6, 6) then ret:AddDelay(2) end
 	return ret
 end	
 
@@ -245,9 +246,9 @@ Djinn_Resonance = Skill:new{
 	Class = "Science",
 	Icon = "weapons/Djinn_Resonance.png",
 	Name = "Resonance",
-	Description = "Kill a target unit with 1 HP, damaging its surroundings.",
+	Description = "Deal 1 damage and spreads gunk to adjacent tiles. Kill a target unit with 1 HP, damaging its surroundings.",
 	Explosion = "",
-	Damage = DAMAGE_DEATH,
+	Damage = 1,
 	PowerCost = 0,
 	HealthToTarget = 1,
 	Push = false,
@@ -267,31 +268,36 @@ Djinn_Resonance = Skill:new{
 function Djinn_Resonance:GetTargetArea(point)
 	local ret = PointList()
 	local maxHealth = self.HealthToTarget
-	if Board:GetPawn(point):IsBoosted() then maxHealth = maxHealth + 1 end
+	-- if Board:GetPawn(point):IsBoosted() then maxHealth = maxHealth + 1 end
 	for i = DIR_START, DIR_END do
 		for k = 2, 8 do
 			local curr = DIR_VECTORS[i]*k + point
-			if Board:GetPawn(curr) and Board:GetPawn(curr):GetHealth() <= maxHealth then ret:push_back(curr) end
+			if Board:GetPawn(curr) or Board:GetItem(curr) == "Meta_BlobGunk" then ret:push_back(curr) end
 			if not Board:IsValid(curr) then break end
 		end
 	end
-	
 	return ret
 end
 				
 function Djinn_Resonance:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local maxHealth = self.HealthToTarget
+	if Board:GetPawn(p1):IsBoosted() then maxHealth = maxHealth + 1 end
 	local damage = SpaceDamage(p2, self.Damage)
 	damage.sAnimation = "ExploRepulse1"
 	damage.sSound = self.LaunchSound
+	if Board:GetPawn(p2) and Board:GetPawn(p2):GetHealth() <= maxHealth then damage.iDamage = DAMAGE_DEATH end
 	ret:AddDamage(damage)
-	for i = DIR_START, DIR_END do
-		local curr = p2 + DIR_VECTORS[i]
-		local burstDamage = SpaceDamage(curr, 1)
-		if self.Push then burstDamage.iPush = i end
-		ret:AddDamage(burstDamage)
+	--do spread gunk off pawn with gunk or gunk item, preview damage icon coz unclear
+	
+	if Board:GetPawn(p2) and Board:GetPawn(p2):GetHealth() <= maxHealth then
+		for i = DIR_START, DIR_END do
+			local curr = p2 + DIR_VECTORS[i]
+			local burstDamage = SpaceDamage(curr, 1)
+			if self.Push then burstDamage.iPush = i end
+			ret:AddDamage(burstDamage)
+		end
 	end
-
 	return ret
 end	
 
