@@ -87,6 +87,7 @@ local files = {
 	"Wormhole.png",
 	"Trample.png",
 	"PsychicTerror.png",
+	"Present.png"
 }
 for _, file in ipairs(files) do
     modApi:appendAsset("img/weapons/"..file, resourcePath.."img/weapons/"..file)
@@ -179,6 +180,8 @@ modApi:appendAsset("img/effects/confuseray_R.png", resourcePath.."img/effects/co
 modApi:appendAsset("img/effects/confuseray_U.png", resourcePath.."img/effects/confuseray_U.png")
 modApi:appendAsset("img/effects/roaroftime.png", resourcePath.."img/effects/roaroftime.png")
 modApi:appendAsset("img/effects/SpatialRift.png", resourcePath.."img/effects/SpatialRift.png")
+
+modApi:appendAsset("img/effects/shotup_present.png", resourcePath.."img/effects/shotup_present.png")
 
 local tiles = { "tile_normal.png","tile_electric.png","tile_fairy.png","tile_fire.png","tile_grass.png","tile_ground.png","tile_ice.png","tile_poison.png","tile_water.png", }
 for _, tile in ipairs(tiles) do
@@ -6191,5 +6194,70 @@ function Poke_PsychicTerror:GetSkillEffect(p1, p2)
 		ret:AddDelay(0.3)
 	end
 	if self.Dreadful then ret:AddScript(string.format("Status.ApplyDreadful(%s)", Board:GetPawn(p1):GetId())) end
+	return ret
+end
+
+
+Poke_Present = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Present.png",
+	Description = "Gifts a random weapon to an ally if it can equip any. Heals and boosts allies otherwise. Deals 1 damage to enemies.",
+	Name = "Present",
+	PathSize = 1,
+	PowerCost = 0, --AE Change
+	Upgrades = 0,
+	Damage = 1,
+	ZoneTargeting = ZONE_CUSTOM,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Target = Point(2,1),
+		CustomPawn = "Poke_DelibirdHelper",
+	}
+}
+
+function Poke_Present:GetTargetArea(p1)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		for j = 2, 8 do
+			ret:push_back(p1 + DIR_VECTORS[i] * j)
+		end 
+	end
+	return ret
+end
+
+function Poke_Present:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local pawn = Board:GetPawn(p2)
+	local dir = GetDirection(p2-p1)
+	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Delibird_shoot_"..dir))
+	ret:AddDelay(1)
+	--anim lasts 2.2 seconds, so we add a delay at the end
+	if pawn and pawn:GetTeam() == TEAM_PLAYER then
+		if pawn:GetWeaponCount() < 2 then
+			local validGifts = {}
+			for id, enabled in pairs(modApi.weaponDeck) do
+				local weapon = _G[id]
+				if weapon.Class ~= "TechnoVek" and weapon.Class ~= "" and weapon.Class ~= "Enemy" and enabled and weapon.Passive == "" then 
+				--no technovek weapons because it's funnier if you get gifted flamethrowers and stuff
+					validGifts[#validGifts + 1] = id 
+				end
+			end
+			if #validGifts == 0 then return ret end
+			local roll = random_removal(validGifts)
+			local damage = SpaceDamage(p2)
+			damage.sImageMark = "effects/shotup_present.png"
+			damage.sScript = string.format("Board:GetPawn(%s):AddWeapon(%q, true)", pawn:GetId(), roll)
+			ret:AddArtillery(p1, damage, "effects/shotup_present.png", NO_DELAY)
+		else
+			local damage = SpaceDamage(p2, -1)
+			damage.sScript = string.format("Board:GetPawn(%s):SetBoosted(true)", pawn:GetId())
+			ret:AddArtillery(p1, damage, "effects/shotup_present.png", NO_DELAY)
+		end
+	else
+		ret:AddArtillery(p1, SpaceDamage(p2, 1), "effects/shotup_present.png", NO_DELAY)
+	end
+	ret:AddDelay(1.21)
+	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Delibird"))
 	return ret
 end

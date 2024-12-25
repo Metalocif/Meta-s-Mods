@@ -749,6 +749,7 @@ modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Palkia.png", path .."img/por
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Giratina.png", path .."img/portraits/pilots/Pilot_Poke_Giratina.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Arceus.png", path .."img/portraits/pilots/Pilot_Poke_Arceus.png")
 modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Metanitar.png", path .."img/portraits/pilots/Pilot_Poke_Metanitar.png")
+modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Delibird.png", path .."img/portraits/pilots/Pilot_Poke_Delibird.png")
 
 
 CreatePilot{Id = "Pilot_Poke_Abra", Personality = "Vek", Name = "Sabrina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
@@ -776,6 +777,8 @@ CreatePilot{Id = "Pilot_Poke_Palkia", Personality = "Vek", Name = "Palkia", Sex 
 CreatePilot{Id = "Pilot_Poke_Giratina", Personality = "Vek", Name = "Giratina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Arceus", Personality = "Vek", Name = "Arceus", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Metanitar", Personality = "Vek", Name = "Metanitar", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+
+CreatePilot{Id = "Pilot_Poke_Delibird", Personality = "Vek", Name = "Delibird", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 

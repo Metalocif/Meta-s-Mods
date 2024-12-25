@@ -181,6 +181,14 @@ modApi:appendAsset(writepath .."Arceus2_d.png", readpath .."Arceus2_d.png")
 modApi:appendAsset(writepath .."star.png", readpath .."star.png")
 modApi:appendAsset(writepath .."star_a.png", readpath .."star_a.png")
 
+modApi:appendAsset("img/units/player/Delibird.png", path .."img/units/player/Delibird.png")
+modApi:appendAsset("img/units/player/Delibird_a.png", path .."img/units/player/Delibird_a.png")
+modApi:appendAsset("img/units/player/Delibird_shoot_0.png", path .."img/units/player/Delibird_shoot_0.png")
+modApi:appendAsset("img/units/player/Delibird_shoot_1.png", path .."img/units/player/Delibird_shoot_1.png")
+modApi:appendAsset("img/units/player/Delibird_shoot_2.png", path .."img/units/player/Delibird_shoot_2.png")
+modApi:appendAsset("img/units/player/Delibird_shoot_3.png", path .."img/units/player/Delibird_shoot_3.png")
+-- modApi:appendAsset(writepath .."Delibird_d.png", readpath .."Delibird_d.png")
+
 modApi:appendAsset(writepath .."MasterBall.png", readpath .."MasterBall.png")
 
 local a = ANIMS
@@ -189,47 +197,47 @@ a.Articuno_B  =	base
 a.Articuno_Ba =	base:new{ Image = "units/aliens/Articuno_a.png", NumFrames = 6 }
 a.Articuno_Bd =	base:new{ Image = "units/aliens/Articuno_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Zapdos.png", PosX = -35, PosY = -31, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Zapdos.png", PosX = -35, PosY = -31, NumFrames = 1, Height = 1 }
 a.Zapdos_B  =	base
 a.Zapdos_Ba =	base:new{ Image = "units/aliens/Zapdos_a.png", NumFrames = 6 }
 a.Zapdos_Bd =	base:new{ Image = "units/aliens/Zapdos_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Moltres.png", PosX = -50, PosY = -31, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Moltres.png", PosX = -50, PosY = -31, NumFrames = 1, Height = 1 }
 a.Moltres_B  =	base
 a.Moltres_Ba =	base:new{ Image = "units/aliens/Moltres_a.png", NumFrames = 6 }
 a.Moltres_Bd =	base:new{ Image = "units/aliens/Moltres_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Mewtwo.png", PosX = -25, PosY = -16, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Mewtwo.png", PosX = -25, PosY = -16, NumFrames = 1, Height = 1 }
 a.Mewtwo_B  =	base
 a.Mewtwo_Ba =	base:new{ Image = "units/aliens/Mewtwo_a.png", NumFrames = 6 }
 a.Mewtwo_Bd =	base:new{ Image = "units/aliens/Mewtwo_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Deoxys.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Deoxys.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Deoxys_B  =	base
 a.Deoxys_Ba =	base:new{ Image = "units/aliens/Deoxys_a.png", NumFrames = 8 }
 a.Deoxys_Bd =	base:new{ Image = "units/aliens/Deoxys_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."DeoxysA.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."DeoxysA.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Deoxys_BA  =	base
 a.Deoxys_BAa =	base:new{ Image = "units/aliens/DeoxysA_a.png", NumFrames = 4 }
 a.Deoxys_BAd =	base:new{ Image = "units/aliens/DeoxysA_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."DeoxysD.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."DeoxysD.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Deoxys_BD  =	base
 a.Deoxys_BDa =	base:new{ Image = "units/aliens/DeoxysD_a.png", NumFrames = 6 }
 a.Deoxys_BDd =	base:new{ Image = "units/aliens/DeoxysD_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."DeoxysS.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."DeoxysS.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Deoxys_BS  =	base
 a.Deoxys_BSa =	base:new{ Image = "units/aliens/DeoxysS_a.png", NumFrames = 6 }
 a.Deoxys_BSd =	base:new{ Image = "units/aliens/DeoxysS_d.png", PosX = -30, NumFrames = 6, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Darkrai.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Darkrai.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Darkrai_B  =	base
 a.Darkrai_Ba =	base:new{ Image = "units/aliens/Darkrai_a.png", PosX = -25, NumFrames = 8 }
 a.Darkrai_Bd =	base:new{ Image = "units/aliens/Darkrai_d.png", NumFrames = 8, Time = 0.2, Loop = false }
 
-local base = a.EnemyUnit:new{Image = imagepath .."Celebi.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."Celebi.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
 a.Celebi_B  =	base
 a.Celebi_Ba =	base:new{ Image = "units/aliens/Celebi_a.png", PosX = -15, NumFrames = 6 }
 a.Celebi_Bd =	base:new{ Image = "units/aliens/Celebi_d.png", NumFrames = 6, Time = 0.2, Loop = false }
@@ -260,6 +268,14 @@ a.Arceus2d =	base:new{ Image = "units/aliens/Arceus2_d.png", NumFrames = 9, Time
 
 a.Poke_StarbirthStar = a.EnemyUnit:new{Image = imagepath .."star.png", PosX = 0, PosY = 0, NumFrames = 1, Height = 1 }
 a.Poke_StarbirthStara = a.EnemyUnit:new{Image = imagepath .."star_a.png", PosX = 0, PosY = 0, NumFrames = 2, Height = 1 }
+
+a.Delibird  =	a.MechUnit:new{Image = "units/player/Delibird.png", PosX = -15, PosY = -11, NumFrames = 1, Height = 1 }
+a.Delibirda =	a.MechUnit:new{ Image = "units/player/Delibird_a.png", PosX = -15, NumFrames = 4 }
+a.Delibird_broken =	a.MechUnit:new{ Image = "units/player/PokeBall.png", PosX = -15, PosY = -11, NumFrames = 1 }
+a.Delibird_shoot_0 =	a.MechUnit:new{ Image = "units/player/Delibird_shoot_0.png", NumFrames = 11, Time = 0.2, Loop = true }
+a.Delibird_shoot_1 =	a.MechUnit:new{ Image = "units/player/Delibird_shoot_1.png", NumFrames = 11, Time = 0.2, Loop = true }
+a.Delibird_shoot_2 =	a.MechUnit:new{ Image = "units/player/Delibird_shoot_2.png", NumFrames = 11, Time = 0.2, Loop = true }
+a.Delibird_shoot_3 =	a.MechUnit:new{ Image = "units/player/Delibird_shoot_3.png", NumFrames = 11, Time = 0.2, Loop = true }
 
 a.MasterBall = a.EnemyUnit:new{Image = imagepath .."MasterBall.png", PosX = -8, PosY = 0, NumFrames = 1, Height = 1 }
 
@@ -1217,10 +1233,6 @@ function Poke_NaturePowerBoss:GetSkillEffect(p1, p2)
 	local damage2 = SpaceDamage(target + DIR_VECTORS[(dir + 1)% 4], amount)
 	local damage3 = SpaceDamage(target + DIR_VECTORS[(dir - 1)% 4], amount)
 	
-	-- damage1.iTerrain = TERRAIN_FOREST
-	-- damage2.iTerrain = TERRAIN_FOREST
-	-- damage3.iTerrain = TERRAIN_FOREST
-	
 	ret:AddQueuedProjectile(damage1,"effects/naturepower")
 	ret:AddQueuedDamage(damage2)
 	ret:AddQueuedDamage(damage3)
@@ -1241,6 +1253,20 @@ Poke_ShayminHelper = Pawn:new{
 	ImpactMaterial = IMPACT_FLESH,
 	GrassMovement = true,
 	Portrait = "pilots/Pilot_Poke_Shaymin",
+}
+
+Poke_DelibirdHelper = Pawn:new{
+	Name = "Delibird",
+	Health = 2,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Image = "Delibird",
+	SkillList = {"Poke_Present" },
+	SoundLocation = "/enemy/firefly_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	Portrait = "pilots/Pilot_Poke_Delibird",
 }
 
 Poke_XerneasHelper = Pawn:new{
