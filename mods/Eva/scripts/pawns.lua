@@ -67,7 +67,7 @@ end
 	CreatePilot{
 		Id = "Pilot_EVA_Unit_00",
 		Name = "Rei",
-		Personality = "Vek",	--I'll ask ChatGPT later
+		Personality = "EvaRei",
 		Sex = SEX_VEK,
 		Rarity = 0,
 		-- GetSkill = function() IsEvaZero = true; return "Survive_Death" end,
@@ -78,8 +78,8 @@ end
 	CreatePilot{
 		Id = "Pilot_EVA_Unit_01",
 		Name = "Shinji",
-		Personality = "Vek",
-		Sex = SEX_VEK,
+		Personality = "EvaShinji",	--"""personality"""
+		Sex = SEX_VEK,				--I think this prevents them from uselessly time travelling? interesting behavior though
 		Rarity = 0,
 		GetSkill = function() IsEva = true; return "Survive_Death" end,
 		Blacklist = {"Invulnerable", "Popular"},	--ahahah baka Shinji is not popular
@@ -88,7 +88,7 @@ end
 	CreatePilot{
 		Id = "Pilot_EVA_Unit_02",
 		Name = "Asuka",
-		Personality = "Vek",	--I'll ask ChatGPT later
+		Personality = "EvaAsuka",
 		Sex = SEX_VEK,
 		Rarity = 0,
 		-- GetSkill = function() IsEvaTwo = true; return "Survive_Death" end,
@@ -278,12 +278,6 @@ local function EVENT_onModsLoaded()
 						Board:AddEffect(ret)
 					end
 					local damage = 2 + Game:GetSector()
-					-- local reactorTable = saveData.getPawnKey(i, "reactor")
-					-- if reactorTable ~= nil then	--stolen from Invisible Inc.
-						-- local reactors = reactorTable["iNormalPower"] + reactorTable["iUsedPower"] + reactorTable["iBonusPower"] + reactorTable["iUsedBonus"] -- Keep Bonus?
-						-- damage = 3 + math.floor(reactors/2)
-					-- end 
-					--the above doesn't work without a library, it's not essential, I'll just use islands to deal 3/4/5/6 damage
 					Board:DamageSpace(SpaceDamage(Board:GetPawn(someId):GetSpace(), damage))
 					--damage proportional to island
 					Eva:SetHealth(0)
