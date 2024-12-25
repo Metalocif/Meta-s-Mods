@@ -121,37 +121,54 @@ function EVA_RamielBossAtk1:GetSkillEffect(p1,p2)
 	local target = p1 + DIR_VECTORS[direction]
 	
 	self:AddLaser(ret, target, direction)	--fourth argument should be true
-	local mission = GetCurrentMission()
-	if mission then
-		if not mission.lastTurnReactiveFire then mission.lastTurnReactiveFire = -1 end
-		if mission.reactiveFireBlacklist == nil then mission.reactiveFireBlacklist = {} end
-		if mission.lastTurnReactiveFire < Game:GetTurnCount() then 
-			mission.lastTurnReactiveFire = Game:GetTurnCount()
-			mission.ReactiveFireAmmo = 3
-			mission.reactiveFireBlacklist = {}
-			LOG("Ramiel reactive fire reloaded.")
-		end
-		if #mission.reactiveFireBlacklist == 0 then
-			for i = 1, #targets do
-				local pawn = Board:GetPawn(targets[i])
-				if pawn and pawn:IsMech() then mission.reactiveFireBlacklist[targets[i]:GetString()] = true end
-			end
-			LOG("blacklisted "..#mission.reactiveFireBlacklist.." mechs.")
-		end
-		local targets = extract_table(general_DiamondTarget(p1, 3))
-		for i = 1, #targets do
-			local pawn = Board:GetPawn(targets[i])
-			if pawn and pawn:IsMech() and mission.ReactiveFireAmmo > 0 and Game:GetTeamTurn() == TEAM_PLAYER and not mission.reactiveFireBlacklist[targets[i]:GetString()]then
-				mission.ReactiveFireAmmo = mission.ReactiveFireAmmo - 1
-				fx = SkillEffect()
-				local damage = SpaceDamage(targets[i], 2)
-				damage.sAnimation = "ExploAir1"
-				fx:AddArtillery(p1, damage, "effects/shotup_ramielreactiveshot.png", PROJ_DELAY)
-				Board:AddEffect(fx)
-				mission.reactiveFireBlacklist[targets[i]:GetString()] = true
-				break
-			end
-		end
-	end
+	-- local mission = GetCurrentMission()
+	-- if mission then
+		-- if not mission.lastTurnReactiveFire then mission.lastTurnReactiveFire = -1 end
+		-- if mission.reactiveFireBlacklist == nil then mission.reactiveFireBlacklist = {} end
+		-- if mission.lastTurnReactiveFire < Game:GetTurnCount() then 
+			-- mission.lastTurnReactiveFire = Game:GetTurnCount()
+			-- mission.ReactiveFireAmmo = 3
+			-- mission.reactiveFireBlacklist[Board:GetPawn(0):GetSpace():GetString()] = true
+			-- mission.reactiveFireBlacklist[Board:GetPawn(1):GetSpace():GetString()] = true
+			-- mission.reactiveFireBlacklist[Board:GetPawn(2):GetSpace():GetString()] = true
+			-- LOG("Ramiel reactive fire reloaded.")
+		-- end
+		-- local targets = extract_table(general_DiamondTarget(p1, 3))
+		-- for i = 1, #targets do
+			-- local pawn = Board:GetPawn(targets[i])
+			-- if pawn and pawn:IsMech() and mission.ReactiveFireAmmo > 0 and Game:GetTeamTurn() == TEAM_PLAYER and not mission.reactiveFireBlacklist[targets[i]:GetString()] then
+				-- LOG(save_table(mission.reactiveFireBlacklist))
+				-- mission.ReactiveFireAmmo = mission.ReactiveFireAmmo - 1
+				-- fx = SkillEffect()
+				-- local damage = SpaceDamage(targets[i], 2)
+				-- damage.sAnimation = "ExploAir1"
+				-- fx:AddArtillery(p1, damage, "effects/shotup_ramielreactiveshot.png", NO_DELAY)
+				-- fx:AddDelay(-1)
+				-- Board:AddEffect(fx)
+				-- mission.reactiveFireBlacklist[targets[i]:GetString()] = true
+				-- break
+			-- end
+		-- end
+	-- end
 	return ret
 end
+
+
+
+
+
+local function EVENT_onModsLoaded()
+	modapiext:addPawnDamagedHook(function(mission, pawn, damageTaken)	--bonded/shocked, remove sleep
+		if not (mission and pawn) then return end
+		local id = pawn:GetId()
+		if pawn and Pawn and pawn:GetType() == "EVA_RamielBoss" and Game:GetTeamTurn() == TEAM_PLAYER and pawn:GetSpace():Manhattan(Pawn:GetSpace()) <= 3 and damageTaken> 0 and not pawn:IsDead() then 
+			local fx = SkillEffect()
+			local damage = SpaceDamage(Pawn:GetSpace(), 2)
+			damage.sAnimation = "ExploAir1"
+			fx:AddArtillery(pawn:GetSpace(), damage, "effects/shotup_ramielreactiveshot.png", PROJ_DELAY)
+			Board:AddEffect(fx)
+		end
+	end)
+end
+
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
