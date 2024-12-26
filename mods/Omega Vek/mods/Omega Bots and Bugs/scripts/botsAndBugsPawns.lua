@@ -100,7 +100,7 @@ Omegalmn_Floater2 = Pawn:new{
 AddPawn("Omegalmn_Floater2")
 
 function Omegalmn_Floater2:GetDeathEffect(point)
-	if not Board:IsBlocked(point, PATH_GROUND) then Board:AddPawn("OmegaBlobberling2", point) end
+	if not Board:IsBlocked(point, PATH_GROUND) then Board:AddPawn("Omegalmn_Blobberling2", point) end
 end
 
 Omegalmn_Roach2 = Pawn:new{
