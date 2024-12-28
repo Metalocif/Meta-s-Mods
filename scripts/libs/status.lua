@@ -211,7 +211,7 @@ function Status.ApplyChill(id, clearQueued)
 		CustomAnim:rem(id, "StatusChill")
 		pawn:SetFrozen(true)
 	elseif CustomAnim:get(id, "StatusWet") then
-		CustomAnim:rem(id, "StatusChill")
+		CustomAnim:rem(id, "StatusWet")
 		pawn:SetFrozen(true)
 	else
 		CustomAnim:add(id, "StatusChill")
