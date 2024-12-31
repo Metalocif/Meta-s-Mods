@@ -38,10 +38,12 @@ end
 local function SilentGainBladeDance(mission)
 	for i = 0, 2 do
 		local pawn = Board:GetPawn(i)
-		if pawn and pawn:IsAbility("StSSilentSkill") and pawn:GetWeaponCount() < 2 then
-			pawn:AddWeapon("StS_BladeDance")
-		else
-			mission.SilentIsToxic = true
+		if pawn and pawn:IsAbility("StSSilentSkill") then
+			if pawn:GetWeaponCount() < 2 then
+				pawn:AddWeapon("StS_BladeDance")
+			else
+				mission.SilentIsToxic = true
+			end
 		end
 	end
 end
