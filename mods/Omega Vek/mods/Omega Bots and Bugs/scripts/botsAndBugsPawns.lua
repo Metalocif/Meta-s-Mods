@@ -107,6 +107,7 @@ Omegalmn_Roach2 = Pawn:new{
 	Name = "Omega Roach",
 	Health = 3,
 	MoveSpeed = 4,
+	Ranged = 1,
 	Armor = true,
 	Burrows = true,
 	Image = "Omegaroach",
