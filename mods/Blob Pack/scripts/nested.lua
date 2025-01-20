@@ -100,7 +100,7 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 	if anim == "Meta_nestedgoo3" then tier = 3 end
 	if tier == 1 or tier == 3 then
 		local gunkedPawn = Board:GetPawn(p2)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
