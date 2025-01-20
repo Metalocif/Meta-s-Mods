@@ -112,7 +112,7 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 	if tier >= 2 then
 		local curr = p1 + DIR_VECTORS[(dir+1)%4] + DIR_VECTORS[(dir+2)%4]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
@@ -123,7 +123,7 @@ function Meta_nestedgooAtk1_StarfishAtk:GetSkillEffect(p1,p2)
 		
 		curr = p1 + DIR_VECTORS[(dir+2)%4] + DIR_VECTORS[(dir+3)%4]
 		gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
