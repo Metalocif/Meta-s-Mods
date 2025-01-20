@@ -154,7 +154,7 @@ function Meta_shapeshifterAtkC1:GetSkillEffect(p1,p2)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
@@ -207,7 +207,7 @@ function Meta_shapeshifterAtkS1_StarfishAtk:GetSkillEffect(p1,p2)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
@@ -219,7 +219,7 @@ function Meta_shapeshifterAtkS1_StarfishAtk:GetSkillEffect(p1,p2)
 		damage.sAnimation = "explogoostarfish_"..dir
 		damage.sSound = self.SoundBase.."/attack"
 		local gunkedPawn = Board:GetPawn(curr)
-		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk" then
+		if gunkedPawn and Status.GetStatus(gunkedPawn:GetId(), "Gunk") then
 			ret:AddQueuedScript(string.format("Status.HealFromGunk(%s)", blob:GetId()))
 			ret:AddQueuedScript(string.format("Status.RemoveStatus(%s, Gunk)", gunkedPawn:GetId()))
 		end
