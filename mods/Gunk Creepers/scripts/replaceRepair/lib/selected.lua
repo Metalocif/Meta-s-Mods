@@ -1,46 +1,31 @@
 
----------------------------------------------------------------------
--- Selected v1.2r - code library
---[[-----------------------------------------------------------------
-	version r: uses special path for replace repair
-]]
-local path = mod_loader.mods[modApi.currentMod].scriptPath
-local getModUtils = require(path .."replaceRepair/lib/getModUtils")
-local this = {}
+local selected = nil
 
-sdlext.addGameExitedHook(function()
-	this.selected = nil
-end)
-
-function this:Get()
-	return self.selected
+local function onPawnSelected(pawn)
+	selected = pawn
 end
 
-function this:load()
-	local modUtils = getModUtils()
-	
-	modUtils:addPawnSelectedHook(function(_, pawn)
-		self.selected = pawn
-	end)
-	
-	modUtils:addPawnDeselectedHook(function(_, pawn)
-		self.selected = nil
-	end)
-	
-	modApi:addTestMechEnteredHook(function()
-		modApi:runLater(function()
-			for id = 0, 2 do
-				self.selected = Board:GetPawn(id)
-				if self.selected then
-					break
-				end
-			end
-		end)
-	end)
-	
-	modApi:addTestMechExitedHook(function()
-		self.selected = nil
-	end)
+local function onPawnDeselected(pawn)
+	selected = nil
 end
 
-return this
+modApi.events.onPawnSelected:subscribe(onPawnSelected)
+modApi.events.onPawnDeselected:subscribe(onPawnDeselected)
+modApi.events.onGameExited:subscribe(onPawnDeselected)
+
+local function getSelectedPawn()
+	return selected
+end
+
+local function isPawnSelected(pawn)
+	if pawn == nil then
+		return selected == nil
+	end
+
+	return selected and pawn:GetId() == selected:GetId()
+end
+
+return {
+	getSelectedPawn = getSelectedPawn,
+	isPawnSelected = isPawnSelected
+}

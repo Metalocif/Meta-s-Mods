@@ -1,3 +1,7 @@
+v1.1
+- Replaced the Tentacular Mech's weapon with something else. Should be more fun and less buggy.
+- Improved the Insanity Status visual when fully insane.
+
 v1.0.1
 - Fixed a bug with the Tentacular mech.
 - Added a squad icon.

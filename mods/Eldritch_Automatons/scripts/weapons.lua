@@ -15,6 +15,24 @@ ANIMS.EldritchTentaclea = ANIMS.MechUnit:new{ Image = "units/player/tentaclehelp
 ANIMS.EldritchTentaclew = ANIMS.MechUnit:new{ Image = "units/player/tentaclehelperw.png", PosX = -15, PosY = 15, NumFrames = 1, Height=1 }
 ANIMS.EldritchTentacled = ANIMS.MechUnit:new{ Image = "units/player/tentaclehelper_death.png", PosX = -15, PosY = 15, NumFrames = 5, Time = 0.14, Loop = false, Height=1 }
 
+modApi:appendAsset("img/effects/eldritchtentacle_D.png", path.."img/effects/eldritchtentacle_D.png")
+modApi:appendAsset("img/effects/eldritchtentacle_L.png", path.."img/effects/eldritchtentacle_L.png")
+modApi:appendAsset("img/effects/eldritchtentacle_R.png", path.."img/effects/eldritchtentacle_R.png")
+modApi:appendAsset("img/effects/eldritchtentacle_U.png", path.."img/effects/eldritchtentacle_U.png")
+modApi:appendAsset("img/effects/eldritchtentaclediagonal_D.png", path.."img/effects/eldritchtentaclediagonal_D.png")
+modApi:appendAsset("img/effects/eldritchtentaclediagonal_L.png", path.."img/effects/eldritchtentaclediagonal_L.png")
+modApi:appendAsset("img/effects/eldritchtentaclediagonal_R.png", path.."img/effects/eldritchtentaclediagonal_R.png")
+modApi:appendAsset("img/effects/eldritchtentaclediagonal_U.png", path.."img/effects/eldritchtentaclediagonal_U.png")
+ANIMS.eldritchtentacleanim_0 = ANIMS.explosmash_0:new{Image = "effects/eldritchtentacle_U.png",NumFrames = 4,Time = 0.15,PosX = -15,PosY = -1}
+ANIMS.eldritchtentacleanim_1 = ANIMS.explosmash_1:new{Image = "effects/eldritchtentacle_R.png",NumFrames = 4,Time = 0.15,PosX = -14,PosY = -8}
+ANIMS.eldritchtentacleanim_2 = ANIMS.explosmash_2:new{Image = "effects/eldritchtentacle_D.png",NumFrames = 4,Time = 0.15,PosX = -12,PosY = -3}
+ANIMS.eldritchtentacleanim_3 = ANIMS.explosmash_3:new{Image = "effects/eldritchtentacle_L.png",NumFrames = 4,Time = 0.15,PosX = -12,PosY = -1}
+ANIMS.eldritchtentaclediaganim_0 = ANIMS.explosmash_0:new{Image = "effects/eldritchtentaclediagonal_R.png",NumFrames = 7,Time = 0.15,PosX = -35,PosY = -1}
+ANIMS.eldritchtentaclediaganim_1 = ANIMS.explosmash_1:new{Image = "effects/eldritchtentaclediagonal_D.png",NumFrames = 7,Time = 0.15,PosX = -10,PosY = -3}
+ANIMS.eldritchtentaclediaganim_2 = ANIMS.explosmash_2:new{Image = "effects/eldritchtentaclediagonal_L.png",NumFrames = 7,Time = 0.15,PosX = 5,PosY = -1}
+ANIMS.eldritchtentaclediaganim_3 = ANIMS.explosmash_3:new{Image = "effects/eldritchtentaclediagonal_U.png",NumFrames = 7,Time = 0.15,PosX = -6,PosY = 19}
+
+
 --might be better to have a mission table listing all tentacles in order of spawn, removing their ID via death effect
 -- that way we have a specific order to make them attack in, like Vek, and player can kill new ones when Octopus is insane
 
@@ -24,8 +42,8 @@ local options = mod_loader.currentModContent[mod.id].options
 local achievements = {
 	Meta_ComeWithMe = modApi.achievements:add{
 		id = "Meta_ComeWithMe",
-		name = "Come with me",
-		tip = "Use Eldritch Tentacles to move at least 3 tiles, then grab an allied pawn at least 3 tiles.",
+		name = "Star of Insanity",
+		tip = "Use Eldritch Tentacles to strike four enemies at once.",
 		img = path.."img/achievements/ComeWithMe.png",
 		squad = "Meta_Eldritch",
 	}, 
@@ -88,11 +106,12 @@ function Pilot_AbdulAlhazred_Meta:IsEnabled()
 end
 
 
+
 Meta_EldritchTentacles = Skill:new{  
 	Name = "Eldritch Tentacles",
 	Class = "Prime",
 	Icon = "weapons/EldritchTentacles.png",
-	Description = "Grab two remote targets. Induce Insanity in adjacent pilots. Insane: +1 damage, but will damage buildings.",
+	Description = "Pull a distant target, push an adjacent target, or push sideways in a diagonal direction. Induce Insanity in adjacent pilots. Insane: attack on all four diagonal directions.",
 	Rarity = 3,
 	Damage = 1,
 	ZoneTargeting = ZONE_DIR,
@@ -117,112 +136,111 @@ Meta_EldritchTentacles = Skill:new{
 	}
 }
 
-Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Melee hits inflict Doomed. Doomed pawns take damage every turn and turn their tile into lava on death.",Doomed=true,Self = "Meta_EldritchTentacles_A",}
-Meta_EldritchTentacles_B = Meta_EldritchTentacles:new{UpgradeDescription = "Deals 1 more damage.",Damage=2,Self = "Meta_EldritchTentacles_B",}
-Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doomed = true,Damage=2,Self = "Meta_EldritchTentacles_AB",}
+Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Melee hits inflict Doomed. Doomed pawns take damage every turn and turn their tile into lava on death.",Doomed=true}
+Meta_EldritchTentacles_B = Meta_EldritchTentacles:new{UpgradeDescription = "Deals 1 more damage.",Damage=2}
+Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doomed = true,Damage=2}
 
 function Meta_EldritchTentacles:GetTargetArea(point)
 	local ret = PointList()
-	for dir = DIR_START, DIR_END do
-		local target = GetProjectileEnd(point, point+DIR_VECTORS[dir])
-		if Board:IsValid(target) then
-			for i = 1, point:Manhattan(target) do
-				ret:push_back(point + DIR_VECTORS[dir] * i)
-			end
-		end
+	local targets = extract_table(general_DiamondTarget(point, 2))
+	for i = 1, #targets do
+		if targets[i] ~= point then ret:push_back(targets[i]) end
 	end
 	return ret
 end
 
-function Meta_EldritchTentacles:GetSkillEffect(p1,p2,boosted)
-	local ret = SkillEffect()
-	local direction = GetDirection(p2 - p1)
-	local target = GetProjectileEnd(p1, p1+DIR_VECTORS[direction])
-	local isMelee = p1:Manhattan(target) == 1
-	local damageAmount = self.Damage
+function Meta_EldritchTentacles:IsTwoClickException(p1, p2)
 	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
-	local mission = GetCurrentMission()
-	if isInsane then damageAmount = damageAmount + 1 end
-	if boosted then damageAmount = damageAmount + 1 end
-	if not Board:IsValid(target) then return ret end
-	local damage = SpaceDamage(target)
-	damage.bHidePath = true
-	ret:AddProjectile(p1,damage,"effects/shot_grapple",PROJ_DELAY)
-	
-	if Board:IsPawnSpace(target) and not Board:GetPawn(target):IsGuarding() then	-- If it's a pawn
-		ret:AddCharge(Board:GetSimplePath(target, p1 + DIR_VECTORS[direction]), FULL_DELAY)
-		if not Board:IsPawnTeam(target, TEAM_PLAYER) then
-			if isMelee and self.Doomed then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
-			ret:AddDamage(SpaceDamage(p1 + DIR_VECTORS[direction],damageAmount))
-		elseif p1:Manhattan(target)>3 then 
-			mission.flag2 = true 
-		end
-	elseif Board:IsBlocked(target, Pawn:GetPathProf()) then     --If it's an obstruction
-		if p1:Manhattan(target)>3 then mission.flag1 = true end
-		ret:AddCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), FULL_DELAY)	
-		if isInsane or (Board:IsPawnSpace(target) and not Board:IsPawnTeam(target, TEAM_PLAYER)) then
-			if isMelee and self.Doomed and Board:IsPawnSpace(target) then ret:AddScript(string.format("Status.ApplyDoomed(%s)", Board:GetPawn(target):GetId())) end
-			ret:AddDamage(SpaceDamage(target,damageAmount))
-		end
-	end
-		
-	return ret
-end
-
-local function GetSubsequentLocation(p1,p2)
-	local firstTarget = GetProjectileEnd(p1, p1+DIR_VECTORS[GetDirection(p2-p1)])
-	if Board:IsValid(firstTarget) and (Board:IsPawnSpace(firstTarget) and Board:GetPawn(firstTarget):IsGuarding()) or Board:GetTerrain(firstTarget) == TERRAIN_MOUNTAIN or Board:GetTerrain(firstTarget) == TERRAIN_BUILDING then
-		return firstTarget - DIR_VECTORS[GetDirection(p2-p1)]
-	else
-		return p1
-	end
+	return isInsane
 end
 
 function Meta_EldritchTentacles:GetSecondTargetArea(p1,p2)
 	local ret = PointList()
-	p1 = GetSubsequentLocation(p1,p2)
-	for dir = DIR_START, DIR_END do
-		local target = GetProjectileEnd(p1, p1+DIR_VECTORS[dir])
-		if target == p1 then target = GetProjectileEnd(target, target+DIR_VECTORS[dir]) end
-		if Board:IsValid(target) then
-			for i = 1, p1:Manhattan(target) do
-				ret:push_back(p1 + DIR_VECTORS[dir] * i)
-			end
+	--May need to check whether pull tiles don't have a blocker in front of them after first skill effect
+	local targets = extract_table(general_DiamondTarget(p1, 2))
+	for i = 1, #targets do
+		if targets[i] ~= p1 and targets[i] ~= p2 then ret:push_back(targets[i]) end	
+	end
+	return ret
+end
+
+function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
+	if isInsane then							--multihit
+		local toastCounter = 0
+		for i = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
+			
+			local damage = SpaceDamage(curr, self.Damage, (i+2)%4)
+			damage.sAnimation = "eldritchtentaclediaganim_"..i
+			if self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s)", curr:GetString()) end
+			ret:AddDamage(damage)
+			if Board:GetPawn(curr) then  toastCounter=toastCounter+1 end
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", user:GetId()))
+		end
+		if toastCounter == 4 then ret:AddScript("completeComeWithMe()") end
+		for i = DIR_START, DIR_END do
+			local curr = loc + DIR_VECTORS[i]
+			local pawn = Board:GetPawn(curr)
+			if pawn and pawn:GetPersonality() ~= "Artificial" then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) end
+		end
+	elseif p1:Manhattan(p2) == 1 then			--push
+		local direction = GetDirection(p2 - p1)
+		ret:AddMelee(p1, SpaceDamage(p2, self.Damage, direction))
+	elseif p1.x == p2.x or p1.y == p2.y then	--pull
+		local direction = GetDirection(p2 - p1)
+		ret:AddMelee(p1, SpaceDamage(p2, self.Damage, (direction+2)%4))
+	else										--diagonal
+		for i = DIR_START, DIR_END do
+			local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
+			if curr == p2 then ret:AddDamage(SpaceDamage(p2, self.Damage, (i+2)%4)) end
 		end
 	end
 	return ret
 end
 
 function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
-	local user = Board:GetPawn(p1)
-	local isBoosted = user:IsBoosted() or user:GetPersonality() == "Arrogant"
-	local loc = GetSubsequentLocation(p1,p2)
-	local ret = Meta_EldritchTentacles:GetSkillEffect(p1,p2,isBoosted)
-	local target1 = GetProjectileEnd(p1, p1+DIR_VECTORS[GetDirection(p2-p1)])
-	local target2 = GetProjectileEnd(loc, loc+DIR_VECTORS[GetDirection(p3-loc)])
-	local damageAmount = self.Damage
-	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
-	local mission = GetCurrentMission()
-	local multishotMark = target1 == target2 and Board:GetPawn(target1) and Board:GetPawn(target1):GetTeam() ~= TEAM_PLAYER
-	if isInsane then damageAmount = damageAmount + 1 end
-
-	--induce insanity
-	for i = DIR_START, DIR_END do
-		local curr = loc + DIR_VECTORS[i]
-		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetPersonality() ~= "Artificial" then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) end
-	end
-	local mission = GetCurrentMission()
-	ret:AddScript(string.format("Board:AddEffect(_G[%q]:GetSkillEffect(%s,%s))", self.Self, loc:GetString(), p3:GetString(), isBoosted))
+	local ret = SkillEffect()
 	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", user:GetId())) end
 
-	local damage = SpaceDamage(target2, damageAmount)
-	if Board:GetPawn(target2) and not Board:GetPawn(target2):IsGuarding() then damage.loc = loc+DIR_VECTORS[GetDirection(p3-loc)] end
-	if Board:GetPawn(target2) and Board:GetPawn(target2):IsGuarding() then damage.loc = GetProjectileEnd(loc, loc+DIR_VECTORS[GetDirection(p3-loc)]) end
-	if multishotMark then damage.sImageMark = MultishotLib:getImageMark(damageAmount, 2, loc, damage.loc) end
-	if isInsane or (Board:GetPawn(target2) and Board:GetPawn(target2):GetTeam() ~= TEAM_PLAYER) then weaponPreview:AddDamage(damage) end
-	if isInsane then ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", user:GetId())) end
-	if mission.flag1 and mission.flag2 then ret:AddScript("completeComeWithMe()") end
+	local mission = GetCurrentMission()
+	local damage1 = SpaceDamage(p2, self.Damage)
+	if self.Doom then damage1.sScript = string.format("Status.ApplyDoomed(%s)", p2:GetString()) end
+	local damage2 = SpaceDamage(p3, self.Damage)
+	if self.Doom then damage2.sScript = string.format("Status.ApplyDoomed(%s)", p3:GetString()) end
+	
+	if p1:Manhattan(p2) == 1 then				--push
+		damage1.iPush = GetDirection(p2 - p1)
+		damage1.sAnimation = "eldritchtentacleanim_"..GetDirection(p2 - p1)
+		ret:AddMelee(p1, damage1)
+	elseif p1.x == p2.x or p1.y == p2.y then	--pull
+		damage1.iPush = (GetDirection(p2 - p1) + 2) % 4
+		ret:AddMelee(p1, damage1)
+		ret:AddAnimation(p1+DIR_VECTORS[GetDirection(p2-p1)], "eldritchtentacleanim_"..GetDirection(p2 - p1))
+	else										--diagonal
+		for i = DIR_START, DIR_END do
+			damage1.iPush = (i+2)%4
+			damage1.sAnimation = "eldritchtentaclediaganim_"..i
+			if p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] == p2 then ret:AddDamage(damage1) end
+		end
+	end
+	ret:AddDelay(-1)
+	if p1:Manhattan(p3) == 1 then				--push
+		damage2.iPush = GetDirection(p3 - p1)
+		damage2.sAnimation = "eldritchtentacleanim_"..GetDirection(p3 - p1)
+		ret:AddMelee(p1, damage2)
+	elseif p1.x == p3.x or p1.y == p3.y then	--pull
+		damage2.iPush = (GetDirection(p3 - p1) + 2) % 4
+		ret:AddMelee(p1, damage2)
+		ret:AddAnimation(p1+DIR_VECTORS[GetDirection(p3-p1)], "eldritchtentacleanim_"..GetDirection(p3 - p1))
+	else										--diagonal
+		for i = DIR_START, DIR_END do
+			damage2.iPush = (i+3)%4
+			damage2.sAnimation = "eldritchtentaclediaganim_"..i
+			if p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] == p3 then ret:AddDamage(damage2) end
+		end
+	end
 	return ret
 end	
 
@@ -263,7 +281,7 @@ function Meta_EldritchInsanity:GetTargetArea(point)
 	if Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") >= 5 then ret:push_back(point) return ret end
 	for k = 1, #targets do	
 		local pawn = Board:GetPawn(targets[k])
-		if pawn and pawn:IsQueued() then ret:push_back(targets[k]) end
+		if pawn and pawn:GetQueuedTarget()~=Point(-1,-1) then ret:push_back(targets[k]) end
 	end
 	if self.Madness then ret:push_back(point) end
 	return ret
@@ -303,7 +321,7 @@ function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 		local enemies = Board:GetPawns(TEAM_ENEMY)
 		for _, i in ipairs(extract_table(enemies)) do
 			local pawn = Board:GetPawn(i)
-			if pawn:IsQueued() then
+			if pawn:GetQueuedTarget()~=Point(-1,-1) then
 				local targetArea = extract_table(_G[pawn:GetQueuedWeapon()]:GetTargetArea(pawn:GetSpace()))
 				local targetAreaPick = (i + Game:GetTurnCount()) % #targetArea + 1
 				--deterministic formula so it persists through reset turns

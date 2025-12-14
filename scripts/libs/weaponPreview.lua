@@ -561,7 +561,7 @@ local function getSecondTargetArea(self, p1, p2, ...)
 	if pawn and previewState == STATE_NONE and not Board:IsTipImage() then
 		actingMarker:setArmed(pawn)
 
-		-- if skillId == actingMarker.weapon and actingMarker ~= targetMarker then
+		if skillId == actingMarker.weapon and actingMarker ~= targetMarker then
 			if targetMarker:isActive() then
 				events.onTargetAreaHidden:dispatch(targetMarker:unpack())
 				targetMarker:clear()
@@ -576,7 +576,7 @@ local function getSecondTargetArea(self, p1, p2, ...)
 			result = oldGetSecondTargetAreas[skillId](self, p1, p2, ...)
 			previewTargetArea = result
 			previewState = STATE_NONE
-		-- end
+		end
 	end
 
 	return result or oldGetSecondTargetAreas[skillId](self, p1, p2, ...)
@@ -618,7 +618,7 @@ local function getFinalEffect(self, p1, p2, p3, ...)
 		end
 	end
 
-	return result or oldGetFinalEffects[skillId](self, p1, p2, ...)
+	return result or oldGetFinalEffects[skillId](self, p1, p2, p3, ...)
 end
 
 

@@ -47,7 +47,7 @@ ANIMS.StatusInsanity1 = Animation:new{ Image = "libs/status/Insanity1.png", PosX
 ANIMS.StatusInsanity2 = Animation:new{ Image = "libs/status/Insanity2.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusInsanity3 = Animation:new{ Image = "libs/status/Insanity3.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusInsanity4 = Animation:new{ Image = "libs/status/Insanity4.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 4, Frames={0,1,2,3,2,1,0}, Time = 0.75, Loop = true}
+ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 8, Frames={0,1,2,3,4,5,6,7,6,5,4,3,2,1,0}, Time = 0.75, Loop = true}
 
 
 

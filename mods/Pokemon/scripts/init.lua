@@ -69,6 +69,7 @@ function mod:init()
 				if modApi.achievements:isComplete(mod.id,"Poke_MewtwoCapture") then table.insert(copy, "Poke_ArmoredMewtwo") end
 				if modApi.achievements:isComplete(mod.id,"Poke_ArceusCapture") then table.insert(copy, "Poke_Arceus") end
 				table.insert(copy, "Poke_Metanitar")
+				table.insert(copy, "Poke_Tyrachomp")
 				return copy
 			end
 

@@ -25,6 +25,7 @@ function mod:init(options)
 	require(self.scriptPath.."libs/spaceDamageObjects")
 	require(self.scriptPath.."libs/status")
 	require(self.scriptPath.."libs/weaponArmed")
+	require(self.scriptPath.."libs/weaponPreview")
 	require(self.scriptPath .."libs/worldConstants")
 end
 

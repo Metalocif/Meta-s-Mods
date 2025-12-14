@@ -2557,7 +2557,7 @@ function CyborgWeapons_Adrenaline:GetTargetArea(point)
 	for i = DIR_START, DIR_END do
 		local curr = point + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if (pawn:GetTeam() == TEAM_ENEMY and pawn:IsQueued()) or (pawn:GetTeam() == TEAM_PLAYER and pawn:GetClass() == "TechnoVek" and not pawn:IsActive()) then
+		if pawn and ((pawn:GetTeam() == TEAM_ENEMY and pawn:IsQueued()) or (pawn:GetTeam() == TEAM_PLAYER and pawn:GetClass() == "TechnoVek" and not pawn:IsActive())) then
 			ret:push_back(curr)
 		end
 	end

@@ -1,6 +1,7 @@
 local mod = modApi:getCurrentMod()
-local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
-local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
+local path = mod.scriptPath
+local customAnim = require(path.."customAnim")
+local weaponPreview = require(path.."weaponPreview")
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/weapons/Djinn_GunkSpray.png", path .."img/weapons/Djinn_GunkSpray.png")
 
@@ -81,13 +82,13 @@ function Djinn_SlimeSlam:GetSkillEffect(p1,p2)
 		ret:AddSafeDamage(SpaceDamage( target - DIR_VECTORS[direction] , selfDamageAmount))
 	else
 		ret:AddCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), NO_DELAY)--FULL_DELAY)
-
+		ret:AddScript(string.format("Board:SetItem(%s, %q)", p1:GetString(), "Meta_BlobGunk")) 
 		local temp = p1 
 		while temp ~= target do 
 			ret:AddBounce(temp,-3)
 			local itemDamage = SpaceDamage(temp, 0)
 			itemDamage.sItem = "Meta_BlobGunk"
-			if (temp ~= p1 or self.ToSpawn == "") and not Board:IsBlocked(temp, PATH_GROUND) then ret:AddDamage(itemDamage) end	--make sure we don't gunk the slimelet
+			if (self.ToSpawn == "") and not Board:IsBlocked(temp, PATH_GROUND) then ret:AddDamage(itemDamage) end	--make sure we don't gunk the slimelet
 			temp = temp + DIR_VECTORS[direction]
 			if temp ~= target then ret:AddDelay(0.06) end
 			if Board:GetTerrain(temp) ~= TERRAIN_WATER and Board:GetTerrain(temp) ~= TERRAIN_HOLE then 
@@ -129,7 +130,7 @@ Djinn_SlimeletShove = Skill:new{
 	Class = "",
 	Icon = "weapons/Djinn_SlimeletShove.png",	
 	Name = "Shove",
-	Description = "Weakly shove an adjacent unit.",
+	Description = "Shove an adjacent unit with slimy strength.",
 	Rarity = 3,
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
@@ -171,7 +172,7 @@ Djinn_GunkSpray = Skill:new{
 	Class = "Prime",
 	Icon = "weapons/Djinn_GunkSpray.png",
 	Name = "Gunk Spray",
-	Description = "Spray gunk over targets in a line, applying Gunk and spawning a Slimelet for each killed enemy.",
+	Description = "Spray caustic Gunk over all targets and tiles in a line. Spawn a temporary Slimelet for each killed enemy.",
 	OnKill = "Spawn a slimelet",
 	Explosion = "",
 	PathSize = 2,
@@ -185,7 +186,6 @@ Djinn_GunkSpray = Skill:new{
 		Unit = Point(2,3),
 		Target = Point(2,1),
 		Enemy = Point(2,1),
-		Enemy2 = Point(3,2),
 		CustomEnemy = "Leaper1",
 	},
 }
@@ -217,9 +217,18 @@ function Djinn_GunkSpray:GetSkillEffect(p1, p2)
 		local spawnDamage = SpaceDamage(curr)
 		spawnDamage.sPawn = "Slimelet"
 		
+	
+				
+
+		
 		if i == distance then damage.sAnimation = "flamethrower"..distance.."_"..direction end
 		if pawn and not isDeadlyDamage(damage, Board:GetPawn(curr)) then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
 		ret:AddDamage(damage)
+		
+		
+				ret:AddScript(string.format("Board:SetItem(%s, %q)", (p1 + DIR_VECTORS[direction]*i):GetString(), "Meta_BlobGunk")) 
+		
+		
 		if pawn and pawn:GetType() == "SlimeBeast" then weaponPreview:AddDamage(SpaceDamage(curr, -1)) end
 		if Board:GetPawn(curr) and isDeadlyDamage(damage, Board:GetPawn(curr)) then
 			ret:AddArtillery(curr, spawnDamage, "units/player/Slimelet.png", NO_DELAY)
@@ -235,9 +244,7 @@ Djinn_GunkSpray_A = Djinn_GunkSpray:new{
 	TipImage = {
 		Unit = Point(2,4),
 		Target = Point(2,0),
-		Enemy = Point(1,0),
-		Enemy2 = Point(3,1),
-		Enemy3 = Point(2,2),
+		Enemy = Point(2,0),
 	},
 }
 Djinn_GunkSpray_B = Djinn_GunkSpray:new{
@@ -250,9 +257,7 @@ Djinn_GunkSpray_AB = Djinn_GunkSpray:new{
 	TipImage = {
 		Unit = Point(2,4),
 		Target = Point(2,0),
-		Enemy = Point(1,0),
-		Enemy2 = Point(3,1),
-		Enemy3 = Point(2,2),
+		Enemy = Point(2,0),
 	},
 }
 
@@ -266,15 +271,17 @@ Djinn_Resonance = Skill:new{
 	Class = "Science",
 	Icon = "weapons/Djinn_Resonance.png",
 	Name = "Resonance",
-	Description = "Deal 1 damage and spreads gunk to adjacent tiles. Kill a target unit with 1 HP, damaging its surroundings.",
+	Description = "Target any unit with 1 HP or any Gunk to deal 1 damage while pushing adjacent units.",
 	Explosion = "",
-	Damage = 1,
+	Damage = 0,
 	PowerCost = 0,
 	HealthToTarget = 1,
-	Push = false,
+	Range = 4,
+	Push = true,
+	Splash = true,
 	Upgrades = 2,
 	UpgradeCost = { 2 , 2 },
-	UpgradeList = { "+1 HP Targets",  "Push"  },
+	UpgradeList = { "+1 HP Targets",  "Splash"  },
 	LaunchSound = "/weapons/science_repulse",
 	TipImage = {
 		Unit = Point(2,3),
@@ -285,20 +292,18 @@ Djinn_Resonance = Skill:new{
 	},
 }
 
-function Djinn_Resonance:GetTargetArea(point)
-	local ret = PointList()
-	local maxHealth = self.HealthToTarget
-	-- if Board:GetPawn(point):IsBoosted() then maxHealth = maxHealth + 1 end
-	for i = DIR_START, DIR_END do
-		for k = 2, 8 do
-			local curr = DIR_VECTORS[i]*k + point
-			if Board:GetPawn(curr) or Board:GetItem(curr) == "Meta_BlobGunk" then ret:push_back(curr) end
-			if not Board:IsValid(curr) then break end
-		end
-	end
-	return ret
+function Djinn_Resonance:GetTargetArea(p1)
+    local ret = PointList()
+    local targets = extract_table(general_DiamondTarget(p1, self.Range))
+    for k = 1, #targets do
+        if Board:GetPawn(targets[k]) and Board:GetPawn(targets[k]):GetHealth() == 1 then ret:push_back(targets[k]) end 
+		if Board:GetItem(targets[k]) == "Meta_BlobGunk" then ret:push_back(targets[k]) end
+		--if Status.GetStatus(Board:GetPawn(targets[k]):GetId(), "Gunk") then ret:push_back(targets[k]) end
+    end
+	
+    return ret
 end
-				
+					
 function Djinn_Resonance:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local maxHealth = self.HealthToTarget
@@ -308,15 +313,18 @@ function Djinn_Resonance:GetSkillEffect(p1, p2)
 	damage.sSound = self.LaunchSound
 	if Board:GetPawn(p2) and Board:GetPawn(p2):GetHealth() <= maxHealth then damage.iDamage = DAMAGE_DEATH end
 	ret:AddDamage(damage)
-	--do spread gunk off pawn with gunk or gunk item, preview damage icon coz unclear
 	
-	if Board:GetPawn(p2) and Board:GetPawn(p2):GetHealth() <= maxHealth then
+	if Board:GetPawn(p2) or Board:GetItem(p2) == "Meta_BlobGunk" then
 		for i = DIR_START, DIR_END do
 			local curr = p2 + DIR_VECTORS[i]
-			local burstDamage = SpaceDamage(curr, 1)
+			local burstDamage = SpaceDamage(curr, DAMAGE_ZERO)
 			if self.Push then burstDamage.iPush = i end
 			ret:AddDamage(burstDamage)
+			if self.Splash then 
+			ret:AddScript(string.format("Board:SetItem(%s, %q)", curr:GetString(), "Meta_BlobGunk")) 
+			end
 		end
+			
 	end
 	return ret
 end	
@@ -333,12 +341,12 @@ Djinn_Resonance_A = Djinn_Resonance:new{
 	},
 }
 Djinn_Resonance_B = Djinn_Resonance:new{
-	Push = true,
-	UpgradeDescription="Explosion pushes.",
+	Splash = true,
+	UpgradeDescription="Explosion spreads Gunk to adjacent tiles.",
 }
 Djinn_Resonance_AB = Djinn_Resonance:new{
+	Splash = true,
 	HealthToTarget = 2,
-	Push = true,
 	TipImage = {
 		Unit = Point(2,4),
 		Target = Point(2,0),

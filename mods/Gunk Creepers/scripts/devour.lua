@@ -2,14 +2,14 @@
 
 local init = function(mod, replaceRepair)
 	modApi:appendAsset("img/weapons/devour_weapon.png",mod.resourcePath.."img/weapons/devour_weapon.png")
-	replaceRepair:ForPilot("DjinnDevour", "Djinn_Devour", {"Devour", "Consume an adjacent Vek with 1 HP - or building - as a free action to heal 1 HP and clear status effects."}, mod.resourcePath .."/img/weapons/devour_weapon.png")
+	replaceRepair:ForPilot("DjinnBlobDevour", "Djinn_Blob_Devour", {"Devour", "Consume an adjacent Vek with 1 HP - or building - as a free action to heal 1 HP and clear status effects."}, mod.resourcePath .."/img/weapons/devour_weapon.png")
 end
 
 
 local load = function()
 end
 
-Djinn_Devour = Skill:new{
+Djinn_Blob_Devour = Skill:new{
     Name = "Devour",
     Description = "Consume an adjacent Vek with 1 HP - or building - as a free action to heal 1 HP and clear status effects. Gunk makes enemies with 2 HP edible.", 
     Damage = DAMAGE_DEATH,
@@ -25,7 +25,7 @@ Djinn_Devour = Skill:new{
     }
 }
 
-function Djinn_Devour:GetTargetArea(point) 
+function Djinn_Blob_Devour:GetTargetArea(point) 
     local ret = PointList()
     
     if Board:GetPawn(point):IsFrozen() then
@@ -45,7 +45,7 @@ function Djinn_Devour:GetTargetArea(point)
 end
 
 
-function Djinn_Devour:GetSkillEffect(p1,p2)
+function Djinn_Blob_Devour:GetSkillEffect(p1,p2)
     local ret = SkillEffect()
     
     if p1 == p2 then

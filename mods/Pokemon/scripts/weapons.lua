@@ -1,7 +1,7 @@
 local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 local artilleryArc = require(mod_loader.mods.meta_mods.scriptPath.."libs/artilleryArc")
 local weaponArmed = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponArmed")
-local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
+-- local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath.."libs/weaponPreview")
 local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 require(mod_loader.mods[modApi.currentMod].scriptPath.."weathers")
 require(mod_loader.mods.meta_mods.scriptPath.."libs/status")
@@ -87,6 +87,9 @@ local files = {
 	"Wormhole.png",
 	"Trample.png",
 	"PsychicTerror.png",
+	"ScorchingSands.png",
+	"DragonTail.png",
+	"MountainHurl.png",
 	"Present.png"
 }
 for _, file in ipairs(files) do
@@ -1158,7 +1161,7 @@ function Poke_Blizzard:GetSkillEffect(p1,p2)		--do chill
 	for _, tile in ipairs(Board) do
 		if Board:GetPawn(tile) and Board:GetPawn(tile):GetTeam() == TEAM_ENEMY then
 			local damage = SpaceDamage(tile, self.Damage)
-			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", pawn:GetId(), tostring(true))
+			damage.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", Board:GetPawn(tile):GetId(), tostring(true))
 			ret:AddDamage(damage)
 		end
 	end
@@ -1500,10 +1503,9 @@ end
 function Poke_ShadowBall:GetFinalEffect(p1, p2, p3, remainingShots)
 	local ret = SkillEffect()
 	local direction = GetDirection(p3-p2)
-	local distance = p2:Manhattan(p3)
 	if not remainingShots then 
 		remainingShots = self.Shots
-		if distance == 1 then
+		if p2:Manhattan(p3) == 1 then
 			
 			local pushDamage = SpaceDamage(p2, 0, direction)
 			pushDamage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, p2)
@@ -1524,7 +1526,7 @@ function Poke_ShadowBall:GetFinalEffect(p1, p2, p3, remainingShots)
 	else
 		local target = GetProjectileEnd(p1,p2)
 		local damage = SpaceDamage(target, 1)
-		-- damage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
+		damage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
 		ret:AddProjectile(p1, damage, "effects/shadowball", NO_DELAY)
 		ret:AddDelay(0.1 + remainingShots * 0.05)
 		remainingShots = remainingShots - 1
@@ -1648,7 +1650,7 @@ Poke_FormChange = Skill:new{
 	Icon = "weapons/FormChange.png",	
 	Rarity = 3,
 	Name = "Form Change",
-	Description = "Change forms and perform a different attack based on the target. \nSelf: taunt adjacent enemies and gain a shield. \nAdjacent: Strike front tiles several times. \nRanged: pull the target and strike it. \Otherwise: phase to the location, pushing adjacent tiles.",
+	Description = "Change forms and perform a different attack based on the target. \nSelf: taunt adjacent enemies and gain a shield. \nAdjacent: Strike front tiles several times. \nRanged: pull the target and strike it. \nOtherwise: phase to the location, pushing adjacent tiles.",
 	Push = 1,--TOOLTIP HELPER
 	MinDamage = 1,
 	Damage = 2,
@@ -2234,8 +2236,6 @@ function Poke_PetalBlizzard:GetSkillEffect(p1, p2)
 	return ret
 end
 
-
-
 Poke_Moonblast=Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/Moonblast.png",	
@@ -2403,7 +2403,7 @@ function Poke_Reflect:GetSkillEffect(p1, p2)
 	ret:AddAnimation(p2, "ExploRepulse1")
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		local pawn = Board:GetPawn(id)		
-		if pawn:IsQueued() then
+		if pawn:GetQueuedTarget() ~= Point(-1, -1) then
 			local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(pawn:GetSpace(), pawn:GetQueuedTarget())
 			for _, spaceDamage in ipairs(extract_table(fx.q_effect)) do
 				if spaceDamage.loc == p2 then 
@@ -2502,14 +2502,31 @@ end
 function Poke_Teleport:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local moverHp = Board:GetPawn(p2):GetHealth()
+	if Board:GetPawn(p2):IsArmor() and not Board:GetPawn(p2):IsAcid() then moverHp = moverHp + 1 end
 	local targetHp = 100
 	if Board:GetPawn(p3) then targetHp = Board:GetPawn(p3):GetHealth() end
+	if Board:GetPawn(p2):IsArmor() and not Board:GetPawn(p2):IsAcid() then targetHp = targetHp + 1 end
 	if (Board:GetTerrain(p3) == TERRAIN_MOUNTAIN and Board:GetHealth(p3) == 2) or (Board:GetTerrain(p3) == TERRAIN_BUILDING and Board:GetHealth(p3) > moverHp) then
 		--we don't want corpses on the same tile as a mountain/building that will be standing 
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCorpse(false)", p2:GetString()))
 	end
 	ret:AddTeleport(p2, p3, FULL_DELAY)
-	if Board:IsBlocked(p3, PATH_PROJECTILE) then ret:AddDamage(SpaceDamage(p3, math.min(moverHp, targetHp))) end
+	if Board:IsBlocked(p3, PATH_PROJECTILE) then 
+		local hadShield = false
+		local wasFrozen = false
+		--make it go through shield and readd, otherwise one pawn survives
+		if Board:IsShield(p3) then
+			hadShield = true
+			Board:SetShield(p3, false, true)
+		end
+		if Board:IsFrozen(p3) then
+			wasFrozen = true
+			Board:SetFrozen(p3, false, true)
+		end
+		ret:AddDamage(SpaceDamage(p3, math.min(moverHp, targetHp))) 
+		if hadShield then Board:SetShield(p3, true, true) end
+		if wasFrozen then Board:SetFrozen(p3, true, true) end
+	end
 	return ret
 end
 
@@ -3313,7 +3330,7 @@ Poke_QuickAttack=Skill:new{
 		Target = Point(2,1),
 		Enemy1 = Point(2,1),
 		Enemy2 = Point(2,4),
-		-- Second_Origin = Point(2,2),
+		-- Second_Origin = Point(2,1),
 		Second_Target = Point(2,3),
 		Second_Click = Point(2,3),
 		CustomPawn = "Poke_Eevee",
@@ -3378,6 +3395,9 @@ end
 
 function Poke_QuickAttack:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
+	
+	if not p3 or not Board:IsValid(p3) then p3 = p2 end
+	
 	local dir2 = GetDirection(p3-p2)
 	local dir = GetDirection(p2-p1)
 	local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
@@ -3393,6 +3413,8 @@ function Poke_QuickAttack:GetFinalEffect(p1, p2, p3)
 	end
 	if moveTo ~= p2 then ret:AddDamage(SpaceDamage(p2, self.Damage, dir)) end
 	if p2 == p3 then return ret end
+	if Board:IsTipImage() then return ret end
+	
 	ret:AddDelay(0.1)
 	if Board:IsBlocked(p3, PATH_PROJECTILE) then
 		if moveTo:Manhattan(p3) == 1 and p3 ~= p1 then
@@ -3852,7 +3874,7 @@ function Reflect(point)
 	ret = SkillEffect()
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		local pawn = Board:GetPawn(id)		
-		if pawn:IsQueued() then
+		if pawn:GetQueuedTarget() ~= Point(-1, -1) then
 			local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(pawn:GetSpace(), pawn:GetQueuedTarget())
 			for _, spaceDamage in ipairs(extract_table(fx.q_effect)) do
 				if spaceDamage.loc == point then 
@@ -4121,8 +4143,7 @@ function Poke_Synchronize:GetTargetArea(p1)
 	local ret = PointList()
 	for dir = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[dir]
-		local pawn = Board:GetPawn(curr)
-		if pawn then ret:push_back(curr) end
+		if Board:GetPawn(curr) then ret:push_back(curr) end
 	end
 	return ret
 end
@@ -4138,8 +4159,7 @@ function Poke_Synchronize:GetSecondTargetArea(p1, p2)
 	for i = 0, 7 do
 		for j = 0, 7 do
 			local curr = Point(i, j)
-			local pawn = Board:GetPawn(curr)
-			if pawn and curr ~= p2 then ret:push_back(curr) end
+			if Board:GetPawn(curr) and curr ~= p2 then ret:push_back(curr) end
 		end
 	end
 	return ret
@@ -4149,9 +4169,10 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local pawn1 = Board:GetPawn(p2)
 	local pawn2 = Board:GetPawn(p3)
-	local id1 = pawn1:GetId()
-	local id2 = pawn2:GetId()
+	-- local id1 = pawn1:GetId()
+	-- local id2 = pawn2:GetId()
 	if Board:IsTipImage() then 
+		if not pawn1 or not pawn2 then return ret end
 		pawn2:SetFrozen(true, true)
 		pawn1:SetAcid(true, true)
 		local freeze = SpaceDamage(p2) 
@@ -4164,6 +4185,7 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 		ret:AddDelay(2)
 		return ret
 	end
+	
 	local synchro = SpaceDamage(p2)
 	if pawn1:IsFire() or pawn2:IsFire() then synchro.iFire = 1 end
 	if pawn1:IsAcid() or pawn2:IsAcid() then synchro.iAcid = 1 end
@@ -4196,7 +4218,8 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 	ret:AddSafeDamage(synchro)
 	synchro.loc = p3
 	ret:AddSafeDamage(synchro)
-	if pawn1:IsQueued() and pawn2:IsQueued() then
+
+	if pawn1:GetQueuedTarget() ~= Point(-1, -1) and pawn2:GetQueuedTarget() ~= Point(-1, -1) then
 		local dir1, dir2, dist1, dist2
 		if pawn1:GetQueuedTarget() ~= p2 then 
 			dir1 = GetDirection(pawn1:GetQueuedTarget() - p2) 
@@ -4286,7 +4309,7 @@ function Poke_FutureSight:GetSkillEffect(p1, p2)
 	local direction = GetDirection(p2-p1)
 	local damage = SpaceDamage(p2, self.Damage, DIR_FLIP)
 	local amount = self.Damage
-	if Board:GetPawn(p1):IsBoosted() then amount = amount + 1 end
+	if Board:GetPawn(p1) and Board:GetPawn(p1):IsBoosted() then amount = amount + 1 end
 	if Board:IsSpawning(p2) then 
 		damage = SpaceDamage(p2, DAMAGE_ZERO)
 		damage.sItem = "Poke_FutureSightItem"..math.min(amount,5)
@@ -4385,7 +4408,9 @@ Poke_FuryCutter_AB=Poke_FuryCutter:new{ Hemorrhage = true, Damage = 2 }
 
 function Poke_FuryCutter:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
-	if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, self.Damage), Board:GetPawn(p2)) then return ret end 
+	local damagePerHit = self.Damage
+	if Board:GetPawn(p1):IsBoosted() then damagePerHit = damagePerHit+1 end
+	if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, damagePerHit), Board:GetPawn(p2)) then return ret end 
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		if curr ~= p2 then ret:push_back(curr) end
@@ -4394,16 +4419,22 @@ function Poke_FuryCutter:GetSecondTargetArea(p1, p2)
 end
 
 function Poke_FuryCutter:IsTwoClickException(p1, p2)
+	local damagePerHit = self.Damage
+	if Board:GetPawn(p1):IsBoosted() then damagePerHit = damagePerHit+1 end
 	if not Board:GetPawn(p2) then return false end
-	return not Board:IsDeadly(SpaceDamage(p2, self.Damage), Board:GetPawn(p2))
+	LOG(damagePerHit, Board:GetPawn(p2):GetHealth(), Board:IsDeadly(SpaceDamage(p2, damagePerHit), Board:GetPawn(p1)))
+	return not Board:IsDeadly(SpaceDamage(p2, damagePerHit), Board:GetPawn(p1))
 end
 	
 function Poke_FuryCutter:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local damagePerHit = self.Damage
+	if Board:GetPawn(p1):IsBoosted() then damagePerHit = damagePerHit+1 end
 	local damage = SpaceDamage(p2, self.Damage)
-	if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, self.Damage), Board:GetPawn(p2)) then
+	
+	-- if Board:GetPawn(p2) and not Board:IsDeadly(SpaceDamage(p2, damagePerHit), Board:GetPawn(p2)) then
 		damage.sImageMark = MultishotLib:getImageMark(self.Damage, 2, p1, p2) 
-	end
+	-- end
 	damage.sSound = "/weapons/sword"
 	ret:AddAnimation(p2, "Swipe2Claw1", ANIM_NO_DELAY)
 	ret:AddMelee(p1, damage)
@@ -4676,7 +4707,7 @@ function Poke_SacredSword:GetSkillEffect(p1, p2)
 	--reverse mega evo
 	local user = Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
-		if user:GetWeaponBaseType(i) == "Poke_LightOfRuin" then 
+		if user:GetWeaponBaseType(i) == "Poke_SacredSword" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
 			break 
 		end
@@ -4962,9 +4993,11 @@ function Poke_ShatteredPsyche:GetSkillEffect(p1, p2)
 		local worstTarget
 		local worstScore = 100
 		local pawn = Board:GetPawn(id)
-		if pawn and pawn:IsQueued() and pawn:GetQueuedTarget() ~= pawn:GetSpace() then
-			for _, p2 in ipairs(extract_table(_G[pawn:GetQueuedWeapon()]:GetTargetArea(pawn:GetSpace()))) do
-				local score = _G[pawn:GetQueuedWeapon()]:GetTargetScoreShatteredPsyche(pawn:GetSpace(), p2)
+		local pos = pawn:GetSpace()
+		local weaponType = pawn:GetQueuedWeapon() or ""
+		if pawn and pawn:GetQueuedTarget() ~= Point(-1, -1) and pawn:GetQueuedTarget() ~= pos then
+			for _, p2 in ipairs(extract_table(_G[weaponType]:GetTargetArea(pos))) do
+				local score = _G[weaponType]:GetTargetScoreShatteredPsyche(pos, p2)
 				--had to tweak vanilla GetTargetScore function because it was using Mewtwo as the skill's user when checking for friendly damage
 				--ie. hitting mechs was "bad" because they are allies, so enemies would retarged mechs
 				if score < worstScore then 
@@ -4972,8 +5005,8 @@ function Poke_ShatteredPsyche:GetSkillEffect(p1, p2)
 					worstTarget = p2
 				end
 			end
-			local preview = SpaceDamage(pawn:GetSpace())
-			local dir = GetDirection(worstTarget - pawn:GetSpace())
+			local preview = SpaceDamage(pos)
+			local dir = GetDirection(worstTarget - pos)
 			local arrows = {"arrow_off_up.png", "arrow_off_right.png", "arrow_off_down.png", "arrow_off_left.png",}
 			preview.sImageMark = "combat/"..arrows[dir+1]
 			ret:AddDamage(preview)
@@ -5785,6 +5818,7 @@ Poke_Judgment = Skill:new{
 		Mountain = Point(3,1),
 		Friendly = Point(1,2),
 		Target = Point(3,2),
+		CustomPawn = "Poke_Arceus",
 	}
 }
 Poke_Judgment_A=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes or flips. Fire: applies fire. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", TwoClick = true, TypesA = true }
@@ -5912,7 +5946,7 @@ function Poke_Judgment:GetFinalEffect(p1, p2, p3)
 	elseif p3 == p1 + DIR_VECTORS[2] + DIR_VECTORS[3] then	--water
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusWater"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(0, 169, 255))", p1:GetString()))
-	elseif p3 == p1 + DIR_VECTORS[0] + DIR_VECTORS[0] then	--fairy
+	elseif p3 == p1 + DIR_VECTORS[3] + DIR_VECTORS[0] then	--fairy
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusFairy"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 140, 215))", p1:GetString()))
 	end
@@ -5942,6 +5976,7 @@ Poke_Wormhole = Skill:new{
 		Mountain = Point(3,1),
 		Friendly = Point(1,2),
 		Target = Point(3,2),
+		CustomPawn = "Poke_Arceus",
 	}
 }
 Poke_Wormhole_A=Poke_Wormhole:new{ UpgradeDescription = "Can teleport one tile further away.", Range = 4 }
@@ -6040,6 +6075,7 @@ Poke_Unmake = Skill:new{
 		Mountain = Point(3,1),
 		Friendly = Point(1,2),
 		Target = Point(3,2),
+		CustomPawn = "Poke_Arceus",
 	}
 }
 
@@ -6182,7 +6218,7 @@ function Poke_PsychicTerror:GetSkillEffect(p1, p2)
 			if not hitTiles[targets[k]:GetString()] then
 				ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 0, %s))", targets[k]:GetString(), 255 - 80 * i))
 				local pawn = Board:GetPawn(targets[k])
-				if pawn and pawn:GetHealth() < Board:GetPawn(p1):GetHealth() and pawn:GetTeam() == TEAM_ENEMY and pawn:IsQueued() then
+				if pawn and pawn:GetHealth() < Board:GetPawn(p1):GetHealth() and pawn:GetTeam() == TEAM_ENEMY and pawn:GetQueuedTarget() ~= Point(-1, -1) then
 					local mark = SpaceDamage(targets[k])
 					mark.sImageMark = "combat/icons/icon_mind_glow.png"
 					ret:AddDamage(mark)
@@ -6259,5 +6295,191 @@ function Poke_Present:GetSkillEffect(p1, p2)
 	end
 	ret:AddDelay(1.21)
 	ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), "Delibird"))
+	return ret
+end
+
+Poke_ScorchingSands = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/ScorchingSands.png",
+	Description = "Creates a sandstorm in a 3x3 area. Sets the center on fire. Pushes pawns on the edges.",
+	Name = "Scorching Sands",
+	Damage = 0,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy1 = Point(2,1),
+		Enemy1 = Point(2,0),
+		Target = Point(2,1),
+		CustomPawn = "Poke_Tyrachomp",
+	}
+}
+
+function Poke_ScorchingSands:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		for j = 2, 8 do
+			ret:push_back(point + DIR_VECTORS[i] * j)
+		end 
+	end
+	return ret
+end
+
+Emitter_ScorchingSands = Emitter_Sandstorm_1:new{ variance_x = 20,variance_y = 14,y = -10, burst_count = 5, max_particles = 30, min_alpha = 0.2, max_alpha = 0.3, birth_rate = 0.05,speed=8, lifespan = 0.5}
+
+	
+function Poke_ScorchingSands:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	local dir = GetDirection(p2-p1)
+	damage.iFire = 1
+	ret:AddDamage(damage)
+	ret:AddScript(string.format("Weathers.AddWeather(%q, %s, %s, %s)", "Sandstorm", 3, (p2 + Point(-1, -1)):GetString(), (p2 + Point(1, 1)):GetString()))
+	for i = -1, 1 do
+		for j = -1, 1 do
+			-- damage.loc = p2 + Point(i, j)
+			ret:AddEmitter(p2 + Point(i, j), "Emitter_ScorchingSands")
+			-- ret:AddDamage(damage)
+		end
+	end
+	ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[dir] + DIR_VECTORS[(dir+1)%4], 0, dir))
+	ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[dir], 0, dir))
+	ret:AddDamage(SpaceDamage(p2 + DIR_VECTORS[dir] + DIR_VECTORS[(dir-1)%4], 0, dir))
+	
+	ret:AddDamage(SpaceDamage(p2 - DIR_VECTORS[dir] + DIR_VECTORS[(dir+1)%4], 0, (dir+2)%4))
+	ret:AddDamage(SpaceDamage(p2 - DIR_VECTORS[dir], 0, (dir+2)%4))
+	ret:AddDamage(SpaceDamage(p2 - DIR_VECTORS[dir] + DIR_VECTORS[(dir-1)%4], 0, (dir+2)%4))
+	return ret
+end
+
+Poke_DragonTail = Skill:new{  
+	Class = "TechnoVek",
+	Icon = "weapons/DragonTail.png",
+	Description = "Sweeps three tiles in a line, pushing all targets hit.",
+	Name = "Dragon Tail",
+	Rarity = 1,
+	PathSize = 1,
+	Damage = 1,
+	Range = 1,
+	Cost = "high",
+	PowerCost = 0, --AE Change
+	Upgrades = 2,
+	UpgradeCost = { 1,3 },
+	UpgradeList = { "Long Push", "+1 Damage" },
+	LaunchSound = "/weapons/sword",
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,2),
+		Enemy2 = Point(3,2),
+		Target = Point(2,2),
+		CustomPawn = "Poke_Tyrachomp",
+	}
+}
+Poke_DragonTail_A=Poke_DragonTail:new{ UpgradeDescription = "Can push enemies as far as possible.", Range = 2 }
+Poke_DragonTail_B=Poke_DragonTail:new{ UpgradeDescription = "Deals 1 more damage.", Damage = 2 }
+Poke_DragonTail_AB=Poke_DragonTail:new{ Range = 2, Damage = 2 }
+
+function Poke_DragonTail:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		for j = 1, self.Range do
+			ret:push_back(point + DIR_VECTORS[i] * j)
+		end 
+	end
+	return ret
+end
+
+function Poke_DragonTail:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1) 
+	local point = p1 + DIR_VECTORS[direction]
+	ret:AddDamage(SoundEffect(p2,self.LaunchSound))
+	
+	local centerdamage = SpaceDamage(point)
+	centerdamage.sAnimation = "explosword_"..direction
+	ret:AddDamage(centerdamage)
+	
+	for i = -1, 1 do
+		local curr = point + DIR_VECTORS[(direction + 1)% 4] * i
+		if Board:GetPawn(curr) then
+			if p1:Manhattan(p2) == 1 then
+				ret:AddDamage(SpaceDamage(curr, self.Damage, direction))
+			else
+				local target = GetProjectileEnd(curr, curr + DIR_VECTORS[direction])
+				local hurt = true
+				if not Board:IsBlocked(target, PATH_PROJECTILE) then hurt = false else target = target - DIR_VECTORS[direction] end
+				ret:AddDamage(SpaceDamage(curr, self.Damage))
+				ret:AddCharge(Board:GetSimplePath(curr, target), PROJ_DELAY)
+				if hurt then
+					ret:AddSafeDamage(SpaceDamage(target, 1))
+					ret:AddSafeDamage(SpaceDamage(target + DIR_VECTORS[direction], 1))
+				end
+			end
+		end
+		ret:AddDelay(0.05)
+	end 
+	return ret
+end	
+
+
+Poke_MountainHurl = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/MountainHurl.png",
+	Description = "Throws an adjacent mountain at a distant target, killing it.",
+	Name = "Mountain Hurl",
+	Damage = DAMAGE_DEATH,
+	PathSize = 8,
+	PowerCost = 0, --AE Change
+	Limited = 1,
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,3),
+		Enemy = Point(2,1),
+		Mountain = Point(2,2),
+		Target = Point(2,1),
+		CustomPawn = "Poke_Larvitar",
+	}
+}
+
+function Poke_MountainHurl:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		if Board:IsTerrain(point +  DIR_VECTORS[i], TERRAIN_MOUNTAIN) then
+			for j = 2, 8 do
+				ret:push_back(point + DIR_VECTORS[i] * j)
+			end 
+		end
+	end
+	return ret
+end
+	
+function Poke_MountainHurl:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	local dir = GetDirection(p2-p1)
+	damage.iTerrain = TERRAIN_MOUNTAIN
+	local removeMountain = SpaceDamage(p1 + DIR_VECTORS[dir])
+	removeMountain.iTerrain = TERRAIN_RUBBLE
+	local tileset = GetCurrentMission().CustomTile
+	if tileset == "" then tileset = Game:GetCorp().name:sub(1, -6) == "" and "grass" or _G[Game:GetCorp().name:sub(1, -6)].Tileset end
+	LOG(tileset)
+	-- ret:AddDropper(damage, "effects/shotdown_rock.png")
+	ret:AddDamage(removeMountain)
+	ret:AddArtillery(p1, damage, "combat/tiles_"..tileset.."/mountain_0.png", PROJ_DELAY)
+	
+	ret:AddScript("Board:AddShake(0.5)")
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_MountainHurl" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end

@@ -1,8 +1,7 @@
 To do:
 - Add strike anims for Scyther line
 - Add requires on libs for customEmitter & CustomAnim
-- Zapdos applies shocked
-- Moltres applies dry
+- 
 - In Hunting Missions, the Vampire bugs when dropped into a chasm while frozen
 - Do Arceus dialogue
 - Ogerpon: has Ivy Cudgel (can self-target to switch masks, whack adjacent for root/wet/fire/push)
@@ -54,7 +53,6 @@ Eldritch Mechs
 - Popevent when building sees insanity weapon? "Iä! Iä!"
 - Better tipimages
 
-acheter 2 baguettes demain comme ça on fait un sandwich à Yumeko (sauce moutarde miel, jambon?)
 
 - TipImages
 - Tentacles needs Multishot goodness to display damage nicely
