@@ -142,6 +142,9 @@ Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doomed = true,Damage=2}
 
 function Meta_EldritchTentacles:GetTargetArea(point)
 	local ret = PointList()
+	local isInsane = Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") >= 5
+	if isInsane then ret:push_back(point) return ret end
+	
 	local targets = extract_table(general_DiamondTarget(point, 2))
 	for i = 1, #targets do
 		if targets[i] ~= point then ret:push_back(targets[i]) end
@@ -177,11 +180,11 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 			if self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s)", curr:GetString()) end
 			ret:AddDamage(damage)
 			if Board:GetPawn(curr) then  toastCounter=toastCounter+1 end
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", user:GetId()))
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", Board:GetPawn(p1):GetId()))
 		end
 		if toastCounter == 4 then ret:AddScript("completeComeWithMe()") end
 		for i = DIR_START, DIR_END do
-			local curr = loc + DIR_VECTORS[i]
+			local curr = p1 + DIR_VECTORS[i]
 			local pawn = Board:GetPawn(curr)
 			if pawn and pawn:GetPersonality() ~= "Artificial" then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) end
 		end
@@ -197,12 +200,19 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 			if curr == p2 then ret:AddDamage(SpaceDamage(p2, self.Damage, (i+2)%4)) end
 		end
 	end
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		local pawn = Board:GetPawn(curr)
+		if pawn and pawn:GetPersonality() ~= "Artificial" then
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+		end
+	end
 	return ret
 end
 
 function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
-	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", user:GetId())) end
+	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", Board:GetPawn(p1):GetId())) end
 
 	local mission = GetCurrentMission()
 	local damage1 = SpaceDamage(p2, self.Damage)
@@ -239,6 +249,13 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 			damage2.iPush = (i+3)%4
 			damage2.sAnimation = "eldritchtentaclediaganim_"..i
 			if p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] == p3 then ret:AddDamage(damage2) end
+		end
+	end
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		local pawn = Board:GetPawn(curr)
+		if pawn and pawn:GetPersonality() ~= "Artificial" then
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
 		end
 	end
 	return ret
@@ -487,23 +504,14 @@ function Meta_TentacularServant:GetFinalEffect(p1, p2, p3)
 	local damage = SpaceDamage(p2)
 	local dir = GetDirection(p3-p2)
 	damage.sPawn = self.Spawn
-	-- if GetCurrentMission().EldritchTentaclesIDs == nil then GetCurrentMission().EldritchTentaclesIDs = {} end
 	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
 	if isInsane then 
 		damage.loc = p3 
 		ret:AddArtillery(damage, "effects/coiledTentacle.png", NO_DELAY)
-		-- ret:AddScript(string.format([[
-		-- local unit = PAWN_FACTORY:CreatePawn(%q);
-		-- GetCurrentMission().EldritchTentaclesIDs[unit:GetId()] = #GetCurrentMission().EldritchTentaclesIDs;
-		-- Board:AddPawn(unit,%s)]], self.Spawn, p3:GetString()))
 		damage.loc = p2
 		--remove Insanity
 		ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", Board:GetPawn(p1):GetId()))
 	end
-	-- ret:AddScript(string.format([[
-	-- local unit = PAWN_FACTORY:CreatePawn(%q);
-	-- GetCurrentMission().EldritchTentaclesIDs[unit:GetId()] = #GetCurrentMission().EldritchTentaclesIDs;
-	-- Board:AddPawn(unit,%s)]], self.Spawn, p2:GetString()))
 	ret:AddArtillery(damage, "effects/coiledTentacle.png", FULL_DELAY)
 	
 	if isInsane then
@@ -552,22 +560,7 @@ end
 
 function Meta_TentacularServant:TentacleAttack(dir, isInsane)
 	local ret = SkillEffect()
-	-- LOG(#GetCurrentMission().EldritchTentaclesIDs.." tentacles.")
-	-- table.sort(GetCurrentMission().EldritchTentaclesIDs)
 	local tentacleCounter = 0
-	-- for id, _ in ipairs(GetCurrentMission().EldritchTentaclesIDs) do
-		-- local pawn = Board:GetPawn(id)
-		-- if pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2") then
-			-- tentacleCounter = tentacleCounter + 1
-			-- if isInsane then 
-				-- for k = DIR_START, DIR_END do
-					-- ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[k], self.Damage, k))
-				-- end
-			-- else
-				-- ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[dir], self.Damage, dir))
-			-- end
-		-- end
-	-- end
 	for i = 0, 7 do
 		for j = 0, 7 do
 			local point = Point(i,j)
@@ -594,8 +587,8 @@ end
 EldritchTentacle = Pawn:new{
 	Name = "Tentacle",
 	Health = 1,
-	Neutral = true,
-	MoveSpeed = 0,
+	-- Neutral = true,
+	MoveSpeed = 1,
 	Minor = true,
 	Massive = true,
 	Pushable = false,
@@ -605,16 +598,13 @@ EldritchTentacle = Pawn:new{
 	SkillList = { },
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
-	-- IsDeathEffect = true,
-	-- GetDeathEffect = EldritchTentacleDE,
-	-- Corpse = true,
 }
 AddPawn("EldritchTentacle") 
 EldritchTentacle2 = Pawn:new{
 	Name = "Tentacle",
 	Health = 4,
-	Neutral = true,
-	MoveSpeed = 0,
+	-- Neutral = true,
+	MoveSpeed = 1,
 	Minor = true,
 	Massive = true,
 	Pushable = false,
@@ -624,9 +614,6 @@ EldritchTentacle2 = Pawn:new{
 	SkillList = { },
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
-	-- IsDeathEffect = true,
-	-- GetDeathEffect = EldritchTentacleDE,
-	-- Corpse = true,
 }
 AddPawn("EldritchTentacle2")
 
@@ -634,27 +621,15 @@ Meta_TentacularServant_A = Meta_TentacularServant:new{UpgradeDescription = "Incr
 Meta_TentacularServant_B = Meta_TentacularServant:new{UpgradeDescription = "Increases tentacle health by 3.",Spawn = "EldritchTentacle2",Self = "Meta_TentacularServant_B",}
 Meta_TentacularServant_AB = Meta_TentacularServant:new{Damage = 2,Spawn = "EldritchTentacle2",Self = "Meta_TentacularServant_AB",}
 
--- local function EldritchTentacleDE(pawn, point)
-	-- local ret = SkillEffect()
-	-- local mission = GetCurrentMission()
-	-- if not mission then return ret end
-	-- if mission.EldritchTentaclesIDs == nil then mission.EldritchTentaclesIDs = {} end
-	-- mission.EldritchTentaclesIDs[id] = nil
-	-- pawn:SetCorpse(false)
--- end
-
 local function TentacleTeamSwitch(mission)
-	LOG("tentacles are turning coats")
 	for i = 0, 7 do
 		for j = 0, 7 do
 			local pawn = Board:GetPawn(Point(i,j))
 			if pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2") then
-				LOG("found tentacle")
 				if pawn:GetTeam() == TEAM_PLAYER and Game:GetTeamTurn() == TEAM_ENEMY then 
-					LOG("set to team none")
 					pawn:SetTeam(TEAM_NONE)
+					pawn:AddMoveBonus(-1)
 				elseif pawn:GetTeam() == TEAM_NONE and Game:GetTeamTurn() == TEAM_PLAYER then 
-					LOG("set to team player")
 					pawn:SetTeam(TEAM_PLAYER)
 				end
 			end
@@ -666,3 +641,7 @@ local function EVENT_onModsLoaded()
 	modApi:addNextTurnHook(TentacleTeamSwitch)
 end
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+
+
+
+

@@ -1,3 +1,7 @@
+v1.1.1
+- Fixed a bug with the Tentacular mech.
+- The spawned tentacles can now move 1 tile. Things have learnt to walk that ought to crawl.
+
 v1.1
 - Replaced the Tentacular Mech's weapon with something else. Should be more fun and less buggy.
 - Improved the Insanity Status visual when fully insane.
