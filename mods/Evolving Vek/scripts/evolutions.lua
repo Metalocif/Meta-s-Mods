@@ -154,7 +154,7 @@ modApi:runLater(function()
 					Board:AddPawn(GAME.EvolvedVeks[i].Prefix..pawn:GetType(), tile)
 					Board:Ping(tile, COLOR_BLACK)
 					if wasFrozen then
-						modApi:runLater(function() Board:GetPawn(tile):SetFrozen() end)
+						modApi:runLater(function() Board:GetPawn(tile):SetFrozen(true) end)
 					else
 						Board:GetPawn(tile):SpawnAnimation()
 					end
