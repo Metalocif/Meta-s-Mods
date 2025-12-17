@@ -231,14 +231,15 @@ function Status.ApplyConfusion(id, turns)
 	CustomAnim:add(id, "StatusConfusion")
 end
 
-function Status.ApplyDoomed(id, source)
+function Status.ApplyDoomed(id, source, amount)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if _G[pawn:GetType()].DoomedImmune then return end
 	source = source or -1
-	mission.DoomedTable[id] = source
+	amount = amount or 1
+	mission.DoomedTable[id] = {amount = amount, source = source}
 	CustomAnim:add(id, "StatusDoomed")
 end
 
@@ -511,7 +512,8 @@ function Status.ApplyWeaken(id, amount, recoverPerTurn)
 	CustomAnim:add(id, "StatusWeaken")
 	if mission.WeakenTable[id] == nil then mission.WeakenTable[id] = 0 end
 	mission.WeakenTable[id] = mission.WeakenTable[id] + recoverPerTurn
-	if mission.WeakenTable[id] == 0 then mission.WeakenTable[id] = nil end
+	-- LOG("WeakenTable["..id.."] = "..mission.WeakenTable[id])
+	-- if mission.WeakenTable[id] == 0 then mission.WeakenTable[id] = nil end
 end	
 
 function Status.ApplyWet(id)
@@ -544,7 +546,6 @@ function Status.ApplyInsanity(id, amount)
 	if pawn:GetPersonality() == "Artificial" then return end
 	if mission.InsanityTable[id] == nil or mission.InsanityTable[id] == 0 then
 		for i = 1, 5 do		--try to get back the amount of insanity in case it's gone
-			
 			if CustomAnim:get(id, "StatusInsanity"..i) ~= nil then mission.InsanityTable[id] = i break end
 		end
 	end
@@ -597,7 +598,15 @@ function Status.RemoveStatus(id, status)
 	elseif status == "Insanity" then
 		CustomAnim:rem(id, "StatusInsanity"..mission["InsanityTable"][id])
 		mission["InsanityTable"][id] = nil 
-	
+	elseif status == "Weaken" then
+		for i = pawn:GetWeaponCount(), 1, -1 do
+			local weapon = pawn:GetWeaponBaseType(i)
+			if string.match(weapon, "^%dweaker") then
+				weapon = string.sub(weapon, 8)
+				pawn:RemoveWeapon(i)
+				pawn:AddWeapon(weapon)
+			end
+		end
 	else
 		CustomAnim:rem(id, "Status"..status)
 		mission[status.."Table"][id] = nil 
@@ -612,8 +621,17 @@ function Status.GetStatus(id, status)
 	return (mission[status.."Table"] ~= nil and mission[status.."Table"][id]) or false
 end
 
-function Status.List()
-	return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
+function Status.List(pawn)
+	if not pawn then
+		return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
+	else
+		local result = {}
+		local mission = GetCurrentMission()
+		for _, status in ipairs(Status.List()) do
+			if mission[status.."Table"][pawn:GetId()] ~= nil then table.insert(result, status) end
+		end
+		return result
+	end
 end
 
 function Status.Count(id)
@@ -699,9 +717,7 @@ local function PrepareTables()						--setup all status tables here so we don't n
 	end, 
 	function()
 		local mission = GetCurrentMission()
-		-- if mission == nil then return end
-		LOG("Status tables are ready!")
-		-- local tablesList = merge_table(Status.List(), {"AdjScore"})
+		-- LOG("Status tables are ready!")
 		local tablesList = Status.List()
 		for i = 1, #tablesList do
 			mission[tablesList[i].."Table"] = {}
@@ -742,7 +758,77 @@ local function ReaddInsanity()
 	end)
 end
 
+
+
 local function EVENT_onModsLoaded()
+	modapiext:addPawnSelectedHook(function(mission, pawn)	--explanations
+		if not (pawn and sdlext.isShiftDown()) then return end
+		local pawnStatuses = Status.List(pawn)
+		if #pawnStatuses == 0 then return end
+		local id = pawn:GetId()
+		local desc = ""
+		for k, status in ipairs(pawnStatuses) do	--I'd rather this were a table, but I need to insert data and stuff.
+			local statusDesc = ""
+			if status == "Alluring" then statusDesc = "Makes Vek want to be adjacent to this pawn." end
+			if status == "Blind" then statusDesc = "Makes Vek want to be adjacent to this pawn ("..mission.BlindTable[id].." turns left)." end
+			if status == "Bloodthirsty" then statusDesc = "Bloodthirsty Vek will prioritize enemies over buildings." end
+			if status == "Bonded" then statusDesc = "Bonded pawns will take 1 damage when other bonded pawns take damage. Can trigger once per turn." end
+			if status == "Chill" then statusDesc = "Chilled pawns will become frozen when chilled again. Chill + Wet also freezes. Removed when frozen or on fire." end
+			if status == "Confusion" then 
+				if pawn:GetTeam() == TEAM_ENEMY then
+					statusDesc = "Confused Vek will choose their worst option, typically attacking allies, instead of their best option."
+				else
+					statusDesc = "Confused mechs will move to a random destination at the start of the player's turn."
+				end
+				statusDesc = statusDesc.." ("..mission.ConfusionTable[id].." turns left)."
+			end
+			if status == "Doomed" then statusDesc = "Takes "..mission.DoomedTable[id].amount.." damage every turn. On death, the pawn's tile turns into lava. Removed by killing the source of the status (."..Board:GetPawn(mission.DoomedTable[id].source):GetName()..")." end
+			if status == "Dreadful" then statusDesc = "Prevents Vek from queuing attacks adjacent to this pawn and makes them avoid being adjacent to this pawn." end
+			if status == "Dry" then statusDesc = "Takes 1 extra damage from fire. Removed by Wet." end
+			if status == "Glory" then 
+				if pawn:GetTeam() == TEAM_ENEMY then
+					statusDesc = "Glory turns Vek weapons into the boss version."
+				else
+					statusDesc = "Glory fully upgrades mech weapons."
+				end
+				statusDesc = statusDesc.." ("..mission.GloryTable[id].turns.." turns left)."
+			end
+			if status == "Gunk" then statusDesc = "Covered in sticky gunk, which does nothing by itself but is consumed by some effects." end
+			if status == "Hemorrhage" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
+			if status == "Infested" then statusDesc = "Will die after a certain number of turns. Removed by damage, fire, and A.C.I.D. ("..mission.InfestedTable[id].." turns left)." end
+			if status == "Insanity" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
+			if status == "LeechSeed" then statusDesc = "Takes 1 damage every turn, healing the pawn that applied the leech seed, if any. Removed by fire." end
+			if status == "Necrosis" then statusDesc = "Prevents healing by constantly setting the pawn's max health to their current health." end
+			if status == "Powder" then statusDesc = "When a pawn has both fire and powder, they explode, taking 1 damage and dealing 1 damage to adjacent tiles, doubled if Dry. Removed by Wet." end
+			if status == "Regen" then statusDesc = "Heals "..mission.RegenTable[id].." damage per turn." end
+			if status == "Reactive" then statusDesc = "When applied A.C.I.D., removes it and smokes adjacent tiles." end
+			if status == "Rooted" then
+				if mission.RootedTable[id] > 0 then statusDesc = "Immobilizes this pawn and deals "..mission.RootedTable[id].." damage to them every turn. Removed by fire." end
+				if mission.RootedTable[id] < 0 then statusDesc = "Immobilizes this pawn and heals "..mission.RootedTable[id].." damage every turn. Removed by fire." end
+				if mission.RootedTable[id] == 0 then statusDesc = "Immobilizes this pawn. Removed by fire." end
+			end
+			if status == "Shatterburst" then statusDesc = "When frozen, deals 1 damage to adjacent tiles and frees the pawn." end
+			if status == "Shocked" then statusDesc = "Flips attack direction on damage. When applied a second time or Wet, clears queued actions." end
+			if status == "Sleep" then statusDesc = "Prevents this pawn from acting. Removed when the pawn takes damage ("..mission.SleepTable[id].." turns left)." end
+			if status == "Targeted" then statusDesc = "Makes Vek want to attack that pawn." end
+			if status == "Toxin" then statusDesc = "After its turn, a pawn with Toxin takes damage equal to its missing health; if this kills, adjacent pawns are applied Toxin. Removed by A.C.I.D. and healing." end
+			if status == "Weaken" then
+				local amount = tonumber(string.sub(pawn:GetWeaponBaseType(1),1,1))
+				if mission.WeakenTable[id] > 0 then statusDesc = "Lowers damage dealt by "..amount..". Effect decreases by "..mission.WeakenTable[id].." every turn." end
+				if mission.WeakenTable[id] < 0 then statusDesc = "Lowers damage dealt by "..amount..". Effect increases by "..mission.WeakenTable[id].." every turn." end
+				if mission.WeakenTable[id] == 0 then statusDesc = "Lowers damage dealt by "..amount.."." end
+			end
+			if status == "Wet" then statusDesc = "Cancels fire, dry, and powder. Wet + Chill freezes. Wet + Shocked clears queued actions." end
+			
+			if statusDesc ~= "" then desc = desc.."\n"..status..": "..statusDesc end
+		end
+		
+		Global_Texts["StatusLib_TempExplanation_Title"] = "Statuses"
+		Global_Texts["StatusLib_TempExplanation_Text"] = desc
+		Game:AddTip("StatusLib_TempExplanation", pawn:GetSpace())
+		Global_Texts["StatusLib_TempExplanation_Title"] = nil		--for some reason the game keeps reusing previous tip contents if I don't delete entries
+		Global_Texts["StatusLib_TempExplanation_Text"] = nil		--something something caching
+	end)
 	modapiext:addPawnHealedHook(function(mission, pawn, healingTaken)	--necrosis/hemorrhage/toxin
 		local id = pawn:GetId()
 		if mission.NecrosisTable[id] then

@@ -1,7 +1,7 @@
 local mod =  {
 	id = "meta_mods",
 	name = "Meta's mods",
-	description = "Mods by Meta.",
+	description = "Mods by Meta. Hold SHIFT and click an enemy with custom status effects for tooltips.",
 	icon = "scripts/icon.png",
 	submodFolders = {"mods/"},
 	version = "1.0",
