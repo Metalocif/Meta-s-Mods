@@ -5,9 +5,9 @@ local path = mod.scriptPath
 local pilotSkill_tooltip = mod.libs.pilotSkill_tooltip
 local repairApi = mod.libs.repairApi
 local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
--- local path2 = mod_loader.mods[modApi.currentMod].resourcePath
--- local personalities = require(path2 .."scripts/libs/personality")
--- local dialog = require(path2 .."scripts/pilots/dialog_metalocif")
+local path2 = mod_loader.mods[modApi.currentMod].resourcePath
+local personalities = require(path2 .."scripts/libs/personality")
+local dialog = require(path2 .."scripts/dialog_watcher")
 
 local pilot = {
 	Id = "Pilot_StSWatcher",
@@ -86,9 +86,9 @@ function this:init(mod)
 end
 
 -- add personality.
--- local personality = personalities:new{ Label = "StSWatcher" }
--- personality:AddDialog(dialog)
--- Personality["StSWatcher"] = personality
+local personality = personalities:new{ Label = "StSWatcher" }
+personality:AddDialog(dialog)
+Personality["StSWatcher"] = personality
 
 
 return this
