@@ -114,8 +114,16 @@ end
 
 local function HOOK_MissionStart(mission)
 	local options = mod_loader.currentModContent[mod.id].options
-	if options["PermanentPsion"] then Board:AddPawn(options["PermanentPsion"].value, Point(0,0)) Board:GetPawn(Point(0,0)):SetSpace(Point(-157,-197)) end
-	if options["PermanentPsion_Vextra"] then mission[options["PermanentPsion_Vextra"].value] = true end
+	if options["PermanentPsion"] and options["PermanentPsion"] ~= "" then Board:AddPawn(options["PermanentPsion"].value, Point(0,0)) Board:GetPawn(Point(0,0)):SetSpace(Point(-157,-197)) end
+	if options["PermanentPsion_Vextra"] and options["PermanentPsion_Vextra"] ~= "" then 
+		--DNT_Winter1: table of points, stored every turn?
+		--others: true
+		if options["PermanentPsion_Vextra"].value ~= "DNT_Winter1" then	--winter psion stores a list of points
+			mission[options["PermanentPsion_Vextra"].value] = true 
+		else
+			mission[options["PermanentPsion_Vextra"].value] = {} 
+		end
+	end
 	--tricks Vextra logic into thinking the psion is present
 end
 
@@ -125,7 +133,7 @@ local function EVENT_onModsLoaded()
 	-- modApi:addVekSpawnAddedHook(HOOK_VekSpawnAdded)	
 	modApi:addPreEnvironmentHook(function(mission)	
 		for i = 0, 2 do
-			if options["PermanentPsion_Tyrant"] and Board:GetTurn() > 0 and Board:GetPawn(i) then
+			if options["PermanentPsion_Tyrant"] == true and Board:GetTurn() > 0 and Board:GetPawn(i) then
 				local damage = SpaceDamage(Board:GetPawn(i):GetSpace(), 1)
 				damage.sAnimation = "PsionAttack_Back"
 				Board:AddAnimation(Board:GetPawn(i):GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
