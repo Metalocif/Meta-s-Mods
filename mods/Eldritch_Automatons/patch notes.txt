@@ -1,7 +1,14 @@
+v1.1.2
+- Worm Mech now correctly breaks webs when forcing a retarget.
+- Tentacular Mech now previews tentacles better.
+- Tentacles should be able to move correctly and will stop spamming the move bonus icon.
+- Added a cool mark in previews to show weapons make adjacent mechs insane.
+- Non-mechs with pilots (train/terraformer/...) will no longer be turned insane.
+
 v1.1.1
 - Fixed a bug with the Tentacular mech.
 - The spawned tentacles can now move 1 tile. Things have learnt to walk that ought to crawl.
-
+	
 v1.1
 - Replaced the Tentacular Mech's weapon with something else. Should be more fun and less buggy.
 - Improved the Insanity Status visual when fully insane.

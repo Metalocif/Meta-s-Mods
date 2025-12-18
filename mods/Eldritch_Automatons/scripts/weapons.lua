@@ -32,6 +32,9 @@ ANIMS.eldritchtentaclediaganim_1 = ANIMS.explosmash_1:new{Image = "effects/eldri
 ANIMS.eldritchtentaclediaganim_2 = ANIMS.explosmash_2:new{Image = "effects/eldritchtentaclediagonal_L.png",NumFrames = 7,Time = 0.15,PosX = 5,PosY = -1}
 ANIMS.eldritchtentaclediaganim_3 = ANIMS.explosmash_3:new{Image = "effects/eldritchtentaclediagonal_U.png",NumFrames = 7,Time = 0.15,PosX = -6,PosY = 19}
 
+modApi:appendAsset("img/effects/insanityMark.png", path.."img/effects/insanityMark.png")
+Location["effects/insanityMark.png"] = Point(-5,10)
+
 
 --might be better to have a mission table listing all tentacles in order of spawn, removing their ID via death effect
 -- that way we have a specific order to make them attack in, like Vek, and player can kill new ones when Octopus is insane
@@ -186,7 +189,12 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
 			local pawn = Board:GetPawn(curr)
-			if pawn and pawn:GetPersonality() ~= "Artificial" then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) end
+			if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
+				ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+				local insanityMark = SpaceDamage(curr)
+				insanityMark.sImageMark = "effects/insanityMark.png"
+				ret:AddDamage(insanityMark)
+			end
 		end
 	elseif p1:Manhattan(p2) == 1 then			--push
 		local direction = GetDirection(p2 - p1)
@@ -203,8 +211,10 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetPersonality() ~= "Artificial" then
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+		if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
+			local insanityMark = SpaceDamage(curr)
+			insanityMark.sImageMark = "effects/insanityMark.png"
+			ret:AddDamage(insanityMark)
 		end
 	end
 	return ret
@@ -254,8 +264,11 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetPersonality() ~= "Artificial" then
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+		if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+			local insanityMark = SpaceDamage(curr)
+			insanityMark.sImageMark = "effects/insanityMark.png"
+			ret:AddDamage(insanityMark)
 		end
 	end
 	return ret
@@ -339,6 +352,10 @@ function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 		for _, i in ipairs(extract_table(enemies)) do
 			local pawn = Board:GetPawn(i)
 			if pawn:GetQueuedTarget()~=Point(-1,-1) then
+				local deleteWebs = SpaceDamage(pawn:GetSpace(), 0, DIR_FLIP)
+				deleteWebs.bHide = true
+				ret:AddDamage(deleteWebs)
+				
 				local targetArea = extract_table(_G[pawn:GetQueuedWeapon()]:GetTargetArea(pawn:GetSpace()))
 				local targetAreaPick = (i + Game:GetTurnCount()) % #targetArea + 1
 				--deterministic formula so it persists through reset turns
@@ -350,9 +367,12 @@ function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
 			local pawn = Board:GetPawn(curr)
-			if pawn and pawn:GetPersonality() ~= "Artificial" then
+			if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
 				if Status.GetStatus(pawn:GetId(), "Insanity") and Status.GetStatus(pawn:GetId(), "Insanity") == 4 then achievementCounter = achievementCounter+1 end
-				ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+				ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+				local insanityMark = SpaceDamage(curr)
+				insanityMark.sImageMark = "effects/insanityMark.png"
+				ret:AddDamage(insanityMark)
 			end
 		end
 		--remove Insanity
@@ -362,9 +382,12 @@ function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
 			local pawn = Board:GetPawn(curr)
-			if pawn and pawn:GetPersonality() ~= "Artificial" then
+			if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
 				if Status.GetStatus(pawn:GetId(), "Insanity") and Status.GetStatus(pawn:GetId(), "Insanity") == 4 then achievementCounter = achievementCounter+1 end
-				ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+				ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+				local insanityMark = SpaceDamage(curr)
+				insanityMark.sImageMark = "effects/insanityMark.png"
+				ret:AddDamage(insanityMark)
 			end
 			if pawn and pawn:GetTeam() == TEAM_ENEMY then
 				ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)",pawn:GetId()))
@@ -409,14 +432,20 @@ function Meta_EldritchInsanity:GetFinalEffect(p1, p2, p3)
 		mark.sImageMark = "combat/"..arrows[dir2+1]
 		ret:AddDamage(mark)
 	end
+	local deleteWebs = SpaceDamage(p2, 0, DIR_FLIP)
+	deleteWebs.bHide = true
+	ret:AddDamage(deleteWebs)
 	ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, Board:GetPawn(%s):GetQueuedWeaponId())", pawn:GetId(), p3:GetString(), pawn:GetId()))
 	--induce insanity
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetPersonality() ~= "Artificial" then
+		if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
 			if Status.GetStatus(pawn:GetId(), "Insanity") and Status.GetStatus(pawn:GetId(), "Insanity") == 4 then achievementCounter = achievementCounter+1 end
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+			local insanityMark = SpaceDamage(curr)
+			insanityMark.sImageMark = "effects/insanityMark.png"
+			ret:AddDamage(insanityMark)
 		end
 	end
 	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", user:GetId())) end
@@ -503,6 +532,7 @@ function Meta_TentacularServant:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
 	local dir = GetDirection(p3-p2)
+	local tentacleCounter = 0
 	damage.sPawn = self.Spawn
 	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
 	if isInsane then 
@@ -514,60 +544,14 @@ function Meta_TentacularServant:GetFinalEffect(p1, p2, p3)
 	end
 	ret:AddArtillery(damage, "effects/coiledTentacle.png", FULL_DELAY)
 	
-	if isInsane then
-		for i = DIR_START, DIR_END do
-			local curr = p2 + DIR_VECTORS[i]
-			weaponPreview:AddDamage(SpaceDamage(p2+DIR_VECTORS[i], self.Damage, i))
-			curr2 = p3 + DIR_VECTORS[i]
-			weaponPreview:AddDamage(SpaceDamage(p3+DIR_VECTORS[i], self.Damage, i))
-		end
-	else
-		weaponPreview:AddDamage(SpaceDamage(p2+DIR_VECTORS[dir], self.Damage, dir))
-	end
 	for i = 0, 7 do
 		for j = 0, 7 do
 			local point = Point(i,j)
 			local pawn = Board:GetPawn(point)
-			if pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2") then
-				if isInsane then 
-					for k = DIR_START, DIR_END do
-						weaponPreview:AddDamage(SpaceDamage(point+DIR_VECTORS[k], self.Damage, k))
-					end
-				else
-					weaponPreview:AddDamage(SpaceDamage(point+DIR_VECTORS[dir], self.Damage, dir))
-				end
-			end
-		end
-	end
-	ret:AddScript(string.format([=[
-		local fx = SkillEffect();
-		fx:AddScript([[
-			Board:AddEffect(_G[%q]:TentacleAttack(%s, %s));
-		]]);
-		Board:AddEffect(fx);
-	]=], self.Self, dir, tostring(isInsane)))
-	--induce insanity
-	for i = DIR_START, DIR_END do
-		local curr = p1 + DIR_VECTORS[i]
-		local pawn = Board:GetPawn(curr)
-		if pawn and pawn:GetPersonality() ~= "Artificial" then
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId()))
-		end
-	end
-	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", Board:GetPawn(p1):GetId())) end
-	return ret
-end	
-
-function Meta_TentacularServant:TentacleAttack(dir, isInsane)
-	local ret = SkillEffect()
-	local tentacleCounter = 0
-	for i = 0, 7 do
-		for j = 0, 7 do
-			local point = Point(i,j)
-			local pawn = Board:GetPawn(point)
-			if pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2") then
+			if (pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2")) or
+			point == p2 or (isInsane and point == p3) then
 				tentacleCounter = tentacleCounter + 1
-				if isInsane then 
+				if isInsane then
 					for k = DIR_START, DIR_END do
 						ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[k], self.Damage, k))
 					end
@@ -577,12 +561,21 @@ function Meta_TentacularServant:TentacleAttack(dir, isInsane)
 			end
 		end
 	end
-
 	if tentacleCounter >= 5 then ret:AddScript("completeArmyOfTheDeep()") end
-
-
+	--induce insanity
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		local pawn = Board:GetPawn(curr)
+		if pawn and pawn:IsMech() and pawn:GetPersonality() ~= "Artificial" then 
+			ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", pawn:GetId())) 
+			local insanityMark = SpaceDamage(curr)
+			insanityMark.sImageMark = "effects/insanityMark.png"
+			ret:AddDamage(insanityMark)
+		end
+	end
+	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", Board:GetPawn(p1):GetId())) end
 	return ret
-end
+end	
 
 EldritchTentacle = Pawn:new{
 	Name = "Tentacle",
@@ -628,7 +621,7 @@ local function TentacleTeamSwitch(mission)
 			if pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2") then
 				if pawn:GetTeam() == TEAM_PLAYER and Game:GetTeamTurn() == TEAM_ENEMY then 
 					pawn:SetTeam(TEAM_NONE)
-					pawn:AddMoveBonus(-1)
+					pawn:SetActive(false)
 				elseif pawn:GetTeam() == TEAM_NONE and Game:GetTeamTurn() == TEAM_PLAYER then 
 					pawn:SetTeam(TEAM_PLAYER)
 				end
