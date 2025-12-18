@@ -101,7 +101,7 @@ local function HOOK_VekSpawnAdded(mission, spawnData)
 	local mission = GetCurrentMission()
 	LOG(spawnData.type)
 	if string.find(spawnData.type, "Jelly") then
-		LOG("cancel psion spawn")
+		LOG("Permanent Psions cancelled a psion spawn.")
 		mission:RemoveSpawnPoint(spawnData.location)
 		modApi:runLater(function()
 			mission:SpawnPawn(spawnData.location, mission:GetSpawner():NextPawn(nil, true))
@@ -112,14 +112,34 @@ local function HOOK_VekSpawnAdded(mission, spawnData)
 	end
 end
 
-local function HOOK_MissionStart()
+local function HOOK_MissionStart(mission)
 	local options = mod_loader.currentModContent[mod.id].options
-	if options["PermanentPsion"] then Board:AddPawn(options["PermanentPsion"].value, Point(0,0)) Board:GetPawn(Point(0,0)):SetSpace(Point(-1,-1)) end
+	if options["PermanentPsion"] then Board:AddPawn(options["PermanentPsion"].value, Point(0,0)) Board:GetPawn(Point(0,0)):SetSpace(Point(-157,-197)) end
+	if options["PermanentPsion_Vextra"] then mission[options["PermanentPsion_Vextra"].value] = true end
+	--tricks Vextra logic into thinking the psion is present
 end
 
 local function EVENT_onModsLoaded()
+	local options = mod_loader.currentModContent[mod.id].options
 	modApi:addMissionStartHook(HOOK_MissionStart)
-	-- modApi:addVekSpawnAddedHook(HOOK_VekSpawnAdded)			
+	-- modApi:addVekSpawnAddedHook(HOOK_VekSpawnAdded)	
+	modApi:addPreEnvironmentHook(function(mission)	
+		for i = 0, 2 do
+			if options["PermanentPsion_Tyrant"] and Board:GetTurn() > 0 and Board:GetPawn(i) then
+				local damage = SpaceDamage(Board:GetPawn(i):GetSpace(), 1)
+				damage.sAnimation = "PsionAttack_Back"
+				Board:AddAnimation(Board:GetPawn(i):GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
+				if Board:GetTerrain(Board:GetPawn(i):GetSpace()) == TERRAIN_WATER and Board:IsAcid(Board:GetPawn(i):GetSpace()) then
+					Board:AddAnimation(Board:GetPawn(i):GetSpace(), "Splash_acid", ANIM_NO_DELAY)
+				elseif Board:IsTerrain(Board:GetPawn(i):GetSpace(),TERRAIN_LAVA) then
+					Board:AddAnimation(Board:GetPawn(i):GetSpace(), "Splash_lava", ANIM_NO_DELAY)
+				elseif Board:GetTerrain(Board:GetPawn(i):GetSpace()) == TERRAIN_WATER then
+					Board:AddAnimation(Board:GetPawn(i):GetSpace(), "Splash", ANIM_NO_DELAY)
+				end
+				Board:GetPawn(i):ApplyDamage(damage)
+			end
+		end
+	end)
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)

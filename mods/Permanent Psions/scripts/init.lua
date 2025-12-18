@@ -18,7 +18,8 @@ function mod:init()
 	require(self.scriptPath .."spawner")
 end
 
-function mod:load( options, version)
+function mod:load(options, version)
+	-- if not modApi:isModLoaded("Djinn_NAH_Tatu_Vextra") then mod_loader.mod_options[Meta_PermanentPsions].options[PermanentPsion_Vextra] = nil end
 end
 
 function mod:metadata()
@@ -27,14 +28,12 @@ function mod:metadata()
 		"Permanent Psion",
 		"Pick the Psion effect to apply to all Vek.",
 		{
-			-- Internal values of the options
-			values = { "Jelly_Health1", "Jelly_Armor1", "Jelly_Regen1", "Jelly_Explode1", "Jelly_Lava1", "Jelly_Boss", "Jelly_Fire1", "Jelly_Spider1", "Jelly_Boost1", "Jelly_Necro1" },
+			values = { "", "Jelly_Health1", "Jelly_Armor1", "Jelly_Regen1", "Jelly_Explode1", "Jelly_Lava1", "Jelly_Boss", "Jelly_Fire1", "Jelly_Spider1", "Jelly_Boost1", "Jelly_Necro1" },
 
-			-- Names of the options that will be shown to the player.
-			strings = { "Invigorating Spores", "Hardened Carapace", "Regeneration", "Explosive Decay", "Hive Targeting", "Overpowered", "Burning Carapace", "Arachnid Host", "Raging Hormones", "Undying Biology" },
+			strings = { "None", "Invigorating Spores", "Hardened Carapace", "Regeneration", "Explosive Decay", "Hive Targeting", "Overpowered", "Burning Carapace", "Arachnid Host", "Raging Hormones", "Undying Biology" },
 
-			-- Tooltips for the options that will be shown to the player.
-			tooltips = {"All Vek receive +1 HP.", 
+			tooltips = {"No effect.",
+						"All Vek receive +1 HP.", 
 						"All Vek have incoming weapon damage reduced by 1.", 
 						"All Vek heal 1 at the start of their turn.", 
 						"All Vek will explode on death, dealing 1 damage to adjacent tiles.",
@@ -46,6 +45,31 @@ function mod:metadata()
 						"All Vek will resurrect on death. This is a scrapped vanilla feature and it is somewhat buggy."},
 		}
 	)
+	modApi:addGenerationOption(
+		"PermanentPsion_Tyrant",
+		"Permanent Tyrant Psion",
+		"All player units take 1 damage at the end of every turn.",
+		{ enabled = false }
+	)
+	-- if modApi:isModLoaded("Djinn_NAH_Tatu_Vextra") then
+		modApi:addGenerationOption(
+			"PermanentPsion_Vextra",
+			"Permanent Vextra Psion",
+			"Pick the Vextra Psion effect to permanently apply. This can stack with vanilla Psion effects. Only works with Vextra enabled.",
+			{
+			values = { "", "DNT_Winter1", "DNT_Haste1", "DNT_Acid1", "DNT_Nurse1", "DNT_Reactive1" },
+
+			strings = { "None", "Psionic Blizzard", "Gotta Go Fast", "Caustic Glands", "Healing Burst", "Repulsive Decay" },
+
+			tooltips = {"No effect.",
+						"Freeze the starting tile of all unfrozen mechs after the Vek attack.", 
+						"All Vek receive +2 bonus movement at the start of every turn.", 
+						"All Vek leave A.C.I.D. on death and apply it to adjacent enemies at the start of the player's turn.", 
+						"All Vek heal with friendly damage.",
+						"All Vek push adjacent tiles on death." },
+			}
+		)
+	-- end
 end
 
 return mod
