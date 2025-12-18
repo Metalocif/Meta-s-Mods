@@ -622,8 +622,10 @@ local function TentacleTeamSwitch(mission)
 				if pawn:GetTeam() == TEAM_PLAYER and Game:GetTeamTurn() == TEAM_ENEMY then 
 					pawn:SetTeam(TEAM_NONE)
 					pawn:SetActive(false)
-				elseif pawn:GetTeam() == TEAM_NONE and Game:GetTeamTurn() == TEAM_PLAYER then 
+				else  --if pawn:GetTeam() == TEAM_NONE and Game:GetTeamTurn() == TEAM_PLAYER then 
 					pawn:SetTeam(TEAM_PLAYER)
+					pawn:SetActive(true)
+					pawn:SetMovementSpent(false)
 				end
 			end
 		end
