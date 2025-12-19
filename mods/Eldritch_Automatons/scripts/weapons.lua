@@ -139,18 +139,23 @@ Meta_EldritchTentacles = Skill:new{
 	}
 }
 
-Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Melee hits inflict Doomed. Doomed pawns take damage every turn and turn their tile into lava on death.",Doomed=true}
+Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Attacks inflict Doomed. Doomed pawns take damage every turn and turn their tile into lava on death.",Doom=true}
 Meta_EldritchTentacles_B = Meta_EldritchTentacles:new{UpgradeDescription = "Deals 1 more damage.",Damage=2}
-Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doomed = true,Damage=2}
+Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doom = true,Damage=2}
 
 function Meta_EldritchTentacles:GetTargetArea(point)
 	local ret = PointList()
 	local isInsane = Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(point):GetId(), "Insanity") >= 5
-	if isInsane then ret:push_back(point) return ret end
-	
-	local targets = extract_table(general_DiamondTarget(point, 2))
-	for i = 1, #targets do
-		if targets[i] ~= point then ret:push_back(targets[i]) end
+	if isInsane then 
+		for i = DIR_START, DIR_END do
+			ret:push_back(point + DIR_VECTORS[i])
+			ret:push_back(point + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4])
+		end
+	else
+		local targets = extract_table(general_DiamondTarget(point, 2))
+		for i = 1, #targets do
+			if targets[i] ~= point then ret:push_back(targets[i]) end
+		end
 	end
 	return ret
 end
@@ -163,6 +168,8 @@ end
 function Meta_EldritchTentacles:GetSecondTargetArea(p1,p2)
 	local ret = PointList()
 	--May need to check whether pull tiles don't have a blocker in front of them after first skill effect
+	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
+	if isInsane then return ret end
 	local targets = extract_table(general_DiamondTarget(p1, 2))
 	for i = 1, #targets do
 		if targets[i] ~= p1 and targets[i] ~= p2 then ret:push_back(targets[i]) end	
@@ -172,19 +179,35 @@ end
 
 function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local userId = Board:GetPawn(p1):GetId()
 	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
 	if isInsane then							--multihit
 		local toastCounter = 0
-		for i = DIR_START, DIR_END do
-			local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
-			
-			local damage = SpaceDamage(curr, self.Damage, (i+2)%4)
-			damage.sAnimation = "eldritchtentaclediaganim_"..i
-			if self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s)", curr:GetString()) end
-			ret:AddDamage(damage)
-			if Board:GetPawn(curr) then  toastCounter=toastCounter+1 end
-			ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", Board:GetPawn(p1):GetId()))
+		if p1:Manhattan(p2) == 2 then			--diagonal multihit
+			for i = DIR_START, DIR_END do
+				local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
+				local pawn = Board:GetPawn(curr)
+				local damage = SpaceDamage(curr, self.Damage, (i+2)%4)
+				damage.sAnimation = "eldritchtentaclediaganim_"..i
+				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
+				--use different sounds; make sure it's either 1 or 2 in case another mod changes weapon damage
+				if pawn and self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn:GetId(), userId) end
+				ret:AddDamage(damage)
+				if pawn then toastCounter=toastCounter+1 end
+			end
+		else									--adjacent multihit
+			for i = DIR_START, DIR_END do
+				local curr = p1 + DIR_VECTORS[i]
+				local pawn = Board:GetPawn(curr)
+				local damage = SpaceDamage(curr, self.Damage, i)
+				damage.sAnimation = "eldritchtentacleanim_"..i
+				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
+				if pawn and self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn:GetId(), userId) end
+				ret:AddDamage(damage)
+				if pawn then toastCounter=toastCounter+1 end
+			end
 		end
+		ret:AddScript(string.format("Status.ApplyInsanity(%s, -5)", Board:GetPawn(p1):GetId()))
 		if toastCounter == 4 then ret:AddScript("completeComeWithMe()") end
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
@@ -225,23 +248,30 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 	if options.Meta_EldritchSelfInsanity and options.Meta_EldritchSelfInsanity.enabled then ret:AddScript(string.format("Status.ApplyInsanity(%s, 1)", Board:GetPawn(p1):GetId())) end
 
 	local mission = GetCurrentMission()
+	
+	local pawn1 = Board:GetPawn(p2)
+ 	local pawn2 = Board:GetPawn(p3)
+	local userId = Board:GetPawn(p1):GetId()
 	local damage1 = SpaceDamage(p2, self.Damage)
-	if self.Doom then damage1.sScript = string.format("Status.ApplyDoomed(%s)", p2:GetString()) end
+	if pawn1 and self.Doom then damage1.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn1:GetId(), userId) end
 	local damage2 = SpaceDamage(p3, self.Damage)
-	if self.Doom then damage2.sScript = string.format("Status.ApplyDoomed(%s)", p3:GetString()) end
+	if pawn2 and self.Doom then damage2.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn2:GetId(), userId) end
 	
 	if p1:Manhattan(p2) == 1 then				--push
 		damage1.iPush = GetDirection(p2 - p1)
 		damage1.sAnimation = "eldritchtentacleanim_"..GetDirection(p2 - p1)
+		damage1.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 		ret:AddMelee(p1, damage1)
 	elseif p1.x == p2.x or p1.y == p2.y then	--pull
 		damage1.iPush = (GetDirection(p2 - p1) + 2) % 4
+		damage1.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 		ret:AddMelee(p1, damage1)
 		ret:AddAnimation(p1+DIR_VECTORS[GetDirection(p2-p1)], "eldritchtentacleanim_"..GetDirection(p2 - p1))
 	else										--diagonal
 		for i = DIR_START, DIR_END do
 			damage1.iPush = (i+2)%4
 			damage1.sAnimation = "eldritchtentaclediaganim_"..i
+			damage1.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 			if p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] == p2 then ret:AddDamage(damage1) end
 		end
 	end
@@ -249,15 +279,18 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 	if p1:Manhattan(p3) == 1 then				--push
 		damage2.iPush = GetDirection(p3 - p1)
 		damage2.sAnimation = "eldritchtentacleanim_"..GetDirection(p3 - p1)
+		damage2.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 		ret:AddMelee(p1, damage2)
 	elseif p1.x == p3.x or p1.y == p3.y then	--pull
 		damage2.iPush = (GetDirection(p3 - p1) + 2) % 4
+		damage2.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 		ret:AddMelee(p1, damage2)
 		ret:AddAnimation(p1+DIR_VECTORS[GetDirection(p3-p1)], "eldritchtentacleanim_"..GetDirection(p3 - p1))
 	else										--diagonal
 		for i = DIR_START, DIR_END do
 			damage2.iPush = (i+3)%4
 			damage2.sAnimation = "eldritchtentaclediaganim_"..i
+			damage2.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 			if p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] == p3 then ret:AddDamage(damage2) end
 		end
 	end
@@ -346,7 +379,7 @@ function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 		return ret
 	end
 	local achievementCounter = 0
-	if Status.GetStatus(user:GetId(), "Insanity") and Status.GetStatus(user:GetId(), "Insanity") >= 5 then
+	if user ~= nil and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5 then
 	--if mad, all enemies retarget "randomly"
 		local enemies = Board:GetPawns(TEAM_ENEMY)
 		for _, i in ipairs(extract_table(enemies)) do
@@ -506,7 +539,7 @@ end
 
 function Meta_TentacularServant:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
-	if Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5 then 
+	if Board:GetPawn(p1) ~= nil and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5 then
 		for i = DIR_START, DIR_END do
 			for k = 2, 8 do
 				if not Board:IsBlocked(DIR_VECTORS[i]*k + p1, PATH_MASSIVE) then ret:push_back(DIR_VECTORS[i]*k + p1) end
@@ -534,7 +567,7 @@ function Meta_TentacularServant:GetFinalEffect(p1, p2, p3)
 	local dir = GetDirection(p3-p2)
 	local tentacleCounter = 0
 	damage.sPawn = self.Spawn
-	local isInsane = Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
+	local isInsane = Board:GetPawn(p1) ~= nil and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") and Status.GetStatus(Board:GetPawn(p1):GetId(), "Insanity") >= 5
 	if isInsane then 
 		damage.loc = p3 
 		ret:AddArtillery(damage, "effects/coiledTentacle.png", NO_DELAY)
