@@ -770,7 +770,7 @@ local function EVENT_onModsLoaded()
 		for k, status in ipairs(pawnStatuses) do	--I'd rather this were a table, but I need to insert data and stuff.
 			local statusDesc = ""
 			if status == "Alluring" then statusDesc = "Makes Vek want to be adjacent to this pawn." end
-			if status == "Blind" then statusDesc = "Makes Vek want to be adjacent to this pawn ("..mission.BlindTable[id].." turns left)." end
+			if status == "Blind" then statusDesc = "Makes Vek unable to target beyond two tiles ("..mission.BlindTable[id].." turns left)." end
 			if status == "Bloodthirsty" then statusDesc = "Bloodthirsty Vek will prioritize enemies over buildings." end
 			if status == "Bonded" then statusDesc = "Bonded pawns will take 1 damage when other bonded pawns take damage. Can trigger once per turn." end
 			if status == "Chill" then statusDesc = "Chilled pawns will become frozen when chilled again. Chill + Wet also freezes. Removed when frozen or on fire." end
@@ -782,7 +782,13 @@ local function EVENT_onModsLoaded()
 				end
 				statusDesc = statusDesc.." ("..mission.ConfusionTable[id].." turns left)."
 			end
-			if status == "Doomed" then statusDesc = "Takes "..mission.DoomedTable[id].amount.." damage every turn. On death, the pawn's tile turns into lava. Removed by killing the source of the status (."..Board:GetPawn(mission.DoomedTable[id].source):GetName()..")." end
+			if status == "Doomed" then 
+				if mission.DoomedTable[id].amount > 0 then statusDesc = "Takes "..mission.DoomedTable[id].amount.." damage every turn. " end
+				statusDesc = statusDesc.."On death, the pawn's tile turns into lava. "
+				if Board:GetPawn(mission.DoomedTable[id].source) then
+					statusDesc = statusDesc.."Removed by killing the source of the status (."..Board:GetPawn(mission.DoomedTable[id].source):GetName()..")." 
+				end
+			end
 			if status == "Dreadful" then statusDesc = "Prevents Vek from queuing attacks adjacent to this pawn and makes them avoid being adjacent to this pawn." end
 			if status == "Dry" then statusDesc = "Takes 1 extra damage from fire. Removed by Wet." end
 			if status == "Glory" then 
@@ -795,7 +801,7 @@ local function EVENT_onModsLoaded()
 			end
 			if status == "Gunk" then statusDesc = "Covered in sticky gunk, which does nothing by itself but is consumed by some effects." end
 			if status == "Hemorrhage" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
-			if status == "Infested" then statusDesc = "Will die after a certain number of turns. Removed by damage, fire, and A.C.I.D. ("..mission.InfestedTable[id].." turns left)." end
+			if status == "Infested" then statusDesc = "Will die after "..mission.InfestedTable[id].." turns. Removed by damage, fire, and A.C.I.D.." end
 			if status == "Insanity" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
 			if status == "LeechSeed" then statusDesc = "Takes 1 damage every turn, healing the pawn that applied the leech seed, if any. Removed by fire." end
 			if status == "Necrosis" then statusDesc = "Prevents healing by constantly setting the pawn's max health to their current health." end
@@ -925,15 +931,15 @@ local function EVENT_onModsLoaded()
 	modapiext:addPawnKilledHook(function(mission, pawn)					--doomed
 		if not (mission and pawn) then return end
 		local id = pawn:GetId()
-		if mission.DoomedTable[id] then
+		if mission.DoomedTable[id] ~= nil then
 			local damage = SpaceDamage(pawn:GetSpace(), DAMAGE_DEATH)
 			damage.sAnimation = "tentacles"
 			damage.iTerrain = TERRAIN_LAVA
 			damage.sSound = "/props/tentacle"
 			Board:DamageSpace(damage)
 		end
-		for doomedID, source in pairs(mission.DoomedTable) do
-			if id == source then Status.RemoveStatus(doomedID, "Doomed") end
+		for doomedID, doomedInformation in pairs(mission.DoomedTable) do
+			if id == doomedInformation.source then Status.RemoveStatus(doomedID, "Doomed") end
 		end
 		
 	end)
@@ -976,24 +982,28 @@ local function EVENT_onModsLoaded()
 				end
 			end
 		end
-		for id, source in pairs(mission.DoomedTable) do
+		for id, doomedInformation in pairs(mission.DoomedTable) do
 			local pawn = Board:GetPawn(id)
-			if source ~= -1 and not Board:GetPawn(source) then			--doublechecking with pawnIsKilled, but something could have removed the pawn without killing
-				Status.RemoveStatus(id, "Doomed")
-			elseif pawn then
-				local damage = SpaceDamage(pawn:GetSpace(), 1)
-				damage.sAnimation = "PsionAttack_Back"
-				Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
-				if Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER and Board:IsAcid(pawn:GetSpace()) then
-					Board:AddAnimation(pawn:GetSpace(), "Splash_acid", ANIM_NO_DELAY)
-				elseif Board:IsTerrain(pawn:GetSpace(),TERRAIN_LAVA) then
-					Board:AddAnimation(pawn:GetSpace(), "Splash_lava", ANIM_NO_DELAY)
-				elseif Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER then
-					Board:AddAnimation(pawn:GetSpace(), "Splash", ANIM_NO_DELAY)
+			if pawn then
+				if pawn:IsDead() or (type(doomedInformation.source) == "number" and doomedInformation.source ~= -1 and 
+				(not Board:GetPawn(doomedInformation.source) or Board:GetPawn(doomedInformation.source):IsDead())) then			
+				--doublechecking with pawnIsKilled, but something could have removed the pawn without killing
+					Status.RemoveStatus(id, "Doomed")
+				else
+					local damage = SpaceDamage(pawn:GetSpace(), doomedInformation.amount)
+					damage.sAnimation = "PsionAttack_Back"
+					Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
+					if Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER and Board:IsAcid(pawn:GetSpace()) then
+						Board:AddAnimation(pawn:GetSpace(), "Splash_acid", ANIM_NO_DELAY)
+					elseif Board:IsTerrain(pawn:GetSpace(),TERRAIN_LAVA) then
+						Board:AddAnimation(pawn:GetSpace(), "Splash_lava", ANIM_NO_DELAY)
+					elseif Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER then
+						Board:AddAnimation(pawn:GetSpace(), "Splash", ANIM_NO_DELAY)
+					end
+					pawn:ApplyDamage(damage)
+					if type(doomedInformation.source) == "number" and doomedInformation.source ~= -1 and Board:GetPawn(doomedInformation.source) then Board:Ping(Board:GetPawn(doomedInformation.source):GetSpace(), GL_Color(100, 100, 0)) end
+					--here to let the player visualise the source of the effect
 				end
-				pawn:ApplyDamage(damage)
-				if Board:GetPawn(source) then Board:Ping(Board:GetPawn(source):GetSpace(), GL_Color(100, 100, 0)) end
-				--here to let the player visualise the source of the effect
 			end
 		end
 		for id, sleepTurnsLeft in pairs(mission.SleepTable) do
