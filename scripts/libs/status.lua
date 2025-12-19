@@ -303,18 +303,19 @@ function Status.ApplyGlory(id, turns)
 	end
 end
 
-function Status.ApplyGunk(id)
+function Status.ApplyGunk(id, anim)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
+	anim = anim or "StatusGunk"
 	if _G[pawn:GetType()].GunkImmune then return end
 	if _G[pawn:GetType()].OnAppliedGunk then
 		_G[pawn:GetType()].OnAppliedGunk(id)
 		return
 	end
 	mission.GunkTable[id] = true
-	CustomAnim:add(id, "StatusGunk")
+	CustomAnim:add(id, anim)
 end
 
 function Status.ApplyHemorrhage(id, turns)
