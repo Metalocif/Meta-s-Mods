@@ -120,7 +120,7 @@ function this:init(mod)
 		local user = Board:GetPawn(p1)
 		if GAME.StSDefectOrb == "Lightning" then 
 			local damage = SpaceDamage(p2, 2)
-			damage.sAnimation = "LightningBolt0"
+			damage.sAnimation = "LightningBoltBig"
 			ret:AddDamage(damage)
 			ret:AddSound("/props/lightning_strike")
 			if Board:GetPawn(p2) then ret:AddScript(string.format("modApi:runLater(function() Status.ApplyShocked(%s) end)", Board:GetPawn(p2):GetId())) end

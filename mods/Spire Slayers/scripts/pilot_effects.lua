@@ -122,14 +122,20 @@ local function DefectOrbPassivesEnemyTurn(mission)
 				for dir = DIR_START, DIR_END do
 					local curr = pawn:GetSpace() + DIR_VECTORS[dir]
 					local enemy = Board:GetPawn(curr)
-					if enemy then Board:DamageSpace(SpaceDamage(curr, 1)) end
-					--needs animation but w/e
+					local damage = SpaceDamage(curr, 1)
+					damage.sAnimation = "LightningBolt"..math.random(0, 1)
+					damage.sSound = "/props/lightning_strike"
+					if enemy then Board:DamageSpace(damage) end
 				end
 			elseif GAME.StSDefectOrb == "Frost" then
 				for dir = DIR_START, DIR_END do
 					local curr = pawn:GetSpace() + DIR_VECTORS[dir]
 					local enemy = Board:GetPawn(curr)
 					if enemy then Status.ApplyChill(enemy:GetId()) end
+					local effect = SkillEffect()
+					effect:AddSound("/weapons/blizzard")
+					effect.iOwner = ENV_EFFECT
+					Board:AddEffect(effect)	
 				end
 			end
 		end
