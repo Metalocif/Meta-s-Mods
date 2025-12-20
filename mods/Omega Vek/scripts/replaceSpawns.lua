@@ -9,7 +9,7 @@ function Spawner:NextPawn(pawn_tables)
 	if _G["Omega"..ret] ~= nil then
 		if options["OmegaVek"] ~= nil and options["Omega"..ret:sub(1, -2)] ~= nil then
 			if options["Omega"..ret:sub(1, -2)].value ~= "Default" then 
-				chance = options["Omega"..pawn:GetType():sub(1, -2)].value
+				chance = options["Omega"..ret:sub(1, -2)].value
 			else
 				chance = options["OmegaVek"].value
 			end
