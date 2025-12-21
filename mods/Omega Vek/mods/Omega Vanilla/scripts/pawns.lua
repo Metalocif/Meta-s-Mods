@@ -29,6 +29,10 @@ for i = 1, #names do
 	a["Omega"..name.."d"] = a[name.."d"]:new{ Image = "units/aliens/Omega"..name.."_death.png"}
 	a["Omega"..name.."a"] = a[name.."a"]:new{ Image = "units/aliens/Omega"..name.."a.png"}
 end
+modApi:appendAsset(writepath.."Omegablob.png", readpath.."Omegablob.png")
+modApi:appendAsset(writepath.."Omegablob_death.png", readpath.."Omegablob_death.png")
+a["Omegablob"] = a["blob"]:new{ Height = 1, Image = "units/aliens/Omegablob.png"}
+a["Omegablobd"] = a["blobd"]:new{ Height = 1, Image = "units/aliens/Omegablob_death.png"}
 
 modApi:appendAsset("img/portraits/enemy/OmegaBeetle2.png", resourcePath.."img/portraits/enemy/OmegaBeetle2.png")
 modApi:appendAsset("img/portraits/enemy/OmegaBlobber2.png", resourcePath.."img/portraits/enemy/OmegaBlobber2.png")
@@ -444,8 +448,7 @@ OmegaBlob2 = {
 	Name = "Omega Blob",
 	Health = 1,
 	MoveSpeed = 0,
-	Image = "blob",
-	ImageOffset = 1,
+	Image = "Omegablob",
 	Minor = true,
 	SkillList = { },
 	Explodes = true,

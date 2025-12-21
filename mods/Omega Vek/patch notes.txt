@@ -1,3 +1,8 @@
+v1.0.2
+- Omega Mosquito now clears smoke on itself and adjacent tiles when attacking.
+- Omega Blobs now have a proper image.
+- Omega Blobs no longer explode at the end of mission.
+
 v1.0.1
 - Omega Leaper has 2 HP, down from 3. Being stable and smartly webbing mechs makes it harder to handle/kill already.
 - Omega Scarab has 2 movement, down from 3. It already autohits all mechs; its main shot should be slightly worse.

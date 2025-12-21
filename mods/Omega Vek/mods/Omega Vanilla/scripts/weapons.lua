@@ -110,6 +110,17 @@ function OmegaMosquitoAtk2:GetSkillEffect(p1, p2)
 	damage = SpaceDamage(p2,self.Damage)
 	damage.sSound = self.SoundBase.."/attack"
 	damage.sAnimation = "explomosquito_"..direction
+	damage.iSmoke = -1
+	local clearSmoke = SpaceDamage(p1)
+	clearSmoke.iSmoke = -1
+	ret:AddQueuedDamage(clearSmoke)
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		if curr ~= p2 then
+			clearSmoke.loc = curr
+			ret:AddQueuedDamage(clearSmoke)
+		end
+	end
 	ret:AddQueuedMelee(p1, damage)
 	
 	return ret
@@ -704,7 +715,8 @@ function OmegaShamanAtk2:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
 	local mission = GetCurrentMission()
-	if mission.hadCorpseBeforeOmegaPlasmodia == nil then mission.hadCorpseBeforeOmegaPlasmodia= {} end
+	if not mission then return ret end
+	mission.hadCorpseBeforeOmegaPlasmodia = mission.hadCorpseBeforeOmegaPlasmodia or {}
 	damage.sPawn = self.MyPawn
 	ret:AddArtillery(damage, self.MyArtillery)
 		
@@ -979,3 +991,20 @@ function OmegaBlobberAtk2:GetSkillEffect(p1, p2)
 	end
 	return ret
 end
+
+local function ClearBlobs(mission)
+	for i = 0, 7 do
+		for j = 0, 7 do
+			local pawn = Board:GetPawn(Point(i,j))
+			if pawn and pawn:GetType() == "OmegaBlob2" then
+				Board:RemovePawn(pawn)
+				Board:AddAnimation(Point(i, j), "Omegablobd", ANIM_NO_DELAY)
+			end
+		end
+	end
+end
+
+local function EVENT_onModsLoaded()
+	modApi:addMissionEndHook(ClearBlobs)
+end
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
