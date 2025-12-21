@@ -536,7 +536,7 @@ function Status.ApplyWet(id)
 	end
 end
 
-function Status.ApplyInsanity(id, amount)
+function Status.ApplyInsanity(id, amount, setToValue)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
@@ -551,6 +551,7 @@ function Status.ApplyInsanity(id, amount)
 		end
 	end
 	local insanityCount = mission.InsanityTable[id] or 0
+	if setToValue then insanityCount = amount end
 	local newInsanityCount = math.min(amount + insanityCount, 5)
 	if newInsanityCount <= 0 then Status.RemoveStatus(id, "Insanity") return end
 	mission.InsanityTable[id] = newInsanityCount
@@ -753,7 +754,8 @@ local function ReaddInsanity()
 		for i = 0, 2 do
 			local pawn = Board:GetPawn(i)
 			if pawn and GAME.InsanityTable ~= nil and GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] and GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] > 0 then
-				Status.ApplyInsanity(pawn:GetId(), GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)])
+				Status.ApplyInsanity(pawn:GetId(), GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)], true)
+				GAME.InsanityTable[pawn:GetPersonality()..pawn:GetPilotName(NAME_NORMAL)] = nil
 			end
 		end
 	end)
