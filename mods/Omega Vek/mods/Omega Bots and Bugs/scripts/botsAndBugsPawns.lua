@@ -2,17 +2,10 @@ local mod = mod_loader.mods["Meta_OmegaBotsAndBugs"]
 local resourcePath = mod.resourcePath
 local scriptPath = mod.scriptPath
 
--- local writepath = "img/units/aliens/Bots and Bugs/"
 local writepath = "img/units/aliens/"
 local readpath = resourcePath .. writepath
 local imagepath = writepath:sub(5,-1)
 local a = ANIMS
-
--- local trait = mod_loader.mods["lmn_bots_and_bugs"].libs.trait
-
-local function IsTipImage()
-	return Board:GetSize() == Point(6,6)
-end
 
 -------------
 --   Art   --
@@ -32,8 +25,6 @@ for i = 1, #names do
 	a["Omega"..name.."d"] = a["lmn_"..name.."d"]:new{ Image = "units/aliens/Omega"..name.."_death.png"}
 	a["Omega"..name.."a"] = a["lmn_"..name.."a"]:new{ Image = "units/aliens/Omega"..name.."a.png"}
 end
-
--- modApi:appendAsset("img/portraits/enemy/OmegaBeetle2.png", resourcePath.."img/portraits/enemy/OmegaBeetle2.png")
 
 ---------------
 --   Pawns   --
