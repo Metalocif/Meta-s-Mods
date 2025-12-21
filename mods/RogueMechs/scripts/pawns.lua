@@ -107,7 +107,7 @@ a.RMBomblingd = 				a.MechUnit:new{ Image = "units/player/rogue/bombling_death.p
 
 
 function GetBestWeapon()
-	if Pawn:GetWeaponCount() == 1 then return 1 end
+	if Pawn:GetWeaponCount() <= 1 then return 1 end
 	local p = Pawn:GetSpace()
 	local bestScore1 = -100
 	local bestScore2 = -100

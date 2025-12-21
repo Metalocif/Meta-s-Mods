@@ -1238,16 +1238,19 @@ end
 
 function RMMechMinerAtk1:GetSkillEffect(p1, p2)	
 	local ret = SkillEffect()	
-	local damage = SpaceDamage(p2,0)
+	local dir = GetDirection(p2 - p1)
+	local damage = SpaceDamage(p2)
 	damage.sPawn = self.Deployed
 	ret:AddBounce(p1, 2)
-	ret:AddArtillery(damage,self.Projectile, NO_DELAY)
-	
+	local delay = PROJ_DELAY
+	if self.DeployCount == 2 then delay = NO_DELAY end
+	ret:AddArtillery(damage,self.Projectile, delay)
 	if self.DeployCount == 2 and not Board:IsBlocked(p2 + DIR_VECTORS[dir], PATH_PROJECTILE) then
 		damage.loc = p2 + DIR_VECTORS[dir]
-		ret:AddArtillery(damage,self.Projectile)
+		ret:AddArtillery(damage,self.Projectile, PROJ_DELAY)
 	end
 	ret:AddBounce(p2, 3)
+	if self.DeployCount == 2 and not Board:IsBlocked(p2 + DIR_VECTORS[dir], PATH_PROJECTILE) then ret:AddBounce(p2 + DIR_VECTORS[dir], 3) end
 	return ret
 end		
 
@@ -1338,6 +1341,18 @@ RMRainingDeath = LineArtillery:new{
 		CustomPawn = "RMMechMiner1",
 	}
 }
+
+function RMRainingDeath:GetTargetArea(point)	
+	local ret = PointList()	
+	for i = DIR_START, DIR_END do
+		for j = 2, 8 do
+			local curr = point + DIR_VECTORS[i] * j
+			ret:push_back(curr)
+		end
+	end
+	return ret
+end		
+
 function RMRainingDeath:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2 - p1)
