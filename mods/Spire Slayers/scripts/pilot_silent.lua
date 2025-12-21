@@ -15,6 +15,7 @@ local pilot = {
 	Sex = SEX_FEMALE,
 	Skill = "StSSilentSkill",
 	Voice = "/voice/archimedes",
+	ToxinImmune = true,
 }
 
 function this:init(mod)

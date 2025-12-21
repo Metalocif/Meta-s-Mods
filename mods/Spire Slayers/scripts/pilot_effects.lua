@@ -56,7 +56,7 @@ local function SilentToxin(mission)
 			for dir = DIR_START, DIR_END do
 				local curr = pawn:GetSpace() + DIR_VECTORS[dir]
 				local enemy = Board:GetPawn(curr)
-				if enemy and enemy:GetTeam() == TEAM_ENEMY then Status.ApplyToxin(enemy:GetId()) end
+				if enemy and enemy:GetTeam() == TEAM_ENEMY and not enemy:IsDead() then Status.ApplyToxin(enemy:GetId()) end
 			end
 		end
 	end
@@ -168,16 +168,19 @@ local function EVENT_onModsLoaded()
 	-- Ironclad: heal 1/turn, fire adjacents when damaged
 	modApi:addNextTurnHook(IroncladRegen)
 	modapiext:addPawnDamagedHook(IroncladFire)
+	
 	-- Silent: gain a weapon if empty slots, otherwise apply toxin on adjacent
 	modApi:addMissionStartHook(SilentGainBladeDance)
 	modApi:addPreEnvironmentHook(SilentToxin)
 	modApi:addMissionEndHook(SilentLoseBladeDance)
+	
 	-- Defect: rotate between 4 passives, rotating triggers stuff
 	modApi:addPostStartGameHook(DefectStartWithLightningOrb)
 	modApi:addMissionStartHook(DefectRetrieveOrb)
 	modApi:addNextTurnHook(DefectOrbPassivesPlayerTurn)
 	modApi:addPreEnvironmentHook(DefectOrbPassivesEnemyTurn)
 	--actives are handled by the replaceRepair weapon
+	
 	-- Watcher: rotate between two modes
 	--wisdom is handled by the replaceRepair weapon
 	modApi:addMissionStartHook(WatcherStartInWisdom)
