@@ -19,7 +19,6 @@ function mod:init()
 end
 
 function mod:load(options, version)
-	-- if not modApi:isModLoaded("Djinn_NAH_Tatu_Vextra") then mod_loader.mod_options[Meta_PermanentPsions].options[PermanentPsion_Vextra] = nil end
 end
 
 function mod:metadata()
