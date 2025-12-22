@@ -3,8 +3,8 @@ local path = mod_loader.mods[modApi.currentMod].resourcePath
 
 -- add assets from our mod so the game can find them.
 modApi:appendAsset("img/weapons/BladeDance.png", path .."img/weapons/BladeDance.png")
--- modApi:appendAsset("img/effects/shot_shiv_R.png", path .."img/effects/shot_shiv_R.png")
--- modApi:appendAsset("img/effects/shot_shiv_U.png", path .."img/effects/shot_shiv_U.png")
+modApi:appendAsset("img/effects/shot_shiv_R.png", path .."img/effects/shot_shiv_R.png")
+modApi:appendAsset("img/effects/shot_shiv_U.png", path .."img/effects/shot_shiv_U.png")
 
 StS_BladeDance = Skill:new{
 	Name = "Blade Dance",
