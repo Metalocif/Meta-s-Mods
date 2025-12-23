@@ -14,7 +14,6 @@ local mod = {
 	modApiVersion = "2.9.2",
 	icon = "mod_icon.png",
 	description = description,
-	--metadata = metadata,
 }
 
 

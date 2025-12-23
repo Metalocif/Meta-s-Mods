@@ -269,7 +269,7 @@ function OmegaDungAtk2:GetSkillEffect(p1, p2)
 	if self:CanSpawnRock(p2) then
 		ret:AddSound("/enemy/"..self.SoundId.."/spawn_rock")
 		ret:AddDamage(spawn)
-		if not Board:IsBlocked(p2, PATH_GROUND) then ret:AddQueuedDamage(spawn) end
+		-- if not Board:IsBlocked(p2, PATH_GROUND) then ret:AddQueuedDamage(spawn) end
 	end	
 	return ret
 end
@@ -721,13 +721,15 @@ function OmegaShamanAtk2:GetSkillEffect(p1, p2)
 	ret:AddArtillery(damage, self.MyArtillery)
 		
 	for dir = DIR_START, DIR_END do 
-		damage = SpaceDamage(p2 + DIR_VECTORS[dir],0)
+		damage = SpaceDamage(p2 + DIR_VECTORS[dir])
 		ret:AddDamage(damage)
 	end
 	
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		if mission.hadCorpseBeforeOmegaPlasmodia[i] == nil then mission.hadCorpseBeforeOmegaPlasmodia[i] = Board:GetPawn(i):IsCorpse() end
-		Board:GetPawn(i):SetCorpse(true)
+		if Board:GetPawn(i) and not Board:GetPawn(i):IsMinor() then
+			if mission.hadCorpseBeforeOmegaPlasmodia[i] == nil then mission.hadCorpseBeforeOmegaPlasmodia[i] = Board:GetPawn(i):IsCorpse() end
+			Board:GetPawn(i):SetCorpse(true)
+		end
 	end
 	
 	return ret
@@ -777,6 +779,10 @@ function OmegaTotemAtk2:GetSkillEffect(p1,p2)
 	local target = GetProjectileEnd(p1,p2)  
 	
 	local damage = SpaceDamage(target, self.Damage)
+	damage.sScript = string.format([[modApi:runLater(function()
+		local pawn = Board:GetPawn(%s)
+		if pawn and pawn:IsDead() then pawn:SetHealth(1) end
+	end)]], target:GetString())
 	ret:AddProjectile(damage,self.Projectile)
 	ret:AddDamage(SpaceDamage(p1,DAMAGE_DEATH))
 	
@@ -1004,7 +1010,29 @@ local function ClearBlobs(mission)
 	end
 end
 
+local function PlasmodiaCorpsifier(mission)
+	modApi:conditionalHook(function()
+		return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+	end, 
+	function()
+		for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
+			if Board:GetPawn(i) and Board:GetPawn(i):GetType() == "OmegaShaman2" then 
+				for _, j in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
+					if Board:GetPawn(j) and not Board:GetPawn(j):IsMinor() then Board:GetPawn(j):SetCorpse(true) end
+				end
+				break
+			end
+		end
+		-- if mission.hadCorpseBeforeOmegaPlasmodia ~= nil then
+			-- for _, id in ipairs(extract_table(mission.hadCorpseBeforeOmegaPlasmodia)) do
+				-- if Board:GetPawn(id) then Board:GetPawn(id):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[id]) end
+			-- end
+		-- end
+	end)
+end
+
 local function EVENT_onModsLoaded()
 	modApi:addMissionEndHook(ClearBlobs)
+	modApi:addPostLoadGameHook(PlasmodiaCorpsifier)
 end
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)

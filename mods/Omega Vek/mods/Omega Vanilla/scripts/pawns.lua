@@ -206,7 +206,7 @@ AddPawn("OmegaMoth2")
 
 OmegaDung2 = Pawn:new{
 	Name = "Omega Tumblebug",
-	Health = 5,
+	Health = 4,
 	MoveSpeed = 3,
 	Image = "Omegadungbeetle",
 	ImageOffset = 1,
@@ -287,12 +287,14 @@ OmegaShaman2 = Pawn:new{
 AddPawn("OmegaShaman2")
 
 function OmegaShaman2:GetDeathEffect(point)
+	local mission = GetCurrentMission()
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		if Board:GetPawn(i):GetType() == "OmegaPlasmodia2" then return SkillEffect() end
 	end
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		Board:GetPawn(i):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[i])
 	end
+	mission.hadCorpseBeforeOmegaPlasmodia = {}
 	return SkillEffect()
 end
 

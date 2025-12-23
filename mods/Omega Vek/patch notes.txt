@@ -1,3 +1,10 @@
+v1.0.3
+- Omega Tumblebugs now have 4 HP, down from 5.
+- Omega Tumblebugs no longer spawn a second explosive rock on fire as a queued action.
+- Omega Plasmodia's Spores correctly revive dead Vek.
+- Spores (and other minor units) no longer have corpses.
+- Omega Plasmodia should no longer cause an error on death.
+
 v1.0.2
 - Omega Mosquito now clears smoke on itself and adjacent tiles when attacking.
 - Omega Blobs now have a proper image.
