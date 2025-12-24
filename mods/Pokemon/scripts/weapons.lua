@@ -752,6 +752,7 @@ Poke_Confusion_A=Poke_Confusion:new{ UpgradeDescription = "Increases damage by 1
 Poke_Confusion_B=Poke_Confusion:new{ UpgradeDescription = "Increases damage by 1.", Damage = 3 }
 Poke_Confusion_AB=Poke_Confusion:new{ Damage = 4 }
 
+
 function Poke_Confusion:GetTargetArea(point)
 	local ret = PointList()
 	for i = DIR_START, DIR_END do
@@ -778,9 +779,6 @@ function Poke_Confusion:GetSkillEffect(p1, p2)
 		damage.loc = p2 + DIR_VECTORS[(direction + 3)%4]
 		if Board:GetPawn(damage.loc) then ret:AddSafeDamage(damage) end
 	end
-	-- Status.ApplyDoomed(Board:GetPawn(p2):GetId())
-	-- ret:AddScript(string.format("Weathers.AddWeather(%q, %s)", "Rain", 20))
-	-- Weathers.AddWeather("Sandstorm", 1)
 	return ret
 end
 
@@ -4169,8 +4167,8 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local pawn1 = Board:GetPawn(p2)
 	local pawn2 = Board:GetPawn(p3)
-	-- local id1 = pawn1:GetId()
-	-- local id2 = pawn2:GetId()
+	
+	--TipImages my beloathed
 	if Board:IsTipImage() then 
 		if not pawn1 or not pawn2 then return ret end
 		pawn2:SetFrozen(true, true)
@@ -4186,6 +4184,7 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 		return ret
 	end
 	
+	--Handle swapping statuses
 	local synchro = SpaceDamage(p2)
 	if pawn1:IsFire() or pawn2:IsFire() then synchro.iFire = 1 end
 	if pawn1:IsAcid() or pawn2:IsAcid() then synchro.iAcid = 1 end
@@ -4218,7 +4217,8 @@ function Poke_Synchronize:GetFinalEffect(p1, p2, p3)
 	ret:AddSafeDamage(synchro)
 	synchro.loc = p3
 	ret:AddSafeDamage(synchro)
-
+	
+	--Swap attack directions
 	if pawn1:GetQueuedTarget() ~= Point(-1, -1) and pawn2:GetQueuedTarget() ~= Point(-1, -1) then
 		local dir1, dir2, dist1, dist2
 		if pawn1:GetQueuedTarget() ~= p2 then 

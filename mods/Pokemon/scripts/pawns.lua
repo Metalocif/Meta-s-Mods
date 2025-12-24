@@ -1370,67 +1370,12 @@ function Move:GetTargetArea(p, ...)
 	return oldMove(self, p, ...)
 end
 
-local lingering
-
 local oldMove = Move.GetSkillEffect
 function Move:GetSkillEffect(p1, p2, ...)
 	local ret = SkillEffect()
 	local mover = Board:GetPawn(p1)
 	if mover and _G[mover:GetType()].GhostMovement then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", p1:GetString(), p2:GetString()))
-		
-		-- local data = _G[mover:GetType()]
-		-- local anim = a[data.Image]
-		-- if not (anim and mover and GetCurrentMission() and Board) then return end
-		
-		-- if not lingering then
-			-- lingering = Ui()
-				-- :width(1)
-				-- :height(1)
-				-- :addTo(sdlext.getUiRoot())
-			-- lingering.visible = true
-			-- lingering.age = 1
-
-			-- lingering.draw = function(self, ...)
-				-- if Board and self.age < 60 then
-					-- Ui.draw(self, ...)
-					-- self.age = self.age+1
-				-- else
-					-- self:detach()
-					-- self = nil
-				-- end
-			-- end
-		-- end
-		
-		-- local scale = GetBoardScale() * GetUiScale()
-		-- local deco = DecoSurface(sdl.scaled(scale, sdlext.surface("img/".. anim.Image)))
-		-- local surface = deco.surface
-		-- local loc = tileToScreen(p1)
-
-		-- local icon = Ui()
-			-- :widthpx(surface:w())
-			-- :heightpx(surface:h())
-			-- :decorate({ deco })
-			-- :addTo(lingering)
-			-- :pospx(loc.x, loc.y)
-		-- icon.translucent = true
-		-- icon.visible = true
-		-- icon.transformations  = {
-			-- { multiply = sdl.rgba(128, 128, 128, 196) }
-		-- }
-
-		-- local w = math.floor(surface:w() / (anim.NumFrames or 1))
-		-- local h = math.floor(surface:h() / (anim.Height or 1))
-		-- icon.x = icon.x + anim.PosX * scale
-		-- icon.y = icon.y - h * data.ImageOffset + (anim.PosY - 15) * scale
-		-- icon.cliprect = sdl.rect(icon.x, icon.y + h * data.ImageOffset, w, h)
-
-		-- deco.draw = function(self, screen, widget)
-			-- screen:clip(widget.cliprect)
-			-- DecoSurface.draw(self, screen, widget)
-			-- screen:unclip()
-		-- end
-		
 		return ret
 	elseif mover and _G[mover:GetType()].FastTeleporter and Board:GetDistance(p1, p2, mover:GetPathProf()) > mover:GetMoveSpeed() then
 		ret:AddTeleport(p1, p2, FULL_DELAY)
