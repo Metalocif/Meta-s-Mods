@@ -657,14 +657,51 @@ function Status.Count(id)
 	return count
 end
 
-function Status.HealFromGunk(id)
+function Status.HealFromGunk(id, overheal)
 	local blob = Board:GetPawn(id)
 	if not blob then return end
-	if not blob:IsDamaged() then
-		blob:SetMaxHealth(blob:GetHealth() + 1)
+	if overheal then
+		Status.Overheal(id, 1)
+	else
+		Board:DamageSpace(SpaceDamage(blob:GetSpace(), -1))
 	end
-	Board:DamageSpace(SpaceDamage(blob:GetSpace(), -1))
 	if Status.GetStatus(id, "Gunk") then Status.RemoveStatus(id, "Gunk") end
+end
+
+function Status.Overheal(id, amount)
+	local pawn = Board:GetPawn(id)
+	local mission = GetCurrentMission()
+	if not pawn or not mission then return end
+	
+	mission.StatusOverhealTable = mission.StatusOverhealTable or {}		--create empty table if it does not exist
+	mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] or 0
+	if amount + pawn:GetHealth() <= pawn:GetMaxHealth() then			--if we are not overhealing, just heal
+		Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
+	else
+		if pawn:IsDamaged() then										--if we are healing, heal and reduce amount
+			Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -(pawn:GetMaxHealth() - pawn:GetHealth())))
+			amount = amount - (pawn:GetMaxHealth() - pawn:GetHealth())
+		end
+		
+		mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] + amount
+		pawn:SetMaxHealth(pawn:GetMaxHealth() + amount)
+		pawn:SetHealth(pawn:GetMaxHealth() + amount)
+	end
+end
+
+local function ReapplyOverheal()
+	modApi:conditionalHook(function()			--we need the conditional hook for some reason
+		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
+	end, 
+	function()
+		local mission = GetCurrentMission()
+		mission.StatusOverhealTable = mission.StatusOverhealTable or {}
+		for id, amount in ipairs(mission.StatusOverhealTable) do
+			if Board:GetPawn(id) then
+				Board:GetPawn(id):SetMaxHealth(Board:GetPawn(id):GetMaxHealth() + mission.StatusOverhealTable[id])
+			end
+		end
+	end)
 end
 
 merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."},} )
@@ -940,7 +977,7 @@ local function EVENT_onModsLoaded()
 		end
 		Status.RemoveStatus(id, "Sleep")
 	end)
-	modapiext:addPawnKilledHook(function(mission, pawn)					--doomed
+	modapiext:addPawnKilledHook(function(mission, pawn)					--doomed, refresh overheal
 		if not (mission and pawn) then return end
 		local id = pawn:GetId()
 		if mission.DoomedTable[id] ~= nil then
@@ -953,7 +990,9 @@ local function EVENT_onModsLoaded()
 		for doomedID, doomedInformation in pairs(mission.DoomedTable) do
 			if id == doomedInformation.source then Status.RemoveStatus(doomedID, "Doomed") end
 		end
-		
+		if _G[pawn:GetType()].Leader == LEADER_BOSS or _G[pawn:GetType()].Leader == LEADER_HEALTH then 
+			modApi:runLater(function() ReapplyOverheal() end)
+		end
 	end)
 	
 	modApi:addPostStartGameHook(GenerateWeakenWeapons)					--generate the weapons Weaken replaces Vek weapons by
@@ -962,6 +1001,11 @@ local function EVENT_onModsLoaded()
 	modApi:addMissionStartHook(PrepareTables)							--create tables for all statuses so we don't have to check everywhere
 	modApi:addMissionStartHook(ReaddInsanity)							
 	modApi:addMissionNextPhaseCreatedHook(PrepareTables)				--also do it on next phase otherwise it won't work
+	
+	modApi:addMissionNextPhaseCreatedHook(ReapplyOverheal)				--Health boosts are lost on game refresh
+	modApi:addPostLoadGameHook(ReapplyOverheal)		
+	modapiext:addResetTurnHook(ReapplyOverheal)		
+	
 	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
 	
 	modApi:addMissionEndHook(WakeUp)									--remove sleep status because unpowered carries over
