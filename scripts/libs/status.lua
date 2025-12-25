@@ -151,11 +151,10 @@ end
 
 
 function Status.IsImmuneTo(pawn, status)
-	-- if not pawn or not status or status == "" then return false end
-	LOG(modapiext.pawn:getPilotId(pawn:GetId()))
-	LOG(_G[modapiext.pawn:getPilotId(pawn:GetId())][status.."Immune"])
+	if not pawn or not status or status == "" then return false end
 	if _G[pawn:GetType()][status.."Immune"] then return true end
-	if _G[modapiext.pawn:getPilotId(pawn:GetId())][status.."Immune"] then return true end
+	if pawn:GetAbility() ~= "" and modapiext.pawn:getPilotId(pawn:GetId()) and _G[modapiext.pawn:getPilotId(pawn:GetId())] and
+	_G[modapiext.pawn:getPilotId(pawn:GetId())][status.."Immune"] then return true end
 	return false
 end
 
@@ -756,10 +755,6 @@ local function GenerateWeakenWeapons()
 end
 
 local function PrepareTables()						--setup all status tables here so we don't need to check everywhere
-	for i = 0, 2 do
-		local pawn = Board:GetPawn(i)
-		if pawn then pawn:SetPowered(true) end		--cancels out the sleep status that carries over for some reason
-	end
 	modApi:conditionalHook(function()			--we need the conditional hook for some reason
 		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
 	end, 
@@ -771,6 +766,10 @@ local function PrepareTables()						--setup all status tables here so we don't n
 			mission[tablesList[i].."Table"] = {}
 		end
 		mission["AdjScoreTable"] = {}
+		for i = 0, 2 do
+			local pawn = Board:GetPawn(i)
+			if pawn then pawn:SetPowered(true) end		--cancels out the sleep status that carries over for some reason
+		end
 	end)
 end
 
