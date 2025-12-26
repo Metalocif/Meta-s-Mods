@@ -707,7 +707,7 @@ local function ReapplyOverheal()
 	end)
 end
 
-merge_table(TILE_TOOLTIPS, { Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."},} )
+TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
 Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = ""}
 Location["libs/status/gunk.png"] = Point(-16,7)
 
