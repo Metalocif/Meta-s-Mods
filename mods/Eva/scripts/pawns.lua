@@ -68,7 +68,7 @@ end
 		Id = "Pilot_EVA_Unit_00",
 		Name = "Rei",
 		Personality = "EvaRei",
-		Sex = SEX_VEK,
+		Sex = SEX_FEMALE,
 		Rarity = 0,
 		-- GetSkill = function() IsEvaZero = true; return "Survive_Death" end,
 		GetSkill = function() IsEva = true; return "Survive_Death" end,
@@ -79,7 +79,7 @@ end
 		Id = "Pilot_EVA_Unit_01",
 		Name = "Shinji",
 		Personality = "EvaShinji",	--"""personality"""
-		Sex = SEX_VEK,				--I think this prevents them from uselessly time travelling? interesting behavior though
+		Sex = SEX_MALE,				--I think this prevents them from uselessly time travelling? interesting behavior though
 		Rarity = 0,
 		GetSkill = function() IsEva = true; return "Survive_Death" end,
 		Blacklist = {"Invulnerable", "Popular"},	--ahahah baka Shinji is not popular
@@ -89,7 +89,7 @@ end
 		Id = "Pilot_EVA_Unit_02",
 		Name = "Asuka",
 		Personality = "EvaAsuka",
-		Sex = SEX_VEK,
+		Sex = SEX_FEMALE,
 		Rarity = 0,
 		-- GetSkill = function() IsEvaTwo = true; return "Survive_Death" end,
 		GetSkill = function() IsEva = true; return "Survive_Death" end,
@@ -322,7 +322,7 @@ local function EVENT_onModsLoaded()
 		--If an EVA is trying to repair, let it target adjacent empty tiles, which would make an AT Field, see hook above
 			for dir = DIR_START, DIR_END do
 				local point = Point(p1 + DIR_VECTORS[dir])
-				if Board:IsValid(point) and not Board:IsBlocked(point, PATH_MASSIVE) then targetArea:push_back(point) end
+				if Board:IsValid(point) and not Board:IsBlocked(point, PATH_PROJECTILE) then targetArea:push_back(point) end
 			end
 			
 		end

@@ -275,7 +275,6 @@ function mod:load( options, version)
 			if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
 			if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
 			
-			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] then LOG(_G[pawn:GetType()].KeepAdding[evo], pawn:GetWeaponCount()) end
 			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 				pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
 				LOG("Gave "..pawn:GetType().." ".._G[pawn:GetType()].KeepAdding[evo])

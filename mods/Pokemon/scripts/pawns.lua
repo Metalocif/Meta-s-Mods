@@ -906,7 +906,7 @@ Poke_Moltres = Pawn:new{
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	-- HasEvolutions = { false, false },
-	KeepAdding = { "", "Poke_MoltresBlast" },
+	KeepAdding = { "", "Poke_FireBlast" },
 }
 Poke_Mewtwo = Pawn:new{
 	Name = "Mewtwo",

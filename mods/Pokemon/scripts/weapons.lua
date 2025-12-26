@@ -1228,10 +1228,12 @@ function Poke_Shockwave:GetSkillEffect(p1,p2)
 		for i = DIR_START, DIR_END do
 			local curr = p1 + DIR_VECTORS[i]
 			local target = GetProjectileEnd(p1, curr)
-			local damage = SpaceDamage(target, self.Damage)
-			damage.sAnimation = "LightningBolt0"
-			if Board:GetPawn(target) then damage.sScript = string.format("Status.ApplyShocked(%s)", Board:GetPawn(target):GetId()) end
-			ret:AddProjectile(damage, self.ProjectileArt, NO_DELAY)
+			if target ~= p1 then 
+				local damage = SpaceDamage(target, self.Damage)
+				damage.sAnimation = "LightningBolt0"
+				if Board:GetPawn(target) then damage.sScript = string.format("Status.ApplyShocked(%s)", Board:GetPawn(target):GetId()) end
+				ret:AddProjectile(damage, self.ProjectileArt, NO_DELAY)
+			end
 		end
 		ret:AddSound("/props/lightning_strike")
 	end
@@ -1271,21 +1273,11 @@ end
 
 function Poke_Thunder:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
-	-- local damage = SpaceDamage(p2, 4)
-	-- damage.sAnimation = "LightningBoltBig"
-	ret:AddAnimation(p2, "LightningBoltBig")
-	local damage = SpaceDamage(p2,self.Damage)
+	
 	local hash = function(point) return point.x + point.y*10 end
 	local explored = {[hash(p1)] = true}
 	local todo = {p2}
-	-- for i = DIR_START, DIR_END do
-		-- todo[#todo+1] = p2 + DIR_VECTORS[i]
-	-- end
 	local origin = { [hash(p2)] = p1 }
-	
-	if Board:IsPawnSpace(p2) or (self.Buildings and Board:IsBuilding(p2)) then
-		ret:AddAnimation(p1,"Lightning_Hit")
-	end
 	
 	while #todo ~= 0 do
 		local current = pop_back(todo)
@@ -1296,19 +1288,15 @@ function Poke_Thunder:GetSkillEffect(p1,p2)
 			if Board:IsPawnSpace(current) or Board:IsBuilding(current) then
 			
 				local direction = GetDirection(current - origin[hash(current)])
+				local damage = SpaceDamage(current,self.Damage)
 				damage.sAnimation = "Lightning_Attack_"..direction
-				damage.loc = current
 				damage.iDamage = Board:IsBuilding(current) and DAMAGE_ZERO or 2
-				damage.sScript = nil
 				if current == p2 then 	--hacky but I couldn't figure out how to change this properly
 					damage.iDamage = 4 
+					damage.sAnimation = "LightningBoltBig"
 					if Board:GetPawn(p2) then damage.sScript = string.format("Status.ApplyShocked(%s)", Board:GetPawn(p2):GetId()) end
 				end		
 				ret:AddDamage(damage)
-				
-				if not Board:IsBuilding(current) then
-					ret:AddAnimation(current,"Lightning_Hit")
-				end
 				
 				for i = DIR_START, DIR_END do
 					local neighbor = current + DIR_VECTORS[i]

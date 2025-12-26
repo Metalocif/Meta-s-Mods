@@ -1,3 +1,6 @@
+v1.7.2
+- Bugfixes in Fire Blast, Shockwave, and Thunder.
+
 v1.7.1
 - Bugfixes. Most notably, Synchronize/Baddy Bad/Reflect should work consistently now, and silly bugs in two-click weapon previews no longer happen.
 - Added Mega Tyranitar and Tyrachomp.
