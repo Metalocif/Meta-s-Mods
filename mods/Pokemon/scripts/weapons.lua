@@ -2388,8 +2388,8 @@ function Poke_Reflect:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	ret:AddAnimation(p2, "ExploRepulse1")
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		local pawn = Board:GetPawn(id)		
-		if pawn:GetQueuedTarget() ~= Point(-1, -1) then
+		local pawn = Board:GetPawn(id)
+		if pawn and pawn:GetQueuedTarget() ~= Point(-1, -1) and _G[pawn:GetQueuedWeapon()] then
 			local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(pawn:GetSpace(), pawn:GetQueuedTarget())
 			for _, spaceDamage in ipairs(extract_table(fx.q_effect)) do
 				if spaceDamage.loc == p2 then 
@@ -3860,7 +3860,7 @@ function Reflect(point)
 	ret = SkillEffect()
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		local pawn = Board:GetPawn(id)		
-		if pawn:GetQueuedTarget() ~= Point(-1, -1) then
+		if pawn and pawn:GetQueuedTarget() ~= Point(-1, -1) and _G[pawn:GetQueuedWeapon()] then
 			local fx = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(pawn:GetSpace(), pawn:GetQueuedTarget())
 			for _, spaceDamage in ipairs(extract_table(fx.q_effect)) do
 				if spaceDamage.loc == point then 
