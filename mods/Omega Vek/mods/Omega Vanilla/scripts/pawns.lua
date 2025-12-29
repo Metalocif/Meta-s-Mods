@@ -292,9 +292,10 @@ function OmegaShaman2:GetDeathEffect(point)
 		if Board:GetPawn(i):GetType() == "OmegaPlasmodia2" then return SkillEffect() end
 	end
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		Board:GetPawn(i):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[i])
+		if mission.hadCorpseBeforeOmegaPlasmodia[i] then Board:GetPawn(i):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[i]) end
 	end
 	mission.hadCorpseBeforeOmegaPlasmodia = {}
+	if Board:GetPawn(point) then Board:GetPawn(point):SetCorpse(false) end
 	return SkillEffect()
 end
 

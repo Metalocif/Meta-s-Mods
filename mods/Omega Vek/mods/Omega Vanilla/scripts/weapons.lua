@@ -45,15 +45,16 @@ function OmegaBurnbugAtk2:GetSkillEffect(p1,p2)
 		damage.sSound = self.PullSound
 		ret:AddQueuedProjectile(damage,"effects/shot_grapple")
 		
-		
-		ret:AddQueuedCharge(Board:GetSimplePath(p1, target), FULL_DELAY)	
-		
-		for i = 1, distance-1 do
-			damage = SpaceDamage(p1 + DIR_VECTORS[direction]*i, self.Damage)
-			ret:AddQueuedDamage(damage)
-			ret:AddQueuedDelay(0.06)
-			ret:AddQueuedBounce(p1 + DIR_VECTORS[direction]*i, -3)
-			-- if i < distance and i > 0 then ret:AddDamage(SpaceDamage(p1 + DIR_VECTORS[direction]*i, self.Damage)) end
+		if Board:IsBlocked(target, PATH_PROJECTILE) then
+			ret:AddQueuedCharge(Board:GetSimplePath(p1, target), FULL_DELAY)	
+			
+			for i = 1, distance-1 do
+				damage = SpaceDamage(p1 + DIR_VECTORS[direction]*i, self.Damage)
+				ret:AddQueuedDamage(damage)
+				ret:AddQueuedDelay(0.06)
+				ret:AddQueuedBounce(p1 + DIR_VECTORS[direction]*i, -3)
+				-- if i < distance and i > 0 then ret:AddDamage(SpaceDamage(p1 + DIR_VECTORS[direction]*i, self.Damage)) end
+			end
 		end
 	else
 		local damage = SpaceDamage(target)
@@ -175,7 +176,7 @@ function OmegaScarabAtk2:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(i)
 		local loc = p2
 		if pawn then loc = pawn:GetSpace() end	--necessary check if you don't have three pawns in eg. tipimages
-		if loc ~= p2 then ret:AddQueuedArtillery(SpaceDamage(loc, self.Damage), self.Projectile ) end
+		if loc ~= p2 then ret:AddQueuedArtillery(SpaceDamage(loc, self.Damage), self.Projectile, NO_DELAY) end
 	end
 	if Board:IsTipImage() then
 		ret:AddQueuedArtillery(SpaceDamage(Point(2,2), self.Damage), self.Projectile, NO_DELAY)
@@ -187,8 +188,16 @@ end
 function OmegaScarabAtk2:GetTargetScore(p1,p2)
 	--Omega Scarab autofires at all mechs, so it only cares if p2 contains a building or a nonmech
 	local ret = 0
-	if Board:GetTerrain(p2) == TERRAIN_BUILDING then ret = ret + 5 end
-	if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_PLAYER and not Board:GetPawn(p2):IsMech() then ret = ret + 5 end
+	for i = 0, 2 do
+		if Board:GetPawn(i) and not Board:GetPawn(i):IsDead() then ret = ret + 5 end
+	end
+	if Board:GetTerrain(p2) == TERRAIN_BUILDING then 
+		ret = ret + 5 end
+	elseif Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_PLAYER and not Board:GetPawn(p2):IsMech() then 
+		ret = ret + 5 end
+	else
+		ret = ret + 1
+	end
     return ret
 end
 
@@ -215,13 +224,14 @@ function OmegaDiggerAtk2:GetTargetScore(p1,p2)
 	local ret = 0
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		local pawn = Board:GetPawn(curr)
+		local pawn1 = Board:GetPawn(curr)
+		local pawn2 = Board:GetPawn(curr + DIR_VECTORS[i])
 		if Board:GetTerrain(curr) == TERRAIN_BUILDING then ret = ret + 5 end
 		if pawn and pawn:GetTeam() == TEAM_PLAYER then ret = ret + 5 end
-		if pawn and pawn:GetTeam() == TEAM_ENEMY then ret = ret - 5 end
+		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:GetQueuedTarget() ~= Point(-1, -1) then ret = ret - 5 end
 		local canSpawnRock = Board:IsBlocked(curr, PATH_PROJECTILE)
-		curr = p1 + DIR_VECTORS[i] * 2
-		if Board:GetTerrain(curr) == TERRAIN_BUILDING and canSpawnRock then ret = ret + 5 end
+		if canSpawnRock and pawn2 and pawn2:GetTeam() == TEAM_ENEMY and pawn2:GetQueuedTarget() ~= Point(-1, -1) then ret = ret - 5 end
+		if (Board:GetTerrain(curr + DIR_VECTORS[i]) == TERRAIN_BUILDING or pawn2 and pawn2:GetMoveSpeed() == 0) and canSpawnRock then ret = ret + 5 end
 	end
     return ret
 end
@@ -668,6 +678,29 @@ function OmegaScorpionAtk2:GetSkillEffect(p1, p2)
 		
 	return ret
 end	
+
+function OmegaScorpionAtk2:GetTargetScore(p1,p2)
+	local ret = 0
+	local direction = GetDirection(p2 - p1)
+	local target = p1 + DIR_VECTORS[direction]
+	local target2 = Point(-1, -1)
+	if not Board:IsBlocked(target, PATH_PROJECTILE) then target2 = target + DIR_VECTORS[direction] end
+	local meleePawn = Board:GetPawn(target)
+	local rangedPawn = Board:GetPawn(target2)
+	--strive to web a pawn with a target that cannot move behind it
+	if meleePawn and meleePawn:GetTeam() == TEAM_PLAYER and 
+	(Board:IsBuilding(target2) or (rangedPawn and rangedPawn:IsMissionCritical() and rangedPawn:GetMoveSpeed() == 0))then
+		ret = 10
+	--if not, attack a pawn in melee or a building
+	elseif (meleePawn and meleePawn:GetTeam() == TEAM_PLAYER) or Board:IsBuilding(target) or Board:IsBuilding(target2) then
+		ret = 6
+	--if not, shooting at a pawn is fine
+	elseif (rangedPawn and rangedPawn:GetTeam() == TEAM_PLAYER) then
+		ret = 5
+	end
+	if meleePawn and meleePawn:GetTeam() == TEAM_PLAYER and Board:IsCracked(target) then ret = ret + 5 end
+	return ret
+end
 
 
 OmegaShamanAtk2 = ShamanAtk2:new{ 

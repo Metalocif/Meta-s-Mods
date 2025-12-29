@@ -1,3 +1,15 @@
+v1.0.5
+- Omega Scarab should now always attack, even if it has to target an empty space.
+- Omega Digger now takes into account immobile units for rock slamming purposes, and only minds attacking already queued Vek.
+
+v1.0.4
+- Omega Scorpions are now smarter. They will try to web a pawn with a building or immobile mission unit behind it.
+- Omega Gastropods can no longer grab the edge of map when dashing.
+
+v1.0.3.1
+- Omega Plasmodia should no longer cause an error on death, for realsies.
+- Omega Plasmodia no longer leave corpses.
+
 v1.0.3
 - Omega Tumblebugs now have 4 HP, down from 5.
 - Omega Tumblebugs no longer spawn a second explosive rock on fire as a queued action.
