@@ -192,9 +192,9 @@ function OmegaScarabAtk2:GetTargetScore(p1,p2)
 		if Board:GetPawn(i) and not Board:GetPawn(i):IsDead() then ret = ret + 5 end
 	end
 	if Board:GetTerrain(p2) == TERRAIN_BUILDING then 
-		ret = ret + 5 end
+		ret = ret + 5
 	elseif Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_PLAYER and not Board:GetPawn(p2):IsMech() then 
-		ret = ret + 5 end
+		ret = ret + 5
 	else
 		ret = ret + 1
 	end
