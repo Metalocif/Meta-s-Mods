@@ -1,6 +1,11 @@
 local mod = modApi:getCurrentMod()
 local options = mod_loader.currentModContent[mod.id].options
 
+--final mission phase 2 is longer?
+--don't make healthy psions if Permanent Psions is enabled
+--don't make Vek leave corpses if Permanent Psions is using the necro psions
+
+
 baseModifiers = {
 	"ForestFire", 
 	"IceIsLava", 
@@ -18,6 +23,8 @@ baseModifiers = {
 	"Mech3LowHP",
 	"NoShields",
 	"NoRepairs",
+	"ExplosiveBuildings",
+	"LongerFinalPhase",
 }
 baseModifiersText = {
 	"All forests are on fire.", 
@@ -36,6 +43,8 @@ baseModifiersText = {
 	"Your third mech starts with 1 HP.",
 	"Mechs cannot be shielded.",
 	"Mechs do not repair between missions.",
+	"Destroyed buildings explode.",
+	"The final battle is 1 turn longer.",
 }
 baseModifiersValidation = {
 	function() return not GAME.MetaModifiers.ForestFire end,		--could check whether Archive and Pinnacle were done? But Meridia/Nautilus... Look at tilesets?
@@ -44,7 +53,7 @@ baseModifiersValidation = {
 	function() return not GAME.MetaModifiers.Tyrant end,
 	function() return not GAME.MetaModifiers.WaterIsChasms end,
 	function() return not GAME.MetaModifiers.AcidHurts end,
-	function() return not GAME.MetaModifiers.HealthyPsions end,
+	function() return not (GAME.MetaModifiers.HealthyPsions or mod_loader.currentModContent["Meta_PermanentPsions"] ~= nil) end,
 	function() return not GAME.MetaModifiers.VekLeaveCorpses end,
 	function() return not (GAME.MetaModifiers.ShorterMissions or GAME.MetaModifiers.LongerMissions) end,
 	function() return not (GAME.MetaModifiers.ShorterMissions or GAME.MetaModifiers.LongerMissions) end,
@@ -54,6 +63,8 @@ baseModifiersValidation = {
 	function() return not (GAME.MetaModifiers.NoRepairs or GAME.MetaModifiers.Mech3LowHP) end,
 	function() return not GAME.MetaModifiers.NoShields end,
 	function() return not (GAME.MetaModifiers.Mech1LowHP or GAME.MetaModifiers.Mech2LowHP or GAME.MetaModifiers.Mech3LowHP or GAME.MetaModifiers.NoRepairs) end,
+	function() return not (GAME.MetaModifiers.ExplosiveBuildings) end,
+	function() return not GAME.MetaModifiers.LongerFinalPhase end,
 }
 
 local function tablelength(T)
@@ -230,6 +241,28 @@ local function ConditionHealthyPsions(mission, pawn)
 	end
 end
 
+local function ConditionExplosiveBuildings(mission, buildingData)
+	if not GAME.MetaModifiers.ExplosiveBuildings then return end
+	if not (Game:GetTurnCount() > 0) then return end
+	--some missions "destroy" a building to spawn unique buildings
+	Board:AddAnimation(buildingData.loc, "explo_fire1", ANIM_NO_DELAY)
+	for dir = DIR_START, DIR_END do
+		local exploDamage = SpaceDamage(buildingData.loc + DIR_VECTORS[dir], 1)
+		exploDamage.sAnimation = "exploout2_"..dir
+		Board:DamageSpace(exploDamage)
+	end
+end
+
+local function ConditionLongerFinalPhase(prevMission, nextMission)
+	if not GAME.MetaModifiers.LongerFinalPhase then return end
+	modApi:conditionalHook(function()
+		return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+	end, 
+	function()
+		GetCurrentMission().TurnLimit = GetCurrentMission().TurnLimit + 1
+	end)
+end
+
 local function EVENT_onModsLoaded()
 	modApi:addPostIslandSelectionHook(ChooseCondition)
 	
@@ -247,7 +280,9 @@ local function EVENT_onModsLoaded()
 	modApi:addMissionStartHook(ConditionNoRepairsRetrieveHP)
 	modApi:addMissionEndHook(ConditionNoRepairsStoreHP)
 	modapiext:addPawnTrackedHook(ConditionHealthyPsions)
+	modapiext:addBuildingDestroyedHook(ConditionExplosiveBuildings)
 	-- modapiext:addPawnTrackedHook(ConditionVekLeaveCorpses)
+	modApi:addMissionNextPhaseCreatedHook(ConditionLongerFinalPhase)
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
