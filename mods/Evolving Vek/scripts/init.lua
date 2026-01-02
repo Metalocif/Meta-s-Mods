@@ -49,6 +49,14 @@ function mod:metadata()
 		}
 	)
 	modApi:addGenerationOption(
+		"ExtraPrefixesToPool",
+		"Add prefixes to pool each mission",
+		"Choose how many prefixes to add to the pool each mission, increasing prefix variety and game difficulty (default: 0).",
+		{
+			values = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+		}
+	)
+	modApi:addGenerationOption(
 		"PrefixDeterministic",
 		"Prefix deterministically",
 		"Check to add a given prefix to Vek that escape in some situations deterministically. For instance, a Vek that survives the mission on fire will always become Fireproof. With this off, the prefix would be random, but suitable for the Vek type (default: true).",
@@ -292,6 +300,18 @@ function mod:metadata()
 		"Enable_Reactive",
 		"Enable the Reactive prefix",
 		"Check to allow Vek to be given the Reactive prefix, making them turn A.C.I.D. into smoke on adjacent tiles (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Swarming",
+		"Enable the Swarming prefix",
+		"Check to allow Vek to be given the Swarming prefix, making them not count against the spawn limit (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Nimble",
+		"Enable the Nimble prefix",
+		"Check to allow Vek to be given the Nimble prefix, making them dodge the first attack targeting them (default: true).",
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(

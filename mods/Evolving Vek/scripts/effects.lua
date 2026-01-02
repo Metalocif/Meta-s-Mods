@@ -836,6 +836,11 @@ function SpawnShocked()
 	return 2	--used in combination with a SE-modifying weapon, so we want to use it instead of the pawn's normal weapon
 end
 
+function SpawnDodging()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyDodge(Pawn:GetId(), 1, 2, "Leap", true) end
+	return 1
+end
+
 
 -------------------------
 --Extra Weapon prefixes--

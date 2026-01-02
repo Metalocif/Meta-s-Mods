@@ -55,6 +55,7 @@ function IsPrefixValidForVek(prefix, vekType)
 	if prefix == "Blessed" and (_G[vekType].VoidShockImmune or not _G[vekType].SkillList or _G[vekType].Tier == TIER_BOSS) then return false end
 	if prefix == "Reactive" and _G[vekType].Health == 1 then return false end
 	if prefix == "Swarming" and (_G[vekType].Minor or not _G[vekType].SpawnLimit) then return false end
+	if prefix == "Nimble" and _G[vekType].Armor then return false end
 	return true
 end
 
@@ -104,6 +105,7 @@ function CreateEvolvedVek(prefix, vekType)
 	if prefix == "Blessed" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnGlory,} end
 	if prefix == "Reactive" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnReactive,} end
 	if prefix == "Swarming" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SpawnLimit = false,} end
+	if prefix == "Nimble" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, GetWeapon = SpawnDodging,} end
 	-- if prefix == "Grappling" then _G[prefix..vekType] = _G[vekType]:new{Name = prefix.." "..name, Prefixed = true, Portrait = portrait, SkillList = { _G[vekType].SkillList[1], "Meta_GrapplingWeapon" }, Weapon = 2} end
 	return false
 end
@@ -143,6 +145,7 @@ modApi:runLater(function()
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["PrefixStartCount"] and options["PrefixStartCount"] == 0 then return false end
 	local prefixesApplied = 0
+	local prefixesToGenerate = options["ExtraPrefixesToPool"]
 	for _, tile in ipairs(Board) do
 		local pawn = Board:GetPawn(tile)
 		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:GetTeam() ~= TEAM_BOTS then
@@ -152,7 +155,6 @@ modApi:runLater(function()
 				if GAME.EvolvedVeks[i].Type == pawn:GetType() and GAME.EvolvedVeks[i].Remaining > 0 and _G[GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type].Name ~= "Missing Mod" then
 					Board:RemovePawn(tile)
 					Board:AddPawn(GAME.EvolvedVeks[i].Prefix..pawn:GetType(), tile)
-					Board:Ping(tile, COLOR_BLACK)
 					if wasFrozen then
 						modApi:runLater(function() Board:GetPawn(tile):SetFrozen(true) end)
 					else
@@ -161,6 +163,23 @@ modApi:runLater(function()
 					if not IsTestMechScenario() then GAME.EvolvedVeks[i].Remaining = GAME.EvolvedVeks[i].Remaining - 1 end
 					prefixesApplied = prefixesApplied + 1
 					if options["PrefixStartCount"] and options["PrefixStartCount"].value >= prefixesApplied then return true end
+				elseif prefixesToGenerate > 0 then
+					prefixesToGenerate = prefixesToGenerate - 1
+					local i = 0
+					local prefix
+					repeat
+						prefix = GeneratePrefix(pawn, i > 0)	--this'll make the prefix random past first try in case eg. Fireproof causes Missing Mod...
+						CreateEvolvedVek(prefix, pawn:GetType())
+						if _G[prefix..pawn:GetType()].Name == "Missing Mod" then LOG(prefix.." "..pawn:GetType().." was a Missing Mod??? Ping @Metalocif on the Discord with a list of mods and the Vek's type.") end
+						i = i + 1
+					until _G[prefix..pawn:GetType()].Name ~= "Missing Mod" or i > 100
+					if GAME.EvolvedVeks == nil then GAME.EvolvedVeks = {} end
+					local found = false
+					for i = 1, #GAME.EvolvedVeks do
+						if GAME.EvolvedVeks[i].Type == pawn:GetType() and GAME.EvolvedVeks[i].Prefix == prefix then GAME.EvolvedVeks[i].Remaining = GAME.EvolvedVeks[i].Remaining + 1 found = true break end
+					end
+					if not found then GAME.EvolvedVeks[#GAME.EvolvedVeks+1] = {Type = pawn:GetType(), Prefix = prefix, Remaining = 1} end
+					LOG("Added an extra "..prefix.." "..pawn:GetType()..", we stored "..tostring(#GAME.EvolvedVeks).." different Vek.")
 				end
 			end
 		end
@@ -187,7 +206,6 @@ local function HOOK_VekSpawnAdded(mission, spawnData)
 				-- if mission:GetSpawnPointData(point) == nil then 
 					-- addSpawnData(mission, point, GAME.EvolvedVeks[i].Prefix..GAME.EvolvedVeks[i].Type, pawn:GetId())
 				-- end
-				Board:Ping(point, COLOR_BLACK)
 				-- if Board:GetTerrain(point) ~= terrain then Board:SetTerrain(point, terrain) end
 			end)
 			local fx = SkillEffect()
