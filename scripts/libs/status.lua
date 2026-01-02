@@ -29,6 +29,9 @@ ANIMS.StatusChill = Animation:new{ Image = "libs/status/chill.png", PosX = -10, 
 ANIMS.StatusConfusion = Animation:new{ Image = "libs/status/confusion.png", PosX = 0, PosY = 0, NumFrames = 2, Time = 0.5, Loop = true}
 ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusDry = Animation:new{ Image = "libs/status/dry.png", PosX = 0, PosY = 0, NumFrames = 3, Time = 0.3, Loop = true}
+ANIMS.StatusDodge1 = Animation:new{ Image = "libs/status/dodge1.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusDodge2 = Animation:new{ Image = "libs/status/dodge2.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusDodge3 = Animation:new{ Image = "libs/status/dodge3.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusDoomed = Animation:new{ Image = "combat/icons/icon_tentacle.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusGunk = Animation:new{ Image = "libs/status/gunk.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
@@ -240,6 +243,44 @@ function Status.ApplyConfusion(id, turns)
 	turns = turns or 1
 	mission.ConfusionTable[id] = turns
 	CustomAnim:add(id, "StatusConfusion")
+end
+
+
+function Status.ApplyDodge(id, amount, distance, movementType, smart)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	if Status.IsImmuneTo(pawn, "Dodge") then return end
+	amount = math.min(amount or 1, 3)
+	distance = distance or 1
+	movementType = movementType or "Walk"
+	if movementType ~= "Walk" and movementType ~= "Leap" and movementType ~= "Burrow" and movementType ~= "Teleport" then movementType = "Walk" end
+	--smart means "try to reposition in a non-suicidal way"
+	if mission.DodgeTable[id] then
+		CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id][amount])
+		mission.DodgeTable[id][amount] = math.min(mission.DodgeTable[id][amount] + amount, 3)
+		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id][amount])
+	else	
+		mission.DodgeTable[id] = {amount = amount, distance = distance, movementType = movementType, smart = smart}
+		CustomAnim:add(id, "StatusDodge"..amount)
+	end
+end
+
+function Status.LowerDodge(id)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	if not mission.DodgeTable[id] then return end
+	if not mission.DodgeTable[id][amount] then return end
+	CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id][amount])
+	mission.DodgeTable[id][amount] = mission.DodgeTable[id][amount] - 1
+	if mission.DodgeTable[id][amount] <= 0 then 
+		mission.DodgeTable[id] = nil 
+	else
+		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id][amount])
+	end
 end
 
 function Status.ApplyDoomed(id, source, amount)
@@ -637,7 +678,7 @@ end
 
 function Status.List(pawn)
 	if not pawn then
-		return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
+		return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Dodge","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
 	else
 		local result = {}
 		local mission = GetCurrentMission()
@@ -660,68 +701,82 @@ function Status.Count(id)
 	return count
 end
 
-function Status.HealFromGunk(id, overheal)
+function Status.HealFromGunk(id, overheal, alwaysOverheal)
 	local blob = Board:GetPawn(id)
 	if not blob then return end
 	if overheal then
-		Status.Overheal(id, 1)
+		Status.Overheal(id, 1, alwaysOverheal)
 	else
 		Board:DamageSpace(SpaceDamage(blob:GetSpace(), -1))
 	end
 	if Status.GetStatus(id, "Gunk") then Status.RemoveStatus(id, "Gunk") end
 end
 
-function Status.Overheal(id, amount)
-	local pawn = Board:GetPawn(id)
+local function ReapplyOverheal()
 	local mission = GetCurrentMission()
-	if not pawn or not mission then return end
-	
-	mission.StatusOverhealTable = mission.StatusOverhealTable or {}		--create empty table if it does not exist
-	mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] or 0
-	if amount + pawn:GetHealth() <= pawn:GetMaxHealth() then			--if we are not overhealing, just heal
-		Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
-	else
-		if pawn:IsDamaged() then										--if we are healing, heal and reduce amount
-			Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -(pawn:GetMaxHealth() - pawn:GetHealth())))
-			amount = amount - (pawn:GetMaxHealth() - pawn:GetHealth())
+	if not mission then return end
+	mission.StatusOverhealTable = mission.StatusOverhealTable or {}
+	for pawnId, overhealAmount in pairs(mission.StatusOverhealTable) do
+		local pawn = Board:GetPawn(pawnId)
+		if pawn then
+			local origMaxHealth = pawn:GetMaxHealth()
+			local newMaxHealth = origMaxHealth + overhealAmount
+			modApi:runLater(function() pawn:SetMaxHealth(newMaxHealth) end)
 		end
-		
-		mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] + amount
-		pawn:SetMaxHealth(pawn:GetMaxHealth() + amount)
-		pawn:SetHealth(pawn:GetMaxHealth() + amount)
 	end
 end
 
-local function ReapplyOverheal()
-	modApi:conditionalHook(function()			--we need the conditional hook for some reason
-		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
-	end, 
-	function()
-		local mission = GetCurrentMission()
-		mission.StatusOverhealTable = mission.StatusOverhealTable or {}
-		for id, amount in ipairs(mission.StatusOverhealTable) do
-			if Board:GetPawn(id) then
-				Board:GetPawn(id):SetMaxHealth(Board:GetPawn(id):GetMaxHealth() + mission.StatusOverhealTable[id])
-			end
+local function ResetOverheal()
+	local mission = GetCurrentMission()
+	if not mission then return end
+	mission.StatusOverhealTable = mission.StatusOverhealTable or {}
+	for pawnId, overhealAmount in pairs(mission.StatusOverhealTable) do
+		local pawn = Board:GetPawn(pawnId)
+		if pawn then
+			pawn:SetMaxBaseHealth(pawn:GetMaxBaseHealth() - overhealAmount)
 		end
-	end)
+	end
 end
 
+function Status.Overheal(id, amount, alwaysOverheal)
+	local pawn = Board:GetPawn(id)
+	local mission = GetCurrentMission()
+	if not pawn or not mission then return end
+	mission.StatusOverhealTable = mission.StatusOverhealTable or {}		--create empty table if it does not exist
+	mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] or 0
+	if alwaysOverheal or amount + pawn:GetHealth() > pawn:GetMaxBaseHealth() then			--if we are not overhealing, just heal
+		if pawn:IsDamaged() then										--if we are healing, heal and reduce amount
+			if not alwaysOverheal then amount = amount - (pawn:GetMaxBaseHealth() - pawn:GetHealth()) end
+			Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
+		end
+		mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] + amount
+		
+		pawn:SetMaxBaseHealth(pawn:GetMaxBaseHealth() + amount)
+		pawn:SetMaxHealth(pawn:GetMaxHealth() + amount)
+		local ret = SkillEffect()
+		ret:AddDamage(SpaceDamage(pawn:GetSpace(),-amount))
+		Board:AddEffect(ret)
+	else
+		Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
+	end
+	
+end
+
+
+
 TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
-Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = ""}
-Location["libs/status/gunk.png"] = Point(-16,7)
+
+local gunk_damage = SpaceDamage(0)
+gunk_damage.sAnimation = "Djinn_explo_gunkpuddle"
+
+Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = gunk_damage, Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
+Location["libs/status/gunk.png"] = Point(-22,6)
+Location["libs/status/gunkused.png"] = Point(-22,6)
 
 BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
     if removed_item == "Meta_BlobGunk" then
         local pawn = Board:GetPawn(loc)
-        if pawn then
-			Status.ApplyGunk(pawn:GetId())
-			if pawn:GetTeam() == TEAM_PLAYER and Status.GetStatus(pawn:GetId(), "Gunk") then 
-			--in case of immunity/instant gunk consumption
-				pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
-				pawn:ClearUndoMove()
-			end
-        end
+        if pawn then Status.ApplyGunk(pawn:GetId()) end
     end
 end)
 
@@ -834,6 +889,7 @@ local function EVENT_onModsLoaded()
 				end
 				statusDesc = statusDesc.." ("..mission.ConfusionTable[id].." turns left)."
 			end
+			if status == "Dodge" then statusDesc = "Dodges incoming instant attacks by moving to a nearby tile. Vek queued attacks are unaffected." end
 			if status == "Doomed" then 
 				if mission.DoomedTable[id].amount > 0 then statusDesc = "Takes "..mission.DoomedTable[id].amount.." damage every turn. " end
 				statusDesc = statusDesc.."On death, the pawn's tile turns into lava. "
@@ -900,6 +956,7 @@ local function EVENT_onModsLoaded()
 		elseif mission.ToxinTable[id] then		--only get cured if healing was not prevented
 			Status.RemoveStatus(id, "Toxin")
 		end
+		-- modApi:runLater(function() ReapplyOverheal() end)
 	end)
 	modapiext:addPawnIsFireHook(function(mission, pawn, isFire)			--powder/dry/wet, remove chill/hemorrhage/roots/leechseed
 		if not (mission and pawn and isFire) then return end
@@ -990,6 +1047,7 @@ local function EVENT_onModsLoaded()
 			damage.sSound = "/props/tentacle"
 			Board:DamageSpace(damage)
 		end
+		mission.DodgeTable[id] = nil
 		for doomedID, doomedInformation in pairs(mission.DoomedTable) do
 			if id == doomedInformation.source then Status.RemoveStatus(doomedID, "Doomed") end
 		end
@@ -1005,7 +1063,14 @@ local function EVENT_onModsLoaded()
 	modApi:addMissionStartHook(ReaddInsanity)							
 	modApi:addMissionNextPhaseCreatedHook(PrepareTables)				--also do it on next phase otherwise it won't work
 	
-	modApi:addMissionNextPhaseCreatedHook(ReapplyOverheal)				--Health boosts are lost on game refresh
+	modApi:addMissionNextPhaseCreatedHook(function()
+		modApi:conditionalHook(function()								--we need the conditional hook for some reason
+			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil
+		end, 
+		function()
+			ReapplyOverheal()
+		end)
+	end)				--Health boosts are lost on game refresh
 	modApi:addPostLoadGameHook(ReapplyOverheal)		
 	modapiext:addResetTurnHook(ReapplyOverheal)		
 	
@@ -1013,6 +1078,7 @@ local function EVENT_onModsLoaded()
 	
 	modApi:addMissionEndHook(WakeUp)									--remove sleep status because unpowered carries over
 	modApi:addMissionEndHook(StoreInsanity)	
+	modApi:addMissionEndHook(ResetOverheal)	
 	
 	modApi:addPreEnvironmentHook(function(mission)						--this is for status that triggers before Vek actions
 		for _, p in ipairs(Board) do
@@ -1215,6 +1281,163 @@ local function EVENT_onModsLoaded()
 			end
 		end
 	end)
+	local calculatingDodge = false
+	
+	local function DoDodge(mission, pawn, skillEffect)
+		if not pawn or not mission then return end
+		if calculatingDodge then return end
+		local pawnsWhoDodged = {}	--we make sure one pawn cannot jump into another instance of damage from the same skill effect and dodge it again
+		local dodgersCount = 0
+		for id, infos in pairs(mission.DodgeTable) do	--quick check early to avoid running stuff pointlessly
+			if Board:GetPawn(id) then dodgersCount = dodgersCount + 1 end
+		end
+		if dodgersCount == 0 then return end
+		
+		local hash = function(point) return point.x * 10 + point.y end
+		local affectedTiles = {}	--store tiles the skillEffect will hit so we don't dodge into another one
+		
+		for _, fx in ipairs(extract_table(skillEffect.effect)) do
+			affectedTiles[hash(fx.loc)] = fx.iDamage
+		end
+		
+		for _, fx in ipairs(extract_table(skillEffect.effect)) do
+			local target = Board:GetPawn(fx.loc)
+			
+			local dodgeInfo = (target ~= nil) and Status.GetStatus(target:GetId(), "Dodge") or nil
+			if dodgeInfo and not pawnsWhoDodged[target:GetId()] then	--don't dodge the same attack twice either
+				local targetWasQueued = target:GetQueuedTarget() ~= Point(-1, -1) and target:GetTeam() == TEAM_ENEMY	--used to requeue attack for Vek
+				
+				local PawnBackup = Pawn; Pawn = pawn
+				local weapon = pawn:GetQueuedWeapon() or pawn:GetWeapons()[1] or _G[pawn:GetType()].SkillList[1]
+	
+				local actions = {}
+				local pathProfile = pawn:GetPathProf()
+				if dodgeInfo.movementType ~= "Walk" then pathProfile = PATH_FLYER end
+				local reachable = extract_table(Board:GetReachable(fx.loc, dodgeInfo.distance, pathProfile))
+				
+				-- create a list of all possible moves.
+				calculatingDodge = true
+				for _, loc in ipairs(reachable) do
+					-- move score
+					local moveScore = 0
+					if dodgeInfo.smart then moveScore = ScorePositioning(loc, pawn) end
+					if affectedTiles[hash(loc)] ~= DAMAGE_ZERO then moveScore = -100 end	--don't dodge into more damage
+					if Board:IsBlocked(loc, pawn:GetPathProf()) then moveScore = -100 end	--don't dodge into a tile you can't stand in
+					if targetWasQueued then
+						targets = extract_table(weapon:GetTargetArea(loc))
+						for _, target in ipairs(targets) do
+							if Board:IsValid(target) then
+								-- attack score
+								local attackScore = 0
+								if dodgeInfo.smart and targetWasQueued then attackScore = weapon:GetTargetScore(loc, target) end
+								
+								table.insert(
+									actions,
+									{
+										loc = loc,
+										target = target,
+										score = moveScore + attackScore
+									}
+								)
+							end
+						end
+					else
+						table.insert(
+							actions,
+							{
+								loc = loc,
+								target = nil,
+								score = moveScore
+							}
+						)
+					end
+				end
+				calculatingDodge = false
+				Pawn = PawnBackup
+				
+				if #actions == 0 then return end
+				
+				-- sort scores from high to low.
+				table.sort(actions, function(a,b) return a.score > b.score end)
+				
+				-- count #indices with same top score.
+				local i = 1
+				while(actions[i+1] and actions[i+1].score == actions[1].score) do
+					i = i + 1
+				end
+				
+				-- pick one top score at random.
+				math.randomseed(Game:GetTurnCount() + target:GetId() + dodgeInfo.amount)
+				local bestAction = actions[math.random(1, i)]
+				
+				--Save old effect
+				local oldEffect = skillEffect.effect or DamageList()
+				local oldQEffect = skillEffect.q_effect or DamageList()
+				local oldEffectCopy = DamageList()
+				local oldQEffectCopy = DamageList()
+				--Make a copy
+				if oldEffect then 
+					for i = 1, oldEffect:size() do
+						local oldDamage = oldEffect:index(i);
+						oldEffectCopy:push_back(oldDamage)
+					end
+				end
+				if oldQEffect then 
+					for i = 1, oldQEffect:size() do
+						local oldDamage = oldQEffect:index(i);
+						oldQEffectCopy:push_back(oldDamage)
+					end
+				end
+				--Reset
+				skillEffect.effect = DamageList()
+				skillEffect.q_effect = DamageList()
+				--Insert
+				
+				if bestAction then 
+					-- move away from danger
+					skillEffect:AddScript(string.format("Status.LowerDodge(%s)", target:GetId()))
+					if dodgeInfo.movementType == "Teleport" then
+						skillEffect:AddTeleport(fx.loc, bestAction.loc, NO_DELAY)
+					elseif dodgeInfo.movementType == "Leap" then
+						local leapMovement = PointList()
+						leapMovement:push_back(fx.loc)
+						leapMovement:push_back(bestAction.loc)
+						skillEffect:AddLeap(leapMovement, NO_DELAY)
+					elseif dodgeInfo.movementType == "Burrow" then
+						skillEffect:AddBurrow(Board:GetPath(fx.loc, bestAction.loc, PATH_FLYER), NO_DELAY)
+					else
+						skillEffect:AddMove(Board:GetPath(fx.loc, bestAction.loc, target:GetPathType()), NO_DELAY)
+					end
+				end
+				--Add in old effects
+				for i = 1, oldEffectCopy:size() do
+					local oldDamage = oldEffectCopy:index(i);
+					skillEffect.effect:push_back(oldDamage)
+				end
+				for i = 1, oldQEffectCopy:size() do
+					local oldDamage = oldQEffectCopy:index(i);
+					skillEffect.q_effect:push_back(oldDamage)
+				end
+				
+				if bestAction and targetWasQueued then
+					-- fire the pawn's weapon in the chosen direction
+					skillEffect:AddScript(string.format([[
+						modApi:runLater(function()
+							local pawn = Board:GetPawn(%s)
+							if pawn then pawn:FireWeapon(%s, 1) end
+						end)
+					]], target:GetId(), bestAction.target:GetString()))
+				end
+				pawnsWhoDodged[target:GetId()] = true
+			end
+		end
+	end
+	modapiext:addSkillBuildHook(function(mission, pawn, weaponId, p1, p2, skillEffect)
+		DoDodge(mission, pawn, skillEffect)
+	end)
+	modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
+		DoDodge(mission, pawn, skillEffect)
+	end)
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
@@ -1302,4 +1525,4 @@ for k, v in pairs(Personality) do
 	end
 end
 StatusLibLoaded = true
-return true
+return true	
