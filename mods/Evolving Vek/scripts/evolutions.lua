@@ -41,7 +41,7 @@ function IsPrefixValidForVek(prefix, vekType)
 	if prefix == "CopyingMelee" and (_G[vekType].Ranged == 1 or not HasOneWeapon(vekType) or _G[vekType].Tier == TIER_BOSS) then return false end
 	if prefix == "CopyingRanged" and (_G[vekType].Ranged == 0 or not HasOneWeapon(vekType) or _G[vekType].Tier == TIER_BOSS) then return false end
 	if prefix == "Tyrannical" and not string.find(_G[vekType].Name, "Psion") then return false end
-	if prefix == "Mirroring" and (not HasOneWeapon(vekType) or SEisMirror(_G[vekType].SkillList[1])) then return false end
+	if prefix == "Mirroring" and (not HasOneWeapon(vekType) or SEIsMirror(_G[vekType].SkillList[1])) then return false end
 	if prefix == "Pushing" and (not HasOneWeapon(vekType) or SEPushes(_G[vekType].SkillList[1]) or SEIsMirror(_G[vekType].SkillList[1])) then return false end
 	if prefix == "Groundbreaking" and (not HasOneWeapon(vekType) or SECracks(_G[vekType].SkillList[1])) then return false end
 	if prefix == "Venomous" and (not HasOneWeapon(vekType) or SEIsArtillery(_G[vekType].SkillList[1])) then return false end
