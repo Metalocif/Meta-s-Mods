@@ -145,7 +145,7 @@ modApi:runLater(function()
 	local options = mod_loader.currentModContent[mod.id].options
 	if options["PrefixStartCount"] and options["PrefixStartCount"] == 0 then return false end
 	local prefixesApplied = 0
-	local prefixesToGenerate = options["ExtraPrefixesToPool"]
+	local prefixesToGenerate = options["ExtraPrefixesToPool"].value
 	for _, tile in ipairs(Board) do
 		local pawn = Board:GetPawn(tile)
 		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:GetTeam() ~= TEAM_BOTS then
