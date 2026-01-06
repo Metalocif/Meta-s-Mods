@@ -289,8 +289,9 @@ AddPawn("OmegaShaman2")
 function OmegaShaman2:GetDeathEffect(point)
 	local mission = GetCurrentMission()
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		if Board:GetPawn(i):GetType() == "OmegaPlasmodia2" then return SkillEffect() end
+		if Board:GetPawn(i):GetType() == "OmegaPlasmodia2" and not Board:GetPawn(i):IsDead() then return SkillEffect() end
 	end
+	LOG("Plasmodia dead; resetting corpses.")
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
 		if mission.hadCorpseBeforeOmegaPlasmodia[i] then Board:GetPawn(i):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[i]) end
 	end

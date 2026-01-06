@@ -139,11 +139,11 @@ function this:load()
 		TryClonePawn(m, pawn)
 	end)
 
-	modApiExt:addResetTurnHook(function()
+	-- modApiExt:addResetTurnHook(function()
 		-- board state is of before reset,
 		-- so wait until it updates.
-		modApi:runLater(TryClonePawns)
-	end)
+		-- modApi:runLater(TryClonePawns)
+	-- end)
 
 	modApiExt:addGameLoadedHook(function(mission)
 		if mission then

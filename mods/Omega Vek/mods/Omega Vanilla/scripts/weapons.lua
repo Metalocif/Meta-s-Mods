@@ -117,10 +117,9 @@ function OmegaMosquitoAtk2:GetSkillEffect(p1, p2)
 	ret:AddQueuedDamage(clearSmoke)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		if curr ~= p2 then
-			clearSmoke.loc = curr
-			ret:AddQueuedDamage(clearSmoke)
-		end
+		local clearSmoke2 = SpaceDamage(curr)
+		clearSmoke2.iSmoke = -1
+		if curr ~= p2 then ret:AddQueuedDamage(clearSmoke2) end
 	end
 	ret:AddQueuedMelee(p1, damage)
 	
@@ -364,18 +363,24 @@ end
 function OmegaCentipedeAtk2:GetTargetScore(p1,p2)
 	--Omega Centipede eats acid, so it cares about using this attack adjacent to acid
 	local ret = 1
+	local missingHealth = Board:GetPawn(p1):GetMaxHealth() - Board:GetPawn(p1):GetHealth()
+	if Status.GetStatus(Board:GetPawn(p1):GetId(), "Hemorrhage") then missingHealth = 0 end
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if Board:GetTerrain(curr) == TERRAIN_ACID and Board:GetPawn(p1):IsDamaged() then ret = ret + 2 end	--healing 3 > hitting one thing?
+		if Board:IsAcid(curr) and missingHealth > 0 then 
+			ret = ret + 2 
+			missingHealth = missingHealth - 1
+		end	--healing 3 > hitting one thing?
 		if Board:GetTerrain(curr) == TERRAIN_BUILDING then ret = ret + 5 end
 		if pawn and pawn:GetTeam() == TEAM_PLAYER then ret = ret + 5 end
-		if pawn and pawn:GetTeam() == TEAM_ENEMY then
-			if pawn:IsAcid() and not pawn:IsQueued() then 
+		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:IsAcid() then
+			if pawn:GetQueuedTarget() == Point(-1, -1) then 
 				ret = ret + 2	--slurps acid from ally but won't hit it
 			else
-				ret = ret - 5
+				ret = ret - 5	--slurps acid from ally and will hit it
 			end
+			missingHealth = missingHealth - 1
 		end
 	end
     return ret
@@ -383,22 +388,23 @@ end
 
 function OmegaCentipedeAtk2:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local acidCount = 0
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
-		if Board:IsAcid(curr) then
-			ret:AddScript(string.format("Board:SetAcid(%s, false)", curr:GetString()))
-			ret:AddDamage(SpaceDamage(p1, -1))
-		elseif pawn and pawn:IsAcid() then
-			ret:AddScript(string.format("Board:GetPawn(%s):SetAcid(false)", pawn:GetId()))
-			ret:AddDamage(SpaceDamage(p1, -1))
+		local cleanupDamage = SpaceDamage(curr)
+		cleanupDamage.iAcid = -1
+		if Board:IsAcid(curr) or (pawn and pawn:IsAcid()) then
+			ret:AddDamage(cleanupDamage)
+			acidCount = acidCount + 1
 		end
 		local damage = SpaceDamage(curr, 2)
 		damage.iAcid = 1
 		ret:AddQueuedDamage(damage)
 	end
-	local applyAcid = SpaceDamage(p1, 0)
+	local applyAcid = SpaceDamage(p1, -acidCount)
 	applyAcid.iAcid = 1
+	applyDamage.sAnimation = "Splash_acid"
 	ret:AddDamage(applyAcid)
 	return ret
 end
@@ -712,7 +718,6 @@ OmegaShamanAtk2 = ShamanAtk2:new{
 	ImpactSound = "/enemy/shaman_2/attack_impact",
 	LaunchSound = "/enemy/shaman_2/attack_launch",
 	Explosion = "",
-	IsDeathEffect = true,	--used to reset the corpsification applied to all Vek
 	TipImage = {
 		CustomPawn = "OmegaShaman2",
 		Unit = Point(3,3),
@@ -759,8 +764,11 @@ function OmegaShamanAtk2:GetSkillEffect(p1, p2)
 	end
 	
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		if Board:GetPawn(i) and not Board:GetPawn(i):IsMinor() then
-			if mission.hadCorpseBeforeOmegaPlasmodia[i] == nil then mission.hadCorpseBeforeOmegaPlasmodia[i] = Board:GetPawn(i):IsCorpse() end
+		if Board:GetPawn(i) and not Board:GetPawn(i):IsMinor() and not Board:GetPawn(i):GetType() == "OmegaShaman2" then
+			if mission.hadCorpseBeforeOmegaPlasmodia[i] == nil then 
+				mission.hadCorpseBeforeOmegaPlasmodia[i] = Board:GetPawn(i):IsCorpse() 
+				LOG("storing corpse for "..Board:GetPawn(i):GetMechName())
+			end
 			Board:GetPawn(i):SetCorpse(true)
 		end
 	end
@@ -934,7 +942,7 @@ function OmegaSpiderAtk2:GetSkillEffect(p1, p2)
 	ret:AddQueuedMelee(p1, damage)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
-		if curr ~= p2 then
+		if curr ~= p2 and not Board:IsBlocked(curr, PATH_GROUND) then
 			local itemSpawn = SpaceDamage(curr)
 			itemSpawn.sItem = "OmegaVek_WebItem"
 			ret:AddDamage(itemSpawn)
@@ -943,7 +951,7 @@ function OmegaSpiderAtk2:GetSkillEffect(p1, p2)
 	return ret
 end	
 
-merge_table(TILE_TOOLTIPS, { OmegaVek_Web_Text = {"Omega Spider Web", "Slows down units that move into it, and triggers attacks of opportunity from adjacent spiders and spiderlings."} } )
+merge_table(TILE_TOOLTIPS, { OmegaVek_Web_Text = {"Omega Spider Web", "Triggers attacks of opportunity from adjacent spiders and spiderlings."} } )
 
 local webdamage = SpaceDamage(0)
 webdamage.sImageMark  = "combat/icons/noflyingicon.png"
@@ -956,12 +964,12 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
         local pawn = Board:GetPawn(loc)
         if pawn then
 			local damage = SpaceDamage(loc)
-			damage.sScript=string.format("Board:GetPawn(%s):SetMoveSpeed(%s)",Board:GetPawn(loc):GetId(), Board:GetPawn(loc):GetMoveSpeed() - 1)
+			-- damage.sScript=string.format("Board:GetPawn(%s):SetMoveSpeed(%s)",Board:GetPawn(loc):GetId(), Board:GetPawn(loc):GetMoveSpeed() - 1)
 			Board:DamageSpace(damage)
 			for i = DIR_START, DIR_END do
 				local curr = loc + DIR_VECTORS[i]
 				local hunter = Board:GetPawn(curr)
-				if hunter and string.find(hunter:GetType(), "Spider") then
+				if hunter and string.find(hunter:GetType(), "Spider") and hunter:GetTeam() ~= pawn:GetTeam() then
 					ret:AddMelee(curr, SpaceDamage(loc, 1))
 				end
 			end

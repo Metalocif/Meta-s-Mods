@@ -101,6 +101,7 @@ Omegalmn_Roach2 = Pawn:new{
 	Ranged = 1,
 	Armor = true,
 	Burrows = true,
+	Pushable = false,
 	Image = "Omegaroach",
 	ImageOffset = 1,
 	SkillList = { "OmegaRoachAtk2" },

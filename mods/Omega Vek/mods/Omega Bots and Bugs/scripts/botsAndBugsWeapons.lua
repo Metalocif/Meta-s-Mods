@@ -96,14 +96,28 @@ function OmegaFloaterAtk2:GetSkillEffect(p1, p2)
 end
 
 
-OmegaRoachAtk2 = SelfTarget:new{
+OmegaRoachAtk2 = Skill:new{
 	Name = "Deadly Spines",
 	Description = "Fires spines around itself.",
 	Icon = "weapons/lmn_roach.png",
 	Class = "Enemy",
 	PathSize = 1,
 	Damage = 2,
+	TipImage = {
+		CustomPawn = "OmegaRoach2",
+		Unit = Point(2,3),
+		Enemy1 = Point(2,2),
+		Enemy2 = Point(2,1),
+		Building1 = Point(0,3),
+		Building2 = Point(4,3),
+	}
 }
+
+function OmegaRoachAtk2:GetTargetArea(p1)
+	local ret = PointList()
+	ret:push_back(p1)
+	return ret
+end
 
 function OmegaRoachAtk2:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
