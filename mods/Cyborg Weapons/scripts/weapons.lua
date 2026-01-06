@@ -2172,10 +2172,9 @@ CyborgWeapons_ShedTail = Skill:new{
 	Name = "Shed Tail",
 	Class = "TechnoVek",
 	Icon = "weapons/ShedTail.png",
-	Description = "Sheds the user's tail to bait all adjacent Vek into attacking the tail until it dies, then repositions to a location, swapping positions with any ally there.",
+	Description = "Sheds the user's tail to bait all adjacent Vek into attacking the tail until it dies, then repositions to a location.",
 	Rarity = 0,
 	LaunchSound = "/weapons/titan_fist",
-	Anim = "tauntedAnim",
 	SelfDamage = 1,
 	Range = 1, -- Tooltip?
 	PathSize = 1,
@@ -2187,7 +2186,7 @@ CyborgWeapons_ShedTail = Skill:new{
 	Push = 1,
 	PowerCost = 1,
 	Upgrades = 2,
-	Health = 1,
+	Spawn = "SheddedTail",
 	UpgradeList = { "+2 HP", "+4 HP"  },
 	UpgradeCost = { 1, 2 },
 	TipImage = {
@@ -2201,26 +2200,9 @@ CyborgWeapons_ShedTail = Skill:new{
 	},
 }
 
-CyborgWeapons_ShedTail_A = CyborgWeapons_ShedTail:new{
-	UpgradeDescription = "The tail gains 2 HP.",
-	Health = 3,
-}
-CyborgWeapons_ShedTail_B = CyborgWeapons_ShedTail:new{
-	UpgradeDescription = "The tail gains 4 HP.",
-	Health = 5,
-}
-CyborgWeapons_ShedTail_AB = CyborgWeapons_ShedTail:new{
-	Health = 7,
-}
-
-ANIMS.tauntedAnim = Animation:new{ 	
-	Image = "effects/tauntedAnim.png",
-	PosX = -10, PosY = -5,
-	NumFrames = 1,
-	Time = 1,
-	Loop = true
-}
-
+CyborgWeapons_ShedTail_A = CyborgWeapons_ShedTail:new{UpgradeDescription = "The tail gains 2 HP.",Spawn = "SheddedTail_A",}
+CyborgWeapons_ShedTail_B = CyborgWeapons_ShedTail:new{UpgradeDescription = "The tail gains 4 HP.",Spawn = "SheddedTail_B",}
+CyborgWeapons_ShedTail_AB = CyborgWeapons_ShedTail:new{Spawn = "SheddedTail_AB"}
 
 SheddedTail = Pawn:new{
 	Name = "Tail",
@@ -2235,8 +2217,52 @@ SheddedTail = Pawn:new{
 	SkillList = { "Tail_Taunt" },
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_BLOB,
-	IsDeathEffect = true,
 	Corpse = true,		--game won't find the pawn's ID in the DeathEffect otherwise, we turn it off in DeathEffect
+}
+SheddedTail_A = Pawn:new{
+	Name = "Tail",
+	Health = 3,
+	Neutral = true,
+	MoveSpeed = 0,
+	Minor = true,
+	IsPortrait = false,
+	Image = "tail",
+	ImageOffset = 1,
+	SoundLocation = "/support/vek_egg/",
+	SkillList = { "Tail_Taunt" },
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_BLOB,
+	Corpse = true,
+}
+SheddedTail_B = Pawn:new{
+	Name = "Tail",
+	Health = 5,
+	Neutral = true,
+	MoveSpeed = 0,
+	Minor = true,
+	IsPortrait = false,
+	Image = "tail",
+	ImageOffset = 1,
+	SoundLocation = "/support/vek_egg/",
+	SkillList = { "Tail_Taunt" },
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_BLOB,
+	Corpse = true,
+}
+SheddedTail_AB = Pawn:new{
+	Name = "Tail",
+	Health = 7,
+	Neutral = true,
+	MoveSpeed = 0,
+	Minor = true,
+	IsPortrait = false,
+	Image = "tail",
+	ImageOffset = 1,
+	SoundLocation = "/support/vek_egg/",
+	SkillList = { "Tail_Taunt" },
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_BLOB,
+	Corpse = true,
 }
 AddPawn("SheddedTail") 
 
@@ -2268,38 +2294,18 @@ function Tail_Taunt:GetSkillEffect(p1, p2)
 			ret:AddDamage(removeWeb)	--this flips the pawn twice, deleting webs
 			ret:AddScript(string.format("Board:GetPawn(%s):SetPriorityTarget(%s)", pawn:GetId(), p1:GetString()))
 			ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", pawn:GetId(), p1:GetString()))
-			ret:AddScript(string.format("CustomAnim:add(%s, %q, %q)", pawn:GetId(), "tauntedAnim", tostring(Board:GetPawn(p1):GetId())))
 		end
 	end
 	return ret
 end
-
-function SheddedTail:GetDeathEffect(point)
-	local ret = SkillEffect()
-	local pawn = Board:GetPawn(point) --:GetId()
-	local selfId = pawn:GetId()
-	local mission = GetCurrentMission()
-	if not mission then return end
-	for _, tile in ipairs(Board) do
-		if Board:GetPawn(tile) and CustomAnim:get(Board:GetPawn(tile):GetId(), "tauntedAnim", tostring(selfId)) then
-			CustomAnim:rem(Board:GetPawn(tile):GetId(), "tauntedAnim", tostring(selfId))
-			Board:GetPawn(tile):SetPriorityTarget(Point(-1, -1))	--untaunts all Vek on death
-		end
-	end
-	pawn:SetCorpse(false)
-	return ret
-end
-
 
 
 function CyborgWeapons_ShedTail:GetTargetArea(point)
 	ret = PointList()
-	if Board:GetTerrain(point) == TERRAIN_WATER or Board:GetTerrain(point) == TERRAIN_HOLE then return ret end
-	--we'll create a pawn on this tile so it has to be standable, only matters for flying mechs
 	for i = DIR_START, DIR_END do
 		for j = 1, 8 do
 			local curr = point + DIR_VECTORS[i] * j
-			if not Board:IsBlocked(curr, PATH_PROJECTILE) then
+			if (j > 1 or (Board:GetTerrain(point) ~= TERRAIN_WATER and Board:GetTerrain(point) ~= TERRAIN_HOLE)) and not Board:IsBlocked(curr, PATH_PROJECTILE) then
 			--we can stand there
 				ret:push_back(curr)
 			end
@@ -2312,15 +2318,21 @@ function CyborgWeapons_ShedTail:GetSkillEffect(p1, p2)
 	ret = SkillEffect()
 	local direction = GetDirection(p2-p1)
 	local distance = p1:Manhattan(p2)
-	local moveDamage = SpaceDamage(p1, 1, direction) --push ourselves to move one tile
+	local selfDamage = SpaceDamage(p1, 1) --push ourselves to move one tile
 	local userId = Board:GetPawn(p1):GetId()	
-	moveDamage.fDelay = -1
+	selfDamage.fDelay = -1
 	local loc = p1
-	if distance == 1 then ret:AddSafeDamage(moveDamage) end
-	if distance > 1 then loc = p2 end
+	-- if distance == 1 then ret:AddSafeDamage(selfDamage) end
+	
+	if distance == 1 then
+		selfDamage.iPush = direction
+	else
+		loc = p2
+	end
+	ret:AddSafeDamage(selfDamage)
 	local spawnDamage = SpaceDamage(loc)
 	
-	spawnDamage.sPawn = "SheddedTail"
+	spawnDamage.sPawn = self.Spawn
 	if distance > 1 then
 		ret:AddArtillery(spawnDamage, "effects/shotup_spider.png")
 	else
@@ -2329,10 +2341,9 @@ function CyborgWeapons_ShedTail:GetSkillEffect(p1, p2)
 	ret:AddScript(string.format([[
     local palette = Board:GetPawn(%s):GetImageOffset()
     unit:SetOwner(%s)
-    unit:SetMaxHealth(%s)
-    unit:SetHealth(%s)
-    unit:SetImageOffset(palette)]], userId, userId, self.Health, self.Health))
+    unit:SetImageOffset(palette)]], userId, userId))
 	ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", loc:GetString(), loc:GetString()))
+	ret:AddScript(string.format("Status.ApplyTargeted(Board:GetPawn(%s):GetId())", loc:GetString()))
 	return ret
 end
 
