@@ -131,7 +131,12 @@ function Meta_DrakeWeapon:GetFinalEffect(p1, p2, p3)
 	if self.Impact then
 		for i = DIR_START, DIR_END do
 			local damage = SpaceDamage(p3 + DIR_VECTORS[i], 0, i)
-			if i == dir then damage.iDamage = 1 damage.iPush = DIR_NONE end
+			if i == dir then 
+				damage.iDamage = 1 
+				damage.iPush = DIR_NONE 
+			else
+				damage.sAnimation = "airpush_"..dir
+			end
 			if i ~= (dir+2)%4 or dist > 2 then ret:AddDamage(damage) end
 		end
 	else
