@@ -81,7 +81,6 @@ OmegaMosquitoAtk2 = Skill:new{
 	Name = "Flak Tentacles",
 	Description = "Smoke the user and its surroundings, preparing to strike the target for 2 damage.",
 	Class = "Enemy",
-	Webbing = false,
 	LaunchSound = "",
 	SoundBase = "/enemy/mosquito_1",
 	TipImage = {
@@ -111,14 +110,14 @@ function OmegaMosquitoAtk2:GetSkillEffect(p1, p2)
 	damage = SpaceDamage(p2,self.Damage)
 	damage.sSound = self.SoundBase.."/attack"
 	damage.sAnimation = "explomosquito_"..direction
-	damage.iSmoke = -1
+	damage.iSmoke = EFFECT_REMOVE
 	local clearSmoke = SpaceDamage(p1)
-	clearSmoke.iSmoke = -1
+	clearSmoke.iSmoke = EFFECT_REMOVE
 	ret:AddQueuedDamage(clearSmoke)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		local clearSmoke2 = SpaceDamage(curr)
-		clearSmoke2.iSmoke = -1
+		clearSmoke2.iSmoke = EFFECT_REMOVE
 		if curr ~= p2 then ret:AddQueuedDamage(clearSmoke2) end
 	end
 	ret:AddQueuedMelee(p1, damage)

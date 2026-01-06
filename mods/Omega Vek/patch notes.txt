@@ -1,3 +1,7 @@
+v1.0.6
+- Omega Roaches should stop being stupid.
+- Omega Roaches are now stable.
+
 v1.0.5
 - Omega Scarab should now always attack, even if it has to target an empty space.
 - Omega Digger now takes into account immobile units for rock slamming purposes, and only minds attacking already queued Vek.
