@@ -85,7 +85,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		return ret 
 	end
 	
-	if mission.WyvernStomach == nil then mission.WyvernStomach = 0 end
+	mission.WyvernStomach = mission.WyvernStomach or 0
 	
 	local dist = p1:Manhattan(p2)
 	if dist == 1 then
@@ -107,7 +107,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 			end
 			if Board:GetPawn(p2):IsArmor() and not Board:GetPawn(p2):IsAcid() then amount = amount - 1 end
 			if Board:GetPawn(p2):IsAcid() then amount = amount * 2 end
-			if Board:GetPawn(p2):IsFrozen() then amount = 0 end
+			if Board:GetPawn(p2):IsFrozen() or Board:GetPawn(p2):IsShield() then amount = 0 end
 			amount = math.min(amount, Board:GetPawn(p2):GetHealth())
 			ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach + "..amount)
 			if Board:GetPawn(p2):GetTeam() == Board:GetPawn(p1):GetTeam() then
@@ -120,7 +120,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		ret:AddSound("/enemy/blobber_1/death")
 		local damage = SpaceDamage(p2, self.MinDamage, dir)
 		damage.sAnimation = "ExploAcid1"
-		ret:AddArtillery(p1, damage, self.ProjectileArt, PROJ_DELAY)
+		ret:AddArtillery(p1, damage, self.ProjectileArt, NO_DELAY)
 		if mission.WyvernStomach == 0 then 
 			ret:AddDamage(SpaceDamage(p1, 1)) 
 		else
@@ -135,10 +135,10 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 	local dir = GetDirection(p2-p1)
 	local dir2 = GetDirection(p2-p3)
 	local mission = GetCurrentMission()
-	if mission.WyvernStomach == nil then mission.WyvernStomach = 0 end	--should not be the case at this point
+	mission.WyvernStomach = mission.WyvernStomach or 0	--should not be the case at this point
 	
 	if p3 == p1 then	--we do multishot projectiles instead of artillery at several tiles
-		if remainingShots == nil then remainingShots = mission.WyvernStomach end
+		remainingShots = remainingShots or mission.WyvernStomach
 		local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
 		local damage = SpaceDamage(target, self.MinDamage)
 		damage.sAnimation = "ExploAcid1"
