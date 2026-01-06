@@ -22,6 +22,8 @@ function Mission_Meta_Vampiric:NextTurn()
 	if Game:GetTeamTurn() == TEAM_ENEMY then
 		if Board:IsPawnAlive(self.Target) then
 			local vampire = Board:GetPawn(self.Target)
+			if not vampire then return end
+			if vampire:IsDead() then return end
 			local space = vampire:GetSpace()
 			local targets = extract_table(general_DiamondTarget(space, 3))
 			local totalHealing = 0
