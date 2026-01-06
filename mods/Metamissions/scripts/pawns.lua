@@ -94,14 +94,16 @@ function Meta_UndyingVek:GetDeathEffect(point)
 	if not mission.KilledCount then mission.KilledCount = 0 end
 	if mission.KilledCount < 2 and Board:GetTerrain(point) ~= TERRAIN_HOLE then
 		mission.KilledCount = mission.KilledCount + 1
-		Board:GetPawn(point):SetInvisible(true)
+		if Board:GetPawn(point) then Board:GetPawn(point):SetInvisible(true) end
 		Board:AddAnimation(point, "undyingvekd", 6)
 		modApi:scheduleHook(1170, function()
-			Board:GetPawn(GetCurrentMission().Target):SetInvisible(false)
+			if Board:GetPawn(GetCurrentMission().Target) then Board:GetPawn(GetCurrentMission().Target):SetInvisible(false) end
 		end)
-		Board:GetPawn(point):SetHealth(4 - mission.KilledCount)
-		Board:GetPawn(point):SetMaxHealth(4 - mission.KilledCount)
-		modApi:runLater(function() Board:GetPawn(point):SetCustomAnim("undyingvek"..mission.KilledCount + 1) end)
+		if Board:GetPawn(point) then 
+			Board:GetPawn(point):SetHealth(4 - mission.KilledCount)
+			Board:GetPawn(point):SetMaxHealth(4 - mission.KilledCount)
+		end
+		modApi:runLater(function() if Board:GetPawn(point) then Board:GetPawn(point):SetCustomAnim("undyingvek"..mission.KilledCount + 1) end end)
 		--we use runLater because in a DeathEffect, even though there is a dead pawn (since it has Corpse), anims can't be applied to it
 		--I imagine it's because it doesn't really use anims as a corpse?
 		--so we wait for it to be done reviving, then it's a regular pawn and we can change its anim
@@ -346,8 +348,9 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 	if not Board:IsBlocked(target,pathing) then target = target + DIR_VECTORS[direction] end
 	if distance == 1 then --and doDamage 
 		local pawn = Board:GetPawn(target)
-		if pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
-		   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2)) then 
+		if pawn and pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
+		   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2) or 
+		   (ANIMS.tosx_whirlpooltile ~= nil and customAnim:get(pawn:GetSpace(), "tosx_whirlpooltile"))) then 
 		   --check this is enough damage
 			if not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(target) == "tosx_rocks_0.png") then
 			--check target is not immune to damage
@@ -366,7 +369,8 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 			local pawn = Board:GetPawn(temp)
 			if pawn and temp ~= p1 then
 				if pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
-				   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2)) then 
+				   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2)) or 
+				   (ANIMS.tosx_whirlpooltile ~= nil and customAnim:get(pawn:GetSpace(), "tosx_whirlpooltile")) then 
 				   --check this is enough damage
 					if not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(temp) == "tosx_rocks_0.png") then
 					--check target is not immune to damage
