@@ -235,7 +235,7 @@ local function EVENT_onModsLoaded()
 					end
 				elseif mission.Weather == "Rain" or mission.Weather == "Acid Rain" then
 					if pawn then Status.RemoveStatus(pawn:GetId(), "Dry") end
-					if pawn then Status.ApplyWet(pawn:GetId()) end
+					if pawn and mission.Weather == "Rain" then Status.ApplyWet(pawn:GetId()) end
 				elseif mission.Weather == "Snow" then
 					if pawn and (not pawn:IsFire()) and not CustomAnim:get(pawn:GetId(), "StatusChill") then
 						Status.ApplyChill(pawn:GetId())
