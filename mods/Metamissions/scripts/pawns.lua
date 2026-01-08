@@ -270,9 +270,11 @@ function Meta_VampiricVek:GetDeathEffect(point)
 		-- Board:GetPawn(point):SetHealth(2)
 		mission.VampiricVekSlain = mission.VampiricVekSlain + 1
 	else
+		pawn:SetCorpse(false)
 		pawn:SetMinor(true)
 		pawn:Kill(false)
 	end
+	
 	return ret
 end
 
