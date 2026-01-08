@@ -583,6 +583,13 @@ function SEIsMirror(skillName)
 	local p2 = Point(4,5)
 	local revDir = GetDirection(p1-p2)
 	local skillEffect = _G[skillName]:GetSkillEffect(p1,p2)
+	local targetArea = _G[skillName]:GetTargetArea(p1,p2)
+	local count = 0
+	for _, point in ipairs(extract_table(targetArea)) do
+		if point == p1 then return true end
+		count = count + 1
+	end
+	if count <= 1 then return true end
 	for _, spaceDamage in ipairs(extract_table(skillEffect.q_effect)) do
 		if spacedamage and spacedamage.loc ~= p1 and GetDirection(spaceDamage.loc - p1) == revDir then return true end
 	end
