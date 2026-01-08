@@ -45,7 +45,7 @@ function mod:metadata()
 		"Max prefixes at start of mission",
 		"Choose how many Vek can have a prefix on the first turn (default: 1).",
 		{
-			values = { 1, 2, 3, 4, 5, 6}
+			values = { 0, 1, 2, 3, 4, 5, 6}
 		}
 	)
 	modApi:addGenerationOption(
