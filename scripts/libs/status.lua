@@ -61,6 +61,9 @@ ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX
 local oldScorePositioning = ScorePositioning
 function ScorePositioning(point, pawn)
 	local mission = GetCurrentMission()
+	if not mission then return oldScorePositioning(point, pawn) end
+	mission.AdjScoreTable = mission.AdjScoreTable or {}
+	mission.BlindTable = mission.BlindTable or {}
 	if mission.BlindTable[pawn:GetId()] and point:Manhattan(pawn:GetSpace()) > 2 then return -100 end
 	--if the pawn is blind, don't move beyond 2 spaces
 	return oldScorePositioning(point, pawn) + (mission.AdjScoreTable[point:GetString()] or 0)
@@ -107,7 +110,11 @@ function Skill:ScoreList(list, queued)
 			end
 		end
 	else
-	
+		mission.AdjScoreTable = mission.AdjScoreTable or {}
+		mission.BlindTable = mission.BlindTable or {}
+		mission.BloodthirstyTable = mission.BloodthirstyTable or {}
+		mission.ConfusionTable = mission.ConfusionTable or {}
+		mission.TargetedTable = mission.TargetedTable or {}
 		if mission.BlindTable[id] then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
 	
 		for i = 1, list:size() do
@@ -148,7 +155,7 @@ function Skill:ScoreList(list, queued)
 			elseif mission.BlindTable[id] then LOG("Blinded to a damage in "..target:GetString()..".") end
 		end
 	end
-	if mission.ConfusionTable[Pawn:GetId()] ~= nil then 
+	if mission and mission.ConfusionTable[Pawn:GetId()] ~= nil then 
 		if posScore > -50 then posScore = -posScore end	--don't get confused into stepping on pods/ignoring blindness range restriction
 		if score > -50 then score = -score end			--don't get confused into spawning unqueued stuff on top of pods
 	end
@@ -421,6 +428,16 @@ function Status.ApplyPowder(id)
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if Status.IsImmuneTo(pawn, "Powder") then return end
+	if pawn:IsFire() then
+		local explosionDamage = SpaceDamage(p2, 1)
+		explosionDamage.sAnimation = "ExploAir1"
+		ret:AddDamage(explosionDamage)
+		for i = DIR_START, DIR_END do
+			local damage = SpaceDamage(curr, 1, i)
+			damage.sAnimation = "explopush_"..i
+			ret:AddDamage(damage)
+		end
+	end
 	if mission.WetTable[id] then return end
 	mission.PowderTable[id] = true
 	CustomAnim:add(id, "StatusPowder")
@@ -819,16 +836,19 @@ local function PrepareTables()						--setup all status tables here so we don't n
 	end, 
 	function()
 		local mission = GetCurrentMission()
-		-- LOG("Status tables are ready!")
 		local tablesList = Status.List()
 		for i = 1, #tablesList do
-			mission[tablesList[i].."Table"] = {}
+			mission[tablesList[i].."Table"] = mission[tablesList[i].."Table"] or {}
 		end
-		mission["AdjScoreTable"] = {}
-		for i = 0, 2 do
-			local pawn = Board:GetPawn(i)
-			if pawn then pawn:SetPowered(true) end		--cancels out the sleep status that carries over for some reason
+		mission["AdjScoreTable"] = mission["AdjScoreTable"] or {}
+		if Game:GetTurnCount() == 0 and Game:GetTeamTurn() == TEAM_ENEMY then	--make sure this only runs on mission start?
+			for i = 0, 2 do
+				local pawn = Board:GetPawn(i)
+				if pawn then pawn:SetPowered(true) end		--cancels out the sleep status that carries over for some reason
+			end
 		end
+		LOG("Created status tables.")
+
 	end)
 end
 
@@ -961,8 +981,9 @@ local function EVENT_onModsLoaded()
 	modapiext:addPawnIsFireHook(function(mission, pawn, isFire)			--powder/dry/wet, remove chill/hemorrhage/roots/leechseed
 		if not (mission and pawn and isFire) then return end
 		local id = pawn:GetId()
-		if mission.WetTable[id] ~= nil then
+		if mission.WetTable and mission.WetTable[id] then
 			pawn:SetFire(false)
+			Board:SetSmoke(pawn:GetSpace(), true, true)
 			Status.RemoveStatus(id, "Wet")
 		end
 		if mission.PowderTable[id] then
@@ -973,14 +994,14 @@ local function EVENT_onModsLoaded()
 				amount = 2
 				Status.RemoveStatus(id, "Dry")
 			end
-			Board:DamageSpace(point, amount)
+			Board:DamageSpace(SpaceDamage(point, amount))
 			Board:AddAnimation(point, "ExploAir"..amount, 1)
 			for i = DIR_START, DIR_END do
-				Board:DamageSpace(point + DIR_VECTORS[i], 1)
+				Board:DamageSpace(SpaceDamage(point + DIR_VECTORS[i], 1))
 				Board:AddAnimation(point, "explopush"..amount.."_"..i, 1)
 			end
 		elseif mission.DryTable[id] ~= nil then
-			Board:DamageSpace(point, 1)
+			Board:DamageSpace(SpaceDamage(point, 1))
 			Status.RemoveStatus(id, "Dry")
 		end
 		Status.RemoveStatus(id, "Hemorrhage")
@@ -1009,10 +1030,10 @@ local function EVENT_onModsLoaded()
 		if mission.ShatterburstTable[id] then
 			Status.RemoveStatus(id, "Shatterburst")
 			local point = pawn:GetSpace()
-			Board:DamageSpace(point, 1)
+			Board:DamageSpace(SpaceDamage(point, 1))
 			Board:AddAnimation(point, "ExplIce1", 1)
 			for i = DIR_START, DIR_END do
-				Board:DamageSpace(point + DIR_VECTORS[i], 1)
+				Board:DamageSpace(SpaceDamage(point + DIR_VECTORS[i], 1))
 			end
 		end
 	end)
@@ -1071,7 +1092,12 @@ local function EVENT_onModsLoaded()
 			ReapplyOverheal()
 		end)
 	end)				--Health boosts are lost on game refresh
+	modApi:addPostLoadGameHook(PrepareTables)		
 	modApi:addPostLoadGameHook(ReapplyOverheal)		
+	modapiext:addResetTurnHook(function()
+		modApi:scheduleHook(2000, PrepareTables)
+		--Apparently this doesn't prepare tables properly, assigning them to the mission object before cleanup
+	end)
 	modapiext:addResetTurnHook(ReapplyOverheal)		
 	
 	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
@@ -1288,6 +1314,7 @@ local function EVENT_onModsLoaded()
 		if calculatingDodge then return end
 		local pawnsWhoDodged = {}	--we make sure one pawn cannot jump into another instance of damage from the same skill effect and dodge it again
 		local dodgersCount = 0
+		mission.DodgeTable = mission.DodgeTable or {}
 		for id, infos in pairs(mission.DodgeTable) do	--quick check early to avoid running stuff pointlessly
 			if Board:GetPawn(id) then dodgersCount = dodgersCount + 1 end
 		end
@@ -1438,6 +1465,7 @@ local function EVENT_onModsLoaded()
 	modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
 		DoDodge(mission, pawn, skillEffect)
 	end)
+	LOG("Status Library added its hooks.")
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
