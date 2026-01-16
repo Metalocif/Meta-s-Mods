@@ -29,7 +29,7 @@ function mod:init()
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/saveData")
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/boardEvents")
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
-	require(self.scriptPath.."weathers")
+	require(self.scriptPath .."weathers")
 	require(self.scriptPath .."weapons")
 	require(self.scriptPath .."items")
 	require(self.scriptPath .."pawns")
@@ -105,6 +105,10 @@ function mod:load( options, version)
 		{"Pokemon Team","Poke_Abra", "Poke_Dratini", "Poke_Mew", id = "Poke_Squad"}, 
 		"Pokemon Team", "A team of Pokemon.", 	--my wife's favorites
 		self.resourcePath .. "img/mod_icon.png")
+	modApi:addSquad(
+		{"Kanto's Finest","Poke_Bulbasaur", "Poke_Charmander", "Poke_Squirtle", id = "Poke_KantoSquad"}, 
+		"Kanto's Finest", "A team of Pokemon from the Kanto region, led by young trainers.",
+		self.resourcePath .. "img/kanto_icon.png")
 	if modApi.achievements:isComplete(mod.id,"Poke_ArticunoCapture") and 
 	   modApi.achievements:isComplete(mod.id,"Poke_ZapdosCapture") and 
 	   modApi.achievements:isComplete(mod.id,"Poke_MoltresCapture") then 
@@ -158,7 +162,7 @@ function mod:load( options, version)
         for id = 0, 2 do
             local pawn = Game:GetPawn(id)
 			if pawn then
-				local pilotLevel = GameData.current["pilot"..id].level
+				local pilotLevel = GameData and GameData.current["pilot"..id].level or 0
 				local branch = GAME.BranchingEvos[id+1]
 				if pawn:IsDead() then												--don't evolve if you were dead
 					Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -1))
@@ -190,10 +194,18 @@ function mod:load( options, version)
 										if weapon == _G[pawn:GetType()].SkillList[j] then isOwnWeapon = true end
 										--if it's natively on the pawn...
 									end
-									for j = 1, #_G[pawn:GetType()].EvoLearn[branch] do
-										for k = 1, #_G[pawn:GetType()].EvoLearn[branch][j] do
-											if weapon == _G[pawn:GetType()].EvoLearn[branch][j][k] then isOwnWeapon = true end
-											--...or it's learnt on level-up, don't remove it
+									if _G[pawn:GetType()].PokemonIsOwnWeapon then
+										for j = 1, #_G[pawn:GetType()].PokemonIsOwnWeapon do
+											if weapon == _G[pawn:GetType()].PokemonIsOwnWeapon[j] then isOwnWeapon = true end
+											--or is whitelisted...
+										end
+									end
+									if _G[pawn:GetType()].EvoLearn and _G[pawn:GetType()].EvoLearn[branch] then
+										for j = 1, #_G[pawn:GetType()].EvoLearn[branch] do
+											for k = 1, #_G[pawn:GetType()].EvoLearn[branch][j] do
+												if weapon == _G[pawn:GetType()].EvoLearn[branch][j][k] then isOwnWeapon = true end
+												--...or it's learnt on level-up, don't remove it
+											end
 										end
 									end
 									if not isOwnWeapon then
@@ -227,7 +239,7 @@ function mod:load( options, version)
 		end
     end)
 	modApi:addMissionStartHook(function(mission)	--need to reassign graphics at mission start since the game forgets otherwise
-		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
+		GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
 		DoSaveGame()
 		if GAME.BranchingEvos == nil or #GAME.BranchingEvos < 3 then 	--prepare branching evos in first since the menu doesn't pause the game at mission end before evolution
 			GAME.BranchingEvos = {}
@@ -298,7 +310,12 @@ function mod:load( options, version)
 				if _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
 				-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
 				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
-					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
+					local weaponToAdd = _G[pawn:GetType()].KeepAdding[evo]
+					local hasWeapon = false
+					for i = pawn:GetWeaponCount(), 1, -1 do
+						if pawn:GetWeaponBaseType(i) == weaponToAdd then hasWeapon = true end
+					end
+					if not hasWeapon then pawn:AddWeapon(weaponToAdd) end
 				end
 				if GetCurrentMission().MegaEvolved == id then
 					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
@@ -335,6 +352,7 @@ function mod:load( options, version)
     end)
 	modApi:addNextTurnHook(function(mission)
 		DoSaveGame()
+		if not GameData then return end
 		for id = 0, 2 do
 			local pawn = Board:GetPawn(id)
 			local pilotLevel = GameData.current["pilot"..id].level
@@ -352,14 +370,13 @@ function mod:load( options, version)
 				pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])
 				mission.MegaEvolved = id	--max once per mission, even if more than one can mega evolve
 			end
-		
 		end
 	end)
 	modApi.events.onPawnSelectedForDeployment:subscribe(function(pawnId)
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
 		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
 		if options["PokemonDeployment"] and options["PokemonDeployment"].enabled then
-			local pilotLevel = GameData.current["pilot"..pawnId].level
+			local pilotLevel = GameData and GameData.current["pilot"..pawnId].level or 0
 			local branch = GAME.BranchingEvos[pawnId+1]
 			if _G[Board:GetPawn(pawnId):GetType()].EvoNames ~= nil and branch ~= nil then
 				LOG(_G[Board:GetPawn(pawnId):GetType()].EvoNames[branch][pilotLevel+1])

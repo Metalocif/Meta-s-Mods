@@ -23,336 +23,8 @@ local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 -- local tileToScreen = require(path .."scripts/libs/tileToScreen")
 local mechPath = mod_loader.mods[modApi.currentMod].resourcePath .."img/units/player/"
-local files = {
-    "Abra.png",
-    "Abra_a.png",
-    "Abra_w.png",
-    "Abra_ns.png",
-    "Abra_h.png",
-	
-	"Kadabra.png",
-    "Kadabra_a.png",
-    "Kadabra_w.png",
-    "Kadabra_ns.png",
-	
-	"Alakazam.png",
-    "Alakazam_a.png",
-    "Alakazam_ns.png",
-	"MegaAlakazam.png",
-    "MegaAlakazam_a.png",
-    "MegaAlakazam_ns.png",
-	
-	"Dratini.png",
-    "Dratini_a.png",
-    "Dratini_w.png",
-    "Dratini_ns.png",
-    "Dratini_h.png",
-	
-	"Dragonair.png",
-    "Dragonair_a.png",
-    "Dragonair_w.png",
-    "Dragonair_ns.png",
-	
-	"Dragonite.png",
-    "Dragonite_a.png",
-    "Dragonite_ns.png",
-	"Dragonite_sleep.png",	--only here for Hyper Beam & because it's cute
-    
-    "Mew.png",
-    "Mew_a.png",
-    "Mew_ns.png",
-    "Mew_h.png",
-	
-	"Articuno.png",
-	"Articuno_a.png",
-	"Articuno_h.png",
-	"Articuno_ns.png",
-	
-	"Zapdos.png",
-	"Zapdos_a.png",
-	"Zapdos_h.png",
-	"Zapdos_ns.png",
-	
-	"Moltres.png",
-	"Moltres_a.png",
-	"Moltres_h.png",
-	"Moltres_ns.png",
-	
-	"Mewtwo.png",
-	"Mewtwo_a.png",
-	"Mewtwo_h.png",
-	"Mewtwo_ns.png",
-	"MegaMewtwoX.png",
-	"MegaMewtwoX_a.png",
-	"MegaMewtwoX_ns.png",
-	"MegaMewtwoY.png",
-	"MegaMewtwoY_a.png",
-	"MegaMewtwoY_ns.png",
-	
-	"Darkrai.png",
-	"Darkrai_a.png",
-	"Darkrai_h.png",
-	"Darkrai_ns.png",
-	
-	"Deoxys.png",
-	"Deoxys_a.png",
-	"Deoxys_w.png",
-	"Deoxys_h.png",
-	"Deoxys_ns.png",
-	"DeoxysA.png",
-	"DeoxysA_a.png",
-	"DeoxysA_w.png",
-	"DeoxysS.png",
-	"DeoxysS_a.png",
-	"DeoxysS_w.png",
-	"DeoxysD.png",
-	"DeoxysD_a.png",
-	"DeoxysD_w.png",
-	
-	"Celebi.png",
-	"Celebi_a.png",
-	"Celebi_h.png",
-	"Celebi_ns.png",
-	
-	"Shaymin.png",
-	"Shaymin_a.png",
-	"Shaymin_w.png",
-	"Shaymin_h.png",
-	"Shaymin_ns.png",
-	"ShayminAir.png",
-	"ShayminAir_a.png",
-	
-	"Xerneas.png",
-	"Xerneas_a.png",
-	"Xerneas_sleep.png",
-	"Xerneas_tree.png",
-	"Xerneas_w.png",
-	"Xerneas_h.png",
-	"Xerneas_ns.png",
-	
-	"ArmoredMewtwo.png",
-	"ArmoredMewtwo_a.png",
-	"ArmoredMewtwo_h.png",
-	"ArmoredMewtwo_ns.png",
-	
-	"Larvitar.png",
-    "Larvitar_a.png",
-    "Larvitar_w.png",
-    "Larvitar_ns.png",
-    "Larvitar_h.png",
-	
-	"Pupitar.png",
-    "Pupitar_a.png",
-    "Pupitar_w.png",
-    "Pupitar_ns.png",
-	
-	"Tyranitar.png",
-    "Tyranitar_a.png",
-    "Tyranitar_w.png",
-    "Tyranitar_ns.png",
-	"MegaTyranitar.png",
-    "MegaTyranitar_a.png",
-    "MegaTyranitar_w.png",
-    "MegaTyranitar_ns.png",
-	
-	"Beldum.png",
-	"Beldum_a.png",
-	"Beldum_h.png",
-	"Beldum_ns.png",
-	
-	"Metang.png",
-	"Metang_a.png",
-	"Metang_ns.png",
-	"Metang_swipe.png",
-	
-	"Metagross.png",
-    "Metagross_a.png",
-    "Metagross_w.png",
-    "Metagross_ns.png",
-    "Metagross_hover.png",
-	
-	"Gible.png",
-    "Gible_a.png",
-    "Gible_w.png",
-    "Gible_ns.png",
-    "Gible_h.png",
-	
-	"Gabite.png",
-    "Gabite_a.png",
-    "Gabite_w.png",
-    "Gabite_ns.png",
-	
-	"Garchomp.png",
-    "Garchomp_a.png",
-    "Garchomp_w.png",
-    "Garchomp_ns.png",
-	"MegaGarchomp.png",
-    "MegaGarchomp_a.png",
-    "MegaGarchomp_w.png",
-	"DracoMeteor.png",
-	"DracoMeteor_death.png",
-	
-	"Eevee.png",
-    "Eevee_a.png",
-    "Eevee_w.png",
-    "Eevee_ns.png",
-    "Eevee_h.png",
-	
-	"Jolteon.png",
-    "Jolteon_a.png",
-    "Jolteon_w.png",
-    "Jolteon_ns.png",
-    "Jolteon_charge_0.png",
-    "Jolteon_charge_1.png",
-    "Jolteon_charge_2.png",
-    "Jolteon_charge_3.png",
-	
-	"Vaporeon.png",
-    "Vaporeon_a.png",
-    "Vaporeon_w.png",
-    "Vaporeon_ns.png",
-    "Vaporeon_bubble.png",
-	
-	"Flareon.png",
-    "Flareon_a.png",
-    "Flareon_w.png",
-    "Flareon_ns.png",
-	
-	"Espeon.png",
-    "Espeon_a.png",
-    "Espeon_w.png",
-    "Espeon_ns.png",
-	
-	"Umbreon.png",
-    "Umbreon_a.png",
-    "Umbreon_w.png",
-    "Umbreon_ns.png",
-	
-	"Leafeon.png",
-    "Leafeon_a.png",
-    "Leafeon_w.png",
-    "Leafeon_ns.png",
-	
-	"Glaceon.png",
-    "Glaceon_a.png",
-    "Glaceon_w.png",
-    "Glaceon_ns.png",
-	
-	"Sylveon.png",
-    "Sylveon_a.png",
-    "Sylveon_w.png",
-    "Sylveon_ns.png",
-	
-	"Ralts.png",
-    "Ralts_a.png",
-    "Ralts_w.png",
-    "Ralts_ns.png",
-    "Ralts_h.png",
-	
-	"Kirlia.png",
-    "Kirlia_a.png",
-    "Kirlia_w.png",
-    "Kirlia_ns.png",
-	
-	"Gardevoir.png",
-    "Gardevoir_a.png",
-    "Gardevoir_ns.png",
-	"MegaGardevoir.png",
-    "MegaGardevoir_a.png",
-    "MegaGardevoir_ns.png",
-	
-	"Gallade.png",
-    "Gallade_a.png",
-    "Gallade_w.png",
-    "Gallade_ns.png",
-	"MegaGallade.png",
-    "MegaGallade_a.png",
-    "MegaGallade_w.png",
-    "MegaGallade_ns.png",
 
-	"Scyther.png",
-    "Scyther_a.png",
-    "Scyther_w.png",
-    "Scyther_ns.png",
-    "Scyther_h.png",
-	
-	"Scizor.png",
-    "Scizor_a.png",
-    "Scizor_w.png",
-    "Scizor_ns.png",
-	
-	"Kleavor.png",
-    "Kleavor_a.png",
-    "Kleavor_w.png",
-    "Kleavor_ns.png",
-	
-	"Dialga.png",
-	"Dialga_w.png",
-	"Dialga_a.png",
-	"Dialga_h.png",
-	"Dialga_ns.png",
-	"Dialga_sleep.png",
-	"DialgaOrigin.png",
-	"DialgaOrigin_a.png",
-	-- "DialgaOrigin_w.png",
-	"DialgaOrigin_ns.png",
-	
-	"Palkia.png",
-	"Palkia_w.png",
-	"Palkia_a.png",
-	"Palkia_h.png",
-	"Palkia_ns.png",
-	"Palkia_sleep.png",
-	"PalkiaOrigin.png",
-	"PalkiaOrigin_a.png",
-	-- "PalkiaOrigin_w.png",
-	"PalkiaOrigin_ns.png",
-	
-	"Giratina.png",
-	"Giratina_a.png",
-	"Giratina_h.png",
-	"Giratina_ns.png",
-	"GiratinaShadow.png",
-	"GiratinaShadow_a.png",
-	
-	"Arceus.png",
-	"Arceus_a.png",
-	"Arceus_h.png",
-	"Arceus_ns.png",
-	"ArceusElectric.png",
-	"ArceusFairy.png",
-	"ArceusFire.png",
-	"ArceusGrass.png",
-	"ArceusGround.png",
-	"ArceusIce.png",
-	"ArceusPoison.png",
-	"ArceusWater.png",
-	"ArceusElectric_a.png",
-	"ArceusFairy_a.png",
-	"ArceusFire_a.png",
-	"ArceusGrass_a.png",
-	"ArceusGround_a.png",
-	"ArceusIce_a.png",
-	"ArceusPoison_a.png",
-	"ArceusWater_a.png",
-	
-	"Metanitar.png",
-	"Metanitar_a.png",
-	"Metanitar_h.png",
-	"Metanitar_w.png",
-	"Metanitar_ns.png",
-	
-	"Tyrachomp.png",
-	"Tyrachomp_a.png",
-	"Tyrachomp_h.png",
-	"Tyrachomp_w.png",
-	"Tyrachomp_ns.png",
-	
-	"PokeBall.png", "HyperBall.png", "MasterBall.png",
-}
-for _, file in ipairs(files) do
-    modApi:appendAsset("img/units/player/".. file, mechPath.. file)
-end
+modApi:appendAssets("img/units/player/", "img/units/player/")
 
 local a=ANIMS
 a.Poke_Abra =a.MechUnit:new{Image="units/player/Abra.png", PosX = -18, PosY = -9}
@@ -742,37 +414,76 @@ a.Poke_Tyrachomp_ns = a.MechIcon:new{Image="units/player/Tyrachomp_ns.png"}
 a.Poke_Tyrachompw =a.MechUnit:new{Image="units/player/Tyrachomp_w.png", PosX = -20, PosY = 6}
 
 
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Abra.png", path .."img/portraits/pilots/Pilot_Poke_Abra.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dratini.png", path .."img/portraits/pilots/Pilot_Poke_Dratini.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Mew.png", path .."img/portraits/pilots/Pilot_Poke_Mew.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Articuno.png", path .."img/portraits/pilots/Pilot_Poke_Articuno.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Zapdos.png", path .."img/portraits/pilots/Pilot_Poke_Zapdos.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Moltres.png", path .."img/portraits/pilots/Pilot_Poke_Moltres.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Mewtwo.png", path .."img/portraits/pilots/Pilot_Poke_Mewtwo.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Deoxys.png", path .."img/portraits/pilots/Pilot_Poke_Deoxys.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Darkrai.png", path .."img/portraits/pilots/Pilot_Poke_Darkrai.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Celebi.png", path .."img/portraits/pilots/Pilot_Poke_Celebi.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Shaymin.png", path .."img/portraits/pilots/Pilot_Poke_Shaymin.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Xerneas.png", path .."img/portraits/pilots/Pilot_Poke_Xerneas.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_ArmoredMewtwo.png", path .."img/portraits/pilots/Pilot_Poke_ArmoredMewtwo.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Larvitar.png", path .."img/portraits/pilots/Pilot_Poke_Larvitar.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Beldum.png", path .."img/portraits/pilots/Pilot_Poke_Beldum.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Gible.png", path .."img/portraits/pilots/Pilot_Poke_Gible.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Eevee.png", path .."img/portraits/pilots/Pilot_Poke_Eevee.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Ralts.png", path .."img/portraits/pilots/Pilot_Poke_Ralts.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Scyther.png", path .."img/portraits/pilots/Pilot_Poke_Scyther.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Dialga.png", path .."img/portraits/pilots/Pilot_Poke_Dialga.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Palkia.png", path .."img/portraits/pilots/Pilot_Poke_Palkia.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Giratina.png", path .."img/portraits/pilots/Pilot_Poke_Giratina.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Arceus.png", path .."img/portraits/pilots/Pilot_Poke_Arceus.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Metanitar.png", path .."img/portraits/pilots/Pilot_Poke_Metanitar.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Tyrachomp.png", path .."img/portraits/pilots/Pilot_Poke_Tyrachomp.png")
-modApi:appendAsset("img/portraits/pilots/Pilot_Poke_Delibird.png", path .."img/portraits/pilots/Pilot_Poke_Delibird.png")
+a.Poke_Charmander =a.MechUnit:new{Image="units/player/Charmander.png", PosX = -15, PosY = 6}
+a.Poke_Charmandera = a.MechUnit:new{Image="units/player/Charmander_a.png",  PosX = -15, PosY = 6, NumFrames = 3 }
+a.Poke_Charmander_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Charmander_ns = a.MechIcon:new{Image="units/player/Charmander_ns.png"}
+a.Poke_Charmanderw =a.MechUnit:new{Image="units/player/Charmander_w.png", PosX = -12, PosY = 15}
+
+a.Poke_Charmeleon =a.MechUnit:new{Image="units/player/Charmeleon.png", PosX = -15, PosY = 3}
+a.Poke_Charmeleona = a.MechUnit:new{Image="units/player/Charmeleon_a.png",  PosX = -15, PosY = 3, NumFrames = 3 }
+a.Poke_Charmeleon_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Charmeleon_ns = a.MechIcon:new{Image="units/player/Charmeleon_ns.png"}
+a.Poke_Charmeleonw =a.MechUnit:new{Image="units/player/Charmeleon_w.png", PosX = -15, PosY = 6}
+
+a.Poke_Charizard =a.MechUnit:new{Image="units/player/Charizard.png", PosX = -20, PosY = -4}
+a.Poke_Charizarda = a.MechUnit:new{Image="units/player/Charizard_a.png",  PosX = -20, PosY = -4, NumFrames = 6, Frames = {0,1,2,1,0,1,2,1,3,4,5,1}, }
+a.Poke_Charizard_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
+a.Poke_Charizard_ns = a.MechIcon:new{Image="units/player/Charizard_ns.png"}
+a.Poke_MegaCharizardX =a.MechUnit:new{Image="units/player/MegaCharizardX.png", PosX = -20, PosY = -4}
+a.Poke_MegaCharizardXa = a.MechUnit:new{Image="units/player/MegaCharizardX_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,2,1,2}, }
+a.Poke_MegaCharizardX_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaCharizardX_ns = a.Poke_Charizard_ns
+a.Poke_MegaCharizardY =a.MechUnit:new{Image="units/player/MegaCharizardY.png", PosX = -20, PosY = -4}
+a.Poke_MegaCharizardYa = a.MechUnit:new{Image="units/player/MegaCharizardY_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaCharizardY_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaCharizardY_ns = a.Poke_Charizard_ns
+
+a.Poke_Bulbasaur =a.MechUnit:new{Image="units/player/Bulbasaur.png", PosX = -10, PosY = -4}
+a.Poke_Bulbasaura = a.MechUnit:new{Image="units/player/Bulbasaur_a.png",  PosX = -15, PosY = 6, NumFrames = 2 }
+a.Poke_Bulbasaur_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Bulbasaur_ns = a.MechIcon:new{Image="units/player/Bulbasaur_ns.png"}
+a.Poke_Bulbasaurw =a.MechUnit:new{Image="units/player/Bulbasaur_w.png", PosX = -12, PosY = 15}
+
+a.Poke_Ivysaur =a.MechUnit:new{Image="units/player/Ivysaur.png", PosX = -10, PosY = -4}
+a.Poke_Ivysaura = a.MechUnit:new{Image="units/player/Ivysaur_a.png",  PosX = -15, PosY = 3, NumFrames = 3 }
+a.Poke_Ivysaur_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Ivysaur_ns = a.MechIcon:new{Image="units/player/Ivysaur_ns.png"}
+a.Poke_Ivysaurw =a.MechUnit:new{Image="units/player/Ivysaur_w.png", PosX = -15, PosY = 6}
+
+a.Poke_Venusaur =a.MechUnit:new{Image="units/player/Venusaur.png", PosX = -20, PosY = 6}
+a.Poke_Venusaura = a.MechUnit:new{Image="units/player/Venusaur_a.png",  PosX = -20, PosY = 6, NumFrames = 3, Frames = {0,2,1,2}, }
+a.Poke_Venusaur_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
+a.Poke_Venusaur_ns = a.MechIcon:new{Image="units/player/Venusaur_ns.png"}
+a.Poke_Venusaurw =a.MechUnit:new{Image="units/player/Venusaur_w.png", PosX = -20, PosY = 6}
+
+a.Poke_Squirtle =a.MechUnit:new{Image="units/player/Squirtle.png", PosX = -10, PosY = -4}
+a.Poke_Squirtlea = a.MechUnit:new{Image="units/player/Squirtle_a.png",  PosX = -15, PosY = 6, NumFrames = 3, Frames = {2,0,2,1}, }
+a.Poke_Squirtleshell = a.MechUnit:new{Image="units/player/Squirtle_shell.png",  PosX = -15, PosY = 6, NumFrames = 1 }
+a.Poke_Squirtle_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Squirtle_ns = a.MechIcon:new{Image="units/player/Squirtle_ns.png"}
+a.Poke_Squirtlew =a.MechUnit:new{Image="units/player/Squirtle_w.png", PosX = -12, PosY = 15}
+
+a.Poke_Wartortle =a.MechUnit:new{Image="units/player/Wartortle.png", PosX = -10, PosY = -4}
+a.Poke_Wartortlea = a.MechUnit:new{Image="units/player/Wartortle_a.png",  PosX = -15, PosY = 3, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_Wartortleshell = a.MechUnit:new{Image="units/player/Wartortle_shell.png",  PosX = -15, PosY = 3, NumFrames = 1 }
+a.Poke_Wartortle_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
+a.Poke_Wartortle_ns = a.MechIcon:new{Image="units/player/Wartortle_ns.png"}
+a.Poke_Wartortlew =a.MechUnit:new{Image="units/player/Wartortle_w.png", PosX = -15, PosY = 6}
+
+a.Poke_Blastoise =a.MechUnit:new{Image="units/player/Blastoise.png", PosX = -10, PosY = 6}
+a.Poke_Blastoisea = a.MechUnit:new{Image="units/player/Blastoise_a.png",  PosX = -20, PosY = 6, NumFrames = 3, Frames = {0,2,1,2}, }
+a.Poke_Blastoiseshell = a.MechUnit:new{Image="units/player/Blastoise_shell.png",  PosX = -20, PosY = 6, NumFrames = 1 }
+a.Poke_Blastoise_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
+a.Poke_Blastoise_ns = a.MechIcon:new{Image="units/player/Blastoise_ns.png"}
+a.Poke_Blastoisew =a.MechUnit:new{Image="units/player/Blastoise_w.png", PosX = -20, PosY = 6}
+
+modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
 
 CreatePilot{Id = "Pilot_Poke_Abra", Personality = "Vek", Name = "Sabrina", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Dratini", Personality = "Vek", Name = "Lance", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
-CreatePilot{Id = "Pilot_Poke_Mew", Personality = "Vek", Name = "Blue", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Mew", Personality = "Vek", Name = "Mew", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Articuno", Personality = "Vek", Name = "Articuno", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Zapdos", Personality = "Vek", Name = "Zapdos", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Moltres", Personality = "Vek", Name = "Moltres", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
@@ -799,6 +510,9 @@ CreatePilot{Id = "Pilot_Poke_Tyrachomp", Personality = "Vek", Name = "Tyrachomp"
 
 CreatePilot{Id = "Pilot_Poke_Delibird", Personality = "Vek", Name = "Delibird", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
+CreatePilot{Id = "Pilot_Poke_Charmander", Personality = "Vek", Name = "Red", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Bulbasaur", Personality = "Vek", Name = "Green", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+CreatePilot{Id = "Pilot_Poke_Squirtle", Personality = "Vek", Name = "Blue", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 Poke_Abra= Pawn:new{
@@ -899,7 +613,7 @@ Poke_Moltres = Pawn:new{
 	Massive = true,
 	Corpse = true,
 	Flying = true,
-	IgnoreMoltres = true,
+	IgnoreFire = true,
 	Image = "Poke_Moltres",
 	SkillList = {"Poke_HeatWave"},
 	SoundLocation = "/enemy/moth_1/",
@@ -1338,6 +1052,74 @@ Poke_Tyrachomp = Pawn:new{
 	EvoForget = { "", "" },
 	SandstormImmune = true,
 	IsDragon = true,
+}
+
+Poke_Bulbasaur = Pawn:new{
+	Name = "Bulbasaur",
+	Class = "TechnoVek",
+	Health = 2,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Image = "Poke_Bulbasaur",
+	SkillList = {"Poke_VineWhip"},
+	SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, true },
+	EvoGraphics = { { "Poke_Ivysaur", "Poke_Venusaur" } },
+	EvoForget = { "", "" },
+	EvoLearn = { { { "Poke_Growth" }, { } } },
+	-- KeepAdding = { "", "Poke_Blossom" },
+	KeepAdding = { "", "Poke_SolarBeam" },	--more iconic, less buggy, less annoying
+	PokemonIsOwnWeapon = { "Poke_PowderPuff", "Poke_BulletSeed", "Poke_Spore" }
+}
+Poke_Charmander = Pawn:new{
+	Name = "Charmander",
+	Class = "TechnoVek",
+	Health = 2,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	IgnoreFire = true,
+	Image = "Poke_Charmander",
+	SkillList = {"Poke_FireTail", "Poke_Scratch"},
+	SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, true },
+	EvoGraphics = { { "Poke_Charmeleon", "Poke_Charizard" } },
+	MegaEvos = { "Poke_MegaCharizardX", "Poke_MegaCharizardY" },
+	MegaEvoMoves = { "Poke_BlastBurn", "Poke_BlastBurn" },
+	MegaEvoNames = { "Mega Charizard X", "Mega Charizard Y" },
+	EvoForget = { "Poke_Scratch", "Poke_FireTail" },
+	EvoLearn = { { { "Poke_Flamethrower" }, { "Poke_Fly" } },
+				 { { "Poke_Flamethrower" }, { "Poke_Fly" } },
+			   },
+	BecomeFlyingAtLevel = {2, 2},
+}
+Poke_Squirtle = Pawn:new{
+	Name = "Squirtle",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 4,
+	Massive = true,
+	Corpse = true,
+	-- This is not quite what I want, but I can't find a way to refer to the pawn instance for which we are running GetArmor
+	GetArmor = function(self) 
+		local mission = GetCurrentMission()
+		-- if mission and not mission.savedTable then mission.savedTable = true LOG(save_table(self)) end
+		return (mission and Game and mission.LastWithdrawTurn == Game:GetTurnCount() or false) 
+	end,
+	Image = "Poke_Squirtle",
+	SkillList = {"Poke_Withdraw", "Poke_WaterGun" },
+	SoundLocation = "/enemy/jelly_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, true },
+	EvoGraphics = { { "Poke_Wartortle", "Poke_Blastoise" } },
+	EvoForget = { "Poke_WaterGun", "Poke_BubbleBeam" },
+	EvoLearn = { { { "Poke_BubbleBeam" }, { "Poke_HydroPump" } } },
 }
 
 

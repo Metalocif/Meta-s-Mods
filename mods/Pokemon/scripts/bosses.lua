@@ -1081,22 +1081,22 @@ Poke_DarkraiBoss = {
 	IsDeathEffect = true,
 	Massive = true,
 	Flying = true,
-	GetWeapon = DarkVoid,
+	-- GetWeapon = DarkVoid,
 }
 AddPawn("Poke_DarkraiBoss") 
 
-function DarkVoid()
-	for i = DIR_START, DIR_END do
-		local curr = Pawn:GetSpace() + DIR_VECTORS[i]
-		local target = Board:GetPawn(curr)
-		if target and target:GetTeam() == TEAM_PLAYER then
-			target:SetPowered(false)
-			CustomAnim:add(target:GetId(), "sleepAnim")
-			GetCurrentMission().SleepTable[target:GetId()] = 2 --when this reaches 0, pawn is active, so 2 stops for 1 turn, 3 for 2 turns...
-		end
-	end
-	return 1
-end
+-- function DarkVoid()
+	-- for i = DIR_START, DIR_END do
+		-- local curr = Pawn:GetSpace() + DIR_VECTORS[i]
+		-- local target = Board:GetPawn(curr)
+		-- if target and target:GetTeam() == TEAM_PLAYER then
+			-- target:SetPowered(false)
+			-- CustomAnim:add(target:GetId(), "sleepAnim")
+			-- GetCurrentMission().SleepTable[target:GetId()] = 2 --when this reaches 0, pawn is active, so 2 stops for 1 turn, 3 for 2 turns...
+		-- end
+	-- end
+	-- return 1
+-- end
 
 function Poke_DarkraiBoss:GetDeathEffect(point)
 	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
@@ -1111,7 +1111,7 @@ Poke_DarkPulseBoss = Skill:new{
 	Icon = "weapons/DarkPulse.png",	
 	Rarity = 3,
 	Name = "Dark Pulse",
-	Description = "Damage all surrounding tiles.",
+	Description = "Damage all surrounding tiles. If a mech is adjacent, puts it to sleep instead.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 1,
@@ -1136,15 +1136,28 @@ end
 
 function Poke_DarkPulseBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	for i = DIR_START, DIR_END do
+		local curr = p1 + DIR_VECTORS[i]
+		local pawn = Board:GetPawn(curr)
+		if pawn and pawn:IsMech() then
+			ret:AddQueuedDamage(SpaceDamage(curr, DAMAGE_ZERO))
+			ret:AddQueuedScript(string.format("Status.ApplySleep(%s, %s)", pawn:GetId(), 2))
+			return ret
+		end
+		curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
+		pawn = Board:GetPawn(curr)
+		if pawn and pawn:IsMech() then
+			ret:AddQueuedDamage(SpaceDamage(curr, DAMAGE_ZERO))
+			ret:AddQueuedScript(string.format("Status.ApplySleep(%s, %s)", pawn:GetId(), 2))
+			return ret
+		end
+	end
 	ret:AddQueuedAnimation(p1, "darkpulseAnim")
 	ret:AddDelay(0.2)
 	for i = DIR_START, DIR_END do
 		local curr = p1 + DIR_VECTORS[i]
 		ret:AddQueuedDamage(SpaceDamage(curr, self.Damage))
-	end
-	for i = DIR_START, DIR_END do
-		local curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
-		ret:AddQueuedDamage(SpaceDamage(curr, self.Damage))
+		ret:AddQueuedDamage(SpaceDamage(curr + DIR_VECTORS[(i+1)%4], self.Damage))
 	end
 	return ret
 end
@@ -1851,8 +1864,9 @@ function Poke_ArceusBoss:GetDeathEffect(point)
 	local arceus = Board:GetPawn(mission.Target)
 	-- Board:RemovePawn(arceus)
 	-- Board:AddPawn(arceus, point)
-	arceus:SetMaxHealth(30)
-	arceus:SetHealth(30)
+	arceus:SetMaxHealth(12)
+	arceus:SetHealth(12)
+	Status.Overheal(arceus:GetId(), 18)
 	arceus:SetCustomAnim("Arceus2")
 	Board:Ping(point, GL_Color(255, 255, 150))
 	arceus:RemoveWeapon(1)
