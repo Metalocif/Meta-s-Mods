@@ -421,7 +421,7 @@ a.Poke_Charmander_ns = a.MechIcon:new{Image="units/player/Charmander_ns.png"}
 a.Poke_Charmanderw =a.MechUnit:new{Image="units/player/Charmander_w.png", PosX = -12, PosY = 15}
 
 a.Poke_Charmeleon =a.MechUnit:new{Image="units/player/Charmeleon.png", PosX = -15, PosY = 3}
-a.Poke_Charmeleona = a.MechUnit:new{Image="units/player/Charmeleon_a.png",  PosX = -15, PosY = 3, NumFrames = 3 }
+a.Poke_Charmeleona = a.MechUnit:new{Image="units/player/Charmeleon_a.png",  PosX = -15, PosY = 3, NumFrames = 3, Frames = {0,1,2,1} }
 a.Poke_Charmeleon_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Charmeleon_ns = a.MechIcon:new{Image="units/player/Charmeleon_ns.png"}
 a.Poke_Charmeleonw =a.MechUnit:new{Image="units/player/Charmeleon_w.png", PosX = -15, PosY = 6}
