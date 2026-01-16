@@ -367,8 +367,6 @@ function Meta_TitanicGooAtk2:GetSkillEffect(p1,p2)
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetInvisible(false)", p2:GetString()))
 	local food = 0
 	for _, offset in ipairs(offsets) do
-		local curr = p1 + offset
-		if Board:IsSmoke(curr) and Board:GetPawn(p1) then Board:GetPawn(p1):ClearQueued() end
 		local tile = p2 + offset
 		if Board:GetPawn(tile) then 
 			food = food + 1 
