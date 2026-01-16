@@ -437,6 +437,7 @@ function Status.ApplyPowder(id)
 			damage.sAnimation = "explopush_"..i
 			ret:AddDamage(damage)
 		end
+		return
 	end
 	if mission.WetTable[id] then return end
 	mission.PowderTable[id] = true
@@ -552,7 +553,6 @@ function Status.ApplyToxin(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
-	LOG("--applying some toxin")
 	if Status.IsImmuneTo(pawn, "Toxin") then return end
 	mission.ToxinTable[id] = true
 	CustomAnim:add(id, "StatusToxin")
@@ -832,10 +832,14 @@ end
 
 local function PrepareTables()						--setup all status tables here so we don't need to check everywhere
 	modApi:conditionalHook(function()			--we need the conditional hook for some reason
-		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil or IsTestMechScenario())
+		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil)
 	end, 
 	function()
 		local mission = GetCurrentMission()
+		if not mission then 
+			LOG("Delayed status tables for some reason.")
+			modApi:runLater(function() PrepareTables() end)
+		end
 		local tablesList = Status.List()
 		for i = 1, #tablesList do
 			mission[tablesList[i].."Table"] = mission[tablesList[i].."Table"] or {}
@@ -860,6 +864,7 @@ end
 
 local function StoreInsanity()
 	local mission = GetCurrentMission()
+	if not mission then return end
 	if GAME.InsanityTable == nil then GAME.InsanityTable = {} end
 	for i = 0, 2 do
 		local pawn = Board:GetPawn(i)
@@ -981,14 +986,15 @@ local function EVENT_onModsLoaded()
 	modapiext:addPawnIsFireHook(function(mission, pawn, isFire)			--powder/dry/wet, remove chill/hemorrhage/roots/leechseed
 		if not (mission and pawn and isFire) then return end
 		local id = pawn:GetId()
+		local point = pawn:GetSpace()
 		if mission.WetTable and mission.WetTable[id] then
 			pawn:SetFire(false)
-			Board:SetSmoke(pawn:GetSpace(), true, true)
+			Board:SetSmoke(point, true, true)
 			Status.RemoveStatus(id, "Wet")
 		end
 		if mission.PowderTable[id] then
 			Status.RemoveStatus(id, "Powder")
-			local point = pawn:GetSpace()
+			
 			local amount = 1
 			if mission.DryTable[id] ~= nil then
 				amount = 2
