@@ -74,6 +74,9 @@ local function SetWeatherOverwriter(BoardClass, board)
     BoardClass.SetWeather = function(self, intensity, weather, loc1, loc2, timer)
         -- Assert.Equals("userdata", type(self), "Argument #0")
         local result
+		timer = timer or -1
+		intensity = intensity or 1
+		if weather == nil then return SetWeatherVanilla(self, intensity, weather, loc1, loc2, timer) end
         if timer == -1 and intensity > 0 then
 			if weather == RAIN_NORMAL then 
 				result = "Rain"
@@ -205,7 +208,7 @@ local function EVENT_onModsLoaded()
 			for _, p in ipairs(Board) do
 				local pawn = Board:GetPawn(p)
 				if pawn and pawn:IsFrozen() then pawn:SetFrozen(false) end
-				Status.RemoveStatus(pawn:GetId(), "Wet")
+				if pawn then Status.RemoveStatus(pawn:GetId(), "Wet") end
 				if Board:IsFrozen(p) then Board:SetFrozen(false) end
 				if Board:GetTerrain(p) == TERRAIN_ICE then Board:SetTerrain(p, TERRAIN_WATER) end
 				if pawn and _G[pawn:GetType()].FunctionInWeatherSun ~= nil then _G[pawn:GetType()].FunctionInWeatherSun(pawn:GetId()) end
