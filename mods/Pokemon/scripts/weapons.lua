@@ -52,6 +52,18 @@ for _, effect in ipairs(effects) do
 	Location["effects/"..effect] = Point(-12,3)
 end
 local effects = {
+	"vinewhiplaser_R.png",
+	"vinewhiplaser_R1.png",
+	"vinewhiplaser_R2.png",
+	-- "vinewhiplaser_start.png",
+	"vinewhiplaser_U.png",
+	"vinewhiplaser_U1.png",
+	"vinewhiplaser_U2.png",
+}
+for _, effect in ipairs(effects) do
+	Location["effects/"..effect] = Point(-12,3)
+end
+local effects = {
 	"laser_SpatialRift_R.png",
 	"laser_SpatialRift_R1.png",
 	"laser_SpatialRift_R2.png",
@@ -225,7 +237,7 @@ Poke_Pound = Skill:new{
 	Damage = 1,
 	PathSize = 1,	--automatically makes a target area?
 	ToSpawn = "",
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	LaunchSound = "/weapons/charge",
 	ImpactSound = "/weapons/charge_impact",
@@ -257,7 +269,7 @@ Poke_Slam = Brute_Beetle:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 3,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -328,7 +340,7 @@ Poke_Protect = Skill:new{
 	Damage = 0,
 	PathSize = 1,	--automatically makes a target area?
 	ToSpawn = "",
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 1,
 	UpgradeList = { "Free Action" },
 	UpgradeCost = { 3 },
@@ -390,7 +402,7 @@ Poke_Psywave = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 1,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "Crush Shields" },
 	UpgradeCost = { 2, 3 },
@@ -463,7 +475,7 @@ Poke_DragonRage = LineArtillery:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
 	UpgradeCost = { 2,3 },
@@ -497,7 +509,7 @@ Poke_Twister = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 1,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "Wind Mastery" },
 	UpgradeCost = { 2,2 },
@@ -586,7 +598,7 @@ Poke_Confusion = Skill:new{
 	Damage = 2,
 	PathSize = 1,	--automatically makes a target area?
 	ToSpawn = "",
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
 	UpgradeCost = { 2,3 },
@@ -660,7 +672,7 @@ Poke_Fly=Skill:new{
 	Damage = 3,
 	PathSize = 1,	--automatically makes a target area?
 	TwoClick = true,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "Global", "Push" },
 	UpgradeCost = { 2,2 },
@@ -791,7 +803,7 @@ Poke_Kinesis=Skill:new{
 	Damage = 0,
 	PathSize = 8,	--automatically makes a target area?
 	TwoClick = true,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 1,
 	UpgradeList = { "Fling" },
 	UpgradeCost = { 3 },
@@ -873,7 +885,7 @@ Poke_HyperBeam = LaserDefault:new{
 	Explosion = "",
 	LaunchSound = "/props/final_bomb_explode",
 	Damage = 3,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	MinDamage = 3,
 	FriendlyDamage = true,
 	ZoneTargeting = ZONE_DIR,
@@ -1285,7 +1297,7 @@ Poke_ShadowBall=Skill:new{
 	PathSize = 1,	--automatically makes a target area?
 	TwoClick = true,
 	Shots = 2,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+2 shots", "Fling" },
 	UpgradeCost = { 2, 3 },
@@ -1429,7 +1441,7 @@ Poke_DarkPulse = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	ZoneTargeting = ZONE_DIR,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "Extend Sleep" },
@@ -1493,7 +1505,7 @@ Poke_FormChange = Skill:new{
 	MinDamage = 1,
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	ZoneTargeting = ZONE_DIR,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
@@ -2380,7 +2392,7 @@ Poke_TakeDown = Brute_Beetle:new{
 	Damage = 2,
 	SelfDamage = 1,
 	PathSize = 4,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = {"+1 Damage", "+1 Damage"},
 	UpgradeCost = {2, 3},
@@ -2471,7 +2483,7 @@ Poke_ZenHeadbutt = Brute_Beetle:new{
 	Damage = 2,
 	SelfDamage = 0,
 	PathSize = 7,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = {"+1 Damage", "+1 Damage"},
 	UpgradeCost = {2, 3},
@@ -2562,7 +2574,7 @@ Poke_MetalClaw = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Strikes = 2,
 	Upgrades = 2,
 	UpgradeList = {"+1 Strike", "+1 Damage"},
@@ -2615,7 +2627,7 @@ Poke_MeteorMash = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Strikes = 3,
 	Upgrades = 2,
 	UpgradeList = {"+1 Strike", "+1 Damage"},
@@ -2682,7 +2694,7 @@ Poke_Bite = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	TwoClick = true,
 	Upgrades = 2,
 	UpgradeList = {"+1 Damage", "+1 Damage"},
@@ -2765,7 +2777,7 @@ Poke_Crunch = Poke_Bite:new{
 	Damage = 2,
 	SelfDamage = 0,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	TwoClick = true,
 	Upgrades = 2,
 	UpgradeList = {"+1 Damage", "+1 Damage"},
@@ -4115,7 +4127,7 @@ Poke_FutureSight = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
 	UpgradeCost = { 2,3 },
@@ -4190,7 +4202,7 @@ Poke_PsychoCut = Skill:new{
 	Damage = 2,
 	PathSize = 8,	--automatically makes a target area?
 	ToSpawn = "",
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
 	UpgradeCost = { 2,3 },
@@ -4229,7 +4241,7 @@ Poke_FuryCutter = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 1,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "Hemorrhage", "+1 Damage" },
 	UpgradeCost = { 1, 3 },
@@ -4306,7 +4318,7 @@ Poke_XScissor = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 1,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "Hemorrhage", "+1 Damage" },
 	UpgradeCost = { 1, 2 },
@@ -4350,7 +4362,7 @@ Poke_BulletPunch = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Shot" },
 	UpgradeCost = { 2, 3 },
@@ -4639,7 +4651,7 @@ Poke_VanishingStrikes = Skill:new{
 	Name = "Vanishing Strikes",
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Limited = 1,
 	Upgrades = 0,
 	ZoneTargeting = ZONE_CUSTOM,
@@ -4751,7 +4763,7 @@ Poke_ShatteredPsyche = Skill:new{
 	Name = "Shattered Psyche",
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Limited = 1,
 	Upgrades = 0,
 	ZoneTargeting = ZONE_CUSTOM,
@@ -4877,7 +4889,7 @@ Poke_MindOverMatter = Skill:new{
 	Name = "Mind over Matter",
 	Damage = 0,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Limited = 1,
 	Upgrades = 0,
 	TwoClick = true,
@@ -4958,7 +4970,7 @@ Poke_DracoMeteor = Skill:new{
 	Name = "Draco Meteor",
 	Damage = DAMAGE_DEATH,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Limited = 1,
 	Upgrades = 0,
 	TipImage = {
@@ -5070,7 +5082,7 @@ Poke_DragonBreath = LineArtillery:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Damage" },
 	UpgradeCost = { 2,3 },
@@ -5132,7 +5144,7 @@ Poke_FlashCannon = Skill:new{
 	Name = "Flash Cannon",
 	Damage = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	-- Upgrades = 2,
 	-- make blind AoE
 	-- +damage
@@ -5181,7 +5193,7 @@ Poke_RoarOfTime = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 5,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
 		Unit = Point(2,2),
@@ -5242,7 +5254,7 @@ Poke_Warpstrike = Skill:new{
 	Damage = 1,
 	Range = 2,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Range", "+1 Damage" },
 	UpgradeCost = { 1,2 },
@@ -5333,7 +5345,7 @@ Poke_SpatialRift = LaserDefault:new{
 	Explosion = "",
 	LaunchSound = "/props/final_bomb_explode",
 	Damage = 3,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	MinDamage = 3,
 	FriendlyDamage = true,
 	ZoneTargeting = ZONE_DIR,
@@ -5489,7 +5501,7 @@ Poke_ShadowForce = Skill:new{
 	Description = "Creates two shadow clones.",
 	Name = "Shadow Force",
 	Damage = 0,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	TwoClick = true,
 	TipImage = {
@@ -5567,7 +5579,7 @@ Poke_Wither = LineArtillery:new{
 	Damage = 2,
 	Weaken = 1,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Damage", "+1 Weaken" },
 	UpgradeCost = { 2,3 },
@@ -5645,7 +5657,7 @@ Poke_Judgment = Skill:new{
 	Damage = 2,
 	Range = 3,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "More Types", "More Types" },
 	UpgradeCost = { 2,2 },
@@ -5803,7 +5815,7 @@ Poke_Wormhole = Skill:new{
 	Name = "Wormhole",
 	Range = 3,
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Range", "+1 Range" },
 	UpgradeCost = { 2,2 },
@@ -5903,7 +5915,7 @@ Poke_Unmake = Skill:new{
 	Description = "Deletes a tile and its contents.",
 	Name = "Unmake",
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	Limited = 1,
 	ZoneTargeting = ZONE_CUSTOM,
@@ -6077,7 +6089,7 @@ Poke_Present = Skill:new{
 	Description = "Gifts a random weapon to an ally if it can equip any. Heals and boosts allies otherwise. Deals 1 damage to enemies.",
 	Name = "Present",
 	PathSize = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	Damage = 1,
 	ZoneTargeting = ZONE_CUSTOM,
@@ -6142,7 +6154,7 @@ Poke_ScorchingSands = Skill:new{
 	Name = "Scorching Sands",
 	Damage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	TipImage = {
 		Unit = Point(2,3),
@@ -6200,7 +6212,7 @@ Poke_DragonTail = Skill:new{
 	Damage = 1,
 	Range = 1,
 	Cost = "high",
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeCost = { 1,3 },
 	UpgradeList = { "Long Push", "+1 Damage" },
@@ -6267,7 +6279,7 @@ Poke_MountainHurl = Skill:new{
 	Name = "Mountain Hurl",
 	Damage = DAMAGE_DEATH,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Limited = 1,
 	Upgrades = 0,
 	TipImage = {
@@ -6323,18 +6335,22 @@ end
 
 
 
-Poke_VineWhip = Skill:new{
+Poke_VineWhip = LaserDefault:new{
 	Class = "TechnoVek",
 	Icon = "weapons/VineWhip.png",	
 	Rarity = 3,
 	Name = "Vine Whip",
 	Description = "Whip a target at a distance and drag it sideways or towards the user. Deals +1 damage to wet targets.",
 	Push = 1,--TOOLTIP HELPER
-	Damage = 1,
+	MinDamage = 1,
+	Damage = 2,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	TwoClick = true,
+	Explosion = "",
+	LaserArt = "effects/vinewhiplaser",
+	LaunchSound = "",
 	Upgrades = 2,
 	UpgradeList = {"Extra Target", "+1 Damage"},
 	UpgradeCost = {2, 3},
@@ -6357,6 +6373,17 @@ function Poke_VineWhip:IsTwoClickException(p1, p2)
 	--if trying to pull a stable pawn and we can't shoot in two directions, we don't need a second click
 end
 
+function Poke_VineWhip:GetTargetArea(point)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		for j = 1, 8 do
+			ret:push_back(point + DIR_VECTORS[i] * j) 
+			if Board:IsBlocked(point + DIR_VECTORS[i] * j, PATH_PROJECTILE) then break end
+		end
+	end
+	return ret
+end
+
 function Poke_VineWhip:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
 	local direction = GetDirection(p2 - p1)
@@ -6369,37 +6396,40 @@ function Poke_VineWhip:GetSecondTargetArea(p1, p2)
 			end
 		end
 	end
-	
 	return ret
+end
+
+function Poke_VineWhip:AddLaser(ret,point,direction,forced_end,pushDirection)
+	local damage = self.MinDamage
+	local start = point - DIR_VECTORS[direction]
+	while Board:IsValid(point) do
+		local dam = SpaceDamage(point, self.Damage)
+		local pawn = Board:GetPawn(point)
+		if pawn and Status.GetStatus(pawn:GetId(), "Wet") then dam.iDamage = self.Damage end
+		if point == forced_end then dam.iPush = pushDirection end
+		if forced_end == point or Board:IsBuilding(point) or Board:GetTerrain(point) == TERRAIN_MOUNTAIN or not Board:IsValid(point + DIR_VECTORS[direction]) then
+			ret:AddProjectile(start,dam,self.LaserArt,FULL_DELAY)
+			break
+		end
+					
+		point = point + DIR_VECTORS[direction]	
+	end
 end
 
 function Poke_VineWhip:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
-	local amount = self.Damage
-	if Board:GetPawn(p2) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Wet") then amount = amount + 1 end
-	local damage = SpaceDamage(p2, amount, (direction + 2)%4)
-	ret:AddDamage(damage)
+	self:AddLaser(ret, p1 + DIR_VECTORS[direction], direction, p2, (direction + 2)%4)
 	return ret
 end
 
 function Poke_VineWhip:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
-	if p2:Manhattan(p3) == 1 then 	--standard yank
-		local amount = self.Damage
-		if Board:GetPawn(p2) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Wet") then amount = amount + 1 end
-		local dir2 = GetDirection(p3 - p2)
-		local damage = SpaceDamage(p2, amount, dir2)
-		ret:AddDamage(damage)
-	else							--second pull
-		local amount = self.Damage
-		if Board:GetPawn(p2) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Wet") then amount = amount + 1 end
-		local damage1 = SpaceDamage(p2, amount, (GetDirection(p2-p1)+2)%4)
-		ret:AddDamage(damage1)
-		amount = self.Damage
-		if Board:GetPawn(p3) and Status.GetStatus(Board:GetPawn(p2):GetId(), "Wet") then amount = amount + 1 end
-		local damage2 = SpaceDamage(p3, amount, (GetDirection(p3-p1)+2)%4)
-		ret:AddDamage(damage2)
+	if p2:Manhattan(p3) == 1 then 
+		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p2-p1)], GetDirection(p2-p1), p2, GetDirection(p3-p2))
+	else
+		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p2-p1)], GetDirection(p2-p1), p2, (GetDirection(p2-p1)+2)%4)
+		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p3-p1)], GetDirection(p3-p1), p2, (GetDirection(p3-p1)+2)%4)
 	end
 	return ret
 end
@@ -6418,7 +6448,7 @@ Poke_Growth = Skill:new{
 	Damage = 0,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -6473,7 +6503,7 @@ Poke_Blossom = Skill:new{
 	Damage = 0,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 0,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -6526,7 +6556,7 @@ Poke_Spore = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Duration = 1,
 	Upgrades = 1,
 	UpgradeList = {"+1 Turn"},
@@ -6569,7 +6599,7 @@ Poke_ToxicPowder = Skill:new{
 	Damage = 0,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Duration = 1,
 	Upgrades = 1,
 	UpgradeList = {"+1 Turn"},
@@ -6677,7 +6707,7 @@ Poke_PowderPuff = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Range = 3,
 	Upgrades = 1,
 	UpgradeList = {"+2 Range"},
@@ -6740,7 +6770,7 @@ Poke_FireTail = Skill:new{
 	Damage = 1,
 	SelfDamage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Duration = 1,
 	Upgrades = 0,
 	TwoClick = true,
@@ -6853,7 +6883,7 @@ Poke_Withdraw = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	PathSize = 8,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	TwoClick = true,
 	Upgrades = 2,
 	UpgradeList = {"Wet", "Stop"},
@@ -7043,7 +7073,7 @@ Poke_BulletSeed = Skill:new{
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Shot", "+1 Shot" },
 	UpgradeCost = { 2, 3 },
@@ -7095,13 +7125,12 @@ Poke_SolarBeam = LaserDefault:new{
 	Rarity = 4,
 	Explosion = "",
 	Damage = 3,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	MinDamage = 2,
 	Damage = 3,
 	FriendlyDamage = true,
 	ZoneTargeting = ZONE_DIR,
 	LaserArt = "effects/laser_solarbeam",
-	-- LaserArt = "effects/laser1",
 	Upgrades = 1,
 	UpgradeList = { "+1 Damage" },
 	UpgradeCost = { 3 },
@@ -7227,7 +7256,7 @@ Poke_BubbleBeam = Skill:new{
 	Damage = 1,
 	Range = 3,
 	PathSize = 8,	--automatically makes a target area?
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "+1 Range", "+1 Range" },
 	UpgradeCost = { 1, 2 },
@@ -7335,7 +7364,7 @@ Poke_Flamethrower = Skill:new{
 	PathSize = 2,
 	Damage = 2,
 	Push = 1,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "Dry",  "+1 Range"  },
 	UpgradeCost = { 1 , 2 },
@@ -7401,7 +7430,7 @@ Poke_HydroPump = LaserDefault:new{
 	Rarity = 4,
 	Explosion = "",
 	Damage = 2,
-	PowerCost = 0, --AE Change
+	PowerCost = 0,
 	MinDamage = 2,
 	FriendlyDamage = true,
 	ZoneTargeting = ZONE_DIR,
