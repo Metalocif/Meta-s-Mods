@@ -6341,11 +6341,12 @@ Poke_VineWhip = Skill:new{
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
 		Unit = Point(2,2),
-		Enemy = Point(2,1),
-		Target = Point(2,1),
-		-- Second_Origin = Point(2,2),
-		-- Second_Target = Point(2,2),
-		-- Second_Click = Point(2,2),
+		Enemy = Point(2,0),
+		Target = Point(2,0),
+		Water = Point(1,0),
+		Second_Origin = Point(2,2),
+		Second_Target = Point(1,0),
+		Second_Click = Point(1,0),
 		CustomPawn = "Poke_Bulbasaur",
 	}
 }
@@ -6748,7 +6749,11 @@ Poke_FireTail = Skill:new{
 		Unit = Point(2,2),
 		Enemy1 = Point(2,1),
 		Enemy2 = Point(1,2),
-		Target = Point(2,2),
+		Water = Point(2,0),
+		Target = Point(1,1),
+		Second_Origin = Point(2,2),
+		Second_Target = Point(2,0),
+		Second_Click = Point(2,0),
 		CustomPawn = "Poke_Charmander",
 	}
 }
@@ -6855,12 +6860,14 @@ Poke_Withdraw = Skill:new{
 	UpgradeCost = {1, 1},
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
-		Unit = Point(2,2),
+		Unit = Point(2,4),
 		Enemy = Point(2,1),
-		Target = Point(2,1),
-		-- Second_Origin = Point(2,2),
-		-- Second_Target = Point(2,2),
-		-- Second_Click = Point(2,2),
+		Target = Point(2,2),
+		Water = Point(2,0),
+		Building = Point(0,2),
+		-- Second_Origin = Point(2,4),
+		-- Second_Target = Point(1,2),
+		Second_Click = Point(1,2),
 		CustomPawn = "Poke_Squirtle",
 	}
 }
@@ -6894,14 +6901,16 @@ end
 function Poke_Withdraw:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
-	local pawnType = Board:GetPawn(p1):GetType()
-	local id = Board:GetPawn(p1):GetId()
-	local resetToCustomAnim = _G[pawnType].Image
-	local evo = GAME.Poke_Evolutions[id + 1]
-	local branch = GAME.BranchingEvos[id + 1]
-	if pawnType == "Poke_Squirtle" then 
-		resetToCustomAnim = _G[pawnType].EvoGraphics[branch][evo] or _G[pawnType].Image
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), resetToCustomAnim.."shell"))
+	if GAME and not Board:GetSize() == Point(6, 6) then
+		local pawnType = Board:GetPawn(p1):GetType()
+		local id = Board:GetPawn(p1):GetId()
+		local resetToCustomAnim = _G[pawnType].Image
+		local evo = GAME.Poke_Evolutions[id + 1]
+		local branch = GAME.BranchingEvos[id + 1]
+		if pawnType == "Poke_Squirtle" then 
+			resetToCustomAnim = _G[pawnType].EvoGraphics[branch][evo] or _G[pawnType].Image
+			ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), resetToCustomAnim.."shell"))
+		end
 	end
 	local move = PointList()
 	move:push_back(p1)
@@ -6921,21 +6930,21 @@ function Poke_Withdraw:GetSkillEffect(p1,p2)
 		end
 		ret:AddDamage(damage)
 	end
-	if GetCurrentMission() and Game and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
-		
+	if GetCurrentMission() and GAME and Game and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
+	
 		ret:AddScript(string.format([[if not Game or not Game:GetTurnCount() then return end
-						GetCurrentMission().LastWithdrawTurn = Game:GetTurnCount()
-						modApi:conditionalHook(
-							function() 
-								return Game and GetCurrentMission() and 
-								Game:GetTurnCount() and GetCurrentMission().LastWithdrawTurn and 
-								Game:GetTurnCount() > GetCurrentMission().LastWithdrawTurn 
-							end,
-							function()
-								Board:GetPawn(%s):SetCustomAnim(%q)
-							end)
-					  ]], id, resetToCustomAnim))
-					  
+					GetCurrentMission().LastWithdrawTurn = Game:GetTurnCount()
+					modApi:conditionalHook(
+						function() 
+							return Game and GetCurrentMission() and 
+							Game:GetTurnCount() and GetCurrentMission().LastWithdrawTurn and 
+							Game:GetTurnCount() > GetCurrentMission().LastWithdrawTurn 
+						end,
+						function()
+							Board:GetPawn(%s):SetCustomAnim(%q)
+						end)
+				  ]], id, resetToCustomAnim))
+				  
 	end
 	return ret
 end
@@ -6943,14 +6952,16 @@ end
 function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
 	local direction = GetDirection(p3 - p2)
-	local pawnType = Board:GetPawn(p1):GetType()
-	local id = Board:GetPawn(p1):GetId()
-	local resetToCustomAnim = _G[pawnType].Image
-	local evo = GAME.Poke_Evolutions[id + 1]
-	local branch = GAME.BranchingEvos[id + 1]
-	if pawnType == "Poke_Squirtle" then 
-		resetToCustomAnim = _G[pawnType].EvoGraphics[branch][evo] or _G[pawnType].Image
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), resetToCustomAnim.."shell"))
+	if GAME and not Board:GetSize() == Point(6, 6) then
+		local pawnType = Board:GetPawn(p1):GetType()
+		local id = Board:GetPawn(p1):GetId()
+		local resetToCustomAnim = _G[pawnType].Image
+		local evo = GAME.Poke_Evolutions[id + 1]
+		local branch = GAME.BranchingEvos[id + 1]
+		if pawnType == "Poke_Squirtle" then 
+			resetToCustomAnim = _G[pawnType].EvoGraphics[branch][evo] or _G[pawnType].Image
+			ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), resetToCustomAnim.."shell"))
+		end
 	end
 	local target = p2
 	if self.Stop then 
@@ -6998,21 +7009,21 @@ function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 		end
 	end
 	ret:AddDamage(SpaceDamage(target + DIR_VECTORS[direction], 0, direction))
-	if GetCurrentMission() and Game and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
-		
+	if GetCurrentMission() and GAME and Game and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
+	
 		ret:AddScript(string.format([[if not Game or not Game:GetTurnCount() then return end
-						GetCurrentMission().LastWithdrawTurn = Game:GetTurnCount()
-						modApi:conditionalHook(
-							function() 
-								return Game and GetCurrentMission() and 
-								Game:GetTurnCount() and GetCurrentMission().LastWithdrawTurn and 
-								Game:GetTurnCount() > GetCurrentMission().LastWithdrawTurn 
-							end,
-							function()
-								Board:GetPawn(%s):SetCustomAnim(%q)
-							end)
-					  ]], id, resetToCustomAnim))
-					  
+					GetCurrentMission().LastWithdrawTurn = Game:GetTurnCount()
+					modApi:conditionalHook(
+						function() 
+							return Game and GetCurrentMission() and 
+							Game:GetTurnCount() and GetCurrentMission().LastWithdrawTurn and 
+							Game:GetTurnCount() > GetCurrentMission().LastWithdrawTurn 
+						end,
+						function()
+							Board:GetPawn(%s):SetCustomAnim(%q)
+						end)
+				  ]], id, resetToCustomAnim))
+				  
 	end
 	return ret
 end
@@ -7182,9 +7193,10 @@ Poke_WaterGun = Skill:new{
 	Upgrades = 0,
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
-		Unit = Point(2,2),
-		Enemy = Point(2,0),
-		Target = Point(2,0),
+		Unit = Point(2,4),
+		Enemy = Point(2,2),
+		Target = Point(2,2),
+		Mountain = Point(2,1),
 		CustomPawn = "Poke_Squirtle",
 	}
 }
