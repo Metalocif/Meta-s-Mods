@@ -463,6 +463,8 @@ a.Poke_Squirtleshell = a.MechUnit:new{Image="units/player/Squirtle_shell.png",  
 a.Poke_Squirtle_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Squirtle_ns = a.MechIcon:new{Image="units/player/Squirtle_ns.png"}
 a.Poke_Squirtlew =a.MechUnit:new{Image="units/player/Squirtle_w.png", PosX = -12, PosY = 15}
+a.Poke_Squirtleshell_ns = a.Poke_Squirtle_ns
+
 
 a.Poke_Wartortle =a.MechUnit:new{Image="units/player/Wartortle.png", PosX = -10, PosY = -4}
 a.Poke_Wartortlea = a.MechUnit:new{Image="units/player/Wartortle_a.png",  PosX = -15, PosY = 3, NumFrames = 3, Frames = {0,1,2,1}, }
@@ -470,6 +472,7 @@ a.Poke_Wartortleshell = a.MechUnit:new{Image="units/player/Wartortle_shell.png",
 a.Poke_Wartortle_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Wartortle_ns = a.MechIcon:new{Image="units/player/Wartortle_ns.png"}
 a.Poke_Wartortlew =a.MechUnit:new{Image="units/player/Wartortle_w.png", PosX = -15, PosY = 6}
+a.Poke_Wartortleshell_ns = a.Poke_Wartortle_ns
 
 a.Poke_Blastoise =a.MechUnit:new{Image="units/player/Blastoise.png", PosX = -10, PosY = 6}
 a.Poke_Blastoisea = a.MechUnit:new{Image="units/player/Blastoise_a.png",  PosX = -20, PosY = 6, NumFrames = 3, Frames = {0,2,1,2}, }
@@ -477,6 +480,7 @@ a.Poke_Blastoiseshell = a.MechUnit:new{Image="units/player/Blastoise_shell.png",
 a.Poke_Blastoise_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
 a.Poke_Blastoise_ns = a.MechIcon:new{Image="units/player/Blastoise_ns.png"}
 a.Poke_Blastoisew =a.MechUnit:new{Image="units/player/Blastoise_w.png", PosX = -20, PosY = 6}
+a.Poke_Blastoiseshell_ns = a.Poke_Blastoise_ns
 
 modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
