@@ -7275,22 +7275,22 @@ function Poke_BubbleBeam:GetSkillEffect(p1,p2)
 		end
 		ret:AddDamage(damage)
 	end
-	ret:AddEmitter(p1, "Emitter_BubbleBeam_"..dir)
+	ret:AddEmitter(p1, "Emitter_BubbleBeam"..p1:Manhattan(p2).."_"..dir)
 	return ret
 end
-Emitter_BubbleBeam_0 = Emitter:new{
+Emitter_BubbleBeam1_0 = Emitter:new{
 	image = "effects/bubble.png",
 	variance = 0,
-	variance_x = 15,
+	variance_x = 5,
 	variance_y = 5,
 	timer = 0.5,
-	x = 5, y = -5,
-	angle = 315,
+	x = 3, y = -2,
+	angle = 330,
 	rot_speed = 0,
 	angle_variance = 5,
-	lifespan = 0.5,
-	birth_rate = 0.01,
-	speed = 8,
+	lifespan = 0.4,
+	birth_rate = 0.005,
+	speed = 4,
 	seed = 4,
 	min_alpha = 0.6,
 	max_alpha = 0.7,
@@ -7298,9 +7298,29 @@ Emitter_BubbleBeam_0 = Emitter:new{
 	random_rot = true,
 	layer = LAYER_FRONT,
 }
-Emitter_BubbleBeam_1 = Emitter_BubbleBeam_0:new{ angle = 45, x = 5, y = 5,}
-Emitter_BubbleBeam_2 = Emitter_BubbleBeam_0:new{ angle = 135, x = -5, y = 5,}
-Emitter_BubbleBeam_3 = Emitter_BubbleBeam_0:new{ angle = 225, x = -5, y = -5,}
+Emitter_BubbleBeam1_1 = Emitter_BubbleBeam1_0:new{ angle = 30, x = 3, y = 8,}
+Emitter_BubbleBeam1_2 = Emitter_BubbleBeam1_0:new{ angle = 150, x = -3, y = 8,}
+Emitter_BubbleBeam1_3 = Emitter_BubbleBeam1_0:new{ angle = 210, x = -3, y = -2,}
+
+Emitter_BubbleBeam2_0 = Emitter_BubbleBeam1_0:new{ speed = 8, }
+Emitter_BubbleBeam2_1 = Emitter_BubbleBeam1_1:new{ speed = 8, }
+Emitter_BubbleBeam2_2 = Emitter_BubbleBeam1_2:new{ speed = 8, }
+Emitter_BubbleBeam2_3 = Emitter_BubbleBeam1_3:new{ speed = 8, }
+
+Emitter_BubbleBeam3_0 = Emitter_BubbleBeam1_0:new{ speed = 12, }
+Emitter_BubbleBeam3_1 = Emitter_BubbleBeam1_1:new{ speed = 12, }
+Emitter_BubbleBeam3_2 = Emitter_BubbleBeam1_2:new{ speed = 12, }
+Emitter_BubbleBeam3_3 = Emitter_BubbleBeam1_3:new{ speed = 12, }
+
+Emitter_BubbleBeam4_0 = Emitter_BubbleBeam1_0:new{ speed = 16, }
+Emitter_BubbleBeam4_1 = Emitter_BubbleBeam1_1:new{ speed = 16, }
+Emitter_BubbleBeam4_2 = Emitter_BubbleBeam1_2:new{ speed = 16, }
+Emitter_BubbleBeam4_3 = Emitter_BubbleBeam1_3:new{ speed = 16, }
+
+Emitter_BubbleBeam5_0 = Emitter_BubbleBeam1_0:new{ speed = 20, }
+Emitter_BubbleBeam5_1 = Emitter_BubbleBeam1_1:new{ speed = 20, }
+Emitter_BubbleBeam5_2 = Emitter_BubbleBeam1_2:new{ speed = 20, }
+Emitter_BubbleBeam5_3 = Emitter_BubbleBeam1_3:new{ speed = 20, }
 
 
 Poke_Flamethrower = Skill:new{  
