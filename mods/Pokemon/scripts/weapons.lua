@@ -7358,7 +7358,7 @@ Poke_Flamethrower = Skill:new{
 	Description = "Deals damage in a line and burns targets. Can self-target to set the current weather to Sunny. While the weather is Sunny, applying fire to pawns deals 1 damage, ice melts, and wet pawns dry.",
 	Rarity = 3,
 	Explosion = "",
---	LaunchSound = "/weapons/titan_fist",
+	LaunchSound = "/weapons/flamethrower",
 	Range = 2, -- Tooltip?
 	PathSize = 2,
 	Damage = 2,
@@ -7373,7 +7373,7 @@ Poke_Flamethrower = Skill:new{
 		Enemy = Point(2,2),
 		CustomPawn = "Poke_Charmander",
 	}
-	LaunchSound = "/weapons/flamethrower"
+	
 }
 
 function Poke_Flamethrower:GetTargetArea(point)
