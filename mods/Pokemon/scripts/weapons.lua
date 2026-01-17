@@ -6400,10 +6400,9 @@ function Poke_VineWhip:GetSecondTargetArea(p1, p2)
 end
 
 function Poke_VineWhip:AddLaser(ret,point,direction,forced_end,pushDirection)
-	local damage = self.MinDamage
 	local start = point - DIR_VECTORS[direction]
 	while Board:IsValid(point) do
-		local dam = SpaceDamage(point, self.Damage)
+		local dam = SpaceDamage(point, self.MinDamage)
 		local pawn = Board:GetPawn(point)
 		if pawn and Status.GetStatus(pawn:GetId(), "Wet") then dam.iDamage = self.Damage end
 		if point == forced_end then dam.iPush = pushDirection end
@@ -7368,7 +7367,12 @@ Poke_Flamethrower = Skill:new{
 	Upgrades = 2,
 	UpgradeList = { "Dry",  "+1 Range"  },
 	UpgradeCost = { 1 , 2 },
-	TipImage = StandardTips.Ranged,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,2),
+		Enemy = Point(2,2),
+		CustomPawn = "Poke_Charmander",
+	}
 	LaunchSound = "/weapons/flamethrower"
 }
 
