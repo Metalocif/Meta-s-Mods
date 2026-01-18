@@ -6932,10 +6932,11 @@ end
 function Poke_Withdraw:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
+	local pawnType = Board:GetPawn(p1):GetType()
+	local id = Board:GetPawn(p1):GetId()
 	local resetToCustomAnim = _G[pawnType].Image
 	if GAME and Board:GetSize() ~= Point(6, 6) then
-		local pawnType = Board:GetPawn(p1):GetType()
-		local id = Board:GetPawn(p1):GetId()
+		
 		local evo = GAME.Poke_Evolutions[id + 1]
 		local branch = GAME.BranchingEvos[id + 1]
 		if pawnType == "Poke_Squirtle" then 
@@ -6983,10 +6984,11 @@ end
 function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
 	local direction = GetDirection(p3 - p2)
+	local pawnType = Board:GetPawn(p1):GetType()
+	local id = Board:GetPawn(p1):GetId()
 	local resetToCustomAnim = _G[pawnType].Image
 	if GAME and Board:GetSize() ~= Point(6, 6) then
-		local pawnType = Board:GetPawn(p1):GetType()
-		local id = Board:GetPawn(p1):GetId()
+		
 		local evo = GAME.Poke_Evolutions[id + 1]
 		local branch = GAME.BranchingEvos[id + 1]
 		if pawnType == "Poke_Squirtle" then 
