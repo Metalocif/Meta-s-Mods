@@ -1,6 +1,6 @@
 
 ---------------------------------------------------------------------
--- Status effects v1.0 - code library
+-- Status effects v2.0 - code library
 ---------------------------------------------------------------------
 -- A library that adds status effects to the game. Weapons and pilot skills can apply status effects.
 -- See the wiki for info: https://github.com/Metalocif/Meta-s-Mods/wiki/Status-Library
@@ -55,6 +55,39 @@ ANIMS.StatusInsanity2 = Animation:new{ Image = "libs/status/Insanity2.png", PosX
 ANIMS.StatusInsanity3 = Animation:new{ Image = "libs/status/Insanity3.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusInsanity4 = Animation:new{ Image = "libs/status/Insanity4.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 8, Frames={0,1,2,3,4,5,6,7,6,5,4,3,2,1,0}, Time = 0.75, Loop = true}
+
+--Metatable voodoo to enable the syntax dmg.iToxin = EFFECT_CREATE; these values are read later.
+
+-- SpaceDamageStatusMT = setmetatable({}, { __mode = "k" })
+-- local mt = getmetatable(SpaceDamage(0))
+-- local oldIndex = mt.__index
+
+--Intercepts reads; translates dmg.iToxin to SpaceDamageStatusMT[SpaceDamageInstance][Toxin]
+-- mt.__index = function(SpaceDamageInstance, key)
+    -- local extra = SpaceDamageStatusMT[SpaceDamageInstance]
+    -- if extra and extra[key] ~= nil then
+		-- LOG("read "..key)
+        -- return extra[key]
+    -- end
+
+    -- if type(oldIndex) == "function" then
+        -- return oldIndex(SpaceDamageInstance, key)
+    -- elseif oldIndex then
+        -- return oldIndex[key]
+    -- end
+-- end
+
+--Intercepts writes; stores whatever is assigned to a nonexistent key of a SpaceDamage.
+-- mt.__newindex = function(SpaceDamageInstance, key, value)
+	-- if key and value then LOG("new index: "..key.." "..tostring(value)) end
+    -- if key == "iToxin" then
+		-- LOG("wrote toxin")
+        -- SpaceDamageStatusMT[SpaceDamageInstance] = SpaceDamageStatusMT[SpaceDamageInstance] or {}
+        -- SpaceDamageStatusMT[SpaceDamageInstance][key] = value
+        -- return
+    -- end
+-- end
+
 
 
 
@@ -1467,9 +1500,29 @@ local function EVENT_onModsLoaded()
 	end
 	modapiext:addSkillBuildHook(function(mission, pawn, weaponId, p1, p2, skillEffect)
 		DoDodge(mission, pawn, skillEffect)
-	end)
-	modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
-		DoDodge(mission, pawn, skillEffect)
+		
+		-- for _, fx in ipairs(extract_table(skillEffect.effect)) do
+			-- if SpaceDamageStatusMT[fx] then
+				-- if SpaceDamageStatusMT[fx][iToxin] then
+					-- fx.sImageMark = "combat/arrow_off_up.png"
+					-- if Board:GetPawn(fx.loc) then skillEffect:AddScript(string.format("Status.ApplyToxin(%s)", Board:GetPawn(fx.loc):GetId())) end
+				-- end
+			-- end
+		-- end
+		
+	-- end)
+	-- modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
+		-- DoDodge(mission, pawn, skillEffect)
+		
+		-- for _, fx in ipairs(extract_table(skillEffect.effect)) do
+			-- if SpaceDamageStatusMT[fx] then
+				-- if SpaceDamageStatusMT[fx][iToxin] then
+					-- LOG("found toxin on space damage")
+					-- fx.sImageMark = "combat/arrow_off_up.png"
+					-- if Board:GetPawn(fx.loc) then skillEffect:AddScript(string.format("Status.ApplyToxin(%s)", Board:GetPawn(fx.loc):GetId())) end
+				-- end
+			-- end
+		-- end
 	end)
 	LOG("Status Library added its hooks.")
 end

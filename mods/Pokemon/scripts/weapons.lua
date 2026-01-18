@@ -6403,6 +6403,8 @@ function Poke_VineWhip:AddLaser(ret,point,direction,forced_end,pushDirection)
 	local start = point - DIR_VECTORS[direction]
 	while Board:IsValid(point) do
 		local dam = SpaceDamage(point, self.MinDamage)
+		-- dam.iToxin = 1
+		-- LOG(SpaceDamageStatusMT[dam].iToxin)
 		local pawn = Board:GetPawn(point)
 		if pawn and Status.GetStatus(pawn:GetId(), "Wet") then dam.iDamage = self.Damage end
 		if point == forced_end then dam.iPush = pushDirection end
@@ -6428,7 +6430,7 @@ function Poke_VineWhip:GetFinalEffect(p1,p2,p3)
 		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p2-p1)], GetDirection(p2-p1), p2, GetDirection(p3-p2))
 	else
 		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p2-p1)], GetDirection(p2-p1), p2, (GetDirection(p2-p1)+2)%4)
-		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p3-p1)], GetDirection(p3-p1), p2, (GetDirection(p3-p1)+2)%4)
+		self:AddLaser(ret, p1 + DIR_VECTORS[GetDirection(p3-p1)], GetDirection(p3-p1), p3, (GetDirection(p3-p1)+2)%4)
 	end
 	return ret
 end
@@ -6930,10 +6932,10 @@ end
 function Poke_Withdraw:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
-	if GAME and not Board:GetSize() == Point(6, 6) then
+	local resetToCustomAnim = _G[pawnType].Image
+	if GAME and Board:GetSize() ~= Point(6, 6) then
 		local pawnType = Board:GetPawn(p1):GetType()
 		local id = Board:GetPawn(p1):GetId()
-		local resetToCustomAnim = _G[pawnType].Image
 		local evo = GAME.Poke_Evolutions[id + 1]
 		local branch = GAME.BranchingEvos[id + 1]
 		if pawnType == "Poke_Squirtle" then 
@@ -6981,10 +6983,10 @@ end
 function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
 	local direction = GetDirection(p3 - p2)
-	if GAME and not Board:GetSize() == Point(6, 6) then
+	local resetToCustomAnim = _G[pawnType].Image
+	if GAME and Board:GetSize() ~= Point(6, 6) then
 		local pawnType = Board:GetPawn(p1):GetType()
 		local id = Board:GetPawn(p1):GetId()
-		local resetToCustomAnim = _G[pawnType].Image
 		local evo = GAME.Poke_Evolutions[id + 1]
 		local branch = GAME.BranchingEvos[id + 1]
 		if pawnType == "Poke_Squirtle" then 
@@ -7301,6 +7303,7 @@ function Poke_BubbleBeam:GetSkillEffect(p1,p2)
 		elseif not Board:IsBlocked(curr, PATH_GROUND) then 
 			damage.sItem = "Poke_Puddle" 
 		end
+		damage.iDelay = 0.1
 		ret:AddDamage(damage)
 	end
 	ret:AddEmitter(p1, "Emitter_BubbleBeam"..p1:Manhattan(p2).."_"..dir)
