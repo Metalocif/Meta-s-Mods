@@ -1082,7 +1082,7 @@ Poke_Charmander = Pawn:new{
 	Name = "Charmander",
 	Class = "TechnoVek",
 	Health = 2,
-	MoveSpeed = 3,
+	MoveSpeed = 4,
 	Massive = true,
 	Corpse = true,
 	IgnoreFire = true,
@@ -1106,7 +1106,7 @@ Poke_Squirtle = Pawn:new{
 	Name = "Squirtle",
 	Class = "TechnoVek",
 	Health = 3,
-	MoveSpeed = 4,
+	MoveSpeed = 3,
 	Massive = true,
 	Corpse = true,
 	-- This is not quite what I want, but I can't find a way to refer to the pawn instance for which we are running GetArmor
