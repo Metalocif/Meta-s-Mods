@@ -121,9 +121,9 @@ function this:init(mod)
 		if GAME.StSDefectOrb == "Lightning" then 
 			local damage = SpaceDamage(p2, 2)
 			damage.sAnimation = "LightningBoltBig"
+			damage.iShocked = 1
 			ret:AddDamage(damage)
 			ret:AddSound("/props/lightning_strike")
-			if Board:GetPawn(p2) then ret:AddScript(string.format("modApi:runLater(function() Status.ApplyShocked(%s) end)", Board:GetPawn(p2):GetId())) end
 			if Board:GetSize() ~= Point(6, 6) then --I hate tip images
 				ret:AddScript(string.format("customAnim:rem(%s, %q)", user:GetId(), "LightningOrb"))
 				ret:AddScript(string.format("customAnim:add(%s, %q)", user:GetId(), "FrostOrb"))
@@ -140,8 +140,9 @@ function this:init(mod)
 		elseif GAME.StSDefectOrb == "Frost" then
 			for i = DIR_START, DIR_END do
 				local curr = p1 + DIR_VECTORS[i]
-				local pawn = Board:GetPawn(curr)
-				if pawn then ret:AddScript(string.format("Status.ApplyChill(%s)", pawn:GetId())) end
+				local chillDamage = SpaceDamage(curr)
+				chillDamage.iChill = 1
+				ret:AddDamage(chillDamage)
 				local freezeDamage = SpaceDamage(p1)
 				freezeDamage.iFrozen = 1
 				ret:AddDamage(freezeDamage)
