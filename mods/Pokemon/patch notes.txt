@@ -1,6 +1,11 @@
 v1.8
-- Release of the Bulbasaur/Charmander/Blastoise squad, Kanto's Finest.
+- Release of the Bulbasaur/Charmander/Squirtle squad, Kanto's Finest.
 - Darkrai boss tweak. Its attack turns into a move that sets a mech to sleep instead of dealing damage when a mech is adjacent.
+- Arceus nerf. Normal-type judgment pushes but does not flip. Removed Fairy-type Judgement and added Psychic-type Judgment, which flips all units hit.
+  - While playing Arceus is supposed to be God mode, the baseline Judgment was too good at solving literally any board.
+- Jolteon animation improvement.
+- Psycho Cut nerf. Removed its second upgrade, capping it at 3 damage.
+- Started using the new Status Library; custom status effects now preview nicely.
 
 v1.7.2
 - Bugfixes in Fire Blast, Shockwave, and Thunder.
