@@ -3,7 +3,6 @@ local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/effects/item_seedflare.png", resourcePath.."img/effects/item_seedflare.png")
 modApi:appendAsset("img/effects/item_gracidea.png", resourcePath.."img/effects/item_gracidea.png")
 modApi:appendAsset("img/effects/item_stealthrocks.png", resourcePath.."img/effects/item_stealthrocks.png")
-modApi:appendAsset("img/effects/item_puddle.png", resourcePath.."img/effects/item_puddle.png")
 modApi:appendAsset("img/effects/item_shadow.png", resourcePath.."img/effects/item_shadow.png")
 for i = 1,4 do
 modApi:appendAsset("img/effects/item_rubble"..i..".png", resourcePath.."img/effects/item_rubble"..i..".png")
@@ -13,13 +12,12 @@ modApi:appendAsset("img/effects/item_rubble_crushed.png", resourcePath.."img/eff
 merge_table(TILE_TOOLTIPS, { Poke_SeedFlare_Text = {"Seed Flare", "Deals 3 Damage to units that move onto it."},
 						     Poke_Gracidea_Text = {"Gracidea", "Boosts units that move onto it."},
 							 Poke_StealthRock_Text = {"Stealth Rocks", "Deals 1 damage to units that move onto it, doubled against flying units."},
-							 Poke_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}, 
 							 Poke_Shadow_Text = {"Shadow", "Blinds pawns that step on it."}, 
 							 Poke_TimeRune_Text = {"Runes", "When a mech performs an action on this tile, it will be able to act again. Limited-use weapons will also be reloaded."}
 						   })	
 
-local rubbledamage = SpaceDamage(0)
-rubbledamage.sSound = "/support/rock/death"
+-- local rubbledamage = SpaceDamage(0)
+-- rubbledamage.sSound = "/support/rock/death"
 
 Poke_SeedFlareItem = { Image = "effects/item_seedflare.png", Damage = SpaceDamage(3), Tooltip = "Poke_SeedFlare_Text", Icon = "effects/item_seedflare.png", UsedImage = ""}
 Location["effects/item_seedflare.png"] = Point(-10,10)
@@ -27,8 +25,6 @@ Poke_Gracidea = { Image = "effects/item_gracidea.png", Damage = SpaceDamage(0), 
 Location["effects/item_gracidea.png"] = Point(-10,10)
 Poke_StealthRock = { Image = "effects/item_stealthrocks.png", Damage = SpaceDamage(0), Tooltip = "Poke_StealthRock_Text", Icon = "effects/item_stealthrocks.png", UsedImage = ""}
 Location["effects/item_stealthrocks.png"] = Point(-15,0)
-Poke_Puddle = { Image = "effects/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Poke_Puddle_Text", Icon = "effects/item_puddle.png", UsedImage = ""}
-Location["effects/item_puddle.png"] = Point(-22,6)
 Poke_DarkTendrilsItem = { Image = "effects/item_shadow.png", Damage = SpaceDamage(0), Tooltip = "Poke_Shadow_Text", Icon = "effects/item_shadow.png", UsedImage = ""}
 Location["effects/item_shadow.png"] = Point(-27,2)
 Poke_Rubble1 = { Image = "effects/item_rubble1.png", Damage = rubbledamage, Tooltip = "", Icon = "effects/item_rubble1.png", UsedImage = "effects/item_rubble_crushed.png"}
@@ -66,14 +62,6 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
 			local rockDamage = SpaceDamage(loc, 1)
 			if pawn:IsFlying() then rockDamage.iDamage = 2 end
 			Board:DamageSpace(rockDamage)
-		end
-	elseif removed_item == "Poke_Puddle" then
-		if (pawn and pawn:IsFire()) or Board:IsFire(loc) then
-			local smokeDamage = SpaceDamage(loc)
-			smokeDamage.iSmoke = 1
-			Board:DamageSpace(smokeDamage)
-		elseif pawn then
-			Status.ApplyWet(pawn:GetId())
 		end
 	elseif removed_item == "Poke_TimeRune" and Board:GetTerrain(loc) ~= TERRAIN_HOLE and Board:GetTerrain(loc) ~= TERRAIN_WATER then
 		Board:SetTerrain(loc, TERRAIN_ROAD)
