@@ -82,7 +82,7 @@ function meta_firefly:GetSkillEffect(p1, p2, remainingShots)
 	damage.sAnimation = "ExploFirefly2"
 	damage.sImageMark = MultishotLib:getImageMark(1, remainingShots, p1, target)
 	local pawn = Board:GetPawn(target)
-	if pawn then damage.sScript = string.format("Status.ApplyGunk(%s)", pawn:GetId()) end
+	damage.iGunk = 1
 	if pawn and IsGooey(pawn:GetType()) and pawn:GetTeam() == TEAM_PLAYER then damage.iDamage = 0 end
 	ret:AddProjectile(p1, damage, "effects/shot_firefly2", NO_DELAY)
 	ret:AddDelay(0.15)
