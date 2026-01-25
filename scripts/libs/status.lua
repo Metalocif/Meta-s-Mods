@@ -11,12 +11,13 @@
 -- These typically check whether a pawn with the given ID exists and whether a mission is ongoing, then adds the ID to the status' table and an animation.
 -- These tables are checked when relevant in the hooks below.
 
+local VERSION = "2.0.0"
 
+local isNewerVersion = false
+    or Status == nil             -- First time loading
+    or Status.version == nil     -- Existing version is unversioned
+    or VERSION > Status.version  -- This file is newer than what's loaded
 
-if StatusLibLoaded then return false end
-
-local path = mod_loader.mods[modApi.currentMod].resourcePath
-Status = {}
 
 modApi:appendAssets("img/libs/status/", "img/libs/status/")
 
@@ -27,24 +28,24 @@ ANIMS.StatusBonded = Animation:new{ Image = "libs/status/bonded.png", PosX = 0, 
 ANIMS.StatusBondedOff = Animation:new{ Image = "libs/status/bonded_off.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusChill = Animation:new{ Image = "libs/status/chill.png", PosX = -10, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusConfusion = Animation:new{ Image = "libs/status/confusion.png", PosX = 0, PosY = 0, NumFrames = 2, Time = 0.5, Loop = true}
-ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusDry = Animation:new{ Image = "libs/status/dry.png", PosX = 0, PosY = 0, NumFrames = 3, Time = 0.3, Loop = true}
 ANIMS.StatusDodge1 = Animation:new{ Image = "libs/status/dodge1.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusDodge2 = Animation:new{ Image = "libs/status/dodge2.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusDodge3 = Animation:new{ Image = "libs/status/dodge3.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusDoomed = Animation:new{ Image = "combat/icons/icon_tentacle.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusGunk = Animation:new{ Image = "libs/status/gunk.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusDoomed = Animation:new{ Image = "libs/status/doomed_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory_icon.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusGunk = Animation:new{ Image = "libs/status/gunk.png", PosX = -5, PosY = 0, NumFrames = 6, Time = 1, Loop = true}
 ANIMS.StatusHemorrhage = Animation:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
 ANIMS.StatusLeechSeed = Animation:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusNecrosis = Animation:new{ Image = "libs/status/necrosis.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusNecrosis = Animation:new{ Image = "libs/status/necrosis_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusShatterburst = Animation:new{ Image = "libs/status/shatterburst.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusShocked = Animation:new{ Image = "libs/status/shocked.png", PosX = -5, PosY = 0, NumFrames = 4, Time = 0.15, Loop = true}
 ANIMS.StatusSleep = Animation:new{ Image = "libs/status/sleep.png", PosX = -30, PosY = -20, NumFrames = 7, Time = 0.3, Loop = true}
 ANIMS.StatusPowder = Animation:new{ Image = "libs/status/powder.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusRegen = Animation:new{ Image = "combat/icons/icon_regen.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusRegen = Animation:new{ Image = "libs/status/icon_regen.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusReactive = Animation:new{ Image = "libs/status/reactive.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusRooted = Animation:new{ Image = "libs/status/rooted.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusRooted = Animation:new{ Image = "libs/status/rooted_icon.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusTargeted = Animation:new{ Image = "libs/status/targeted.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusToxin = Animation:new{ Image = "libs/status/toxin.png", PosX = 0, PosY = 0, NumFrames = 6, Time = 0.15, Loop = true}
 ANIMS.StatusWeaken = Animation:new{ Image = "libs/status/weaken.png", PosX = -15, PosY = 0, NumFrames = 6, Time = 0.1, Loop = true}
@@ -56,43 +57,488 @@ ANIMS.StatusInsanity3 = Animation:new{ Image = "libs/status/Insanity3.png", PosX
 ANIMS.StatusInsanity4 = Animation:new{ Image = "libs/status/Insanity4.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
 ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 8, Frames={0,1,2,3,4,5,6,7,6,5,4,3,2,1,0}, Time = 0.75, Loop = true}
 
+
+Location["libs/status/alluring_icon.png"] = Point(-5,0)
+Location["libs/status/alluring_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/blind_icon.png"] = Point(-5,0)
+Location["libs/status/blind_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/bloodthirsty_icon.png"] = Point(-5,0)
+Location["libs/status/bloodthirsty_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/bonded_icon.png"] = Point(-5,0)
+Location["libs/status/bonded_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/chill_icon.png"] = Point(-5,0)
+Location["libs/status/chill_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/confusion_icon.png"] = Point(-5,0)
+Location["libs/status/confusion_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/dodge_icon.png"] = Point(-5,0)
+Location["libs/status/dodge_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/doomed_icon.png"] = Point(-5,0)
+Location["libs/status/doomed_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/dreadful_icon.png"] = Point(-5,0)
+Location["libs/status/dreadful_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/dry_icon.png"] = Point(-5,0)
+Location["libs/status/dry_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/glory_icon.png"] = Point(-5,0)
+Location["libs/status/glory_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/hemorrhage_icon.png"] = Point(-5,0)
+Location["libs/status/hemorrhage_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/infested_icon.png"] = Point(-5,0)
+Location["libs/status/infested_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/leechseed_icon.png"] = Point(-5,0)
+Location["libs/status/leechseed_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/necrosis_icon.png"] = Point(-5,0)
+Location["libs/status/necrosis_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/powder_icon.png"] = Point(-5,0)
+Location["libs/status/powder_icon_trigger.png"] = Point(-5,0)
+Location["libs/status/powder_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/reactive_icon.png"] = Point(-5,0)
+Location["libs/status/reactive_icon_remove.png"] = Point(-5,0)
+Location["libs/status/reactive_icon_trigger.png"] = Point(-5,0)
+
+Location["libs/status/regen_icon.png"] = Point(-5,0)
+Location["libs/status/regen_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/rooted_icon.png"] = Point(-5,0)
+Location["libs/status/rooted_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/shatterburst_icon.png"] = Point(-5,0)
+Location["libs/status/shatterburst_icon_remove.png"] = Point(-5,0)
+Location["libs/status/shatterburst_icon_trigger.png"] = Point(-5,0)
+
+Location["libs/status/shocked_icon.png"] = Point(-5,0)
+Location["libs/status/shocked_icon_remove.png"] = Point(-5,0)
+Location["libs/status/shocked_icon_trigger.png"] = Point(-5,0)
+Location["libs/status/shocked_icon_stun.png"] = Point(-5,0)
+
+Location["libs/status/sleep_icon.png"] = Point(-5,0)
+Location["libs/status/sleep_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/targeted_icon.png"] = Point(-5,0)
+Location["libs/status/targeted_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/toxin_icon.png"] = Point(-5,0)
+Location["libs/status/toxin_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/weaken_icon.png"] = Point(-5,0)
+Location["libs/status/weaken_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/wet_icon.png"] = Point(-5,0)
+Location["libs/status/wet_icon_remove.png"] = Point(-5,0)
+
 --Metatable voodoo to enable the syntax dmg.iToxin = EFFECT_CREATE; these values are read later.
-
--- SpaceDamageStatusMT = setmetatable({}, { __mode = "k" })
--- local mt = getmetatable(SpaceDamage(0))
--- local oldIndex = mt.__index
-
---Intercepts reads; translates dmg.iToxin to SpaceDamageStatusMT[SpaceDamageInstance][Toxin]
--- mt.__index = function(SpaceDamageInstance, key)
-    -- local extra = SpaceDamageStatusMT[SpaceDamageInstance]
-    -- if extra and extra[key] ~= nil then
-		-- LOG("read "..key)
-        -- return extra[key]
-    -- end
-
-    -- if type(oldIndex) == "function" then
-        -- return oldIndex(SpaceDamageInstance, key)
-    -- elseif oldIndex then
-        -- return oldIndex[key]
-    -- end
--- end
+local function SetupMetatable()
+local mt = getmetatable(SpaceDamage(0))
+local oldNewIndex = mt.__newindex
 
 --Intercepts writes; stores whatever is assigned to a nonexistent key of a SpaceDamage.
--- mt.__newindex = function(SpaceDamageInstance, key, value)
-	-- if key and value then LOG("new index: "..key.." "..tostring(value)) end
-    -- if key == "iToxin" then
-		-- LOG("wrote toxin")
-        -- SpaceDamageStatusMT[SpaceDamageInstance] = SpaceDamageStatusMT[SpaceDamageInstance] or {}
-        -- SpaceDamageStatusMT[SpaceDamageInstance][key] = value
-        -- return
-    -- end
--- end
+mt.__newindex = function(SpaceDamageInstance, key, value)
+	if not (SpaceDamageInstance and SpaceDamageInstance.loc) then return oldNewIndex(SpaceDamageInstance, key, value) end
+	local pawn = Board:GetPawn(SpaceDamageInstance.loc)
+	--Handle applying status effects to empty spaces
+	if not pawn then 
+		if key == "iWet" then
+			if not Board:IsBlocked(SpaceDamageInstance.loc, PATH_GROUND) then SpaceDamageInstance.sItem = "Status_Puddle" end
+			return
+		elseif key == "iPowder" then
+			if Board:IsFire(SpaceDamageInstance.loc) then
+				SpaceDamageInstance.sImageMark = "libs/status/powder_icon_trigger.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyPowder(%q)", SpaceDamageInstance.loc.x.."_"..SpaceDamageInstance.loc.y)
+				return
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/powder_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyPowder(%q)", SpaceDamageInstance.loc.x.."_"..SpaceDamageInstance.loc.y)
+				return
+			end
+		else
+			return oldNewIndex(SpaceDamageInstance, key, value)
+		end
+	end
+	
+	local id = pawn:GetId()
+	
+	--Handle vanilla status triggering custom status
+	if key == "iFire" and value == 1 then
+		local fullScript = ""
+		if Status.GetStatus(id, "Chill") then
+			SpaceDamageInstance.sImageMark = "libs/status/chill_icon_remove.png"
+			fullScript = fullScript..string.format("Status.RemoveStatus(%q, %s)", "Chill", id)
+			SpaceDamageInstance.sScript = fullScript
+		end
+		if Status.GetStatus(id, "Hemorrhage") then
+			SpaceDamageInstance.sImageMark = "libs/status/hemorrhage_icon_remove.png"
+			fullScript = fullScript..string.format("Status.RemoveStatus(%q, %s)", "Hemorrhage", id)
+			SpaceDamageInstance.sScript = fullScript
+		end
+		if Status.GetStatus(id, "LeechSeed") then
+			SpaceDamageInstance.sImageMark = "libs/status/leechseed_icon_remove.png"
+			fullScript = fullScript..string.format("Status.RemoveStatus(%q, %s)", "LeechSeed", id)
+			SpaceDamageInstance.sScript = fullScript
+		end
+		if Status.GetStatus(id, "Rooted") then
+			SpaceDamageInstance.sImageMark = "libs/status/rooted_icon_remove.png"
+			fullScript = fullScript..string.format("Status.RemoveStatus(%q, %s)", "Rooted", id)
+			SpaceDamageInstance.sScript = fullScript
+		end
+		if Status.GetStatus(id, "Wet") then
+			SpaceDamageInstance.iSmoke = 1
+			SpaceDamageInstance.sImageMark = "libs/status/wet_icon_remove.png"
+			fullScript = fullScript..string.format("Status.RemoveStatus(%q, %s)", "Wet", id)
+			SpaceDamageInstance.sScript = fullScript
+			return oldNewIndex(SpaceDamageInstance, key, 0)
+		end
+		--handle Dry -> damage + 1 here?
+	end
+	if key == "iAcid" and value == 1 then
+		if Status.GetStatus(id, "Toxin") then
+			SpaceDamageInstance.sImageMark = "libs/status/toxin_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Toxin", id)
+		end
+		if Status.GetStatus(id, "Reactive") then
+			SpaceDamageInstance.sImageMark = "libs/status/reactive_icon_trigger.png"
+			SpaceDamageInstance.sScript = string.format([[Status.RemoveStatus(%q, %s)
+			local p = %s
+			for i = DIR_START, DIR_END do
+				Board:AddSmoke(p + DIR_VECTORS[i])
+			end]], "Reactive", id, SpaceDamageInstance.loc)
+			return oldNewIndex(SpaceDamageInstance, key, 0)
+		end
+	end
+	if key == "iFreeze" and value == 1 then
+		if Status.GetStatus(id, "Shatterburst") then
+			SpaceDamageInstance.sImageMark = "libs/status/shatterburst_icon_trigger.png"
+			SpaceDamageInstance.sScript = string.format([[Status.RemoveStatus(%q, %s)
+			local p = %s
+			for i = DIR_START, DIR_END do
+				Board:DamageSpace(SpaceDamage(p + DIR_VECTORS[i], 1))
+			end]], "Shatterburst", id, SpaceDamageInstance.loc)
+			return oldNewIndex(SpaceDamageInstance, key, 0)
+		end
+	end
+	
+    if key == "iAlluring" then
+		if value then
+			SpaceDamageInstance.sImageMark = "libs/status/alluring_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyAlluring(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/alluring_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Alluring", id, value)
+		end
+        return
+	elseif key == "iBlind" then
+		if value > 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/blind_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyBlind(%s, value)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/blind_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Blind", id)
+		end
+        return
+	elseif key == "iBloodthirsty" then
+		if value then
+			SpaceDamageInstance.sImageMark = "libs/status/bloodthirsty_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyBloodthirsty(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/bloodthirsty_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Bloodthirsty", id)
+		end
+        return
+	elseif key == "iBonded" then
+		if value then
+			SpaceDamageInstance.sImageMark = "libs/status/bonded_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyBonded(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/bonded_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Bonded", id)
+		end
+        return
+	elseif key == "iChill" or key == "iChilled" then
+		if value == 1 and not pawn:IsFire() and not pawn:IsFrozen() then
+			if Status.GetStatus(id, "Chill") then
+				SpaceDamageInstance.iFrozen = 1
+				return oldNewIndex(SpaceDamageInstance, key, 0)
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/chill_icon.png"
+				SpaceDamageInstance.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", id, value)
+			end
+		elseif not pawn:IsFrozen() then
+			SpaceDamageInstance.sImageMark = "libs/status/chill_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Chill", id)
+		end
+        return
+	elseif key == "iConfusion" then
+		if value and value > 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/confusion_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyConfusion(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/confusion_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Confusion", id)
+		end
+        return
+	elseif key == "iDodge" then
+		if value and value ~= 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/dodge_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyDodge(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/dodge_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Dodge", id)
+		end
+        return
+	elseif key == "iDoomed" or key == "iDoom" then
+		if value then
+			if type(value) == "table" then 
+				value.amount = value.amount or 1
+			else
+				value = {source = -1, amount = value or 1 }
+			end
+			SpaceDamageInstance.sImageMark = "libs/status/doomed_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyDoomed(%s, %s, %s)", id, value.source, value.amount)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/doomed_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Doomed", id)
+		end
+        return
+	elseif key == "iDreadful" then
+		if value then
+			SpaceDamageInstance.sImageMark = "libs/status/dreadful_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyDreadful(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/dreadful_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Dreadful", id)
+		end
+        return
+	elseif key == "iDry" then		--removes Wet instead of applying; deals 1 damage to pawns on fire; does nothing on pawns in water
+		if value then
+			if Status.GetStatus(id, "Wet") then
+				SpaceDamageInstance.sImageMark = "libs/status/wet_icon_remove.png"
+				SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Wet", id)
+				return oldNewIndex(SpaceDamageInstance, key, 0)
+			elseif pawn:IsFire() then
+				if SpaceDamageInstance.iDamage ~= DAMAGE_DEATH then
+					if SpaceDamageInstance.iDamage == DAMAGE_ZERO then 
+						SpaceDamageInstance.iDamage = 1 
+					else
+						SpaceDamageInstance.iDamage = SpaceDamageInstance.iDamage + 1
+					end
+					SpaceDamageInstance.sImageMark = "libs/status/dry_icon_trigger.png"
+				end
+			elseif Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER then
+				SpaceDamageInstance.sImageMark = "libs/status/dry_icon_remove.png"
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/dry_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyDry(%s)", id)
+			end
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/dry_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Dry", id)
+		end
+        return
+	elseif key == "iGlory" then
+        if value > 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/glory_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyGlory(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/glory_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Glory", id)
+		end
+        return
+	elseif key == "iHemorrhage" then
+        if value == 1 and not pawn:IsFire() then
+			SpaceDamageInstance.sImageMark = "libs/status/hemorrhage_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyHemorrhage(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/hemorrhage_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Hemorrhage", id)
+		end
+        return
+	elseif key == "iInfested" then
+        if value == 1 and not pawn:IsFire() then
+			SpaceDamageInstance.sImageMark = "libs/status/hemorrhage_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyHemorrhage(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/hemorrhage_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Hemorrhage", id)
+		end
+        return
+	elseif key == "iLeechSeed" then
+        if value >= 0 and not pawn:IsFire() then
+			SpaceDamageInstance.sImageMark = "libs/status/leechseed_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyLeechSeed(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/leechseed_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "LeechSeed", id)
+		end
+        return
+	elseif key == "iNecrosis" then
+        if value == 1 then
+			SpaceDamageInstance.sImageMark = "libs/status/necrosis_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyNecrosis(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/necrosis_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Necrosis", id)
+		end
+        return
+	
+	elseif key == "iPowder" then
+        if value == 1 and not Status.GetStatus(id, "Wet") then
+			if pawn:IsFire() then
+				SpaceDamageInstance.sImageMark = "libs/status/powder_icon_trigger.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyPowder(%s)", id)
+				--increase damage amount here?
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/powder_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyPowder(%s)", id)
+			end
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/powder_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Powder", id)
+		end
+        return
+	elseif key == "iReactive" then
+        if value == 1 then
+			if pawn:IsAcid() then
+				SpaceDamageInstance.sImageMark = "libs/status/reactive_icon_trigger.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyReactive(%s)", id)
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/reactive_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyReactive(%s)", id)
+			end
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/reactive_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Reactive", id)
+		end
+        return
+	elseif key == "iRegen" then
+        if value > 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/regen_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyRegen(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/regen_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Regen", id)
+		end
+        return
+	elseif key == "iRooted" then
+        if value and not pawn:IsFire() then
+			SpaceDamageInstance.sImageMark = "libs/status/rooted_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyRooted(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/rooted_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Rooted", id)
+		end
+        return
+	elseif key == "iShatterburst" then
+        if value == 1 then
+			SpaceDamageInstance.sImageMark = "libs/status/shatterburst_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyShatterburst(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/shatterburst_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Shatterburst", id)
+		end
+        return
+	elseif key == "iShocked" then
+        if value == 1 then
+			if Status.GetStatus(id, "Wet") or Status.GetStatus(id, "Shocked") then
+				SpaceDamageInstance.sImageMark = "libs/status/shocked_icon_stun.png"
+				SpaceDamageInstance.sScript = string.format("Board:GetPawn(%s):ClearQueued() Status.ApplyShocked(%s, %s)", id, id, tostring(not (SpaceDamageInstance.iDamage > 0 and SpaceDamageInstance.iDamage ~= DAMAGE_ZERO)))
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/shocked_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyShocked(%s, %s)", id, tostring(not (SpaceDamageInstance.iDamage > 0 and SpaceDamageInstance.iDamage ~= DAMAGE_ZERO)))
+			end
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/shocked_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Shocked", id)
+		end
+        return
+	elseif key == "iSleep" then
+        if type(value) == "number" and value == 2 then
+			SpaceDamageInstance.sImageMark = "libs/status/sleep_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Sleep", id)
+		else
+			if type(value) == "table" then 
+				value.turns = value.turns or 1
+			else
+				value = {turns = value or 1, addTurns = false }
+			end
+			SpaceDamageInstance.sImageMark = "libs/status/sleep_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplySleep(%s, %s, %s)", id, value.turns, tostring(value.addTurns))
+		end
+        return
+	elseif key == "iTargeted" then
+        if value > 0 then
+			SpaceDamageInstance.sImageMark = "libs/status/targeted_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyTargeted(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/targeted_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Targeted", id)
+		end
+        return
+    elseif key == "iToxin" then
+        if value == 1 and not pawn:IsAcid() then
+			SpaceDamageInstance.sImageMark = "libs/status/toxin_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyToxin(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/toxin_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Toxin", id)
+		end
+        return
+	elseif key == "iWeaken" or key == "iWeak" then
+		if value then
+			if type(value) == "table" then 
+				value.amount = value.amount or 1
+				value.recoverPerTurn = value.recoverPerTurn or 0
+			else
+				value = {recoverPerTurn = 0, amount = value or 1 }
+			end
+			SpaceDamageInstance.sImageMark = "libs/status/weaken_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyWeaken(%s, %s, %s)", id, value.amount, value.recoverPerTurn)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/weaken_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Weaken", id)
+		end
+        return
+	elseif key == "iWet" then
+        if value then
+			if pawn:IsFire() then
+				SpaceDamageInstance.iSmoke = 1
+			elseif Status.GetStatus(id, "Chill") then
+				SpaceDamageInstance.iFrozen = 1
+			elseif Status.GetStatus(id, "Shocked") then
+				SpaceDamageInstance.sImageMark = "libs/status/shocked_icon_stun.png"
+				SpaceDamageInstance.sScript = string.format("Board:GetPawn(%s):ClearQueued() Status.ApplyWet(%s)", id, id)
+			else
+				SpaceDamageInstance.sImageMark = "libs/status/wet_icon.png"
+				SpaceDamageInstance.sScript = string.format("Status.ApplyWet(%s)", id)
+			end
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/wet_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Wet", id)
+		end
+        return
+    end
+	return oldNewIndex(SpaceDamageInstance, key, value)
+end
+end
 
 
-
-
+local function AlterScoringFunctions()
 local oldScorePositioning = ScorePositioning
 function ScorePositioning(point, pawn)
+	point = point or Point(-1, -1)
 	local mission = GetCurrentMission()
 	if not mission then return oldScorePositioning(point, pawn) end
 	mission.AdjScoreTable = mission.AdjScoreTable or {}
@@ -103,23 +549,38 @@ function ScorePositioning(point, pawn)
 	--nil check for Vek outside the board
 end
 
+local oldScoreList = Skill:ScoreList()
 function Skill:ScoreList(list, queued)
 	local mission = GetCurrentMission()
+	if not mission then return oldScoreList(list, queued) end
+	
 	local id = Pawn:GetId()
 	local pos = Pawn:GetSpace()
 	local score = 0
 	local posScore = 0
 	
-	if not mission then
-		for i = 1, list:size() do
-			local spaceDamage = list:index(i)
-			local target = spaceDamage.loc
+	mission.BlindTable = mission.BlindTable or {}
+	mission.BloodthirstyTable = mission.BloodthirstyTable or {}
+	mission.ConfusionTable = mission.ConfusionTable or {}
+	mission.TargetedTable = mission.TargetedTable or {}
+	
+	local isBlind = mission.BlindTable[id]
+	local bloodthirstAmount = mission.BloodthirstyTable[id] or 0
+	
+	if isBlind then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
+
+	for i = 1, list:size() do
+		local spaceDamage = list:index(i)
+		local target = spaceDamage.loc
+		if pos:Manhattan(target) <= 2 or not isBlind then
 			local damage = spaceDamage.iDamage 
-			local moving = spaceDamage:IsMovement() and spaceDamage:MoveStart() == Pawn:GetSpace()
+			local moving = spaceDamage:IsMovement() and spaceDamage:MoveStart() == pos
+			
 			if Board:IsValid(target) or moving then	
+				local foundPawn = Board:GetPawn(target)
 				if spaceDamage:IsMovement() then
 					posScore = posScore + ScorePositioning(spaceDamage:MoveEnd(), Pawn)
-				elseif Board:IsPawnSpace(target) and Board:GetPawn(target):IsNonGridStructure() then
+				elseif foundPawn and foundPawn:IsNonGridStructure() then
 					score = score + self.ScoreBuilding
 				elseif Board:GetPawnTeam(target) == Pawn:GetTeam() and damage > 0 then
 					if Board:IsFrozen(target) and not Board:IsTargeted(target) then
@@ -128,75 +589,34 @@ function Skill:ScoreList(list, queued)
 						score = score + self.ScoreFriendlyDamage
 					end
 				elseif isEnemy(Board:GetPawnTeam(target),Pawn:GetTeam()) then
-						if Board:GetPawn(target):IsDead() or Board:GetPawn(target):IsTempUnit() then 
-							score = self.ScoreNothing
-						else
-							score = score + self.ScoreEnemy
-						end
-				elseif Board:IsBuilding(target) and Board:IsPowered(target) and damage > 0 then
+					if foundPawn:IsDead() or foundPawn:IsTempUnit() then 
+						score = score + self.ScoreNothing
+					else
+						score = score + self.ScoreEnemy + bloodthirstAmount
+					end
+				elseif Board:IsBuilding(target) and Board:IsPowered(target) and (damage > 0 and damage ~= DAMAGE_ZERO) then
 					score = score + self.ScoreBuilding
-				elseif Board:IsPod(target) and not queued and (damage > 0 or spaceDamage.sPawn ~= "") then
+				elseif Board:IsPod(target) and not queued and ((damage > 0 and damage ~= DAMAGE_ZERO) or spaceDamage.sPawn ~= "") then
 					return -100
 				else
 					score = score + self.ScoreNothing
 				end
+				if foundPawn and mission.TargetedTable[foundPawn:GetId()] then score = score + mission.TargetedTable[foundPawn:GetId()] end
 			end
-		end
-	else
-		mission.AdjScoreTable = mission.AdjScoreTable or {}
-		mission.BlindTable = mission.BlindTable or {}
-		mission.BloodthirstyTable = mission.BloodthirstyTable or {}
-		mission.ConfusionTable = mission.ConfusionTable or {}
-		mission.TargetedTable = mission.TargetedTable or {}
-		if mission.BlindTable[id] then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
-	
-		for i = 1, list:size() do
-			local spaceDamage = list:index(i)
-			local target = spaceDamage.loc
-			if mission.BlindTable[id] == nil or pos:Manhattan(target) <= 2 then
-				local damage = spaceDamage.iDamage 
-				local moving = spaceDamage:IsMovement() and spaceDamage:MoveStart() == Pawn:GetSpace()
-				
-				if Board:IsValid(target) or moving then	
-					local foundPawn = Board:GetPawn(target)
-					if spaceDamage:IsMovement() then
-						posScore = posScore + ScorePositioning(spaceDamage:MoveEnd(), Pawn)
-					elseif foundPawn and foundPawn:IsNonGridStructure() then
-						score = score + self.ScoreBuilding
-					elseif Board:GetPawnTeam(target) == Pawn:GetTeam() and damage > 0 then
-						if Board:IsFrozen(target) and not Board:IsTargeted(target) then
-							score = score + self.ScoreEnemy
-						else
-							score = score + self.ScoreFriendlyDamage
-						end
-					elseif isEnemy(Board:GetPawnTeam(target),Pawn:GetTeam()) then
-						if foundPawn:IsDead() or foundPawn:IsTempUnit() then 
-							score = self.ScoreNothing
-						else
-							score = score + self.ScoreEnemy
-							if mission.BloodthirstyTable[Pawn:GetId()] then score = score + mission.BloodthirstyTable[Pawn:GetId()] end
-						end
-					elseif Board:IsBuilding(target) and Board:IsPowered(target) and damage > 0 then
-						score = score + self.ScoreBuilding
-					elseif Board:IsPod(target) and not queued and (damage > 0 or spaceDamage.sPawn ~= "") then
-						return -100
-					else
-						score = score + self.ScoreNothing
-					end
-					if Board:IsPawnSpace(target) and mission.TargetedTable[Board:GetPawn(target):GetId()] then score = score + mission.TargetedTable[foundPawn:GetId()] end
-				end
-			elseif mission.BlindTable[id] then LOG("Blinded to a damage in "..target:GetString()..".") end
+		elseif isBlind then 
+			LOG("Blinded to a damage in "..target:GetString()..".") 
 		end
 	end
-	if mission and mission.ConfusionTable[Pawn:GetId()] ~= nil then 
+	if mission.ConfusionTable[id] then 
 		if posScore > -50 then posScore = -posScore end	--don't get confused into stepping on pods/ignoring blindness range restriction
 		if score > -50 then score = -score end			--don't get confused into spawning unqueued stuff on top of pods
 	end
 	if posScore < -5 then return posScore end
 	return score
 end
+end
 
-
+local function CreateStatusFunctions()
 function Status.IsImmuneTo(pawn, status)
 	if not pawn or not status or status == "" then return false end
 	if _G[pawn:GetType()][status.."Immune"] then return true end
@@ -298,9 +718,9 @@ function Status.ApplyDodge(id, amount, distance, movementType, smart)
 	if movementType ~= "Walk" and movementType ~= "Leap" and movementType ~= "Burrow" and movementType ~= "Teleport" then movementType = "Walk" end
 	--smart means "try to reposition in a non-suicidal way"
 	if mission.DodgeTable[id] then
-		CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id][amount])
-		mission.DodgeTable[id][amount] = math.min(mission.DodgeTable[id][amount] + amount, 3)
-		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id][amount])
+		CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id].amount)
+		mission.DodgeTable[id].amount = math.min(mission.DodgeTable[id].amount + amount, 3)
+		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id].amount)
 	else	
 		mission.DodgeTable[id] = {amount = amount, distance = distance, movementType = movementType, smart = smart}
 		CustomAnim:add(id, "StatusDodge"..amount)
@@ -313,13 +733,13 @@ function Status.LowerDodge(id)
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if not mission.DodgeTable[id] then return end
-	if not mission.DodgeTable[id][amount] then return end
-	CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id][amount])
-	mission.DodgeTable[id][amount] = mission.DodgeTable[id][amount] - 1
-	if mission.DodgeTable[id][amount] <= 0 then 
+	if not mission.DodgeTable[id].amount then return end
+	CustomAnim:rem(id, "StatusDodge"..mission.DodgeTable[id].amount)
+	mission.DodgeTable[id].amount = mission.DodgeTable[id].amount - 1
+	if mission.DodgeTable[id].amount <= 0 then 
 		mission.DodgeTable[id] = nil 
 	else
-		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id][amount])
+		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id].amount)
 	end
 end
 
@@ -456,25 +876,49 @@ function Status.ApplyNecrosis(id)
 end
 
 function Status.ApplyPowder(id)
-	local pawn = Board:GetPawn(id)
-	if not pawn then return end
+	local pawn, point
+	if type(id) == "number" then
+		LOG("powdering a pawn")
+		pawn = Board:GetPawn(id)
+	else
+		point = Point(tonumber(string.sub(id, 1, 1)), tonumber(string.sub(id, -1)))
+		LOG("powdering a point:"..point:GetString())
+	end
+	if not (pawn or point) then LOG("no powder") return end
 	local mission = GetCurrentMission()
 	if not mission then return end
-	if Status.IsImmuneTo(pawn, "Powder") then return end
-	if pawn:IsFire() then
-		local explosionDamage = SpaceDamage(p2, 1)
+	
+	local ret = SkillEffect()
+	if point and Board:IsFire(point) then
+		local explosionDamage = SpaceDamage(point, 1)
 		explosionDamage.sAnimation = "ExploAir1"
 		ret:AddDamage(explosionDamage)
 		for i = DIR_START, DIR_END do
-			local damage = SpaceDamage(curr, 1, i)
-			damage.sAnimation = "explopush_"..i
+			local damage = SpaceDamage(point+DIR_VECTORS[i], 1)
+			damage.sAnimation = "explopush1_"..i
 			ret:AddDamage(damage)
 		end
-		return
+		Board:AddEffect(ret)
+	elseif pawn then
+		if Status.IsImmuneTo(pawn, "Powder") then return end
+		if pawn:IsFire() then
+			local amount = 1
+			if Status.GetStatus(id, "Dry") then amount = 2 end
+			local explosionDamage = SpaceDamage(pawn:GetSpace(), amount)
+			explosionDamage.sAnimation = "ExploAir"..amount
+			ret:AddDamage(explosionDamage)
+			for i = DIR_START, DIR_END do
+				local damage = SpaceDamage(pawn:GetSpace()+DIR_VECTORS[i], amount)
+				damage.sAnimation = "explopush"..amount.."_"..i
+				ret:AddDamage(damage)
+			end
+			Board:AddEffect(ret)
+			return
+		end
+		if mission.WetTable[id] then return end
+		mission.PowderTable[id] = true
+		CustomAnim:add(id, "StatusPowder")
 	end
-	if mission.WetTable[id] then return end
-	mission.PowderTable[id] = true
-	CustomAnim:add(id, "StatusPowder")
 end
 
 function Status.ApplySleep(id, turns, addTurns)
@@ -661,7 +1105,7 @@ function Status.ApplyInsanity(id, amount, setToValue)
 	if insanityCount > 0 and CustomAnim:get(id, "StatusInsanity"..insanityCount) then CustomAnim:rem(id, "StatusInsanity"..insanityCount) end
 	CustomAnim:add(id, "StatusInsanity"..newInsanityCount)
 	if newInsanityCount >= 5 then 
-		fx = SkillEffect()
+		local fx = SkillEffect()
 		fx:AddVoice("Meta_GoingInsane"..math.random(1,14), id)
 		Board:AddEffect(fx)
 	end
@@ -673,6 +1117,7 @@ function Status.RemoveStatus(id, status)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
+	mission[status.."Table"] = mission[status.."Table"] or {}
 	if not mission[status.."Table"][id] then return end
 	if status == "Rooted" then 
 		pawn:SetPushable(mission["RootedTable"][id].wasPushable) 
@@ -762,6 +1207,33 @@ function Status.HealFromGunk(id, overheal, alwaysOverheal)
 	if Status.GetStatus(id, "Gunk") then Status.RemoveStatus(id, "Gunk") end
 end
 
+function Status.Overheal(id, amount, alwaysOverheal)
+	local pawn = Board:GetPawn(id)
+	local mission = GetCurrentMission()
+	if not pawn or not mission then return end
+	mission.StatusOverhealTable = mission.StatusOverhealTable or {}		--create empty table if it does not exist
+	mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] or 0
+	if alwaysOverheal or amount + pawn:GetHealth() > pawn:GetMaxBaseHealth() then			--if we are not overhealing, just heal
+		if pawn:IsDamaged() then										--if we are healing, heal and reduce amount
+			if not alwaysOverheal then amount = amount - (pawn:GetMaxBaseHealth() - pawn:GetHealth()) end
+			Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
+		end
+		mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] + amount
+		
+		pawn:SetMaxBaseHealth(pawn:GetMaxBaseHealth() + amount)
+		pawn:SetMaxHealth(pawn:GetMaxHealth() + amount)
+		local ret = SkillEffect()
+		ret:AddDamage(SpaceDamage(pawn:GetSpace(),-amount))
+		Board:AddEffect(ret)
+	else
+		Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
+	end
+end
+
+end
+
+
+
 local function ReapplyOverheal()
 	local mission = GetCurrentMission()
 	if not mission then return end
@@ -787,46 +1259,29 @@ local function ResetOverheal()
 		end
 	end
 end
-
-function Status.Overheal(id, amount, alwaysOverheal)
-	local pawn = Board:GetPawn(id)
-	local mission = GetCurrentMission()
-	if not pawn or not mission then return end
-	mission.StatusOverhealTable = mission.StatusOverhealTable or {}		--create empty table if it does not exist
-	mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] or 0
-	if alwaysOverheal or amount + pawn:GetHealth() > pawn:GetMaxBaseHealth() then			--if we are not overhealing, just heal
-		if pawn:IsDamaged() then										--if we are healing, heal and reduce amount
-			if not alwaysOverheal then amount = amount - (pawn:GetMaxBaseHealth() - pawn:GetHealth()) end
-			Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
-		end
-		mission.StatusOverhealTable[id] = mission.StatusOverhealTable[id] + amount
-		
-		pawn:SetMaxBaseHealth(pawn:GetMaxBaseHealth() + amount)
-		pawn:SetMaxHealth(pawn:GetMaxHealth() + amount)
-		local ret = SkillEffect()
-		ret:AddDamage(SpaceDamage(pawn:GetSpace(),-amount))
-		Board:AddEffect(ret)
-	else
-		Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -amount))
-	end
-	
-end
-
-
-
 TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
+TILE_TOOLTIPS.Status_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}
 
-local gunk_damage = SpaceDamage(0)
-gunk_damage.sAnimation = "Djinn_explo_gunkpuddle"
-
-Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = gunk_damage, Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
+Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
+Status_Puddle = { Image = "libs/status/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Status_Puddle_Text", Icon = "libs/status/item_puddle.png", UsedImage = ""}
 Location["libs/status/gunk.png"] = Point(-22,6)
 Location["libs/status/gunkused.png"] = Point(-22,6)
+Location["libs/status/item_puddle.png"] = Point(-22,6)
 
 BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
-    if removed_item == "Meta_BlobGunk" then
+    local pawn = Board:GetPawn(loc)
+	if removed_item == "Status_Puddle" then
+		if (pawn and pawn:IsFire()) or Board:IsFire(loc) then
+			local smokeDamage = SpaceDamage(loc)
+			smokeDamage.iSmoke = 1
+			Board:DamageSpace(smokeDamage)
+		elseif pawn then
+			Status.ApplyWet(pawn:GetId())
+		end
+	elseif removed_item == "Meta_BlobGunk" then
         local pawn = Board:GetPawn(loc)
         if pawn then Status.ApplyGunk(pawn:GetId()) end
+		Board:AddAnimation(loc, "Djinn_explo_gunkpuddle", ANIM_NO_DELAY)
     end
 end)
 
@@ -935,10 +1390,10 @@ local function EVENT_onModsLoaded()
 		for k, status in ipairs(pawnStatuses) do	--I'd rather this were a table, but I need to insert data and stuff.
 			local statusDesc = ""
 			if status == "Alluring" then statusDesc = "Makes Vek want to be adjacent to this pawn." end
-			if status == "Blind" then statusDesc = "Makes Vek unable to target beyond two tiles ("..mission.BlindTable[id].." turns left)." end
+			if status == "Blind" then statusDesc = "Makes units unable to target beyond two tiles ("..mission.BlindTable[id].." turns left)." end
 			if status == "Bloodthirsty" then statusDesc = "Bloodthirsty Vek will prioritize enemies over buildings." end
-			if status == "Bonded" then statusDesc = "Bonded pawns will take 1 damage when other bonded pawns take damage. Can trigger once per turn." end
-			if status == "Chill" then statusDesc = "Chilled pawns will become frozen when chilled again. Chill + Wet also freezes. Removed when frozen or on fire." end
+			if status == "Bonded" then statusDesc = "Bonded units will take 1 damage when other bonded units take damage. Can trigger once per turn." end
+			if status == "Chill" then statusDesc = "Chilled units will become frozen when chilled again. Chill + Wet also freezes. Removed when frozen or on fire." end
 			if status == "Confusion" then 
 				if pawn:GetTeam() == TEAM_ENEMY then
 					statusDesc = "Confused Vek will choose their worst option, typically attacking allies, instead of their best option."
@@ -966,24 +1421,24 @@ local function EVENT_onModsLoaded()
 				statusDesc = statusDesc.." ("..mission.GloryTable[id].turns.." turns left)."
 			end
 			if status == "Gunk" then statusDesc = "Covered in sticky gunk, which does nothing by itself but is consumed by some effects." end
-			if status == "Hemorrhage" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
+			if status == "Hemorrhage" then statusDesc = "When a hemorrhaging unit would heal, they take that much damage instead." end
 			if status == "Infested" then statusDesc = "Will die after "..mission.InfestedTable[id].." turns. Removed by damage, fire, and A.C.I.D.." end
-			if status == "Insanity" then statusDesc = "When a hemorrhaging pawn would heal, they take that much damage instead." end
-			if status == "LeechSeed" then statusDesc = "Takes 1 damage every turn, healing the pawn that applied the leech seed, if any. Removed by fire." end
-			if status == "Necrosis" then statusDesc = "Prevents healing by constantly setting the pawn's max health to their current health." end
-			if status == "Powder" then statusDesc = "When a pawn has both fire and powder, they explode, taking 1 damage and dealing 1 damage to adjacent tiles, doubled if Dry. Removed by Wet." end
+			if status == "Insanity" then statusDesc = "When a hemorrhaging unit would heal, they take that much damage instead." end
+			if status == "LeechSeed" then statusDesc = "Takes 1 damage every turn, healing the unit that applied the leech seed, if any. Removed by fire." end
+			if status == "Necrosis" then statusDesc = "Prevents healing." end
+			if status == "Powder" then statusDesc = "When a unit has both fire and powder, they explode, taking 1 damage and dealing 1 damage to adjacent tiles, doubled if Dry. Removed by Wet." end
 			if status == "Regen" then statusDesc = "Heals "..mission.RegenTable[id].." damage per turn." end
 			if status == "Reactive" then statusDesc = "When applied A.C.I.D., removes it and smokes adjacent tiles." end
 			if status == "Rooted" then
-				if mission.RootedTable[id] > 0 then statusDesc = "Immobilizes this pawn and deals "..mission.RootedTable[id].." damage to them every turn. Removed by fire." end
-				if mission.RootedTable[id] < 0 then statusDesc = "Immobilizes this pawn and heals "..mission.RootedTable[id].." damage every turn. Removed by fire." end
-				if mission.RootedTable[id] == 0 then statusDesc = "Immobilizes this pawn. Removed by fire." end
+				if mission.RootedTable[id] > 0 then statusDesc = "Immobilizes this unit and deals "..mission.RootedTable[id].." damage to them every turn. Removed by fire." end
+				if mission.RootedTable[id] < 0 then statusDesc = "Immobilizes this unit and heals "..mission.RootedTable[id].." damage every turn. Removed by fire." end
+				if mission.RootedTable[id] == 0 then statusDesc = "Immobilizes this unit. Removed by fire." end
 			end
-			if status == "Shatterburst" then statusDesc = "When frozen, deals 1 damage to adjacent tiles and frees the pawn." end
+			if status == "Shatterburst" then statusDesc = "When frozen, deals 1 damage to adjacent tiles and frees the unit." end
 			if status == "Shocked" then statusDesc = "Flips attack direction on damage. When applied a second time or Wet, clears queued actions." end
-			if status == "Sleep" then statusDesc = "Prevents this pawn from acting. Removed when the pawn takes damage ("..mission.SleepTable[id].." turns left)." end
-			if status == "Targeted" then statusDesc = "Makes Vek want to attack that pawn." end
-			if status == "Toxin" then statusDesc = "After its turn, a pawn with Toxin takes damage equal to its missing health; if this kills, adjacent pawns are applied Toxin. Removed by A.C.I.D. and healing." end
+			if status == "Sleep" then statusDesc = "Prevents this unit from acting. Removed when the unit takes damage ("..mission.SleepTable[id].." turns left)." end
+			if status == "Targeted" then statusDesc = "Makes Vek want to attack that unit." end
+			if status == "Toxin" then statusDesc = "After its turn, a unit with Toxin takes damage equal to its missing health; if this kills, adjacent units are applied Toxin. Removed by A.C.I.D. and healing." end
 			if status == "Weaken" then
 				local amount = tonumber(string.sub(pawn:GetWeaponBaseType(1),1,1))
 				if mission.WeakenTable[id] > 0 then statusDesc = "Lowers damage dealt by "..amount..". Effect decreases by "..mission.WeakenTable[id].." every turn." end
@@ -1303,6 +1758,7 @@ local function EVENT_onModsLoaded()
 					local damage = SpaceDamage(pawn:GetSpace(), pawn:GetMaxHealth() - pawn:GetHealth())
 					if Board:IsDeadly(damage, pawn) then
 						Board:Ping(pawn:GetSpace(), GL_Color(100, 200, 100))
+						Board:AddAlert(pawn:GetSpace(), "Toxin Damage")
 						CustomAnim:rem(id, "StatusToxin")				--anim disappears after Vek emerge otherwise, which looks weird
 						for i = DIR_START, DIR_END do
 							local curr = pawn:GetSpace() + DIR_VECTORS[i]
@@ -1390,7 +1846,7 @@ local function EVENT_onModsLoaded()
 					if affectedTiles[hash(loc)] ~= DAMAGE_ZERO then moveScore = -100 end	--don't dodge into more damage
 					if Board:IsBlocked(loc, pawn:GetPathProf()) then moveScore = -100 end	--don't dodge into a tile you can't stand in
 					if targetWasQueued then
-						targets = extract_table(weapon:GetTargetArea(loc))
+						local targets = extract_table(weapon:GetTargetArea(loc))
 						for _, target in ipairs(targets) do
 							if Board:IsValid(target) then
 								-- attack score
@@ -1500,34 +1956,47 @@ local function EVENT_onModsLoaded()
 	end
 	modapiext:addSkillBuildHook(function(mission, pawn, weaponId, p1, p2, skillEffect)
 		DoDodge(mission, pawn, skillEffect)
-		
-		-- for _, fx in ipairs(extract_table(skillEffect.effect)) do
-			-- if SpaceDamageStatusMT[fx] then
-				-- if SpaceDamageStatusMT[fx][iToxin] then
-					-- fx.sImageMark = "combat/arrow_off_up.png"
-					-- if Board:GetPawn(fx.loc) then skillEffect:AddScript(string.format("Status.ApplyToxin(%s)", Board:GetPawn(fx.loc):GetId())) end
-				-- end
-			-- end
-		-- end
-		
-	-- end)
-	-- modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
-		-- DoDodge(mission, pawn, skillEffect)
-		
-		-- for _, fx in ipairs(extract_table(skillEffect.effect)) do
-			-- if SpaceDamageStatusMT[fx] then
-				-- if SpaceDamageStatusMT[fx][iToxin] then
-					-- LOG("found toxin on space damage")
-					-- fx.sImageMark = "combat/arrow_off_up.png"
-					-- if Board:GetPawn(fx.loc) then skillEffect:AddScript(string.format("Status.ApplyToxin(%s)", Board:GetPawn(fx.loc):GetId())) end
-				-- end
-			-- end
-		-- end
+	end)
+	modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
+		DoDodge(mission, pawn, skillEffect)
+	end)
+
+	modapiext:addTargetAreaBuildHook(function(mission, pawn, weaponId, p1, targetArea)
+		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") then
+			local targets = extract_table(targetArea)
+			local closeTargets = {}
+			for _, point in pairs(targets) do
+				if point:Manhattan(p1) <= 2 then table.insert(closeTargets, point) end
+			end
+			if #closeTargets == #targets then return end
+			while not targetArea:empty() do
+				targetArea:erase(0)
+			end
+			for _, point in ipairs(closeTargets) do
+				targetArea:push_back(point)
+			end
+		end
+	end)
+	modapiext:addSecondTargetAreaBuildHook(function(mission, pawn, weaponId, p1, p2, targetArea)
+		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") then
+			local targets = extract_table(targetArea)
+			local closeTargets = {}
+			for _, point in pairs(targets) do
+				if point:Manhattan(p2) <= 2 then table.insert(closeTargets, point) end
+			end
+			if #closeTargets == #targets then return end
+			while not targetArea:empty() do
+				targetArea:erase(0)
+			end
+			for _, point in ipairs(closeTargets) do
+				targetArea:push_back(point)
+			end
+		end
 	end)
 	LOG("Status Library added its hooks.")
 end
 
-modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+-- modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
 --fixes for Glory: replaces junk leaper boss weapon from vanilla, adds weapons to Moth and Burrower
 --we check whether another mod added boss versions of Moth and Burrower first though
@@ -1555,13 +2024,9 @@ if _G["MothAtkB"] == nil then --ranged bouncer boss attack
 		damage.sAnimation = "airpush_"..dirback
 		ret:AddQueuedDamage(damage)
 		
-		damage = SpaceDamage(p2, self.Damage, dir)
-		--damage.iSmoke = 1
-		ret:AddQueuedArtillery(damage, self.Projectile)
-		damage = SpaceDamage(p2 + DIR_VECTORS[(dir+1)%4], self.Damage, dir)
-		ret:AddQueuedArtillery(damage, self.Projectile)
-		damage = SpaceDamage(p2 + DIR_VECTORS[(dir-1)%4], self.Damage, dir)
-		ret:AddQueuedArtillery(damage, self.Projectile)
+		ret:AddQueuedArtillery(SpaceDamage(p2, self.Damage, dir), self.Projectile)
+		ret:AddQueuedArtillery(SpaceDamage(p2 + DIR_VECTORS[(dir+1)%4], self.Damage, dir), self.Projectile)
+		ret:AddQueuedArtillery(SpaceDamage(p2 + DIR_VECTORS[(dir-1)%4], self.Damage, dir), self.Projectile)
 		return ret
 	end
 end
@@ -1578,16 +2043,10 @@ if _G["BurrowerAtkB"] == nil and _G["BurrowerAtk2"] ~= nil then
 		local direction = GetDirection(p2 - p1)
 		local damage = SpaceDamage(p2,self.Damage)
 		damage.sSound = self.SoundBase.."attack"
-		
-		ret:AddQueuedDamage(damage)
-		damage.loc = p2 + DIR_VECTORS[(direction + 1)% 4]
-		ret:AddQueuedDamage(damage)
-		damage.loc = p2 + DIR_VECTORS[(direction + 1)% 4] * 2
-		ret:AddQueuedDamage(damage)
-		damage.loc = p2 - DIR_VECTORS[(direction + 1)% 4]
-		ret:AddQueuedDamage(damage)
-		damage.loc = p2 - DIR_VECTORS[(direction + 1)% 4] * 2
-		ret:AddQueuedDamage(damage)
+		ret:AddQueuedDamage(SpaceDamage(p2 + DIR_VECTORS[(direction + 1)% 4], self.Damage))
+		ret:AddQueuedDamage(SpaceDamage(p2 + DIR_VECTORS[(direction + 1)% 4] * 2, self.Damage))
+		ret:AddQueuedDamage(SpaceDamage(p2 - DIR_VECTORS[(direction + 1)% 4], self.Damage))
+		ret:AddQueuedDamage(SpaceDamage(p2 - DIR_VECTORS[(direction + 1)% 4] * 2, self.Damage))
 		return ret
 	end
 end
@@ -1608,8 +2067,35 @@ for k, v in pairs(Personality) do
 		v["Meta_GoingInsane11"] = "The light of the North Star, breaking the minds of children!"
 		v["Meta_GoingInsane12"] = "We are like lambs to the slaughter! No - ants trampled underfoot!"
 		v["Meta_GoingInsane13"] = "Doom, ruin, and dust!"
-		v["Meta_GoingInsane14"] = "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!"
+		v["Meta_GoingInsane14"] = "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!"
 	end
 end
+
+
+
+
+if isNewerVersion then
+    Status = Status or {}
+    Status.version = VERSION
+
+    Status.finalizeInit = function(self)
+        modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+		SetupMetatable()
+		CreateStatusFunctions()
+        LOG("Status Library Version " .. self.version .. " finalized.")
+    end
+    local function onModsInitialized()
+        local isHighestVersion = true
+            and Status.initialized ~= true
+            and Status.version == VERSION
+
+        if isHighestVersion then
+            Status:finalizeInit()
+            Status.initialized = true
+        end
+    end
+    modApi.events.onModsInitialized:subscribe(onModsInitialized)
+end
+
 StatusLibLoaded = true
 return true	
