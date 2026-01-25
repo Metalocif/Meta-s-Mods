@@ -195,7 +195,11 @@ function CyborgWeapons_Scream_Boost:GetSkillEffect(p1, p2)
 		local toBoost = Board:GetPawn(targets[k])
 		if toBoost and (toBoost:GetClass() == "TechnoVek" or toBoost:GetTeam() == TEAM_ENEMY) then --or toBoost.GetTeam == TEAM_ENEMY_MAJOR 
 			ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)",toBoost:GetId()))
-			if self.Bloodthirsty and toBoost:GetTeam() == TEAM_ENEMY then ret:AddScript(string.format("Status.ApplyBloodthirsty(%s)",toBoost:GetId())) end
+			if self.Bloodthirsty and toBoost:GetTeam() == TEAM_ENEMY then 
+				local damage = SpaceDamage(targets[k])
+				damage.iBloodthirsty = 10
+				ret:AddDamage(damage)
+			end
 		end
 	end
 	ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString()))
@@ -1376,7 +1380,10 @@ function CyborgWeapons_Pheromones:GetFinalEffect(p1, p2, p3)
 		local toAffect = Board:GetPawn(curr)
 		if toAffect and (toAffect:GetClass() == "TechnoVek" or toAffect:GetTeam() == TEAM_ENEMY) then
 			if self.Status ~= "" then 
-				ret:AddScript(string.format("Status.Apply%s(%s)", self.Status, toAffect:GetId())) 
+				-- ret:AddScript(string.format("Status.Apply%s(%s)", self.Status, toAffect:GetId())) 
+				local damage = SpaceDamage(curr)
+				damage["i"..self.Status] = 1
+				ret:AddDamage(damage)
 			end
 			damage.sAnimation = "HypnoticPheromone"
 			ret:AddDamage(damage)
@@ -1967,12 +1974,11 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 				ret:AddScript(string.format("GetCurrentMission().AssimilateDamage.sItem = %q", Board:GetItem(p2)))
 				ret:AddScript(string.format("Board:RemoveItem(%s)", p2:GetString()))
 			end
+			
+			if mission.AssimilateDamage.Chill then damage.iChill = 1 end
+			if mission.AssimilateDamage.Powder then damage.iChill = 1 end
+			if mission.AssimilateDamage.Toxin then damage.iChill = 1 end
 			ret:AddMelee(p1, damage)
-			if Board:GetPawn(p2) then
-				if mission.AssimilateDamage.Chill then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
-				if mission.AssimilateDamage.Powder then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
-				if mission.AssimilateDamage.Toxin then ret:AddScript(string.format("Status.ApplyChill(%s)", Board:GetPawn(p2):GetId())) end
-			end
 			if addFire then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end
 			if addAcid then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
 			if addSmoke then ret:AddScript("GetCurrentMission().AssimilateDamage.iSmoke = EFFECT_CREATE") end
@@ -2529,7 +2535,7 @@ function CyborgWeapons_ToxicImpaler:GetSkillEffect(p1, p2)
 	local damage = SpaceDamage(target, self.Damage)
 	if distance == 2 then damage.iPush = (direction+2)%4 end
 	local pawn = Board:GetPawn(target)
-	if pawn then damage.sScript = string.format("Status.ApplyToxin(%s)", pawn:GetId()) end
+	damage.iToxin = 1
 	ret:AddAnimation(p1+DIR_VECTORS[direction], "explotoxinspear"..distance.."_"..direction)
 	ret:AddDelay(0.2)		--first two frames of anim
 	ret:AddDamage(damage)

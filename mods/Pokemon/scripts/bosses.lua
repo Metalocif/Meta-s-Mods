@@ -1140,15 +1140,17 @@ function Poke_DarkPulseBoss:GetSkillEffect(p1, p2)
 		local curr = p1 + DIR_VECTORS[i]
 		local pawn = Board:GetPawn(curr)
 		if pawn and pawn:IsMech() then
-			ret:AddQueuedDamage(SpaceDamage(curr, DAMAGE_ZERO))
-			ret:AddQueuedScript(string.format("Status.ApplySleep(%s, %s)", pawn:GetId(), 2))
+			local sleepDamage = SpaceDamage(curr, DAMAGE_ZERO)
+			sleepDamage.iSleep = 1
+			ret:AddQueuedDamage(sleepDamage)
 			return ret
 		end
 		curr = p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
 		pawn = Board:GetPawn(curr)
 		if pawn and pawn:IsMech() then
-			ret:AddQueuedDamage(SpaceDamage(curr, DAMAGE_ZERO))
-			ret:AddQueuedScript(string.format("Status.ApplySleep(%s, %s)", pawn:GetId(), 2))
+			local sleepDamage = SpaceDamage(curr, DAMAGE_ZERO)
+			sleepDamage.iSleep = 1
+			ret:AddQueuedDamage(sleepDamage)
 			return ret
 		end
 	end
@@ -1685,7 +1687,7 @@ function Poke_Hex:GetSkillEffect(p1, p2)
 		local pawn = Board:GetPawn(i)
 		if pawn then
 			local damage = SpaceDamage(pawn:GetSpace(), self.Damage)
-			damage.sScript = string.format("Status.ApplyNecrosis(%s)", i)
+			damage.iNecrosis = 1
 			ret:AddQueuedDamage(damage)
 			ret:AddQueuedAnimation(pawn:GetSpace(), "darkpulseAnim", ANIM_REVERSE)
 		end

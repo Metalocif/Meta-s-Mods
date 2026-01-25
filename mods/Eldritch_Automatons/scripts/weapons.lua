@@ -191,7 +191,7 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 				damage.sAnimation = "eldritchtentaclediaganim_"..i
 				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 				--use different sounds; make sure it's either 1 or 2 in case another mod changes weapon damage
-				if pawn and self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn:GetId(), userId) end
+				if self.Doom then damage.iDoomed = userId end
 				ret:AddDamage(damage)
 				if pawn then toastCounter=toastCounter+1 end
 			end
@@ -202,7 +202,7 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 				local damage = SpaceDamage(curr, self.Damage, i)
 				damage.sAnimation = "eldritchtentacleanim_"..i
 				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
-				if pawn and self.Doom then damage.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn:GetId(), userId) end
+				if self.Doom then damage.iDoomed = userId end
 				ret:AddDamage(damage)
 				if pawn then toastCounter=toastCounter+1 end
 			end
@@ -249,13 +249,11 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 
 	local mission = GetCurrentMission()
 	
-	local pawn1 = Board:GetPawn(p2)
- 	local pawn2 = Board:GetPawn(p3)
 	local userId = Board:GetPawn(p1):GetId()
 	local damage1 = SpaceDamage(p2, self.Damage)
-	if pawn1 and self.Doom then damage1.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn1:GetId(), userId) end
+	if self.Doom then damage1.iDoomed = userId end
 	local damage2 = SpaceDamage(p3, self.Damage)
-	if pawn2 and self.Doom then damage2.sScript = string.format("Status.ApplyDoomed(%s, %s)", pawn2:GetId(), userId) end
+	if self.Doom then damage2.iDoomed = userId end
 	
 	if p1:Manhattan(p2) == 1 then				--push
 		damage1.iPush = GetDirection(p2 - p1)
