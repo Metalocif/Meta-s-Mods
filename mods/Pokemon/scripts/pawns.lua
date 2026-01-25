@@ -232,14 +232,14 @@ a.Poke_DracoMeteora = a.Poke_DracoMeteor
 a.Poke_DracoMeteord = a.MechUnit:new{Image="units/player/DracoMeteor_death.png",  PosX = -20, PosY = -4, NumFrames = 13, Time = 0.07 }
 
 
-a.Poke_Eevee =a.MechUnit:new{Image="units/player/Eevee.png", PosX = -10, PosY = -4}
+a.Poke_Eevee =a.MechUnit:new{Image="units/player/Eevee.png", PosX = -15, PosY = 6}
 a.Poke_Eeveea = a.MechUnit:new{Image="units/player/Eevee_a.png",  PosX = -15, PosY = 6, NumFrames = 2 }
 a.Poke_Eevee_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Eevee_ns = a.MechIcon:new{Image="units/player/Eevee_ns.png"}
 a.Poke_Eeveew =a.MechUnit:new{Image="units/player/Eevee_w.png", PosX = -12, PosY = 15}
 
-a.Poke_Jolteon =a.MechUnit:new{Image="units/player/Jolteon.png", PosX = -10, PosY = -4}
-a.Poke_Jolteona = a.MechUnit:new{Image="units/player/Jolteon_a.png",  PosX = -15, PosY = 6, NumFrames = 2 }
+a.Poke_Jolteon =a.MechUnit:new{Image="units/player/Jolteon.png", PosX = -15, PosY = 6}
+a.Poke_Jolteona = a.MechUnit:new{Image="units/player/Jolteon_a.png",  PosX = -15, PosY = 6, NumFrames = 3, Frames = {0,2,1,2} }
 a.Poke_Jolteon_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
 a.Poke_Jolteon_ns = a.MechIcon:new{Image="units/player/Jolteon_ns.png"}
 a.Poke_Jolteonw =a.MechUnit:new{Image="units/player/Jolteon_w.png", PosX = -12, PosY = 15}
@@ -427,7 +427,7 @@ a.Poke_Charmeleon_ns = a.MechIcon:new{Image="units/player/Charmeleon_ns.png"}
 a.Poke_Charmeleonw =a.MechUnit:new{Image="units/player/Charmeleon_w.png", PosX = -15, PosY = 6}
 
 a.Poke_Charizard =a.MechUnit:new{Image="units/player/Charizard.png", PosX = -20, PosY = -4}
-a.Poke_Charizarda = a.MechUnit:new{Image="units/player/Charizard_a.png",  PosX = -20, PosY = -4, NumFrames = 6, Frames = {0,1,2,1,0,1,2,1,3,4,5,1}, }
+a.Poke_Charizarda = a.MechUnit:new{Image="units/player/Charizard_a.png",  PosX = -20, PosY = -4, NumFrames = 5, Frames = {0,1,2,1,0,1,2,1,0,1,4,3}, }
 a.Poke_Charizard_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
 a.Poke_Charizard_ns = a.MechIcon:new{Image="units/player/Charizard_ns.png"}
 a.Poke_MegaCharizardX =a.MechUnit:new{Image="units/player/MegaCharizardX.png", PosX = -20, PosY = -4}
