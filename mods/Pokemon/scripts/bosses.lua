@@ -13,6 +13,9 @@ local resourcePath = mod_loader.mods[modApi.currentMod].resourcePath
 modApi:appendAsset("img/effects/roaroftime.png", resourcePath.."img/effects/roaroftime.png")
 modApi:appendAsset("img/effects/ancientpower.png", resourcePath.."img/effects/ancientpower.png")
 modApi:appendAsset("img/effects/judgment.png", resourcePath.."img/effects/judgment.png")
+
+modApi:appendAssets("img/portraits/enemy/", "img/portraits/enemy/")
+modApi:appendAssets("img/units/aliens/", "img/units/aliens/")
 ANIMS.RoarOfTimeAnim = Animation:new{ Image = "effects/roaroftime.png", NumFrames = 6,Time = 0.1,PosX = -42,PosY = -30}
 
 achievements = {
@@ -122,65 +125,6 @@ local writepath = "img/units/aliens/"
 local readpath = path .. writepath
 local imagepath = writepath:sub(5,-1)
 
-modApi:appendAsset(writepath .."Articuno.png", readpath .."Articuno.png")
-modApi:appendAsset(writepath .."Articuno_a.png", readpath .."Articuno_a.png")
-modApi:appendAsset(writepath .."Articuno_d.png", readpath .."Articuno_d.png")
-
-modApi:appendAsset(writepath .."Zapdos.png", readpath .."Zapdos.png")
-modApi:appendAsset(writepath .."Zapdos_a.png", readpath .."Zapdos_a.png")
-modApi:appendAsset(writepath .."Zapdos_d.png", readpath .."Zapdos_d.png")
-
-modApi:appendAsset(writepath .."Moltres.png", readpath .."Moltres.png")
-modApi:appendAsset(writepath .."Moltres_a.png", readpath .."Moltres_a.png")
-modApi:appendAsset(writepath .."Moltres_d.png", readpath .."Moltres_d.png")
-
-modApi:appendAsset(writepath .."Mewtwo.png", readpath .."Mewtwo.png")
-modApi:appendAsset(writepath .."Mewtwo_a.png", readpath .."Mewtwo_a.png")
-modApi:appendAsset(writepath .."Mewtwo_d.png", readpath .."Mewtwo_d.png")
-
-modApi:appendAsset(writepath .."Deoxys.png", readpath .."Deoxys.png")
-modApi:appendAsset(writepath .."Deoxys_a.png", readpath .."Deoxys_a.png")
-modApi:appendAsset(writepath .."Deoxys_d.png", readpath .."Deoxys_d.png")
-modApi:appendAsset(writepath .."DeoxysA.png", readpath .."DeoxysA.png")
-modApi:appendAsset(writepath .."DeoxysA_a.png", readpath .."DeoxysA_a.png")
-modApi:appendAsset(writepath .."DeoxysA_d.png", readpath .."DeoxysA_d.png")
-modApi:appendAsset(writepath .."DeoxysD.png", readpath .."DeoxysD.png")
-modApi:appendAsset(writepath .."DeoxysD_a.png", readpath .."DeoxysD_a.png")
-modApi:appendAsset(writepath .."DeoxysD_d.png", readpath .."DeoxysD_d.png")
-modApi:appendAsset(writepath .."DeoxysS.png", readpath .."DeoxysS.png")
-modApi:appendAsset(writepath .."DeoxysS_a.png", readpath .."DeoxysS_a.png")
-modApi:appendAsset(writepath .."DeoxysS_d.png", readpath .."DeoxysS_d.png")
-
-modApi:appendAsset(writepath .."Darkrai.png", readpath .."Darkrai.png")
-modApi:appendAsset(writepath .."Darkrai_a.png", readpath .."Darkrai_a.png")
-modApi:appendAsset(writepath .."Darkrai_d.png", readpath .."Darkrai_d.png")
-
-modApi:appendAsset(writepath .."Celebi.png", readpath .."Celebi.png")
-modApi:appendAsset(writepath .."Celebi_a.png", readpath .."Celebi_a.png")
-modApi:appendAsset(writepath .."Celebi_d.png", readpath .."Celebi_d.png")
-
-modApi:appendAsset(writepath .."PrimalDialga.png", readpath .."PrimalDialga.png")
-modApi:appendAsset(writepath .."PrimalDialga_a.png", readpath .."PrimalDialga_a.png")
-modApi:appendAsset(writepath .."PrimalDialga_d.png", readpath .."PrimalDialga_d.png")
-
-modApi:appendAsset(writepath .."PrimalPalkia.png", readpath .."PrimalPalkia.png")
-modApi:appendAsset(writepath .."PrimalPalkia_a.png", readpath .."PrimalPalkia_a.png")
-modApi:appendAsset(writepath .."PrimalPalkia_d.png", readpath .."PrimalPalkia_d.png")
-
-modApi:appendAsset(writepath .."Giratina.png", readpath .."Giratina.png")
-modApi:appendAsset(writepath .."Giratina_a.png", readpath .."Giratina_a.png")
-modApi:appendAsset(writepath .."Giratina_d.png", readpath .."Giratina_d.png")
-
-modApi:appendAsset(writepath .."Arceus.png", readpath .."Arceus.png")
-modApi:appendAsset(writepath .."Arceus_a.png", readpath .."Arceus_a.png")
-modApi:appendAsset(writepath .."Arceus_attack.png", readpath .."Arceus_attack.png")
-modApi:appendAsset(writepath .."Arceus_d.png", readpath .."Arceus_d.png")
-modApi:appendAsset(writepath .."Arceus2.png", readpath .."Arceus2.png")
-modApi:appendAsset(writepath .."Arceus2_a.png", readpath .."Arceus2_a.png")
-modApi:appendAsset(writepath .."Arceus2_d.png", readpath .."Arceus2_d.png")
-modApi:appendAsset(writepath .."star.png", readpath .."star.png")
-modApi:appendAsset(writepath .."star_a.png", readpath .."star_a.png")
-
 modApi:appendAsset("img/units/player/Delibird.png", path .."img/units/player/Delibird.png")
 modApi:appendAsset("img/units/player/Delibird_a.png", path .."img/units/player/Delibird_a.png")
 modApi:appendAsset("img/units/player/Delibird_shoot_0.png", path .."img/units/player/Delibird_shoot_0.png")
@@ -259,12 +203,17 @@ a.Giratinad =	base:new{ Image = "units/aliens/Giratina_d.png", NumFrames = 9, Ti
 
 base = a.EnemyUnit:new{Image = imagepath .."Arceus.png", PosX = -26, PosY = -23, NumFrames = 1, Height = 1 }
 a.ArceusBoss  =	base
-a.Arceus2 = a.EnemyUnit:new{Image = imagepath .."Arceus2.png", PosX = -31, PosY = -13, NumFrames = 1, Height = 1 }
+a.Arceus2 = a.EnemyUnit:new{Image = imagepath .."Arceus2.png", PosX = -26, PosY = -23, NumFrames = 1, Height = 1 }
 a.ArceusBossa =	base:new{ Image = "units/aliens/Arceus_a.png", NumFrames = 8 }
 a.Arceus2a =	base:new{ Image = "units/aliens/Arceus2_a.png", NumFrames = 8 }
 a.Arceus_Judgment =	base:new{ Image = "units/aliens/Arceus_attack.png", NumFrames = 11, Time = 0.2, PosY = -23, }
 a.ArceusBossd =	base:new{ Image = "units/aliens/Arceus_d.png", NumFrames = 11, Time = 0.2, Loop = false }
 a.Arceus2d =	base:new{ Image = "units/aliens/Arceus2_d.png", NumFrames = 9, Time = 0.2, Loop = false }
+
+base = a.EnemyUnit:new{Image = imagepath .."ArceusShade.png", PosX = -26, PosY = -23, NumFrames = 1, Height = 1 }
+a.ArceusShade  =	base
+a.ArceusShadea =	base:new{ Image = "units/aliens/ArceusShade_a.png", NumFrames = 4 }
+a.ArceusShaded =	base:new{ Image = "units/aliens/ArceusShade_d.png", NumFrames = 6, Time = 0.2, Loop = false }
 
 a.Poke_StarbirthStar = a.EnemyUnit:new{Image = imagepath .."star.png", PosX = 0, PosY = 0, NumFrames = 1, Height = 1 }
 a.Poke_StarbirthStara = a.EnemyUnit:new{Image = imagepath .."star_a.png", PosX = 0, PosY = 0, NumFrames = 2, Height = 1 }
@@ -1833,7 +1782,8 @@ Poke_ArceusBoss = {
 	SoundLocation = "/enemy/digger_1/",
 	ImpactMaterial = IMPACT_FLESH,
 	DefaultTeam = TEAM_ENEMY,
-	IsPortrait = false,
+	IsPortrait = true,
+	Portrait = "enemy/Poke_ArceusBoss",
 	Tier = TIER_BOSS,
 	IsDeathEffect = true,
 	Massive = true,
@@ -1843,38 +1793,68 @@ Poke_ArceusBoss = {
 	ShockedImmune = true,
 	SleepImmune = true,
 	InfestedImmune = true,
+	BlindImmune = true,
+	-- Corpse = true,
 	IsDeathEffect = true,
 }
 AddPawn("Poke_ArceusBoss") 
 
 function Poke_ArceusBoss:GetDeathEffect(point)
-	local mission = GetCurrentMission()
-	if mission.ArceusRevived then 
-		local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
-		Board:AddPawn(ball, point)
-		mission.BallID = ball:GetId()
-		for _, p in ipairs(Board) do
-			if Board:GetPawn(p) and Board:GetPawn(p):GetType() == "Poke_StarbirthStar" then
-				Board:GetPawn(p):Kill()
-			end
-		end
-		GetCurrentMission().TurnLimit = Game:GetTurnCount()
-		return SkillEffect()
-	end
-	mission.ArceusRevived = true
-	
-	local arceus = Board:GetPawn(mission.Target)
-	-- Board:RemovePawn(arceus)
-	-- Board:AddPawn(arceus, point)
-	arceus:SetMaxHealth(12)
-	arceus:SetHealth(12)
-	Status.Overheal(arceus:GetId(), 18)
-	arceus:SetCustomAnim("Arceus2")
-	Board:Ping(point, GL_Color(255, 255, 150))
-	arceus:RemoveWeapon(1)
-	arceus:AddWeapon("Poke_UnmakeBoss")
+	local arceus = PAWN_FACTORY:CreatePawn("Poke_ArceusBoss2")
+	modApi:scheduleHook(2200, function()
+		Board:AddPawn(arceus, point)
+		GetCurrentMission().Target = arceus:GetId()
+		Board:Ping(point, GL_Color(255, 255, 150))
+		modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_SecondForm", {main = GetCurrentMission().Target})
+	end)
 	return SkillEffect()
 end
+
+Poke_ArceusBoss2 = {
+	Health = 30,
+	MoveSpeed = 6,
+	Image = "Arceus2",
+	Name = "Arceus",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_UnmakeBoss" },
+	SoundLocation = "/enemy/digger_1/",
+	ImpactMaterial = IMPACT_FLESH,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = true,
+	Portrait = "enemy/Poke_ArceusBoss2",
+	Tier = TIER_BOSS,
+	IsDeathEffect = true,
+	Massive = true,
+	Flying = true,
+	IgnoreSmoke = true,
+	ChillImmune = true,
+	ShockedImmune = true,
+	SleepImmune = true,
+	InfestedImmune = true,
+	BlindImmune = true,
+	Corpse = true,
+	IsDeathEffect = true,
+}
+AddPawn("Poke_ArceusBoss2") 
+
+function Poke_ArceusBoss2:GetDeathEffect(point)
+	modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Death", {main = self.Target})
+	Board:GetPawn(point):SetCorpse(false)
+	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+	if not Board:IsBlocked(point, PATH_GROUND) then
+		Board:AddPawn(ball, point)
+		GetCurrentMission().BallID = ball:GetId()
+	end
+	for _, p in ipairs(Board) do
+		if Board:GetPawn(p) and Board:GetPawn(p):GetType() == "Poke_StarbirthStar" then
+			Board:GetPawn(p):Kill()
+		end
+	end
+	GetCurrentMission().TurnLimit = Game:GetTurnCount()
+	return SkillEffect()
+end
+
+
 
 Poke_JudgmentBoss = Skill:new{
 	Class = "Enemy",
@@ -1882,7 +1862,7 @@ Poke_JudgmentBoss = Skill:new{
 	Rarity = 3,
 	Name = "Judgment",
 	User = "Arceus",
-	Description = "Damages all allies.",
+	Description = "Damages all mechs.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 8,
@@ -2032,13 +2012,13 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	ret:AddQueuedDelay(1)
 	local iStart, iEnd = 0, 7
 	local jStart, jEnd = 4, 7
-	if GetCurrentMission().UnmadeStuff then iEnd = 3 jStart = 0 else GetCurrentMission().UnmadeStuff = 0 end
+	if GetCurrentMission().UnmadeStuff then iEnd = 3 jStart = 0 else ret:AddScript("GetCurrentMission().UnmadeStuff = 0") end
 	for i = iStart, iEnd do
 		for j = jStart, jEnd do
 			local p = Point(i, j)
 			-- local bounceIt = false
 			-- weaponPreview:AddAnimation(p, "Emitter_Crack_Start", ANIM_DELAY)
-			-- ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
+			ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
 			-- ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
 			if p ~= p1 then
 				local damage = SpaceDamage(p, DAMAGE_DEATH)

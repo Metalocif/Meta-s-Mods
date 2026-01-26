@@ -13,6 +13,8 @@ Mission_Poke_Arceus = Mission_Infinite:new{
 	Target = -1,
 	BallID = -1,
 	TurnLimit = 10,
+	MaxEnemy = 0,
+	MaxEnemy_Easy = 0,
 	CustomTile = "tiles_Pillars",
 	MapTags = { "Poke_Boss_Pillars_Arceus" },
 	BlockSecret = true,
@@ -39,9 +41,9 @@ function Mission_Poke_Arceus:StartMission()
 			end
 		end
 	end
-	for name, maxCount in ipairs(self:GetSpawner().max_pawns) do
-		if string.find(name, "Jelly") then self:GetSpawner().max_pawns.name = 0 LOG("blocked "..name) end
-	end
+	-- for name, maxCount in ipairs(self:GetSpawner().max_pawns) do
+		-- if string.find(name, "Jelly") then self:GetSpawner().max_pawns.name = 0 LOG("blocked "..name) end
+	-- end
 end
 
 function Mission_Poke_Arceus:NextTurn()
@@ -58,7 +60,13 @@ function Mission_Poke_Arceus:NextTurn()
 				Status.ApplyGlory(i)
 			end
 		end)
+	else
+		if Board:GetPawn(self.Target) and Game:GetTurnCount() >= 1 and Game:GetTurnCount() <= 5 and Game:GetTeamTurn() == TEAM_ENEMY then
+			modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Turn"..Game:GetTurnCount(), {main = self.Target})
+		end
 	end
+	-- Board:AddPawn("Poke_ArceusShade")
+	
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
 		local pawn = Board:GetPawn(id)		
 		if id ~= self.Target and not Status.GetStatus(id, "Glory") then Status.ApplyGlory(id, 99) end
