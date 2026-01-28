@@ -1905,7 +1905,7 @@ Poke_Bloom=Skill:new{
 	Icon = "weapons/Bloom.png",	
 	Rarity = 3,
 	Name = "Bloom",
-	Description = "Creates forests in an area, pushing pawns on the edge. Forests already present bloom with Gracidea, which empower allied units.",
+	Description = "Creates forests in an area, pushing units on the edge. Forests already present bloom with Gracidea, which empower allied units.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	PathSize = 8,	
@@ -2040,7 +2040,7 @@ Poke_PetalBlizzard=Skill:new{
 	Icon = "weapons/PetalBlizzard.png",	
 	Rarity = 3,
 	Name = "Petal Blizzard",
-	Description = "Strikes and pushes all pawns in a two tiles radius in the chosen direction.",
+	Description = "Strikes and pushes all units in a two tiles radius in the chosen direction.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	Range = 2,
@@ -2315,7 +2315,7 @@ Poke_Teleport=Skill:new{
 	}
 }
 Poke_Teleport_A=Poke_Teleport:new{ UpgradeDescription = "Can teleport targets two tiles further.", Range = 5 }
-Poke_Teleport_B=Poke_Teleport:new{ UpgradeDescription = "Can teleport targets into mountains and buildings, killing them, or into pawns, dealing damage to both equal to the lowest health of the two.", Shunt = true }
+Poke_Teleport_B=Poke_Teleport:new{ UpgradeDescription = "Can teleport targets into mountains and buildings, killing them, or into units, dealing damage to both equal to the lowest health of the two.", Shunt = true }
 --inspired by an ability from Fell Seal, great game
 Poke_Teleport_AB=Poke_Teleport:new{ Range = 5, Shunt = true }
 
@@ -2488,7 +2488,7 @@ Poke_ZenHeadbutt = Brute_Beetle:new{
 	Icon = "weapons/ZenHeadbutt.png",	
 	Rarity = 3,
 	Name = "Zen Headbutt",
-	Description = "Strike a target and push it back, confusing adjacent enemies on both sides of the target.",
+	Description = "Strike a target and push it back, flipping adjacent enemies on both sides of the target.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	SelfDamage = 0,
@@ -3419,7 +3419,7 @@ Poke_BouncyBubble=Skill:new{
 	Icon = "weapons/BouncyBubble.png",	
 	Rarity = 3,
 	Name = "Bouncy Bubble",
-	Description = "Leap to a tile, splashing adjacent tiles with water, turning fires into smoke and making puddles on empty tiles. Wets pawns. Can leap again if the target is a puddle, water, or wet. Removes fire from the user.",
+	Description = "Leap to a tile, splashing adjacent tiles with water, turning fires into smoke and making puddles on empty tiles. Wets units. Can leap again if the target is a puddle, water, or wet. Removes fire from the user.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	PathSize = 8,	
@@ -5650,7 +5650,7 @@ Emitter_Wither_12 = Emitter_Wither_Base:new{ image = "effects/wither_12.png" }
 Poke_Judgment = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/Judgment.png",
-	Description = "Deals damage to every pawn in a large area. Pushes pawns on the same row or column as this unit.",
+	Description = "Deals damage to every pawn in a large area. Pushes units on the same row or column as the user.",
 	Name = "Judgment",
 	Damage = 2,
 	Range = 3,
@@ -6000,7 +6000,7 @@ function Poke_Trample:GetSkillEffect(p1, p2)
 	local dist = p1:Manhattan(p2)
 	local curr = p1
 	local targetPawn = Board:GetPawn(p2)
-	ret:AddCharge(Board:GetSimplePath(p1, p2), NO_DELAY)
+	ret:AddCharge(Board:GetPath(p1, p2, PATH_FLYER), NO_DELAY)
 	for i = 0, dist do
 		ret:AddSound("/support/earthmover/attack_first")
 		ret:AddEmitter(curr, "Emitter_Dust")
@@ -6154,7 +6154,7 @@ end
 Poke_ScorchingSands = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/ScorchingSands.png",
-	Description = "Creates a sandstorm in a 3x3 area. Sets the center on fire. Pushes pawns on the edges.",
+	Description = "Creates a sandstorm in a 3x3 area. Sets the center on fire. Pushes units on the edges.",
 	Name = "Scorching Sands",
 	Damage = 0,
 	PathSize = 8,
@@ -6446,7 +6446,7 @@ Poke_Growth = Skill:new{
 	Icon = "weapons/Growth.png",	
 	Rarity = 3,
 	Name = "Growth",
-	Description = "Replace this weapon with another, depending on current conditions.\nWhen dry: Powder Puff (push and apply powder in an area; powder explodes when exposed to fire).\nWhen wet: Spore (put adjacent pawns to sleep).\nOtherwise: Bullet Seed (fire multiple projectiles, benefitting from being dry/wet).",
+	Description = "Replace this weapon with another, depending on current conditions.\nWhen dry: Powder Puff (push and apply powder in an area; powder explodes when exposed to fire).\nWhen wet: Spore (put adjacent units to sleep).\nOtherwise: Bullet Seed (fire multiple projectiles, benefitting from being dry/wet).",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	SelfDamage = 0,
@@ -6471,8 +6471,9 @@ end
 function Poke_Growth:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()
+	if not mission then return end
 	local pawn = Board:GetPawn(p1)
-	if not (mission and pawn) then return end
+	if not pawn then return end
 	if Status.GetStatus(pawn:GetId(), "Dry") then
 		Board:AddAlert(p1, "Powder Puff")
 		ret:AddScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), "Poke_PowderPuff"))
@@ -6501,7 +6502,7 @@ Poke_Blossom = Skill:new{
 	Icon = "weapons/Blossom.png",	
 	Rarity = 3,
 	Name = "Blossom",
-	Description = "Replace this weapon with another, depending on current conditions.\nIn the sun: Solar Beam (deal damage in a line, queued if not sunny).\nIn the rain: Toxic Powder (apply toxin on adjacent pawns, damaging them after Vek actions).\nOtherwise: Mega Drain (damage adjacent and heal).",
+	Description = "Replace this weapon with another, depending on current conditions.\nIn the sun: Solar Beam (deal damage in a line, queued if not sunny).\nIn the rain: Toxic Powder (apply toxin on adjacent units, damaging them after Vek actions).\nOtherwise: Mega Drain (damage adjacent and heal).",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	SelfDamage = 0,
@@ -6554,7 +6555,7 @@ Poke_Spore = Skill:new{
 	Icon = "weapons/Spore.png",	
 	Rarity = 3,
 	Name = "Spore",
-	Description = "Puts adjacent pawns to sleep for a turn, cancelling their attacks.",
+	Description = "Puts adjacent units to sleep for a turn, cancelling their attacks.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	SelfDamage = 0,
@@ -6597,7 +6598,7 @@ Poke_ToxicPowder = Skill:new{
 	Icon = "weapons/ToxicPowder.png",	
 	Rarity = 3,
 	Name = "Toxic Powder",
-	Description = "Applies Toxin to adjacent pawns. After Vek actions, damaged pawns with Toxin take damage equal to their missing health; on death, toxin spreads to adjacent pawns.",
+	Description = "Applies Toxin to adjacent units. After Vek actions, damaged units with Toxin take damage equal to their missing health; on death, toxin spreads to adjacent units.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	SelfDamage = 0,
@@ -6633,7 +6634,7 @@ function Poke_ToxicPowder:GetSkillEffect(p1,p2)
 	return ret
 end
 
-Poke_ToxicPowder_A=Poke_ToxicPowder:new{ UpgradeDescription = "Deals damage to afflicted pawns.", Damage = 1 }
+Poke_ToxicPowder_A=Poke_ToxicPowder:new{ UpgradeDescription = "Deals damage to afflicted units.", Damage = 1 }
 
 Poke_MegaDrain = Skill:new{
 	Class = "TechnoVek",
@@ -6694,7 +6695,7 @@ function Poke_MegaDrain:GetSkillEffect(p1,p2)
 end
 
 Poke_MegaDrain_A=Poke_MegaDrain:new{ UpgradeDescription = "Deals 1 more damage.", Damage = 4 }
-Poke_MegaDrain_B=Poke_MegaDrain:new{ UpgradeDescription = "Can self-target to hit all adjacent pawns at once.", Multitarget = true }
+Poke_MegaDrain_B=Poke_MegaDrain:new{ UpgradeDescription = "Can self-target to hit all adjacent units at once.", Multitarget = true }
 Poke_MegaDrain_AB=Poke_MegaDrain:new{ Damage = 4, Multitarget = true }
 
 Poke_PowderPuff = Skill:new{
@@ -6702,7 +6703,7 @@ Poke_PowderPuff = Skill:new{
 	Icon = "weapons/Powder.png",	
 	Rarity = 3,
 	Name = "Powder Puff",
-	Description = "Throws powder to a nearby tile, pushing pawns adjacent to the target and applying Powder. Deals damage when thrown at a fire tile.",
+	Description = "Throws powder to a nearby tile, pushing units adjacent to the target and applying Powder. Deals damage when thrown at a fire tile.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	SelfDamage = 0,
@@ -6757,10 +6758,9 @@ Poke_FireTail = Skill:new{
 	Icon = "weapons/FireTail.png",	
 	Rarity = 3,
 	Name = "Fire Tail",
-	Description = "Sweeps three tiles adjacent to the user, pushing one of them away from Charmander.",
+	Description = "Sweeps three tiles adjacent to the user, pushing one of them away.",
 	Push = 1,--TOOLTIP HELPER
-	Damage = 1,
-	SelfDamage = 0,
+	Damage = 0,
 	PathSize = 8,
 	PowerCost = 0,
 	Duration = 1,
@@ -6938,10 +6938,10 @@ function Poke_Withdraw:GetSkillEffect(p1,p2)
 	local pawnType = Board:GetPawn(p1):GetType()
 	local id = Board:GetPawn(p1):GetId()
 	local resetToCustomAnim = _G[pawnType].Image
-	if GAME and Board:GetSize() ~= Point(6, 6) then
+	if GAME and GAME.Poke_Evolutions and Board:GetSize() ~= Point(6, 6) then
 		
 		local evo = GAME.Poke_Evolutions[id + 1]
-		local branch = GAME.BranchingEvos[id + 1]
+		local branch = GAME.BranchingEvos and GAME.BranchingEvos[id + 1] or 1
 		if pawnType == "Poke_Squirtle" then 
 			resetToCustomAnim = _G[pawnType].EvoGraphics[branch][evo] or _G[pawnType].Image
 			ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", p1:GetString(), resetToCustomAnim.."shell"))
@@ -6981,9 +6981,8 @@ function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 	local direction = GetDirection(p3 - p2)
 	local pawnType = Board:GetPawn(p1):GetType()
 	local id = Board:GetPawn(p1):GetId()
-	local resetToCustomAnim = _G[pawnType].Image
-	if GAME and Board:GetSize() ~= Point(6, 6) then
-		
+	local resetToCustomAnim = Board:GetPawn(p1) and _G[pawnType].Image or ""
+	if GAME and GAME.Poke_Evolutions and Board:GetSize() ~= Point(6, 6) then		
 		local evo = GAME.Poke_Evolutions[id + 1]
 		local branch = GAME.BranchingEvos[id + 1]
 		if pawnType == "Poke_Squirtle" then 
@@ -7025,7 +7024,7 @@ function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 		end
 	end
 	ret:AddDamage(SpaceDamage(target + DIR_VECTORS[direction], 0, direction))
-	if GetCurrentMission() and GAME and Game and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
+	if GetCurrentMission() and GAME and Game and Board:GetPawn(p1) and pawnType == "Poke_Squirtle" and Board:GetSize() ~= Point(6, 6) then
 	
 		ret:AddScript(string.format([[if not Game or not Game:GetTurnCount() then return end
 					GetCurrentMission().LastWithdrawTurn = Game:GetTurnCount()
@@ -7238,7 +7237,7 @@ Poke_BubbleBeam = Skill:new{
 	Icon = "weapons/BubbleBeam.png",	
 	Rarity = 3,
 	Name = "Bubble Beam",
-	Description = "Deals damage in a line and wets targets, pushing the last tile hit. Can self-target to set the current weather to Rain. While it rains, pawns become wet and fires turn to smoke.",
+	Description = "Deals damage in a line and wets targets, pushing the last tile hit. Can self-target to set the current weather to Rain. While it rains, units become wet and fires turn to smoke.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 1,
 	Range = 3,
@@ -7338,7 +7337,7 @@ Poke_Flamethrower = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/Flame Thrower.png",
 	Name = "Flamethrower",
-	Description = "Deals damage in a line and burns targets. Can self-target to set the current weather to Sunny. While the weather is Sunny, applying fire to pawns deals 1 damage, ice melts, and wet pawns dry.",
+	Description = "Deals damage in a line and burns targets. Can self-target to set the current weather to Sunny. While the weather is Sunny, applying fire to units deals 1 damage, ice melts, and wet units dry.",
 	Rarity = 3,
 	Explosion = "",
 	LaunchSound = "/weapons/flamethrower",
@@ -7406,7 +7405,7 @@ function Poke_Flamethrower:GetSkillEffect(p1, p2)
 	return ret
 end	
 
-Poke_Flamethrower_A = Poke_Flamethrower:new{ UpgradeDescription = "Applies Dry to pawns adjacent to tiles hit. Dry pawns take more damage from fire.", Dry = true,}
+Poke_Flamethrower_A = Poke_Flamethrower:new{ UpgradeDescription = "Applies Dry to units adjacent to tiles hit. Dry units take more damage from fire.", Dry = true,}
 Poke_Flamethrower_B = Poke_Flamethrower:new{ UpgradeDescription = "Increases range.", PathSize = 3, Range = 3,}
 Poke_Flamethrower_AB = Poke_Flamethrower:new{ Dry = true, PathSize = 3, Range = 3,}
 
@@ -7414,7 +7413,7 @@ Poke_HydroPump = LaserDefault:new{
 	Class = "TechnoVek",
 	Icon = "weapons/HydroPump.png",
 	Name = "Hydro Pump",
-	Description = "Deals damage and wets pawns across any number of tiles in a direction, pushing the last tile hit.",
+	Description = "Deals damage and wets units across any number of tiles in a direction, pushing the last tile hit.",
 	Rarity = 4,
 	Explosion = "",
 	Damage = 2,
