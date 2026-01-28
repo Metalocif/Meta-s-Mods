@@ -210,7 +210,7 @@ a.Arceus_Judgment =	base:new{ Image = "units/aliens/Arceus_attack.png", NumFrame
 a.ArceusBossd =	base:new{ Image = "units/aliens/Arceus_d.png", NumFrames = 11, Time = 0.2, Loop = false }
 a.Arceus2d =	base:new{ Image = "units/aliens/Arceus2_d.png", NumFrames = 9, Time = 0.2, Loop = false }
 
-base = a.EnemyUnit:new{Image = imagepath .."ArceusShade.png", PosX = -26, PosY = -23, NumFrames = 1, Height = 1 }
+base = a.EnemyUnit:new{Image = imagepath .."ArceusShade.png", PosX = -16, PosY = -20, NumFrames = 1, Height = 1 }
 a.ArceusShade  =	base
 a.ArceusShadea =	base:new{ Image = "units/aliens/ArceusShade_a.png", NumFrames = 4 }
 a.ArceusShaded =	base:new{ Image = "units/aliens/ArceusShade_d.png", NumFrames = 6, Time = 0.2, Loop = false }
@@ -1795,17 +1795,17 @@ Poke_ArceusBoss = {
 	InfestedImmune = true,
 	BlindImmune = true,
 	-- Corpse = true,
-	IsDeathEffect = true,
 }
 AddPawn("Poke_ArceusBoss") 
 
 function Poke_ArceusBoss:GetDeathEffect(point)
 	local arceus = PAWN_FACTORY:CreatePawn("Poke_ArceusBoss2")
 	modApi:scheduleHook(2200, function()
+		if not (GetCurrentMission() and Board) then return end
 		Board:AddPawn(arceus, point)
 		GetCurrentMission().Target = arceus:GetId()
 		Board:Ping(point, GL_Color(255, 255, 150))
-		modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_SecondForm", {main = GetCurrentMission().Target})
+		modApi:runLater(function() modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_SecondForm", {main = arceus:GetId()}) end)
 	end)
 	return SkillEffect()
 end
@@ -1833,12 +1833,16 @@ Poke_ArceusBoss2 = {
 	InfestedImmune = true,
 	BlindImmune = true,
 	Corpse = true,
-	IsDeathEffect = true,
 }
 AddPawn("Poke_ArceusBoss2") 
 
 function Poke_ArceusBoss2:GetDeathEffect(point)
-	modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Death", {main = self.Target})
+	local arceusSpeaker = PAWN_FACTORY:CreatePawn("Poke_ArceusBoss")
+	Board:AddPawn(arceusSpeaker, Point(-12, 42))
+	
+	arceusSpeaker:SetInvisible(true)
+	modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Death", {main = arceusSpeaker:GetId()})
+	modApi:runLater(function() Board:RemovePawn(arceusSpeaker) DoSaveGame() end)
 	Board:GetPawn(point):SetCorpse(false)
 	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
 	if not Board:IsBlocked(point, PATH_GROUND) then
@@ -1846,14 +1850,87 @@ function Poke_ArceusBoss2:GetDeathEffect(point)
 		GetCurrentMission().BallID = ball:GetId()
 	end
 	for _, p in ipairs(Board) do
-		if Board:GetPawn(p) and Board:GetPawn(p):GetType() == "Poke_StarbirthStar" then
-			Board:GetPawn(p):Kill()
+		if Board:GetPawn(p) and (Board:GetPawn(p):GetType() == "Poke_StarbirthStar" or Board:GetPawn(p):GetType() == "Poke_ArceusShade") then
+			Board:GetPawn(p):Kill(false)
 		end
 	end
 	GetCurrentMission().TurnLimit = Game:GetTurnCount()
 	return SkillEffect()
 end
 
+Poke_ArceusShade = {
+	Health = 3,
+	MoveSpeed = 4,
+	Image = "ArceusShade",
+	Name = "Shade",
+	-- ImageOffset = 2,
+	SkillList = { "Poke_BlindingLight" },
+	SoundLocation = "",
+	ImpactMaterial = IMPACT_FLESH,
+	DefaultTeam = TEAM_ENEMY,
+	IsPortrait = false,
+	Tier = TIER_BOSS,
+	Massive = true,
+	Flying = true,
+	BlindImmune = true,
+	GloryImmune = true,
+}
+AddPawn("Poke_ArceusShade") 
+Poke_BlindingLight = LaserDefault:new{
+	Class = "TechnoVek",
+	Icon = "weapons/SolarBeam.png",
+	Name = "Blinding Light",
+	Description = "Cast a beam of energy. Will not damage friendly targets. Blinds units hit and adjacent to damaged tiles.",
+	Rarity = 4,
+	Explosion = "",
+	Damage = 2,
+	PowerCost = 0,
+	FriendlyDamage = false,
+	ZoneTargeting = ZONE_DIR,
+	LaserArt = "effects/laser_solarbeam",
+	Upgrades = 0,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,2),
+		Friendly = Point(2,1),
+		Target = Point(2,2),
+		Mountain = Point(2,0),
+		CustomPawn = "Poke_ArceusShade",
+	}
+}
+function Poke_BlindingLight:AddLaser(ret,point,direction,forced_end)
+	local queued = queued or false
+	local damage = self.Damage
+	local start = point - DIR_VECTORS[direction]
+	while Board:IsValid(point) do
+		local blind1 = SpaceDamage(point + DIR_VECTORS[(direction+1)%4], DAMAGE_ZERO)
+		local blind2 = SpaceDamage(point + DIR_VECTORS[(direction+3)%4], DAMAGE_ZERO)
+		blind1.iBlind = 1
+		blind2.iBlind = 1
+		ret:AddQueuedDamage(blind1)
+		ret:AddQueuedDamage(blind2)
+		local dam = SpaceDamage(point, damage)
+		if Board:GetPawn(point) and Board:GetPawn(point):GetTeam() == TEAM_ENEMY then dam.iDamage = DAMAGE_ZERO end
+		if forced_end == point or Board:IsBuilding(point) or Board:GetTerrain(point) == TERRAIN_MOUNTAIN or not Board:IsValid(point + DIR_VECTORS[direction]) then
+			local blind3 = SpaceDamage(point + DIR_VECTORS[direction], DAMAGE_ZERO)
+			blind3.iBlind = 1
+			ret:AddQueuedDamage(blind3)
+			ret:AddQueuedProjectile(dam,self.LaserArt)
+			break
+		else
+			ret:AddQueuedDamage(dam)  
+		end
+		point = point + DIR_VECTORS[direction]	
+	end
+end
+function Poke_BlindingLight:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	local target = p1 + DIR_VECTORS[direction]
+	local mission = GetCurrentMission()
+	self:AddQueuedLaser(ret, target, direction, target + DIR_VECTORS[direction])
+	return ret
+end
 
 
 Poke_JudgmentBoss = Skill:new{
@@ -2006,13 +2083,14 @@ end
 
 function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	
+	local mission = GetCurrentMission()
 	if not Board:GetPawn(p1) then return ret end
 	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
 	ret:AddQueuedDelay(1)
 	local iStart, iEnd = 0, 7
 	local jStart, jEnd = 4, 7
-	if GetCurrentMission().UnmadeStuff then iEnd = 3 jStart = 0 else ret:AddScript("GetCurrentMission().UnmadeStuff = 0") end
+	if mission then mission.UnmadeStuff = mission.UnmadeStuff or 0 end
+	if mission.UnmadeStuff == 1 then iEnd = 3 jStart = 0 else ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1") end
 	for i = iStart, iEnd do
 		for j = jStart, jEnd do
 			local p = Point(i, j)
@@ -2038,10 +2116,9 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 			end
 			-- if bounceIt then ret:AddQueuedScript(string.format("Board:Bounce(%s, 0)", p:GetString())) end
 			-- ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
-			-- ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
+			ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
 		end
 	end
-	ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1")
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", p1:GetString()))
 	ret:AddQueuedScript(string.format("Board:GetPawn(%s):AddWeapon(%q)", p1:GetString(), self.NextWeapon))
 	return ret
