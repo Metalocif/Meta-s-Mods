@@ -1,3 +1,8 @@
+v1.8.1
+- Weapon description fixes.
+- Fixed a bug occurring when using Withdraw in a test environment prior to any battle.
+- Fixes and improvements to the Arceus boss fight.
+
 v1.8
 - Release of the Bulbasaur/Charmander/Squirtle squad, Kanto's Finest.
 - Darkrai boss tweak. Its attack turns into a move that sets a mech to sleep instead of dealing damage when a mech is adjacent.
