@@ -227,9 +227,9 @@ function mod:load( options, version)
 						
 						Game:TriggerSound("/ui/map/flyin_rewards")
 						Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 150))
-						-- if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" then --update graphics
-							-- pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][pilotLevel])
-						-- end 
+						if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" then --update graphics
+							pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][pilotLevel])
+						end 
 					end
 					GAME.Poke_Evolutions[id+1] = pilotLevel			
 					--remember it evolved so we don't do it again
@@ -280,6 +280,7 @@ function mod:load( options, version)
 			local evo = GAME.Poke_Evolutions[id + 1]
 			local branch = GAME.BranchingEvos[id + 1]
 			while pawn:GetWeaponCount() == 3 do
+				LOG("removing a weapon")
 				pawn:RemoveWeapon(3) 
 			end
 			
