@@ -1962,7 +1962,7 @@ local function EVENT_onModsLoaded()
 	end)
 
 	modapiext:addTargetAreaBuildHook(function(mission, pawn, weaponId, p1, targetArea)
-		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") then
+		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") and weaponId ~= "Move" then
 			local targets = extract_table(targetArea)
 			local closeTargets = {}
 			for _, point in pairs(targets) do
@@ -1978,7 +1978,7 @@ local function EVENT_onModsLoaded()
 		end
 	end)
 	modapiext:addSecondTargetAreaBuildHook(function(mission, pawn, weaponId, p1, p2, targetArea)
-		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") then
+		if pawn:IsMech() and Status.GetStatus(pawn:GetId(), "Blind") and weaponId ~= "Move" then
 			local targets = extract_table(targetArea)
 			local closeTargets = {}
 			for _, point in pairs(targets) do
