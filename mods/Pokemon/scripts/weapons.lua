@@ -5861,8 +5861,7 @@ end
 	
 function Poke_Wormhole:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	local away = Point(-33, 0)
-	local user = Board:GetPawn(p1)
+	local user = Board:GetPawn(p1) or Pawn
 	local pawn0 = Board:GetPawn(p1 + DIR_VECTORS[0])
 	local pawn1 = Board:GetPawn(p1 + DIR_VECTORS[1])
 	local pawn2 = Board:GetPawn(p1 + DIR_VECTORS[2])
@@ -5884,26 +5883,31 @@ function Poke_Wormhole:GetSkillEffect(p1, p2)
 	local mark = SpaceDamage(p1)
 	mark.sImageMark = "advanced/combat/icons/icon_teleport_glow.png"
 	ret:AddDamage(mark)
-	if pawn0 then mark.loc = p1 + DIR_VECTORS[0] ret:AddDamage(mark) end
-	if pawn1 then mark.loc = p1 + DIR_VECTORS[1] ret:AddDamage(mark) end
-	if pawn2 then mark.loc = p1 + DIR_VECTORS[2] ret:AddDamage(mark) end
-	if pawn3 then mark.loc = p1 + DIR_VECTORS[3] ret:AddDamage(mark) end
+	if pawn0 then mark.loc = p1 + DIR_VECTORS[0] ret:AddDamage(mark) mark.loc = p2 + DIR_VECTORS[0] ret:AddDamage(mark) end
+	if pawn1 then mark.loc = p1 + DIR_VECTORS[1] ret:AddDamage(mark) mark.loc = p2 + DIR_VECTORS[1] ret:AddDamage(mark) end
+	if pawn2 then mark.loc = p1 + DIR_VECTORS[2] ret:AddDamage(mark) mark.loc = p2 + DIR_VECTORS[2] ret:AddDamage(mark) end
+	if pawn3 then mark.loc = p1 + DIR_VECTORS[3] ret:AddDamage(mark) mark.loc = p2 + DIR_VECTORS[3] ret:AddDamage(mark) end
 	ret:AddAnimation(p1, "wormholeAnim")
 	ret:AddDelay(0.2)
-	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", user:GetId(), away:GetString()))
+	ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(true)", user:GetId()))
 	ret:AddDelay(0.6)
-	if pawn0 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn0:GetId(), (away + DIR_VECTORS[0]):GetString())) end
-	if pawn1 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn1:GetId(), (away + DIR_VECTORS[1]):GetString())) end
-	if pawn2 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn2:GetId(), (away + DIR_VECTORS[2]):GetString())) end
-	if pawn3 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn3:GetId(), (away + DIR_VECTORS[3]):GetString())) end
+	if pawn0 then ret:AddTeleport(p1 + DIR_VECTORS[0], p2 + DIR_VECTORS[0], NO_DELAY) end
+	if pawn1 then ret:AddTeleport(p1 + DIR_VECTORS[1], p2 + DIR_VECTORS[1], NO_DELAY) end
+	if pawn2 then ret:AddTeleport(p1 + DIR_VECTORS[2], p2 + DIR_VECTORS[2], NO_DELAY) end
+	if pawn3 then ret:AddTeleport(p1 + DIR_VECTORS[3], p2 + DIR_VECTORS[3], NO_DELAY) end
+	if pawn0 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(true)", pawn0:GetId())) end
+	if pawn1 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(true)", pawn1:GetId())) end
+	if pawn2 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(true)", pawn2:GetId())) end
+	if pawn3 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(true)", pawn3:GetId())) end
 	ret:AddDelay(0.5)
 	ret:AddAnimation(p2, "wormholeAnim", ANIM_REVERSE)
-	if pawn0 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn0:GetId(), (p2 + DIR_VECTORS[0]):GetString())) end
-	if pawn1 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn1:GetId(), (p2 + DIR_VECTORS[1]):GetString())) end
-	if pawn2 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn2:GetId(), (p2 + DIR_VECTORS[2]):GetString())) end
-	if pawn3 then ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", pawn3:GetId(), (p2 + DIR_VECTORS[3]):GetString())) end
+	
+	if pawn0 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(false)", pawn0:GetId())) end
+	if pawn1 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(false)", pawn1:GetId())) end
+	if pawn2 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(false)", pawn2:GetId())) end
+	if pawn3 then ret:AddScript(string.format("Board:GetPawn(%s):SetInvisible(false)", pawn3:GetId())) end
 	ret:AddDelay(0.6)
-	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", user:GetId(), p2:GetString()))
+	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s) Board:GetPawn(%s):SetInvisible(false)", user:GetId(), p2:GetString(), user:GetId()))
 	return ret
 end
 
