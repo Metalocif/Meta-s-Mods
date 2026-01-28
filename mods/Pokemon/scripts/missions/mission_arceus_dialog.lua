@@ -10,6 +10,7 @@ modapiext.dialog:addRuledDialog("Pokemon_Arceus_Turn2", {Odds = 100,{ main = "Po
 modapiext.dialog:addRuledDialog("Pokemon_Arceus_Turn3", {Odds = 100,{ main = "Pokemon_Arceus_Turn3" }})
 modapiext.dialog:addRuledDialog("Pokemon_Arceus_Turn4", {Odds = 100,{ main = "Pokemon_Arceus_Turn4" }})
 modapiext.dialog:addRuledDialog("Pokemon_Arceus_Turn5", {Odds = 100,{ main = "Pokemon_Arceus_Turn5" }})
+modapiext.dialog:addRuledDialog("Pokemon_Arceus_SecondForm", {Odds = 100,{ main = "Pokemon_Arceus_SecondForm" }})
 modapiext.dialog:addRuledDialog("Pokemon_Arceus_Death", {Odds = 100,{ main = "Pokemon_Arceus_Death" }})
 
 return {
