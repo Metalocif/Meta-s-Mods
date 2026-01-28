@@ -15,6 +15,9 @@ Mission_Poke_Arceus = Mission_Infinite:new{
 	TurnLimit = 10,
 	MaxEnemy = 0,
 	MaxEnemy_Easy = 0,
+	SpawnStart = 0,
+	SpawnStart_Easy = {0,0},
+	SpawnStart_Unfair = 0,
 	CustomTile = "tiles_Pillars",
 	MapTags = { "Poke_Boss_Pillars_Arceus" },
 	BlockSecret = true,
@@ -57,15 +60,24 @@ function Mission_Poke_Arceus:NextTurn()
 		end,
 		function()
 			for i = 0, 2 do
-				Status.ApplyGlory(i)
+				if Board:GetPawn(i) then Status.ApplyGlory(i) end
 			end
 		end)
 	else
-		if Board:GetPawn(self.Target) and Game:GetTurnCount() >= 1 and Game:GetTurnCount() <= 5 and Game:GetTeamTurn() == TEAM_ENEMY then
-			modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Turn"..Game:GetTurnCount(), {main = self.Target})
+		if Board:GetPawn(self.Target) and Game:GetTurnCount() >= 0 and Game:GetTurnCount() <= 4 and Game:GetTeamTurn() == TEAM_ENEMY then
+			modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Turn"..Game:GetTurnCount() + 1, {main = self.Target})
 		end
 	end
-	-- Board:AddPawn("Poke_ArceusShade")
+	if Board:GetPawn(self.Target) and Game:GetTeamTurn() == TEAM_ENEMY then
+		Board:Ping(Board:GetPawn(self.Target):GetSpace(), GL_Color(255, 255, 150))
+		local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
+		local shade1 = PAWN_FACTORY:CreatePawn("Poke_ArceusShade")
+		local shade2 = PAWN_FACTORY:CreatePawn("Poke_ArceusShade")
+		Board:AddPawn(shade1)
+		Board:AddPawn(shade2)
+		Board:Ping(shade1:GetSpace(), GL_Color(255, 255, 150))
+		Board:Ping(shade2:GetSpace(), GL_Color(255, 255, 150))
+	end
 	
 	for _, id in ipairs(extract_table(Board:GetPawns(TEAM_ANY))) do
 		local pawn = Board:GetPawn(id)		
