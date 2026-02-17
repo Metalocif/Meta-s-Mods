@@ -3842,7 +3842,7 @@ Poke_FreezyFrost=Skill:new{
 	PathSize = 8,	
 	PowerCost = 0,
 	Upgrades = 2,
-	UpgradeList = {"+1 Damage", "+1 Damage"},
+	UpgradeList = {"Freeze Buildings", "+1 Damage"},
 	UpgradeCost = {2, 2},
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -6983,8 +6983,8 @@ end
 function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
 	local direction = GetDirection(p3 - p2)
-	local pawnType = Board:GetPawn(p1):GetType()
-	local id = Board:GetPawn(p1):GetId()
+	local pawnType = Board:GetPawn(p1) and Board:GetPawn(p1):GetType() or ""
+	local id = Board:GetPawn(p1) and Board:GetPawn(p1):GetId() or -1
 	local resetToCustomAnim = Board:GetPawn(p1) and _G[pawnType].Image or ""
 	if GAME and GAME.Poke_Evolutions and Board:GetSize() ~= Point(6, 6) then		
 		local evo = GAME.Poke_Evolutions[id + 1]
@@ -6999,7 +6999,8 @@ function Poke_Withdraw:GetFinalEffect(p1,p2,p3)
 		target = p3
 	else
 		for i = 0, 8 do
-			if Board:IsBlocked(target + DIR_VECTORS[direction], PATH_MASSIVE) or not Board:IsValid(target + DIR_VECTORS[direction]) then break end
+			if (Board:IsBlocked(target + DIR_VECTORS[direction], PATH_MASSIVE) and target + DIR_VECTORS[direction] ~= p1)
+			or not Board:IsValid(target + DIR_VECTORS[direction]) then break end
 			target = target + DIR_VECTORS[direction]
 		end
 	end
