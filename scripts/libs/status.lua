@@ -21,41 +21,42 @@ local isNewerVersion = false
 
 modApi:appendAssets("img/libs/status/", "img/libs/status/")
 
-ANIMS.StatusAlluring = Animation:new{ Image = "libs/status/alluring.png", PosX = 0, PosY = 0, NumFrames = 4, Time = 0.3, Loop = true}
-ANIMS.StatusBlind = Animation:new{ Image = "libs/status/blind.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusBloodthirsty = Animation:new{ Image = "libs/status/bloodthirsty.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusBonded = Animation:new{ Image = "libs/status/bonded.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusBondedOff = Animation:new{ Image = "libs/status/bonded_off.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusChill = Animation:new{ Image = "libs/status/chill.png", PosX = -10, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusConfusion = Animation:new{ Image = "libs/status/confusion.png", PosX = 0, PosY = 0, NumFrames = 2, Time = 0.5, Loop = true}
-ANIMS.StatusDreadful = Animation:new{ Image = "libs/status/dreadful_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusDry = Animation:new{ Image = "libs/status/dry.png", PosX = 0, PosY = 0, NumFrames = 3, Time = 0.3, Loop = true}
-ANIMS.StatusDodge1 = Animation:new{ Image = "libs/status/dodge1.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusDodge2 = Animation:new{ Image = "libs/status/dodge2.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusDodge3 = Animation:new{ Image = "libs/status/dodge3.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusDoomed = Animation:new{ Image = "libs/status/doomed_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusGlory = Animation:new{ Image = "libs/status/glory_icon.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusGunk = Animation:new{ Image = "libs/status/gunk.png", PosX = -5, PosY = 0, NumFrames = 6, Time = 1, Loop = true}
-ANIMS.StatusHemorrhage = Animation:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
-ANIMS.StatusLeechSeed = Animation:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusNecrosis = Animation:new{ Image = "libs/status/necrosis_icon.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusShatterburst = Animation:new{ Image = "libs/status/shatterburst.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusShocked = Animation:new{ Image = "libs/status/shocked.png", PosX = -5, PosY = 0, NumFrames = 4, Time = 0.15, Loop = true}
-ANIMS.StatusSleep = Animation:new{ Image = "libs/status/sleep.png", PosX = -30, PosY = -20, NumFrames = 7, Time = 0.3, Loop = true}
-ANIMS.StatusPowder = Animation:new{ Image = "libs/status/powder.png", PosX = -5, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusRegen = Animation:new{ Image = "libs/status/icon_regen.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusReactive = Animation:new{ Image = "libs/status/reactive.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusRooted = Animation:new{ Image = "libs/status/rooted_icon.png", PosX = -7, PosY = 15, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusTargeted = Animation:new{ Image = "libs/status/targeted.png", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusToxin = Animation:new{ Image = "libs/status/toxin.png", PosX = 0, PosY = 0, NumFrames = 6, Time = 0.15, Loop = true}
-ANIMS.StatusWeaken = Animation:new{ Image = "libs/status/weaken.png", PosX = -15, PosY = 0, NumFrames = 6, Time = 0.1, Loop = true}
-ANIMS.StatusWet = Animation:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2, Loop = true}
+ANIMS.StatusBase = Animation:new{ Image = "", PosX = 0, PosY = 0, NumFrames = 1, Time = 1, Loop = true}
+ANIMS.StatusAlluring = ANIMS.StatusBase:new{ Image = "libs/status/alluring.png", NumFrames = 4, Time = 0.3}
+ANIMS.StatusBlind = ANIMS.StatusBase:new{ Image = "libs/status/blind.png"}
+ANIMS.StatusBloodthirsty = ANIMS.StatusBase:new{ Image = "libs/status/bloodthirsty.png"}
+ANIMS.StatusBonded = ANIMS.StatusBase:new{ Image = "libs/status/bonded.png"}
+ANIMS.StatusBondedOff = ANIMS.StatusBase:new{ Image = "libs/status/bonded_off.png"}
+ANIMS.StatusChill = ANIMS.StatusBase:new{ Image = "libs/status/chill.png", PosX = -10}
+ANIMS.StatusConfusion = ANIMS.StatusBase:new{ Image = "libs/status/confusion.png", NumFrames = 2, Time = 0.5}
+ANIMS.StatusDreadful = ANIMS.StatusBase:new{ Image = "libs/status/dreadful_icon.png"}
+ANIMS.StatusDry = ANIMS.StatusBase:new{ Image = "libs/status/dry.png", NumFrames = 3, Time = 0.3}
+ANIMS.StatusDodge1 = ANIMS.StatusBase:new{ Image = "libs/status/dodge1.png"}
+ANIMS.StatusDodge2 = ANIMS.StatusBase:new{ Image = "libs/status/dodge2.png"}
+ANIMS.StatusDodge3 = ANIMS.StatusBase:new{ Image = "libs/status/dodge3.png"}
+ANIMS.StatusDoomed = ANIMS.StatusBase:new{ Image = "libs/status/doomed_icon.png"}
+ANIMS.StatusGlory = ANIMS.StatusBase:new{ Image = "libs/status/glory_icon.png", PosX = -5}
+ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunk.png", PosX = -5, NumFrames = 6}
+ANIMS.StatusHemorrhage = ANIMS.StatusBase:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2}
+ANIMS.StatusLeechSeed = ANIMS.StatusBase:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5}
+ANIMS.StatusNecrosis = ANIMS.StatusBase:new{ Image = "libs/status/necrosis_icon.png"}
+ANIMS.StatusShatterburst = ANIMS.StatusBase:new{ Image = "libs/status/shatterburst.png"}
+ANIMS.StatusShocked = ANIMS.StatusBase:new{ Image = "libs/status/shocked.png", PosX = -5, NumFrames = 4, Time = 0.15}
+ANIMS.StatusSleep = ANIMS.StatusBase:new{ Image = "libs/status/sleep.png", PosX = -30, PosY = -20, NumFrames = 7, Time = 0.3}
+ANIMS.StatusPowder = ANIMS.StatusBase:new{ Image = "libs/status/powder.png", PosX = -5}
+ANIMS.StatusRegen = ANIMS.StatusBase:new{ Image = "libs/status/icon_regen.png"}
+ANIMS.StatusReactive = ANIMS.StatusBase:new{ Image = "libs/status/reactive.png", PosX = -7, PosY = 15}
+ANIMS.StatusRooted = ANIMS.StatusBase:new{ Image = "libs/status/rooted_icon.png", PosX = -7, PosY = 15}
+ANIMS.StatusTargeted = ANIMS.StatusBase:new{ Image = "libs/status/targeted.png"}
+ANIMS.StatusToxin = ANIMS.StatusBase:new{ Image = "libs/status/toxin.png", NumFrames = 6, Time = 0.15}
+ANIMS.StatusWeaken = ANIMS.StatusBase:new{ Image = "libs/status/weaken.png", PosX = -15, NumFrames = 6, Time = 0.1}
+ANIMS.StatusWet = ANIMS.StatusBase:new{ Image = "libs/status/wet.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2}
 
-ANIMS.StatusInsanity1 = Animation:new{ Image = "libs/status/Insanity1.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusInsanity2 = Animation:new{ Image = "libs/status/Insanity2.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusInsanity3 = Animation:new{ Image = "libs/status/Insanity3.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusInsanity4 = Animation:new{ Image = "libs/status/Insanity4.png", PosX = -5, PosY = 10, NumFrames = 1, Time = 1, Loop = true}
-ANIMS.StatusInsanity5 = Animation:new{ Image = "libs/status/Insanity5.png", PosX = -5, PosY = 10, NumFrames = 8, Frames={0,1,2,3,4,5,6,7,6,5,4,3,2,1,0}, Time = 0.75, Loop = true}
+ANIMS.StatusInsanity1 = ANIMS.StatusBase:new{ Image = "libs/status/Insanity1.png", PosX = -5, PosY = 10}
+ANIMS.StatusInsanity2 = ANIMS.StatusInsanity1:new{ Image = "libs/status/Insanity2.png"}
+ANIMS.StatusInsanity3 = ANIMS.StatusInsanity1:new{ Image = "libs/status/Insanity3.png"}
+ANIMS.StatusInsanity4 = ANIMS.StatusInsanity1:new{ Image = "libs/status/Insanity4.png"}
+ANIMS.StatusInsanity5 = ANIMS.StatusInsanity1:new{ Image = "libs/status/Insanity5.png", NumFrames = 8, Frames={0,1,2,3,4,5,6,7,6,5,4,3,2,1,0}, Time = 0.75}
 
 
 Location["libs/status/alluring_icon.png"] = Point(-5,0)
