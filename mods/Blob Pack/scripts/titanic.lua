@@ -352,7 +352,7 @@ end
 
 function Meta_TitanicGooAtk2:GetSkillEffect(p1,p2)
 	ret = SkillEffect()
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local offsets = { Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1) }
 	for _, offset in ipairs(offsets) do
 		local curr = p1 + offset

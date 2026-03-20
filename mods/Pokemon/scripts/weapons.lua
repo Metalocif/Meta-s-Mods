@@ -2528,7 +2528,7 @@ function Poke_ZenHeadbutt:GetSkillEffect(p1,p2)
 	local doDamage = true
 	local target = p2
 	local distance = p1:Manhattan(target)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local resetAnim
 	if user:GetCustomAnim() == "Poke_Metagross" and (p1:Manhattan(p2) > 1 or not Board:IsBlocked(p2, PATH_PROJECTILE)) and not Board:IsTipImage() then
 		resetAnim = true
@@ -4549,7 +4549,7 @@ function Poke_SacredSword:GetSkillEffect(p1, p2)
 		ret:AddDelay(0.07)
 	end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_SacredSword" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -4621,7 +4621,7 @@ function Poke_LightOfRuin:GetSkillEffect(p1, p2)
 		ret:AddBounce(p2 + DIR_VECTORS[i] * 2, 8)
 	end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_LightOfRuin" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -4710,7 +4710,7 @@ function Poke_VanishingStrikes:GetSkillEffect(p1, p2)
 	elseif p2.y == 1 or p2.y == 2 then dir = DIR_UP
 	elseif p2.y == 5 or p2.y == 6 then dir = DIR_DOWN end
 	
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	
 	for i = 0, 7 do
 		for j = 0, 7  do
@@ -4733,7 +4733,7 @@ function Poke_VanishingStrikes:GetSkillEffect(p1, p2)
 	end
 	ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", user:GetId(), p1:GetString()))
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_VanishingStrikes" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -4858,7 +4858,7 @@ function Poke_ShatteredPsyche:GetSkillEffect(p1, p2)
 		end
 	end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_ShatteredPsyche" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -4940,7 +4940,7 @@ function Poke_MindOverMatter:GetFinalEffect(p1, p2, p3)
 	ret:AddDamage(damage1)
 	ret:AddDamage(damage2)
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_MindOverMatter" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -4993,7 +4993,7 @@ function Poke_DracoMeteor:GetSkillEffect(p1, p2)
 	ret:AddDropper(damage, "effects/DracoMeteor.png")
 	ret:AddScript("Board:AddShake(0.5)")
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_DracoMeteor" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -5049,7 +5049,7 @@ function Poke_DracoMeteor_Boost:GetSkillEffect(p1, p2)
 		end
 	end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_DracoMeteor" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -5220,7 +5220,7 @@ function Poke_RoarOfTime:GetSkillEffect(p1, p2)
 		ret:AddDelay(0.05)
 	end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_RoarOfTime" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -5386,7 +5386,7 @@ function Poke_SpatialRift:GetSkillEffect(p1,p2)
 	ret:AddDelay(1)
 	
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_SpatialRift" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -5861,7 +5861,7 @@ end
 	
 function Poke_Wormhole:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	local user = Board:GetPawn(p1) or Pawn
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1) or Pawn
 	local pawn0 = Board:GetPawn(p1 + DIR_VECTORS[0])
 	local pawn1 = Board:GetPawn(p1 + DIR_VECTORS[1])
 	local pawn2 = Board:GetPawn(p1 + DIR_VECTORS[2])
@@ -6327,7 +6327,7 @@ function Poke_MountainHurl:GetSkillEffect(p1, p2)
 	
 	ret:AddScript("Board:AddShake(0.5)")
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_MountainHurl" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -7561,7 +7561,7 @@ function Poke_BlastBurn:GetSkillEffect(p1, p2)
 		ret:AddDamage(damage)
 	end
 
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_BlastBurn" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -7602,7 +7602,7 @@ Poke_FlareBlitz=Skill:new{
 function Poke_FlareBlitz:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2 - p1)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local target = GetProjectileEnd(p1, p2)
 	local dist = p1:Manhattan(target)
 	local curr = p1
@@ -7634,7 +7634,7 @@ function Poke_FlareBlitz:GetSkillEffect(p1, p2)
 	end
 	ret:AddDamage(SpaceDamage(moveTo, 1))
 	
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_FlareBlitz" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 

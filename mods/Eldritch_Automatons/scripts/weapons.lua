@@ -370,7 +370,7 @@ end
 
 function Meta_EldritchInsanity:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	if Board:GetSize() == Point(6,6) then
 		Board:GetPawn(Point(2, 2)):FireWeapon(Point(2, 3), 1)
 		Board:GetPawn(Point(2, 2)):FireWeapon(Point(3, 2), 1)
