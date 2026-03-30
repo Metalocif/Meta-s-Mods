@@ -1931,7 +1931,7 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 	local direction = GetDirection(p2-p1)
 	local distance = p1:Manhattan(p2)
 	local mission = GetCurrentMission()
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	if mission then
 		if not mission.AssimilateDamage then mission.AssimilateDamage = SpaceDamage(point) end
 		if self.HealSelf then
@@ -2476,7 +2476,7 @@ function CyborgWeapons_Adapt:GetSkillEffect(p1, p2)
 	local roll = random_removal(cyborgWeapons)
 	local thisID = 0
 	local cyborgID = 0
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	for i = 1, 2 do
 		if user:GetWeaponType(i) == "CyborgWeapons_Adapt" then thisID = i
 		elseif user:GetWeaponClass(i) == "TechnoVek" then cyborgID = i end

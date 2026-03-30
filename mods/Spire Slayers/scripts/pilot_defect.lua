@@ -117,7 +117,7 @@ function this:init(mod)
 
 	function StSDefectSkill_Link:GetSkillEffect(p1,p2)
 		local ret = SkillEffect()
-		local user = Board:GetPawn(p1)
+		local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 		if GAME.StSDefectOrb == "Lightning" then 
 			local damage = SpaceDamage(p2, 2)
 			damage.sAnimation = "LightningBoltBig"

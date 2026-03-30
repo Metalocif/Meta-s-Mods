@@ -275,7 +275,7 @@ function RecoilingWeaponSE(self,p1,p2)
 end
 
 function RecklessWeaponSE(self,p1,p2)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local ret = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
 	local new_damage_list = DamageList()
 	for i = 1, ret.effect:size() do
@@ -325,7 +325,7 @@ function BerserkWeaponSE(self,p1,p2)
 end
 
 function PushingWeaponSE(self,p1,p2)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local ret = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
 	local new_damage_list = DamageList()
 	for i = 1, ret.effect:size() do
@@ -340,7 +340,7 @@ function PushingWeaponSE(self,p1,p2)
 end
 
 function ShieldingWeaponSE(self,p1,p2)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local ret = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
 	local new_damage_list = DamageList()
 	for i = 1, ret.effect:size() do
@@ -358,7 +358,7 @@ function ShieldingWeaponSE(self,p1,p2)
 end
 
 function KamikazeWeaponSE(self,p1,p2)
-	local user = Board:GetPawn(p1)
+	local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 	local ret = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
 	local new_damage_list = DamageList()
 	for i = 1, ret.effect:size() do

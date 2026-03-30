@@ -55,7 +55,7 @@ function this:init(mod)
 
 	function StSWatcherSkill_Link:GetSkillEffect(p1,p2)
 		local ret = SkillEffect()
-		local user = Board:GetPawn(p1)
+		local user = Board:IsPawnSpace(p1) and Board:GetPawn(p1)
 		DoSaveGame()
 		if customAnim:get(user:GetId(), "WisdomStance") then
 			if Board:IsSpawning(p2) then	--reveal spawn

@@ -164,7 +164,10 @@ function mod:load( options, version)
 			if pawn then
 				local pilotLevel = GameData and GameData.current["pilot"..id].level or 0
 				local branch = GAME.BranchingEvos[id+1]
-				if pawn:IsDead() then												--don't evolve if you were dead
+				if pawn:IsDead() and
+				_G[pawn:GetType()].HasEvolutions and
+				_G[pawn:GetType()].HasEvolutions[pilotLevel] and 
+				GAME.Poke_Evolutions[id+1] < pilotLevel then			--don't evolve if you were dead
 					Board:DamageSpace(SpaceDamage(pawn:GetSpace(), -1))
 				elseif pilotLevel > 0 then											--check whether we should consider evolving
 					if _G[pawn:GetType()].HasEvolutions and 							--check it's a Pokemon that should evolve
