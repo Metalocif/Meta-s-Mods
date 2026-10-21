@@ -285,8 +285,6 @@ function mod:load( options, version)
 			end
 			
 			if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
-			if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
-			if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
 			
 			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 				pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
@@ -318,6 +316,18 @@ function mod:load( options, version)
 					end
 					if not hasWeapon then pawn:AddWeapon(weaponToAdd) end
 				end
+				
+				if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and
+				   _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and
+				   _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then
+					_G[pawn:GetType()].Flying = true
+				end
+				if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and 
+				   _G[pawn:GetType()].LoseFlyingAtLevel[branch] and
+				   _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then 
+				   _G[pawn:GetType()].Flying = false
+				end
+				
 				if GetCurrentMission().MegaEvolved == id then
 					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
 					pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])

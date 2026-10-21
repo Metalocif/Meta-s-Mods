@@ -541,6 +541,7 @@ Poke_Abra= Pawn:new{
 	MegaEvoMoves = { "Poke_MindOverMatter" },
 	MegaEvoNames = { "Mega Alakazam" },
 	BecomeFlyingAtLevel = {2},
+	Flying = true,
 }
 Poke_Dratini = Pawn:new{
 	Name = "Lance",
@@ -561,6 +562,7 @@ Poke_Dratini = Pawn:new{
 	EvoNames = { { "Dratini", "Dragonair", "Dragonite" } },
 	KeepAdding = { "", "Poke_HyperBeam" },
 	BecomeFlyingAtLevel = {2},
+	Flying = true,
 	IsDragon = true,
 }
 Poke_Mew = Pawn:new{
@@ -717,6 +719,7 @@ Poke_Shaymin = Pawn:new{
 	EvoLearn = { { { }, { "Poke_SeedFlare" } } },
 	GrassMovement = true,
 	BecomeFlyingAtLevel = {2},
+	Flying = true,
 }
 Poke_Xerneas = Pawn:new{
 	Name = "Xerneas",
@@ -905,6 +908,7 @@ Poke_Ralts = Pawn:new{
 				 { "Ralts", "Kirlia", "Gallade" },
 			   },
     BecomeFlyingAtLevel = {2, 3},	--only happens in one branch
+	Flying = true,
 }
 Poke_Scyther = Pawn:new{
 	Name = "Aaron",
@@ -1101,6 +1105,7 @@ Poke_Charmander = Pawn:new{
 				 { { "Poke_Flamethrower" }, { "Poke_Fly" } },
 			   },
 	BecomeFlyingAtLevel = {2, 2},
+	Flying = true,
 }
 Poke_Squirtle = Pawn:new{
 	Name = "Squirtle",
