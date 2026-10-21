@@ -3820,11 +3820,12 @@ function Poke_SappySeed:GetSkillEffect(p1, p2)
 	ret:AddArtillery(damage, "effects/shotup_seedflare.png")
 	for i = DIR_START, DIR_END do
 		local curr = p2 + DIR_VECTORS[i]
-		local seedDamage = SpaceDamage(curr, self.Damage)
+		local seedDamage = SpaceDamage(curr, DAMAGE_ZERO)
 		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then 
 			seedDamage.iLeechSeed = Board:GetPawn(p1):GetId()
+			seedDamage.iDamage = self.Damage
 		end
-		ret:AddDamage(damage)
+		ret:AddDamage(seedDamage)
 	end
 	
 	return ret
@@ -5671,8 +5672,8 @@ Poke_Judgment = Skill:new{
 		CustomPawn = "Poke_Arceus",
 	}
 }
-Poke_Judgment_A=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes or flips. Fire: applies fire. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", TwoClick = true, TypesA = true }
-Poke_Judgment_B=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes or flips. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips the attack direction of units hit.", TwoClick = true, TypesB = true }
+Poke_Judgment_A=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Fire: applies fire. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", TwoClick = true, TypesA = true }
+Poke_Judgment_B=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips the attack direction of units hit.", TwoClick = true, TypesB = true }
 Poke_Judgment_AB=Poke_Judgment:new{ TwoClick = true, TypesA = true, TypesB = true }
 
 function Poke_Judgment:GetTargetArea(p1)
