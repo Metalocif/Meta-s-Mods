@@ -15,7 +15,8 @@ local pilot = {
 	Sex = SEX_MALE,
 	Skill = "StSIroncladSkill",
 	Voice = "/voice/archimedes",
-	-- Blacklist = {"Thick"},
+	-- IgnoreFire = true,	we do this through a hook
+	Blacklist = {"Thick"},
 }
 
 function this:init(mod)

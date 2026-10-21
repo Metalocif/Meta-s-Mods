@@ -17,6 +17,7 @@ local mod = {
 function mod:init()
 	modApi:appendAssets("img/portraits/pilots/","img/portraits/pilots/")
     modApi:appendAssets("img/weapons/","img/weapons/")
+	modApi:appendAssets("img/units/player/", "img/units/player/")
 	self.libs = {}
 
 	self.libs.pilotSkill_tooltip = require(mod.scriptPath .."libs/pilotSkill_tooltip")
@@ -30,6 +31,8 @@ function mod:init()
 	require(self.scriptPath .."pilot_ironclad"):init()
 	require(self.scriptPath .."pilot_silent"):init()
 	require(self.scriptPath .."pilot_watcher"):init()
+	require(self.scriptPath .."pilot_regent"):init()
+	require(self.scriptPath .."pilot_necrobinder"):init()
 end
 
 function mod:load( options, version)

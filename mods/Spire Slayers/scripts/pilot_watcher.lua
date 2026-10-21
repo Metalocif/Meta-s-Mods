@@ -44,10 +44,8 @@ function this:init(mod)
 		local ret = PointList()
 		ret:push_back(point)
 		if Board:GetPawn(point) and customAnim:get(Board:GetPawn(point):GetId(), "WisdomStance") then
-			for i = 0, 7 do
-				for j = 0, 7 do
-					if Board:IsSpawning(Point(i, j)) then ret:push_back(Point(i, j)) end
-				end
+			for index, point in ipairs(Board) do
+				if Board:IsSpawning(point) then ret:push_back(point) end
 			end
 		end
 		return ret

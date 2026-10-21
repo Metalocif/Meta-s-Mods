@@ -1,0 +1,9 @@
+Ironclad (Heavy Blade): Boost increases damage by 1 more. Gain boosted when starting turn targeted by a Vek?
+Silent (Phantasmal Killer): Once per battle, can go invisible (Vek will ignore this unit when targeting); on the next turn, boost?
+Defect (C L A W): replace repair with C L A W (deal 1 damage, +1 hit per time this was used in the current battle)
+Watcher (Omniscience): equip a random weapon; it plays twice this turn and gets removed at the end of the turn?
+
+Ironclad: heal 1/turn; set fire to adjacent tiles when taking damage.
+Silent (Shiv/Fumes): at the start of battle, gain Blade Dance if at least one empty weapon slot; if not, apply Toxin to adjacent enemies at the end of each turn.
+Defect (orbs): replace repair with orbs, each orb has a different passive effect, they can be activated for a different effect, moving to the next orb.
+Watcher (stances): swap between Wisdom and Blasphemy (Wisdom: can see Vek spawns; Blasphemy: lose 1 HP and boost every turn) as a free action.

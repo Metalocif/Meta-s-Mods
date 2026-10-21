@@ -35,6 +35,13 @@ local function IroncladFire(mission, pawn, damageTaken)
 	end
 end
 
+local function IroncladFireImmune(mission, pawn, isFire)
+	if pawn and isFire and pawn:IsAbility("StSIroncladSkill") then
+		if Board:IsFire(pawn:GetSpace()) then Board:SetFire(pawn:GetSpace(), false) end
+		pawn:SetFire(false)
+	end
+end
+
 local function SilentGainBladeDance(mission)
 	for i = 0, 2 do
 		local pawn = Board:GetPawn(i)
@@ -162,12 +169,43 @@ local function WatcherBlasphemy(mission)
 	end
 end
 
---check Defect skill is powered by using IsAbility (not GetAbility)
+local function NecrobinderSpawnOsty(mission)
+	LOG(Game:GetTurnCount())
+	if Game:GetTeamTurn() ~= TEAM_PLAYER then return end
+	if Game:GetTurnCount() > 1 then return end
+	local p1
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn and pawn:IsAbility("StSNecrobinderSkill") then p1 = pawn:GetSpace() break end
+	end
+	for dist = 1, 8 do
+		local targets = extract_table(general_DiamondTarget(p1, dist))
+		for k = 1, #targets do
+			if not Board:IsBlocked(targets[k], PATH_GROUND) then
+				Board:AddPawn("StS_Osty", targets[k])
+				return
+			end
+		end
+	end
+end
+
+local function NecrobinderHealOsty(mission)
+	if Game:GetTeamTurn() ~= TEAM_PLAYER then return end
+	for index, point in ipairs(Board) do
+		--IIRC corpses in water/holes are still on the board; we need that check so Osty doesn't get revived and killed the next frame
+		if Board:GetPawn(point) and Board:GetPawn(point):GetType() == "StS_Osty" and not (Board:GetTerrain(point) == TERRAIN_WATER or Board:GetTerrain(point) == TERRAIN_HOLE) then
+			if Board:GetPawn(point):GetHealth() == 0 then Board:DamageSpace(SpaceDamage(point, -1)) end
+			--Board:GetPawn(point):SetHealth(1)
+			break
+		end
+	end
+end
 
 local function EVENT_onModsLoaded()
 	-- Ironclad: heal 1/turn, fire adjacents when damaged
 	modApi:addNextTurnHook(IroncladRegen)
 	modapiext:addPawnDamagedHook(IroncladFire)
+	modapiext:addPawnIsFireHook(IroncladFireImmune)
 	
 	-- Silent: gain a weapon if empty slots, otherwise apply toxin on adjacent
 	modApi:addMissionStartHook(SilentGainBladeDance)
@@ -185,6 +223,12 @@ local function EVENT_onModsLoaded()
 	--wisdom is handled by the replaceRepair weapon
 	modApi:addMissionStartHook(WatcherStartInWisdom)
 	modApi:addNextTurnHook(WatcherBlasphemy)
+	
+	--Regent: nothing, everything is in replace repair
+	
+	-- Necrobinder: spawn Osty, heal Osty
+	modApi:addNextTurnHook(NecrobinderSpawnOsty)
+	modApi:addNextTurnHook(NecrobinderHealOsty)
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
