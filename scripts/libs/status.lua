@@ -112,6 +112,10 @@ Location["libs/status/reactive_icon.png"] = Point(-5,0)
 Location["libs/status/reactive_icon_remove.png"] = Point(-5,0)
 Location["libs/status/reactive_icon_trigger.png"] = Point(-5,0)
 
+Location["libs/status/repulsive_icon.png"] = Point(-5,0)
+Location["libs/status/repulsive_icon_remove.png"] = Point(-5,0)
+Location["libs/status/repulsive_icon_trigger.png"] = Point(-5,0)
+
 Location["libs/status/regen_icon.png"] = Point(-5,0)
 Location["libs/status/regen_icon_remove.png"] = Point(-5,0)
 
@@ -431,6 +435,15 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 		else
 			SpaceDamageInstance.sImageMark = "libs/status/regen_icon_remove.png"
 			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Regen", id)
+		end
+        return
+	elseif key == "iRepulsive" then
+        if value == 1 then
+			SpaceDamageInstance.sImageMark = "libs/status/repulsive_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyRepulsive(%s)", id)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/repulsive_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%q, %s)", "Repulsive", id)
 		end
         return
 	elseif key == "iRooted" then
@@ -903,17 +916,17 @@ function Status.ApplyPowder(id)
 	elseif pawn then
 		if Status.IsImmuneTo(pawn, "Powder") then return end
 		if pawn:IsFire() then
-			local amount = 1
-			if Status.GetStatus(id, "Dry") then amount = 2 end
-			local explosionDamage = SpaceDamage(pawn:GetSpace(), amount)
-			explosionDamage.sAnimation = "ExploAir"..amount
-			ret:AddDamage(explosionDamage)
-			for i = DIR_START, DIR_END do
-				local damage = SpaceDamage(pawn:GetSpace()+DIR_VECTORS[i], amount)
-				damage.sAnimation = "explopush"..amount.."_"..i
-				ret:AddDamage(damage)
-			end
-			Board:AddEffect(ret)
+			-- local amount = 1
+			-- if Status.GetStatus(id, "Dry") then amount = 2 end
+			-- local explosionDamage = SpaceDamage(pawn:GetSpace(), amount)
+			-- explosionDamage.sAnimation = "ExploAir"..amount
+			-- ret:AddDamage(explosionDamage)
+			-- for i = DIR_START, DIR_END do
+				-- local damage = SpaceDamage(pawn:GetSpace()+DIR_VECTORS[i], amount)
+				-- damage.sAnimation = "explopush"..amount.."_"..i
+				-- ret:AddDamage(damage)
+			-- end
+			-- Board:AddEffect(ret)
 			return
 		end
 		if mission.WetTable[id] then return end
@@ -998,6 +1011,17 @@ function Status.ApplyReactive(id)
 	if Status.IsImmuneTo(pawn, "Reactive") then return end
 	mission.ReactiveTable[id] = true
 	CustomAnim:add(id, "StatusReactive")
+end
+
+function Status.ApplyRepulsive(id, value)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	if Status.IsImmuneTo(pawn, "Repulsive") then return end
+	amount = amount or 0
+	mission.RepulsiveTable[id] = value
+	CustomAnim:add(id, "StatusRepulsive")
 end
 
 function Status.ApplyRooted(id, amount)
@@ -1141,7 +1165,7 @@ function Status.RemoveStatus(id, status)
 			pawn:RemoveWeapon(i)
 		end
 		local weaponCount = #mission.GloryTable[id].weapons
-		for i = 1, weaponCount do
+		for i = weaponCount, 1, -1 do
 			pawn:AddWeapon(mission.GloryTable[id].weapons[i], true)
 		end
 		CustomAnim:rem(id, "StatusGlory")
@@ -1174,7 +1198,7 @@ end
 
 function Status.List(pawn)
 	if not pawn then
-		return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Dodge","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
+		return {"Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Dodge","Doomed","Dreadful","Dry","Glory","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Repulsive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Toxin","Weaken","Wet","Insanity"}
 	else
 		local result = {}
 		local mission = GetCurrentMission()
@@ -1429,7 +1453,12 @@ local function EVENT_onModsLoaded()
 			if status == "Necrosis" then statusDesc = "Prevents healing." end
 			if status == "Powder" then statusDesc = "When a unit has both fire and powder, they explode, taking 1 damage and dealing 1 damage to adjacent tiles, doubled if Dry. Removed by Wet." end
 			if status == "Regen" then statusDesc = "Heals "..mission.RegenTable[id].." damage per turn." end
-			if status == "Reactive" then statusDesc = "When applied A.C.I.D., removes it and smokes adjacent tiles." end
+			if status == "Reactive" then statusDesc = "When applied A.C.I.D., removes it and smokes adjacent tiles, then removes this status." end
+			if status == "Repulsive" then 
+				if mission.RepulsiveTable[id] > 0 then statusDesc = "When damaged, pushes adjacent tiles, dealing "..mission.RepulsiveTable[id].." damage, then removes this status." end
+				if mission.RepulsiveTable[id] < 0 then statusDesc = "When damaged, pushes adjacent tiles, healing "..mission.RepulsiveTable[id]..", then removes this status." end
+				if mission.RepulsiveTable[id] == 0 then statusDesc = "When damaged, pushes adjacent tiles, then removes this status." end
+			end
 			if status == "Rooted" then
 				if mission.RootedTable[id] > 0 then statusDesc = "Immobilizes this unit and deals "..mission.RootedTable[id].." damage to them every turn. Removed by fire." end
 				if mission.RootedTable[id] < 0 then statusDesc = "Immobilizes this unit and heals "..mission.RootedTable[id].." damage every turn. Removed by fire." end
@@ -1588,11 +1617,7 @@ local function EVENT_onModsLoaded()
 		end)
 	end)				--Health boosts are lost on game refresh
 	modApi:addPostLoadGameHook(PrepareTables)		
-	modApi:addPostLoadGameHook(ReapplyOverheal)		
-	modapiext:addResetTurnHook(function()
-		modApi:scheduleHook(2000, PrepareTables)
-		--Apparently this doesn't prepare tables properly, assigning them to the mission object before cleanup
-	end)
+	modApi:addPostLoadGameHook(ReapplyOverheal)
 	modapiext:addResetTurnHook(ReapplyOverheal)		
 	
 	modApi:addTestMechEnteredHook(PrepareTables)						--also do it on test environment entered
@@ -1955,11 +1980,80 @@ local function EVENT_onModsLoaded()
 			end
 		end
 	end
+	
+	local function DisplayStatusTriggers(mission, pawn, skillEffect)
+		--Needs anims and such
+		--Maybe add ret:AddDelay(-1) to avoid things bumping into each other?
+		--Need to remove triggers for statuses that are here from the ApplyStatus scripts
+		for _, fx in ipairs(extract_table(skillEffect.effect)) do
+			local target = Board:GetPawn(fx.loc)
+			if target then
+				local id = target:GetId()
+				if (target:IsFire() or (Board:GetTerrain(fx.loc) == TERRAIN_FOREST and fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO))
+				and string.find(fx.sScript, "ApplyPowder") and not Status.IsImmuneTo(id, "Powder") then
+					local amount = 1
+					-- ret:AddDamage(SpaceDamage(fx.loc, amount))
+					fx.iDamage = fx.iDamage + amount
+					if fx.sAnimation == "" then fx.sAnimation = "ExploAir"..amount end
+					for i = DIR_START, DIR_END do
+						local damage = SpaceDamage(fx.loc+DIR_VECTORS[i], amount)
+						damage.sAnimation = "explopush"..amount.."_"..i
+						ret:AddDamage(damage)
+					end
+				elseif Status.GetStatus(id, "Powder") and fx.iFire == 1 and not target:IsIgnoreFire() then
+					local amount = 1
+					if Status.GetStatus(id, "Dry") then amount = 2 end
+					-- ret:AddDamage(SpaceDamage(fx.loc, amount))
+					fx.iDamage = fx.iDamage + amount
+					if fx.sAnimation == "" then fx.sAnimation = "ExploAir"..amount end
+					for i = DIR_START, DIR_END do
+						local damage = SpaceDamage(fx.loc+DIR_VECTORS[i], amount)
+						damage.sAnimation = "explopush"..amount.."_"..i
+						ret:AddDamage(damage)
+					end
+				elseif target:IsAcid() and string.find(fx.sScript, "ApplyReactive") and not Status.IsImmuneTo(id, "Reactive") then
+					fx.iAcid = EFFECT_REMOVE
+					for i = DIR_START, DIR_END do
+						local damage = SpaceDamage(fx.loc + DIR_VECTORS[i])
+						damage.iSmoke = 1
+						ret:AddDamage(damage)
+					end
+				elseif target:IsFrozen() and string.find(fx.sScript, "ApplyShatterburst") and not Status.IsImmuneTo(id, "Shatterburst") then
+					fx.iFrozen = EFFECT_REMOVE
+					for i = DIR_START, DIR_END do
+						ret:AddDamage(SpaceDamage(fx.loc + DIR_VECTORS[i], 1))
+					end
+				elseif Status.GetStatus(id, "Repulsive") and fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO then
+				--need to check for armor/shield/frozen/acid/tosx rocks
+					for i = DIR_START, DIR_END do
+						local damage = SpaceDamage(fx.loc + DIR_VECTORS[i], 0, i)
+						damage.sAnimation = "airpush_"..i
+						ret:AddDamage(damage)
+					end
+					Status.RemoveStatus(id, "Repulsive")
+				end
+			else
+				if (Board:IsFire(fx.loc) or (Board:GetTerrain(fx.loc) == TERRAIN_FOREST and fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO))
+				and string.find(fx.sScript, "ApplyPowder") then
+					fx.iDamage = fx.iDamage + 1
+					if fx.sAnimation == "" then fx.sAnimation = "ExploAir1" end
+					for i = DIR_START, DIR_END do
+						local damage = SpaceDamage(fx.loc+DIR_VECTORS[i], 1)
+						damage.sAnimation = "explopush1_"..i
+						ret:AddDamage(damage)
+					end
+				end
+			end
+		end
+	end
+	
 	modapiext:addSkillBuildHook(function(mission, pawn, weaponId, p1, p2, skillEffect)
 		DoDodge(mission, pawn, skillEffect)
+		DisplayStatusTriggers(mission, pawn, skillEffect)
 	end)
 	modapiext:addFinalEffectBuildHook(function(mission, pawn, weaponId, p1, p2, p3, skillEffect)
 		DoDodge(mission, pawn, skillEffect)
+		DisplayStatusTriggers(mission, pawn, skillEffect)
 	end)
 
 	modapiext:addTargetAreaBuildHook(function(mission, pawn, weaponId, p1, targetArea)
