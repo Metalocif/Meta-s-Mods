@@ -66,10 +66,8 @@ function meta_blobber:GetTargetArea(point)
 			local curr = point + DIR_VECTORS[i] * j
 			if not Board:IsBlocked(curr, PATH_GROUND) then ret:push_back(curr) end
 		end
-		for i = DIR_START, DIR_END do
-			local curr = point + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] 
-			if not Board:IsBlocked(curr, PATH_GROUND) then ret:push_back(curr) end
-		end
+		local curr = point + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4] 
+		if not Board:IsBlocked(curr, PATH_GROUND) then ret:push_back(curr) end
 	end	
 	return ret
 end
