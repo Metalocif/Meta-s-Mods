@@ -1943,7 +1943,7 @@ end
 function Poke_Bloom:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
-	if self.Roots then damage.iRooted = self.Damage end
+	if self.Roots and (Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_ENEMY) then damage.iRooted = self.Damage end
 	if Board:GetTerrain(p2) == TERRAIN_FOREST then 
 		if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_ENEMY and self.Damage > 0 then 
 			ret:AddSafeDamage(SpaceDamage(p2, self.Damage))
