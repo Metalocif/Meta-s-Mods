@@ -403,7 +403,7 @@ function OmegaCentipedeAtk2:GetSkillEffect(p1,p2)
 	end
 	local applyAcid = SpaceDamage(p1, -acidCount)
 	applyAcid.iAcid = 1
-	applyDamage.sAnimation = "Splash_acid"
+	applyAcid.sAnimation = "Splash_acid"
 	ret:AddDamage(applyAcid)
 	return ret
 end
