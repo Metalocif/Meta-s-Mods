@@ -6197,7 +6197,7 @@ function Poke_ScorchingSands:GetSkillEffect(p1, p2)
 	for i = -1, 1 do
 		for j = -1, 1 do
 			-- damage.loc = p2 + Point(i, j)
-			ret:AddEmitter(p2 + Point(i, j), "Emitter_ScorchingSands")
+			if not Board:IsTipImage() then ret:AddEmitter(p2 + Point(i, j), "Emitter_ScorchingSands") end
 			-- ret:AddDamage(damage)
 		end
 	end
