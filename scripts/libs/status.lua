@@ -46,6 +46,7 @@ ANIMS.StatusSleep = ANIMS.StatusBase:new{ Image = "libs/status/sleep.png", PosX 
 ANIMS.StatusPowder = ANIMS.StatusBase:new{ Image = "libs/status/powder.png", PosX = -5}
 ANIMS.StatusRegen = ANIMS.StatusBase:new{ Image = "libs/status/icon_regen.png"}
 ANIMS.StatusReactive = ANIMS.StatusBase:new{ Image = "libs/status/reactive.png", PosX = -7, PosY = 15}
+ANIMS.StatusRepulsive = ANIMS.StatusBase:new{ Image = "libs/status/repulsive.png", PosX = -7, PosY = 15}
 ANIMS.StatusRooted = ANIMS.StatusBase:new{ Image = "libs/status/rooted_icon.png", PosX = -7, PosY = 15}
 ANIMS.StatusTargeted = ANIMS.StatusBase:new{ Image = "libs/status/targeted.png"}
 ANIMS.StatusToxin = ANIMS.StatusBase:new{ Image = "libs/status/toxin.png", NumFrames = 6, Time = 0.15}
@@ -566,7 +567,7 @@ end
 local oldScoreList = Skill:ScoreList()
 function Skill:ScoreList(list, queued)
 	local mission = GetCurrentMission()
-	if not mission then return oldScoreList(list, queued) end
+	if not mission then return oldScoreList(self, list, queued) end
 	
 	local id = Pawn:GetId()
 	local pos = Pawn:GetSpace()
