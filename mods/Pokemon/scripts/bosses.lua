@@ -1939,7 +1939,7 @@ Poke_JudgmentBoss = Skill:new{
 	Rarity = 3,
 	Name = "Judgment",
 	User = "Arceus",
-	Description = "Damages all mechs.",
+	Description = "Damages all mechs. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 8,
@@ -1990,7 +1990,7 @@ Poke_SpatialRendArceus = Poke_SpatialRendBoss:new{
 	Rarity = 3,
 	Name = "Spatial Rend",
 	User = "Arceus",
-	Description = "Dramatically alters terrain.",
+	Description = "Dramatically alters terrain. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 0,
 	PathSize = 8,
@@ -2035,7 +2035,7 @@ Poke_RoarOfTimeArceus = Poke_RoarOfTimeBoss:new{
 	Rarity = 3,
 	Name = "Roar of Time",
 	User = "Arceus",
-	Description = "Damages all other tiles.",
+	Description = "Damages all other tiles. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 5,
 	PathSize = 8,
@@ -2059,7 +2059,7 @@ Poke_UnmakeBoss = Skill:new{
 	Rarity = 3,
 	Name = "Unmake",
 	User = "Arceus",
-	Description = "Unmakes half of the board, killing anything there.",
+	Description = "Unmakes half of the board, killing anything there. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = DAMAGE_DEATH,
 	PathSize = 8,
@@ -2075,9 +2075,55 @@ Poke_UnmakeBoss = Skill:new{
 	}
 }
 
+function Poke_UnmakeBoss:GetTargetScore(p1,p2)
+	local ret = 0
+	local dir = GetDirection(p2-p1)
+	local iStart, iEnd = 0, 7
+	local jStart, jEnd = 0, 7
+	local oiStart, oiEnd = 0, 7
+	local ojStart, ojEnd = 0, 7
+
+	if dir == 0 then
+		iEnd = 3        -- up: top half
+		oiStart = 4     -- opposite: bottom half
+	elseif dir == 1 then
+		jEnd = 3        -- right: left half
+		ojStart = 4     -- opposite: right half
+	elseif dir == 2 then
+		iStart = 4      -- down: bottom half
+		oiEnd = 3       -- opposite: top half
+	elseif dir == 3 then
+		jStart = 4      -- left: right half
+		ojEnd = 3       -- opposite: left half
+	end
+	
+	local holeCount = 0
+	for i = oiStart, oiEnd do
+		for j = ojStart, ojEnd do
+			if Board:GetTerrain(Point(i, j)) == TERRAIN_HOLE then
+				holeCount = holeCount + 1
+			end
+		end
+	end
+
+	if holeCount == 16 then return -100 end
+	if holeCount >= 8 and holeCount <= 12 then return -100 end	--make sure we unmake half of the board's half
+	
+	for i = iStart, iEnd do
+		for j = jStart, jEnd do
+			if Board:GetTerrain(Point(i, j)) ~= TERRAIN_HOLE then ret = ret + 5 end
+			if Board:GetPawn(Point(i, j)) and Board:GetPawn(Point(i, j)):IsMech() then ret = ret + 5 end
+		end
+	end
+    return ret
+end
+
 function Poke_UnmakeBoss:GetTargetArea(point)
 	local ret = PointList()
-	ret:push_back(point)
+	ret:push_back(point + DIR_VECTORS[0])
+	ret:push_back(point + DIR_VECTORS[1])
+	ret:push_back(point + DIR_VECTORS[2])
+	ret:push_back(point + DIR_VECTORS[3])
 	return ret
 end
 
@@ -2085,20 +2131,54 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()
 	if not Board:GetPawn(p1) then return ret end
+	local dir = GetDirection(p2-p1)
 	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
 	ret:AddQueuedDelay(1)
 	local iStart, iEnd = 0, 7
-	local jStart, jEnd = 4, 7
+	local jStart, jEnd = 0, 7
+	if dir == 0 then iEnd = 3 end
+	if dir == 1 then jEnd = 3 end
+	if dir == 2 then iStart = 4 end
+	if dir == 3 then jStart = 4 end
+	if mission and mission.Weather ~= "" and mission.WeatherLoc2 ~= Point(8, 8) then	--(8,8) means global weather
+	--We figure out the intersection of the weather and the unmade area
+		local weatherIStart = mission.WeatherLoc1.x
+		local weatherIEnd = mission.WeatherLoc2.x
+		local weatherJStart = mission.WeatherLoc1.y
+		local weatherJEnd = mission.WeatherLoc2.y
+		if iStart <= weatherIEnd and iEnd >= weatherIStart and jStart <= weatherJEnd and jEnd >= weatherJStart then
+			local weatherType = mission.Weather
+			local intensity = mission.WeatherIntensity
+			Weathers.ClearWeather()
+			Weathers.AddWeather(weatherType, intensity, 
+			Point(math.max(iStart, weatherIStart), math.max(jStart, weatherJStart)), 
+			Point(math.min(iEnd, weatherIEnd), math.min(jEnd, weatherJEnd)))
+		end
+	end
 	if mission then mission.UnmadeStuff = mission.UnmadeStuff or 0 end
-	if mission.UnmadeStuff == 1 then iEnd = 3 jStart = 0 else ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1") end
+	ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1")
 	for i = iStart, iEnd do
 		for j = jStart, jEnd do
 			local p = Point(i, j)
-			-- local bounceIt = false
-			-- weaponPreview:AddAnimation(p, "Emitter_Crack_Start", ANIM_DELAY)
 			ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
-			-- ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
-			if p ~= p1 then
+			ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
+			local damage = SpaceDamage(p, DAMAGE_DEATH)
+			if Board:IsCrackable(p) and not Board:GetTerrain(p) == TERRAIN_MOUNTAIN then
+				local crackDamage = SpaceDamage(p)
+				crackDamage.iCrack = 1
+				crackDamage.bHide = true
+				ret:AddQueuedDamage(crackDamage)
+			end
+			if Board:GetTerrain(p) == 17 then damage.iTerrain = TERRAIN_HOLE end
+			ret:AddQueuedDamage(damage)
+		end
+	end
+	ret:AddDelay(0.1)
+	for i = iStart, iEnd do
+		for j = jStart, jEnd do
+			local p = Point(i, j)
+			ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
+			if p ~= p1 and not (Board:GetPawn(p) and Board:GetPawn(p):GetTeam() == TEAM_ENEMY and Board:GetPawn(p):IsFlying()) then
 				local damage = SpaceDamage(p, DAMAGE_DEATH)
 				if Board:IsCrackable(p) and not Board:GetTerrain(p) == TERRAIN_MOUNTAIN then
 					local crackDamage = SpaceDamage(p)
@@ -2114,8 +2194,6 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 				damage.iTerrain = TERRAIN_HOLE
 				ret:AddQueuedDamage(damage)
 			end
-			-- if bounceIt then ret:AddQueuedScript(string.format("Board:Bounce(%s, 0)", p:GetString())) end
-			-- ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
 			ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
 		end
 	end
@@ -2131,7 +2209,7 @@ Poke_AstralBarrage = Skill:new{
 	Rarity = 3,
 	Name = "Astral Barrage",
 	User = "Arceus",
-	Description = "Fires projectiles from one edge of the board, damaging the first thing hit and healing the user.",
+	Description = "Fires projectiles from one edge of the board, damaging the first thing hit and healing the user. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 2,
 	PathSize = 8,
@@ -2192,7 +2270,7 @@ Poke_Starbirth = Skill:new{
 	Rarity = 3,
 	Name = "Starbirth",
 	User = "Arceus",
-	Description = "Prepares to create and explode a star at a location by spawning five star fragments. The explosion will damage everything on the board by an amount equal to the number of star fragments left alive.",
+	Description = "Prepares to create and explode a star at a location by spawning five star fragments. The explosion will damage everything on the board by an amount equal to the number of star fragments left alive. Switches to another move next turn.",
 	Push = 1,--TOOLTIP HELPER
 	MinDamage = 0,
 	Damage = 5,
