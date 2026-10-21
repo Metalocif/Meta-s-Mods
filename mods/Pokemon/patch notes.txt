@@ -1,3 +1,10 @@
+v1.8.2
+- Wormhole no longer clears queued actions.	
+- Pokémon that gain Flying on evolution should no longer die when resetting turn with them flying above a chasm.
+- Sappy Seed fix; correctly hits in AoE instead of oneshotting things.
+- Zippy Zap now correctly mentions shocking in the description.
+- Scorching Sands no longer creates random emitters because of the TipImage (derogatory).
+
 v1.8.1
 - Weapon description fixes.
 - Fixed a bug occurring when using Withdraw in a test environment prior to any battle.
