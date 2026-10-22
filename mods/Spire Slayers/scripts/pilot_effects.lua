@@ -195,7 +195,7 @@ local function NecrobinderHealOsty(mission)
 		--IIRC corpses in water/holes are still on the board; we need that check so Osty doesn't get revived and killed the next frame
 		if Board:GetPawn(point) and Board:GetPawn(point):GetType() == "StS_Osty" and not (Board:GetTerrain(point) == TERRAIN_WATER or Board:GetTerrain(point) == TERRAIN_HOLE) then
 			if Board:GetPawn(point):GetHealth() == 0 then Board:DamageSpace(SpaceDamage(point, -1)) end
-			--Board:GetPawn(point):SetHealth(1)
+			Board:GetPawn(point):SetHealth(1)
 			break
 		end
 	end
