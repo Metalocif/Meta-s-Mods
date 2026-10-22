@@ -564,7 +564,7 @@ function ScorePositioning(point, pawn)
 	--nil check for Vek outside the board
 end
 
-local oldScoreList = Skill:ScoreList()
+local oldScoreList = Skill.ScoreList
 function Skill:ScoreList(list, queued)
 	local mission = GetCurrentMission()
 	if not mission then return oldScoreList(self, list, queued) end
@@ -582,7 +582,9 @@ function Skill:ScoreList(list, queued)
 	local isBlind = mission.BlindTable[id]
 	local bloodthirstAmount = mission.BloodthirstyTable[id] or 0
 	
-	if isBlind then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
+	-- if isBlind then LOG(Pawn:GetType().." in "..pos:GetString().." is blind.") end
+	-- if bloodthirstAmount ~= 0 then LOG(Pawn:GetType().." in "..pos:GetString().." is bloodthirsty.") end
+	-- if mission.ConfusionTable[id] then LOG(Pawn:GetType().." in "..pos:GetString().." is confused.") end
 
 	for i = 1, list:size() do
 		local spaceDamage = list:index(i)
@@ -1644,16 +1646,22 @@ local function EVENT_onModsLoaded()
 			end
 		end
 		for id, score in pairs(mission.DreadfulTable) do
-			local pawn = Board:GetPawn(id)
-			if pawn then
-				local tile = pawn:GetSpace()
-				for i = DIR_START, DIR_END do
-					local curr = tile + DIR_VECTORS[i]
-					mission.AdjScoreTable[curr:GetString()] = mission.AdjScoreTable[curr:GetString()] + score
-					if Board:GetPawn(curr) then Board:GetPawn(curr):ClearQueued() end
-				end
-			end
-		end
+            local pawn = Board:GetPawn(id)
+            if pawn then
+                local tile = pawn:GetSpace()
+                local amount = 0
+                for i = DIR_START, DIR_END do
+                    local curr = tile + DIR_VECTORS[i]
+                    mission.AdjScoreTable[curr:GetString()] = mission.AdjScoreTable[curr:GetString()] + score
+                    if Board:GetPawn(curr) then
+                        Board:GetPawn(curr):ClearQueued()
+                        Board:Ping(curr, GL_Color(127, 0, 255))
+                        amount = amount + 1
+                    end
+                    if amount > 0 then Board:AddAlert(tile,"Dreadful") end
+                end
+            end
+        end
 		for id, doomedInformation in pairs(mission.DoomedTable) do
 			local pawn = Board:GetPawn(id)
 			if pawn then
@@ -2178,6 +2186,7 @@ if isNewerVersion then
         modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 		SetupMetatable()
 		CreateStatusFunctions()
+		AlterScoringFunctions()
         LOG("Status Library Version " .. self.version .. " finalized.")
     end
     local function onModsInitialized()
