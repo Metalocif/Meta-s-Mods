@@ -82,10 +82,12 @@ function StS_PullAggro:GetSkillEffect(p1, p2)
 	local suffix = ""
 	for i = 0, 2 do
 		local pawn = Board:GetPawn(i)
-		if pawn and pawn:IsAbility("StSNecrobinderSkill") then talker = pawn break end
+		if pawn and pawn:IsAbility("StSNecrobinderSkill") and not pawn:IsDead() then talker = pawn break end
 	end
-	if p1 ~= p2 then suffix = "Jump" end
-	ret:AddVoice("PullAggro"..suffix, talker:GetId())
+	if talker then
+		if p1 ~= p2 then suffix = "Jump" end
+		ret:AddVoice("PullAggro"..suffix, talker:GetId())
+	end
 	if p1 ~= p2 then
 		local move = PointList()
 		move:push_back(p1)
