@@ -78,6 +78,14 @@ end
 
 function StS_PullAggro:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local talker
+	local suffix = ""
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn and pawn:IsAbility("StSNecrobinderSkill") then talker = pawn break end
+	end
+	if p1 ~= p2 then suffix = "Jump" end
+	ret:AddVoice("PullAggro"..suffix, talker:GetId())
 	if p1 ~= p2 then
 		local move = PointList()
 		move:push_back(p1)
@@ -119,7 +127,6 @@ StS_Unleash = Skill:new{
 
 function StS_Unleash:GetTargetArea(point)
 	local ret = PointList()
-	ret:push_back(point)
 	for i = DIR_START, DIR_END do
 		ret:push_back(point + DIR_VECTORS[i])
 	end
@@ -129,6 +136,32 @@ end
 function StS_Unleash:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
+	local talker
+	local suffix = ""
+	for i = 0, 2 do
+		local pawn = Board:GetPawn(i)
+		if pawn and pawn:IsAbility("StSNecrobinderSkill") and not pawn:IsDead() then talker = pawn break end
+	end
+	if talker then
+		if Board:GetPawn(p2) and Board:GetPawn(p2):GetId() == talker:GetId() then 
+			suffix = "Self" 
+		elseif Board:IsBuilding(p2) then 
+			suffix = "Building" 
+		elseif Board:GetPawn(p2) and Board:GetPawn(p2):IsMech() then
+			suffix = "Mech"
+		elseif Board:GetPawn(p2) then
+			suffix = ""
+		elseif Board:GetTerrain(p2) == TERRAIN_FOREST then
+			suffix = "Forest"
+		elseif Board:GetTerrain(p2) == TERRAIN_ICE then
+			suffix = "Ice"
+		elseif Board:GetTerrain(p2) == TERRAIN_MOUNTAIN then
+			suffix = "Mountain"
+		elseif Board:IsCracked(p2) then
+			suffix = "Cracked"
+		end
+		ret:AddVoice("Unleash"..suffix, talker:GetId())
+	end
 	ret:AddMelee(p1, SpaceDamage(p2, self.Damage, dir))
 	return ret
 end	

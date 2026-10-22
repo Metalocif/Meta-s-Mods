@@ -120,4 +120,9 @@ return {
 	Mission_Power_Destroyed = {"Power grid shattered in this dump! How fitting.", "The power station went kaboom. Total darkness!", "Facility power lost. Fix it or find me a torch!"},
 	Mission_Teleporter_Mech = {"Teleported across the map?! I despise quantum trickery!", "Jumping through space? My royal stomach dislikes this.", "I have not seen teleportation this poor for centuries."},
 	Mission_Belt_Mech = {"Conveyor belts pushing my mech around?! The insolence!", "Moving floors? Who designed this ridiculous obstacle course?!", "Sliding on a belt? I am a prince, not a package in a warehouse!"},
+	
+	ForgeLV0 = { "Ah, that will do. Beautiful!", "Fly, my blade! Dazzle and amaze the peons!" },
+	ForgeLV1 = { "I think it rather needed a bit more heft.", "Perhaps I could have made it sharper." },
+	ForgeLV2 = { "Folded a thousand times in the depths of a black hole!", "And now, to whet its edge on this shard of a neutron star..." },
+	ForgeLV3 = { "Finally, it's perfect. Shall I name it? No.", "Nothing to add, nothing to change, nothing to take away. Almost as perfect as my regal mien." },
 }

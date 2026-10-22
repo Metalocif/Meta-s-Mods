@@ -120,4 +120,15 @@ return {
 	Mission_Power_Destroyed = {"The power station collapses! Darkness claims the district!", "Energy conduit severed! We fight in the dim light!", "Generator destroyed! A severe blow to the grid!"},
 	Mission_Teleporter_Mech = {"Spatial displacement! The warp wrenches my bones!", "Shifted through the void... an unsettling sensation.", "Instantaneous travel. My bones rattle from the shock!"},
 	Mission_Belt_Mech = {"Conveyor tracks force our movement! Maintain footing!", "Dragged along metal belts... how irritating!", "Forced displacement by industrial machinery. Adjust positions!"},
+	
+	PullAggro = {"Distract them, Osty!", "Osty, get their attention!"},
+	PullAggroJump = {"Osty, go there!"},
+	Unleash = {"Punch that one, Osty!", "Kill it!"},
+	UnleashSelf = {"Punch me, Osty!"},
+	UnleashForest = {"Tear through that forest, Osty!"},
+	UnleashMountain = {"Crush that mountain, Osty!"},
+	UnleashIce = {"Break that ice, Osty!"},
+	UnleashBuilding = {"Level that building, Osty! ...Yes, it has to be done. Obey me. Come on."},
+	UnleashCrack = {"Shatter that cracked ground, Osty!"},
+	UnleashMech = {"Punch that one, Osty! ...Yes, I know they are helping us." },
 }

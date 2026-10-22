@@ -150,18 +150,22 @@ function this:init(mod)
 			if blade:IsWeaponPowered("StS_SovereignBlade_B") then
 				ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", blade:GetId()))
 				ret:AddScript(string.format("Board:GetPawn(%s):AddWeapon(%q, true)", blade:GetId(), "StS_SovereignBlade_AB"))
+				ret:AddVoice("ForgeLV3", user:GetId())
 			elseif blade:IsWeaponPowered("StS_SovereignBlade_A") then
 				ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", blade:GetId()))
 				ret:AddScript(string.format("Board:GetPawn(%s):AddWeapon(%q, true)", blade:GetId(), "StS_SovereignBlade_B"))
+				ret:AddVoice("ForgeLV2", user:GetId())
 			elseif blade:IsWeaponPowered("StS_SovereignBlade") then
 				ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(1)", blade:GetId()))
 				ret:AddScript(string.format("Board:GetPawn(%s):AddWeapon(%q, true)", blade:GetId(), "StS_SovereignBlade_A"))
+				ret:AddVoice("ForgeLV1", user:GetId())
 			end
 		else
 			--make blade
 			local spawner = SpaceDamage(p2)
 			spawner.sPawn = "StS_RegentBlade"
 			ret:AddDamage(spawner)
+			ret:AddVoice("ForgeLV0", user:GetId())
 		end
 		return ret
 	end
