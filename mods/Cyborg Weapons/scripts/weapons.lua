@@ -1778,9 +1778,6 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 				if _G[playerVersionId] == nil then 
 					_G[playerVersionId] = _G[spaceDamage.sPawn]:new{
 						DefaultTeam = TEAM_PLAYER,
-						-- Image = _G[spaceDamage.sPawn].Image,
-						-- Portrait = _G[spaceDamage.sPawn].Portrait,
-						-- SkillList = _G[spaceDamage.sPawn].SkillList,
 					}
 				end
 				LOG(_G[playerVersionId].SkillList[1])
@@ -1802,12 +1799,6 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 				if _G[playerVersionId] == nil then 
 					_G[playerVersionId] = _G[spaceDamage.sPawn]:new{
 						DefaultTeam = TEAM_PLAYER,
-						--IsDeathEffect = true,
-						--GetDeathEffect = function(pawn, point) ret = SkillEffect() ret:AddDelay(1) ret:AddScript(Board:GetPawn(point):SetTeam(TEAM_PLAYER)) LOG("will convert at "..point:GetString()) return ret end,
-						--it's cool that I can programatically make a copy of a pawn and give it a custom death effect, but it won't help here
-						-- Image = _G[spaceDamage.sPawn].Image,
-						-- Portrait = _G[spaceDamage.sPawn].Portrait,
-						-- SkillList = _G[spaceDamage.sPawn].SkillList,
 					}
 				end
 				spaceDamage.sPawn = playerVersionId
@@ -1842,13 +1833,6 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 	return ret	
 end
 
-function SpawnPlayerTeam(pawn, point)
-	ret = SkillEffect()
-	local damage = SpaceDamage(point, 0)
-	damage.iPawnTeam = TEAM_PLAYER
-	ret:AddDamage(damage)
-	return ret
-end
 
 
 
