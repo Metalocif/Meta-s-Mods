@@ -129,7 +129,7 @@ end
 function StS_Unleash:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
-	ret:AddDamage(SpaceDamage(p2, self.Damage, dir))
+	ret:AddMelee(p1, SpaceDamage(p2, self.Damage, dir))
 	return ret
 end	
 
