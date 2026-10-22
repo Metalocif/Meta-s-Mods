@@ -5725,7 +5725,7 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusElectric" then damage.iShocked = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusPoison" then damage.iToxin = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGround" then damage.iCrack = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGrass" then damage.iRooted = 1 end
+				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGrass" then damage.iRooted = 0 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusWater" then damage.iWet = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
 				ret:AddDropper(damage, "effects/judgment.png")
@@ -7647,5 +7647,108 @@ function Poke_FlareBlitz:GetSkillEffect(p1, p2)
 	end	
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	
+	return ret
+end
+
+
+Poke_Splash = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Splash.png",	
+	Rarity = 3,
+	Name = "Splash",
+	Description = "Exerts itself to push its pathetic body in a direction.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 0,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0,
+	Upgrades = 0,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,3),
+		Target = Point(2,2),
+		Mountain = Point(2,1),
+		CustomPawn = "Poke_Magikarp",
+	}
+}
+
+function Poke_Splash:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local direction = GetDirection(p2 - p1)
+	ret:AddDamage(SpaceDamage(p1, 0, direction))
+	return ret
+end
+
+
+Poke_Outrage = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Outrage.png",	
+	Rarity = 3,
+	Name = "Outrage",
+	Description = "The user rampages, dealing damage in a large area. When this weapon runs out of uses, it recovers one use and the user becomes confused.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	SelfDamage = 0,
+	PathSize = 1,
+	PowerCost = 0,
+	Limited = 2,
+	Upgrades = 2,
+	UpgradeList = { "+1 Use", "+1 Use" },
+	UpgradeCost = { 1,2 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Enemy = Point(2,3),
+		Target = Point(2,2),
+		Mountain = Point(2,1),
+		CustomPawn = "Poke_Magikarp",
+	}
+}
+Poke_Outrage_A = Poke_Outrage:new{ UpgradeDescription = "Can be used one more time before confusion sets in.", Limited = 3,}
+Poke_Outrage_B = Poke_Outrage:new{ UpgradeDescription = "Can be used one more time before confusion sets in.", Limited = 3,}	
+Poke_Outrage_AB = Poke_Outrage:new{ Limited = 3,}
+
+function Poke_Outrage:GetTargetArea(p1)
+	local ret = PointList()
+	for i = DIR_START, DIR_END do
+		for j = 1, 3 do
+			ret:push_back(p1 + DIR_VECTORS[i]*j)
+		end
+	end
+	return ret
+end
+
+function Poke_Outrage:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	for i = 1, p1:Manhattan(p2) do
+		local curr = p1 + DIR_VECTORS[dir] * i
+		local damage1 = SpaceDamage(curr, self.Damage)
+		damage1.sAnimation = "boomAnim"
+		ret:AddBounce(curr, 3)
+		ret:AddDamage(damage1)
+		ret:AddDelay(0.2)
+		if i == p1:Manhattan(p2) then
+			local damage2 = SpaceDamage(curr + DIR_VECTORS[(dir+1)%4], self.Damage)
+			local damage3 = SpaceDamage(curr + DIR_VECTORS[(dir-1)%4], self.Damage)
+			damage2.sAnimation = "boomAnim"
+			damage3.sAnimation = "boomAnim"
+			ret:AddBounce(curr + DIR_VECTORS[(dir+1)%4], 3)
+			ret:AddBounce(curr + DIR_VECTORS[(dir-1)%4], 3)
+			ret:AddDamage(damage2)
+			ret:AddDamage(damage3)
+		end
+	end
+	local pawn = Board:GetPawn(p1) 
+	local weapons = pawn:GetEquippedWeapons() 
+	for i = 1, pawn:GetWeaponCount() do
+		if weapons[i] == "Poke_Outrage" and pawn:GetWeaponLimitedRemaining(i) <= 1 then
+			ret:AddScript(string.format("Board:GetPawn(%s):SetWeaponLimitedRemaining(%s, 1)", pawn:GetId(), i))
+			local confusion = SpaceDamage(p1)
+			confusion.iConfusion = 2
+			ret:AddDamage(confusion)
+		end
+	end
 	return ret
 end

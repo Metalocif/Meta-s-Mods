@@ -439,6 +439,7 @@ a.Poke_MegaCharizardYa = a.MechUnit:new{Image="units/player/MegaCharizardY_a.png
 a.Poke_MegaCharizardY_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaCharizardY_ns = a.Poke_Charizard_ns
 
+
 a.Poke_Bulbasaur =a.MechUnit:new{Image="units/player/Bulbasaur.png", PosX = -10, PosY = -4}
 a.Poke_Bulbasaura = a.MechUnit:new{Image="units/player/Bulbasaur_a.png",  PosX = -15, PosY = 6, NumFrames = 2 }
 a.Poke_Bulbasaur_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -15, PosY = -2 }
@@ -457,6 +458,7 @@ a.Poke_Venusaur_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX 
 a.Poke_Venusaur_ns = a.MechIcon:new{Image="units/player/Venusaur_ns.png"}
 a.Poke_Venusaurw =a.MechUnit:new{Image="units/player/Venusaur_w.png", PosX = -20, PosY = 6}
 
+
 a.Poke_Squirtle =a.MechUnit:new{Image="units/player/Squirtle.png", PosX = -10, PosY = -4}
 a.Poke_Squirtlea = a.MechUnit:new{Image="units/player/Squirtle_a.png",  PosX = -15, PosY = 6, NumFrames = 3, Frames = {2,0,2,1}, }
 a.Poke_Squirtleshell = a.MechUnit:new{Image="units/player/Squirtle_shell.png",  PosX = -15, PosY = 6, NumFrames = 1 }
@@ -464,7 +466,6 @@ a.Poke_Squirtle_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX 
 a.Poke_Squirtle_ns = a.MechIcon:new{Image="units/player/Squirtle_ns.png"}
 a.Poke_Squirtlew =a.MechUnit:new{Image="units/player/Squirtle_w.png", PosX = -12, PosY = 15}
 a.Poke_Squirtleshell_ns = a.Poke_Squirtle_ns
-
 
 a.Poke_Wartortle =a.MechUnit:new{Image="units/player/Wartortle.png", PosX = -10, PosY = -4}
 a.Poke_Wartortlea = a.MechUnit:new{Image="units/player/Wartortle_a.png",  PosX = -15, PosY = 3, NumFrames = 3, Frames = {0,1,2,1}, }
@@ -481,6 +482,22 @@ a.Poke_Blastoise_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX
 a.Poke_Blastoise_ns = a.MechIcon:new{Image="units/player/Blastoise_ns.png"}
 a.Poke_Blastoisew =a.MechUnit:new{Image="units/player/Blastoise_w.png", PosX = -20, PosY = 6}
 a.Poke_Blastoiseshell_ns = a.Poke_Blastoise_ns
+
+
+a.Poke_Magikarp =a.MechUnit:new{Image="units/player/Magikarp.png", PosX = -18, PosY = -4}
+a.Poke_Magikarpa = a.MechUnit:new{Image="units/player/Magikarp_a.png",  PosX = -18, PosY = 2, NumFrames = 7, Time= 0.1}
+a.Poke_Magikarpshell = a.MechUnit:new{Image="units/player/Magikarp_shell.png",  PosX = -18, PosY = 6, NumFrames = 1 }
+a.Poke_Magikarp_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -18, PosY = -2 }
+a.Poke_Magikarp_ns = a.MechIcon:new{Image="units/player/Magikarp_ns.png"}
+a.Poke_Magikarpw =a.MechUnit:new{Image="units/player/Magikarp_w.png", PosX = -12, PosY = 5}
+a.Poke_Magikarpshell_ns = a.Poke_Magikarp_ns
+
+a.Poke_Gyarados =a.MechUnit:new{Image="units/player/Gyarados.png", PosX = -42, PosY = -24}
+a.Poke_Gyaradosa = a.MechUnit:new{Image="units/player/Gyarados_a.png",  PosX = -42, PosY = -24, NumFrames = 4 }
+a.Poke_Gyarados_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -42, PosY = -2 }
+a.Poke_Gyarados_ns = a.MechIcon:new{Image="units/player/Gyarados_ns.png"}
+a.Poke_Gyaradosw =a.MechUnit:new{Image="units/player/Gyarados_w.png", PosX = -35, PosY = -24}
+a.Poke_Gyaradosshell_ns = a.Poke_Gyarados_ns
 
 modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
@@ -517,6 +534,8 @@ CreatePilot{Id = "Pilot_Poke_Delibird", Personality = "Vek", Name = "Delibird", 
 CreatePilot{Id = "Pilot_Poke_Charmander", Personality = "Vek", Name = "Red", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Bulbasaur", Personality = "Vek", Name = "Green", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 CreatePilot{Id = "Pilot_Poke_Squirtle", Personality = "Vek", Name = "Blue", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+
+CreatePilot{Id = "Pilot_Poke_Magikarp", Personality = "Vek", Name = "Jonah", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 
 Poke_Abra= Pawn:new{
@@ -1129,6 +1148,25 @@ Poke_Squirtle = Pawn:new{
 	EvoGraphics = { { "Poke_Wartortle", "Poke_Blastoise" } },
 	EvoForget = { "Poke_WaterGun", "Poke_BubbleBeam" },
 	EvoLearn = { { { "Poke_BubbleBeam" }, { "Poke_HydroPump" } } },
+}
+
+Poke_Magikarp = Pawn:new{
+	Name = "Magikarp",
+	Class = "TechnoVek",
+	Health = 3,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	Image = "Poke_Magikarp",
+	SkillList = {"Poke_Splash" },
+	SoundLocation = "/enemy/jelly_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_FLESH,
+	HasEvolutions = { true, false },
+	EvoGraphics = { { "Poke_Gyarados" } },
+	EvoForget = { "Poke_Splash" },
+	EvoLearn = { { { "Poke_Outrage", "Poke_HyperBeam" } } },
+	IsDragon = true,
 }
 
 

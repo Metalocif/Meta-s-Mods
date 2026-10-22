@@ -1,3 +1,8 @@
+v1.8.3
+- Added the Magikarp free agent.
+- Nerfed Judgment's Grass type. Its rooted debuff no longer damages over time.
+- Confusion and other status effects that alter enemy AI should do something again.
+
 v1.8.2
 - Wormhole no longer clears queued actions.	
 - Pokémon that gain Flying on evolution should no longer die when resetting turn with them flying above a chasm.
