@@ -131,4 +131,5 @@ return {
 	UnleashBuilding = {"Level that building, Osty! ...Yes, it has to be done. Obey me. Come on."},
 	UnleashCrack = {"Shatter that cracked ground, Osty!"},
 	UnleashMech = {"Punch that one, Osty! ...Yes, I know they are helping us." },
+	Arise = {"Arise.", "Osty, stop being dramatic.", "I know you are fine, Osty. Stand up already." },
 }
