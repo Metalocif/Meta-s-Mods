@@ -108,12 +108,21 @@ function this:init(mod)
 	function StSRegentSkill_Link:GetTargetArea(point)
 		local ret = PointList()
 		ret:push_back(point)
+		--get blade
+		local blade
+		for index, point in ipairs(Board) do
+			if Board:GetPawn(point) and Board:GetPawn(point):GetType() == "StS_RegentBlade" then
+				blade = Board:GetPawn(point)
+				break
+			end
+		end
 		for i = DIR_START, DIR_END do
 			local curr = point + DIR_VECTORS[i]
 			local pawn = Board:GetPawn(curr)
 			if not pawn then 
 				ret:push_back(curr)
-			elseif pawn and not pawn:IsGuarding() and not Board:IsBlocked(curr + DIR_VECTORS[i], PATH_PROJECTILE) then
+			elseif blade or (pawn and not pawn:IsGuarding() and not Board:IsBlocked(curr + DIR_VECTORS[i], PATH_PROJECTILE)) then
+			--we will spawn the blade there so we need the pawn to be pushable; if the blade is out we don't care
 				ret:push_back(curr)
 			end
 		end
@@ -134,7 +143,7 @@ function this:init(mod)
 		local pushDamage = SpaceDamage(p2, 0, dir)
 		pushDamage.sAnimation = "explopush1_"..dir
 		ret:AddDamage(pushDamage)
-		if Board:GetPawn(p2) then ret:AddDelay(1) end
+		if Board:GetPawn(p2) then ret:AddDelay(-1) end
 		
 		--get blade
 		local blade
