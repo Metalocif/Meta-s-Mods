@@ -1,9 +1,9 @@
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-modApi:appendAsset("img/effects/shotup_wyvern.png", path .."img/effects/shotup_wyvern.png")
-modApi:appendAsset("img/effects/shot_wyvern_R.png", path .."img/effects/shot_wyvern_R.png")
-modApi:appendAsset("img/effects/shot_wyvern_U.png", path .."img/effects/shot_wyvern_U.png")
-modApi:appendAsset("img/weapons/Wyvern.png", path .."img/weapons/Wyvern.png")
 local weaponPreview = require(mod_loader.mods.meta_mods.scriptPath .."libs/weaponPreview")
+
+for i = 0, 9 do
+	Location["combat/stomach_"..i..".png"] = Point(-12,3)
+end
 
 Meta_WyvernWeapon = Skill:new{  
 	Name = "Voracious Hunger",
@@ -49,16 +49,20 @@ end
 
 function Meta_WyvernWeapon:IsTwoClickException(p1, p2)
 	local mission = GetCurrentMission()
-	if mission.WyvernStomach == nil then mission.WyvernStomach = 0 end
-	return p1:Manhattan(p2) == 1 or mission.WyvernStomach <= 1
+	local user = Board:GetPawn(p1)
+	mission["WyvernStomach"..user:GetId()] = mission["WyvernStomach"..user:GetId()] or 0
+	return p1:Manhattan(p2) == 1 or mission["WyvernStomach"..user:GetId()] <= 1
 end
 
 function Meta_WyvernWeapon:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
 	local dir = GetDirection(p2-p1)
 	local dist = p1:Manhattan(p2)
+	if dist <= 1 then return ret end
+	local user = Board:GetPawn(p1)
+	local mission = GetCurrentMission()
 	local stomach = 0
-	if GetCurrentMission() then stomach = GetCurrentMission().WyvernStomach end
+	if mission then stomach = mission["WyvernStomach"..user:GetId()] end
 	for i = math.max(-(stomach-1), -dist + 2), (stomach-1) do
 		ret:push_back(p2 + DIR_VECTORS[dir] * i)
 	end
@@ -72,6 +76,7 @@ end
 function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
+	local user = Board:GetPawn(p1)
 	local mission = GetCurrentMission()
 	if not mission then 	--tipImage stuff
 		local damage = SpaceDamage(p1+DIR_VECTORS[dir], self.Damage)
@@ -85,7 +90,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		return ret 
 	end
 	
-	mission.WyvernStomach = mission.WyvernStomach or 0
+	mission["WyvernStomach"..user:GetId()] = mission["WyvernStomach"..user:GetId()] or 0
 	
 	local dist = p1:Manhattan(p2)
 	if dist == 1 then
@@ -97,7 +102,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		end
 		damage.sAnimation = "bite_"..dir
 		ret:AddMelee(p1, damage)
-		-- ret:AddSound("/enemy/scorpion_1/attack")
+		ret:AddSound("/enemy/scorpion_1/attack")
 		local amount = math.max(damage.iDamage, 1)
 		if Board:GetPawn(p2) and not IsTestMechScenario() then
 			local toBoost = false
@@ -109,7 +114,7 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 			if Board:GetPawn(p2):IsAcid() then amount = amount * 2 end
 			if Board:GetPawn(p2):IsFrozen() or Board:GetPawn(p2):IsShield() then amount = 0 end
 			amount = math.min(amount, Board:GetPawn(p2):GetHealth())
-			ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach + "..amount)
+			ret:AddScript("GetCurrentMission().WyvernStomach"..user:GetId().." = GetCurrentMission().WyvernStomach"..user:GetId().." + "..amount)
 			if Board:GetPawn(p2):GetTeam() == Board:GetPawn(p1):GetTeam() then
 				ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)",Board:GetPawn(p1):GetId()))
 				if toBoost then ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", p1:GetString())) end
@@ -121,10 +126,13 @@ function Meta_WyvernWeapon:GetSkillEffect(p1, p2)
 		local damage = SpaceDamage(p2, self.MinDamage, dir)
 		damage.sAnimation = "ExploAcid1"
 		ret:AddArtillery(p1, damage, self.ProjectileArt, NO_DELAY)
-		if mission.WyvernStomach == 0 then 
+		if mission["WyvernStomach"..user:GetId()] == 0 then 
 			ret:AddDamage(SpaceDamage(p1, 1)) 
 		else
-			ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - 1")
+			ret:AddScript("GetCurrentMission().WyvernStomach"..user:GetId().." = GetCurrentMission().WyvernStomach"..user:GetId().." - 1")
+			local stomachDisplay = SpaceDamage(p1)
+			stomachDisplay.sImageMark = "combat/stomach_"..mission["WyvernStomach"..user:GetId()]..".png"
+			ret:AddDamage(stomachDisplay)
 		end
 	end
 	return ret
@@ -134,11 +142,16 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
 	local dir2 = GetDirection(p2-p3)
+	local user = Board:GetPawn(p1)
 	local mission = GetCurrentMission()
-	mission.WyvernStomach = mission.WyvernStomach or 0	--should not be the case at this point
+	mission["WyvernStomach"..user:GetId()] = mission["WyvernStomach"..user:GetId()] or 0	--should not be the case at this point
+	
+	local stomachDisplay = SpaceDamage(p1)
+	stomachDisplay.sImageMark = "combat/stomach_"..mission["WyvernStomach"..user:GetId()]..".png"
+	ret:AddDamage(stomachDisplay)
 	
 	if p3 == p1 then	--we do multishot projectiles instead of artillery at several tiles
-		remainingShots = remainingShots or mission.WyvernStomach
+		remainingShots = remainingShots or mission["WyvernStomach"..user:GetId()]
 		local target = GetProjectileEnd(p1, p2, PATH_PROJECTILE)
 		local damage = SpaceDamage(target, self.MinDamage)
 		damage.sAnimation = "ExploAcid1"
@@ -156,7 +169,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 				Board:AddEffect(fx);
 			]=], self.Self, p1:GetString(), p2:GetString(), p3:GetString(), remainingShots))
 		end
-		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = 0") end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach"..user:GetId().." = 0") end
 		return ret
 	elseif dir2 == (dir+1)%4 or dir2 == (dir-1)%4 then
 		local dist1 = p1:Manhattan(p2)
@@ -168,7 +181,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 			ret:AddSound("/enemy/blobber_1/death")
 			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.05)
 		end
-		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..dist2*2 + 1) end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach"..user:GetId().." = GetCurrentMission().WyvernStomach"..user:GetId().." - "..dist2*2 + 1) end
 	else
 		--do multi-artillery normally
 		local dist1 = p1:Manhattan(p2)
@@ -195,7 +208,7 @@ function Meta_WyvernWeapon:GetFinalEffect(p1, p2, p3, remainingShots)
 			ret:AddSound("/enemy/blobber_1/death")
 			ret:AddArtillery(p1, damage, self.ProjectileArt, 0.15)
 		end
-		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach = GetCurrentMission().WyvernStomach - "..p2:Manhattan(p3) + 1) end
+		if not IsTestMechScenario() then ret:AddScript("GetCurrentMission().WyvernStomach"..user:GetId().." = GetCurrentMission().WyvernStomach"..user:GetId().." - "..p2:Manhattan(p3) + 1) end
 	end
 	return ret
 end	

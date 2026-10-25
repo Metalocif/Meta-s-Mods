@@ -1,17 +1,4 @@
 local path = mod_loader.mods[modApi.currentMod].resourcePath
-modApi:appendAsset("img/effects/bite_0.png", path .."img/effects/bite_0.png")
-modApi:appendAsset("img/effects/bite_1.png", path .."img/effects/bite_1.png")
-modApi:appendAsset("img/effects/bite_2.png", path .."img/effects/bite_2.png")
-modApi:appendAsset("img/effects/bite_3.png", path .."img/effects/bite_3.png")
-modApi:appendAsset("img/effects/redbite_0.png", path .."img/effects/redbite_0.png")
-modApi:appendAsset("img/effects/redbite_1.png", path .."img/effects/redbite_1.png")
-modApi:appendAsset("img/effects/redbite_2.png", path .."img/effects/redbite_2.png")
-modApi:appendAsset("img/effects/redbite_3.png", path .."img/effects/redbite_3.png")
-modApi:appendAsset("img/effects/greenbite_0.png", path .."img/effects/greenbite_0.png")
-modApi:appendAsset("img/effects/greenbite_1.png", path .."img/effects/greenbite_1.png")
-modApi:appendAsset("img/effects/greenbite_2.png", path .."img/effects/greenbite_2.png")
-modApi:appendAsset("img/effects/greenbite_3.png", path .."img/effects/greenbite_3.png")
-modApi:appendAsset("img/weapons/Hydra.png", path .."img/weapons/Hydra.png")
 
 local a = ANIMS
 

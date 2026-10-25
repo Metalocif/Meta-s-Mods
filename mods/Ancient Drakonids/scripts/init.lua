@@ -23,6 +23,12 @@ function mod:init()
 	require(self.scriptPath .."drake")
 	require(self.scriptPath .."pawns")
 	require(mod_loader.mods.meta_mods.scriptPath.."libs/multishot")
+	
+	modApi:appendAssets("img/combat/", "img/combat/")
+	modApi:appendAssets("img/effects/", "img/effects/")
+	modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
+	modApi:appendAssets("img/units/player/", "img/units/player/")
+	modApi:appendAssets("img/weapons/", "img/weapons/")
 end
 
 function mod:load( options, version)
