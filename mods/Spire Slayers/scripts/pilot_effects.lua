@@ -170,7 +170,6 @@ local function WatcherBlasphemy(mission)
 end
 
 local function NecrobinderSpawnOsty(mission)
-	LOG(Game:GetTurnCount())
 	if Game:GetTeamTurn() ~= TEAM_PLAYER then return end
 	if Game:GetTurnCount() > 1 then return end
 	local p1
@@ -178,6 +177,7 @@ local function NecrobinderSpawnOsty(mission)
 		local pawn = Board:GetPawn(i)
 		if pawn and pawn:IsAbility("StSNecrobinderSkill") then p1 = pawn:GetSpace() break end
 	end
+	if not p1 then return end
 	for dist = 1, 8 do
 		local targets = extract_table(general_DiamondTarget(p1, dist))
 		for k = 1, #targets do
