@@ -1,8 +1,8 @@
-local description = "Adds the four playable characters from Slay the Spire as pilots."
+local description = "Adds the four playable characters from Slay the Spire and the two newcomers from Slay the Spire 2 as pilots."
 local mod = {
 	id = "Meta_SpireSlayers",
 	name = "Spire Slayers",
-	version = "1.0.0",
+	version = "1.1.0",
 	requirements = {},
 	dependencies = { 
 		modApiExt = "1.18", --We can get this by using the variable `modapiext`
