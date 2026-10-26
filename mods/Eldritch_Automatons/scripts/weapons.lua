@@ -582,12 +582,14 @@ function Meta_TentacularServant:GetFinalEffect(p1, p2, p3)
 			if (pawn and (pawn:GetType() == "EldritchTentacle" or pawn:GetType() == "EldritchTentacle2")) or
 			point == p2 or (isInsane and point == p3) then
 				tentacleCounter = tentacleCounter + 1
-				if isInsane then
-					for k = DIR_START, DIR_END do
-						ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[k], self.Damage, k))
+				if pawn:IsPowered() and not (pawn:IsFrozen() or pawn:IsDead()) then
+					if isInsane then
+						for k = DIR_START, DIR_END do
+							ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[k], self.Damage, k))
+						end
+					else
+						ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[dir], self.Damage, dir))
 					end
-				else
-					ret:AddMelee(point, SpaceDamage(point+DIR_VECTORS[dir], self.Damage, dir))
 				end
 			end
 		end
