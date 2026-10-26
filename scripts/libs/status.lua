@@ -1333,8 +1333,8 @@ local function GenerateWeakenWeapons()
 			repeat
 				--for an alpha firefly's weapon weakened 3 times, its ID is 3weakerFireflyAtk2
 				_G[i.."weaker"..id] =  _G[id]:new{ Damage = weapon.Damage - amount, Original = id, }
-				if weapon.MinDamage and weapon.MinDamage > 0 then _G[i.."weaker"..id].MinDamage = math.min(weapon.MinDamage - amount, 0) end
-				if weapon.OuterDamage and weapon.OuterDamage > 0 then _G[i.."weaker"..id].OuterDamage = math.min(weapon.OuterDamage - amount, 0) end
+				if weapon.MinDamage and weapon.MinDamage > 0 then _G[i.."weaker"..id].MinDamage = math.max(weapon.MinDamage - amount, 0) end
+				if weapon.OuterDamage and weapon.OuterDamage > 0 then _G[i.."weaker"..id].OuterDamage = math.max(weapon.OuterDamage - amount, 0) end
 				_G[i.."weaker"..id].GetName = function(self) return getWeaponKey(self.Original, "Name") end
 				_G[i.."weaker"..id].GetDescription = function(self) return getWeaponKey(self.Original, "Description") end
 				_G[i.."weaker"..id].GetIcon = function(self) return "weapons/enemy_scorpion1.png" end
