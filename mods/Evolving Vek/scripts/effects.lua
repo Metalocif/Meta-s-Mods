@@ -848,6 +848,11 @@ function SpawnDodging()
 	return 1
 end
 
+function SpawnRepulsive()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyRepulsive(Pawn:GetId(), 0) end
+	return 1
+end
+
 
 -------------------------
 --Extra Weapon prefixes--
