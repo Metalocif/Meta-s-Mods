@@ -1,3 +1,8 @@
+v1.3
+- If you have multiple copies of the wyvern's weapon, they will now have separate stomach values.
+- Added a preview showing you how much is stored in the wyvern's stomach.
+- Improved portraits.
+
 v1.2
 - Added an extra mode to the wyvern's weapon.
 - Added new anims to the fire/acid bites of the hydra.
