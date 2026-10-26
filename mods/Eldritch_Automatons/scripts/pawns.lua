@@ -48,7 +48,7 @@ a.mech_wormw_broken = a.MechUnit:new{Image="units/player/mech_worm_w_broken.png"
 a.mech_worm_ns = a.MechIcon:new{Image="units/player/mech_worm_ns.png"}
 a.mech_worme = a.MechIcon:new{Image="units/player/mech_worm_emerge.png", PosX = -18, PosY = -10, Loop = false, NumFrames = 10, Time = .07}
 
-a.mech_octopus = a.MechUnit:new{Image="units/player/mech_octopus.png", PosX = -17, PosY = -19, Height = 3}
+a.mech_octopus = a.MechUnit:new{Image="units/player/mech_octopus.png", PosX = -17, PosY = -1, Height = 3}
 a.mech_octopusa = a.MechUnit:new{Image="units/player/mech_octopus_a.png", PosX = -25, PosY = -1, NumFrames = 4 }
 a.mech_octopusw = a.MechUnit:new{Image="units/player/mech_octopus_w.png", PosX = -25, PosY = 4 }
 a.mech_octopus_broken = a.MechUnit:new{Image="units/player/mech_octopus_broken.png", PosX = -25, PosY = -1 }
