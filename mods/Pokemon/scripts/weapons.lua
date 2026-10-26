@@ -5716,9 +5716,6 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 			local pawn = Board:GetPawn(targets[k])
 			local damage = SpaceDamage(targets[k], 2)
 			damage.sAnimation = "explo_gold"
-			if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" or Board:GetPawn(p1):GetCustomAnim() == "" then
-				if targets[k].x == p1.x or targets[k].y == p1.y then damage.iPush = GetDirection(targets[k] - p1) end
-			end
 			if pawn and p1:Manhattan(targets[k]) == i then -- and targets[k] ~= p1 
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFire" then damage.iFire = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusIce" then damage.iChill = 1 end
@@ -5728,8 +5725,11 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGrass" then damage.iRooted = 0 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusWater" then damage.iWet = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
+				if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" or Board:GetPawn(p1):GetCustomAnim() == "" then
+					damage.iPush = GetDirection(targets[k] - p1)
+					willDelay = true
+				end
 				ret:AddDropper(damage, "effects/judgment.png")
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" and (targets[k].x == p1.x or targets[k].y == p1.y) then willDelay = true end
 			elseif p1:Manhattan(targets[k]) == i then
 				ret:AddDamage(SpaceDamage(targets[k], DAMAGE_ZERO))
 			end
