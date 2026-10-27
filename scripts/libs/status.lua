@@ -1408,7 +1408,96 @@ local function ReaddInsanity()
 	end)
 end
 
-
+local function DoTurnStartStatus(mission, wasResetTurn)					--this is for status that triggers each turn/after Vek actions
+	LOG("checking for Necrosis/Bonded/Glory/Confusion/Toxin")
+	for id, _ in pairs(mission.NecrosisTable) do
+		local pawn = Board:GetPawn(id)
+		if pawn and not pawn:IsDead() then pawn:SetMaxHealth(pawn:GetHealth()) end
+	end
+	for id, _ in pairs(mission.BondedTable) do
+		local pawn = Board:GetPawn(id)
+		if pawn then CustomAnim:rem(id, "StatusBondedOff") end
+	end
+	for id, gloryInfo in pairs(mission.GloryTable) do				--must happen after Vek performed queued actions
+		local pawn = Board:GetPawn(id)
+		if pawn and Game:GetTeamTurn() == pawn:GetTeam() then mission.GloryTable[id].turns = mission.GloryTable[id].turns - 1 end
+		if mission.GloryTable[id].turns < 0 then Status.RemoveStatus(id, "Glory") end
+	end
+	if Game:GetTeamTurn() == TEAM_PLAYER or wasResetTurn then						--do confusion on player mechs: they move somewhere random
+		modApi:conditionalHook(function()								--we need the conditional hook for some reason
+			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and not Board:IsBusy()
+		end, 
+		function()
+			for i = 0, 2 do
+				local pawn = Board:GetPawn(i)
+				local p = pawn:GetSpace()
+				if mission.ConfusionTable[i] ~= nil and pawn and not (pawn:IsDead() or pawn:IsFrozen() or not pawn:IsPowered()) then
+					local targets = extract_table(Board:GetReachable(p, pawn:GetMoveSpeed(), pawn:GetPathProf()))
+					local hash = math.abs((Game:GetTurnCount() * 73856093) + (i * 19349663) + (p.x * 83492791) + (p.y * 45281989))
+					local index = (hash % #targets) + 1
+					local target = targets[index]
+					if target ~= p then
+						local ret = SkillEffect()
+						ret:AddMove(Board:GetPath(p, target, pawn:GetPathProf()), NO_DELAY)
+						Board:AddEffect(ret)
+						pawn:SetMovementSpent(true)
+					end
+				end
+			end
+		end)
+	elseif Game:GetTeamTurn() == TEAM_ENEMY then										--do toxin check to propagate it		
+		for id, _ in pairs(mission.ToxinTable) do
+			local pawn = Board:GetPawn(id)
+			if (not pawn) or pawn:IsDead() then
+				mission.ToxinTable[id] = nil
+			elseif pawn:IsDamaged() then
+				local damage = SpaceDamage(pawn:GetSpace(), pawn:GetMaxHealth() - pawn:GetHealth())
+				if Board:IsDeadly(damage, pawn) then
+					Board:Ping(pawn:GetSpace(), GL_Color(100, 200, 100))
+					Board:AddAlert(pawn:GetSpace(), "Toxin Damage")
+					CustomAnim:rem(id, "StatusToxin")				--anim disappears after Vek emerge otherwise, which looks weird
+					for i = DIR_START, DIR_END do
+						local curr = pawn:GetSpace() + DIR_VECTORS[i]
+						local spreadTo = Board:GetPawn(curr)
+						if spreadTo then 
+							modApi:runLater(function() Status.ApplyToxin(spreadTo:GetId()) end)
+						end
+						
+					end
+				else
+					Status.RemoveStatus(id, "Toxin")
+				end
+				Board:DamageSpace(damage)
+			end
+		end
+	end
+	for id, recoverPerTurn in pairs(mission.WeakenTable) do
+		local pawn = Board:GetPawn(id)
+		if pawn and Game:GetTeamTurn() == pawn:GetTeam() and recoverPerTurn ~= 0 then
+			local hasWeakenedWeapon = false
+			for i = pawn:GetWeaponCount(), 1, -1 do
+				local weapon = pawn:GetWeaponBaseType(i)
+				if string.match(weapon, "^%dweaker") then 
+					local baseWeapon = _G[weapon].Original
+					local amount = tonumber(string.sub(weapon,1,1)) - recoverPerTurn
+					local newWeapon
+					if amount <= 0 then 
+						newWeapon = baseWeapon 
+					else 
+						newWeapon = amount.."weaker"..baseWeapon 
+						hasWeakenedWeapon = true
+					end
+					local target = pawn:GetQueuedTarget()
+					local indexQueued = pawn:GetQueuedWeaponId()
+					pawn:RemoveWeapon(i)
+					pawn:AddWeapon(newWeapon)
+					pawn:FireWeapon(target, indexQueued)
+				end
+			end
+			if not hasWeakenedWeapon then CustomAnim:rem(id, "StatusWeaken") end
+		end
+	end
+end
 
 local function EVENT_onModsLoaded()
 	modapiext:addPawnSelectedHook(function(mission, pawn)	--explanations
@@ -1756,89 +1845,8 @@ local function EVENT_onModsLoaded()
 			end
 		end
 	end)
-	modApi:addNextTurnHook(function(mission)							--this is for status that triggers each turn/after Vek actions
-		for id, _ in pairs(mission.NecrosisTable) do
-			local pawn = Board:GetPawn(id)
-			if pawn and not pawn:IsDead() then pawn:SetMaxHealth(pawn:GetHealth()) end
-		end
-		for id, _ in pairs(mission.BondedTable) do
-			local pawn = Board:GetPawn(id)
-			if pawn then CustomAnim:rem(id, "StatusBondedOff") end
-		end
-		for id, gloryInfo in pairs(mission.GloryTable) do				--must happen after Vek performed queued actions
-			local pawn = Board:GetPawn(id)
-			if pawn and Game:GetTeamTurn() == pawn:GetTeam() then mission.GloryTable[id].turns = mission.GloryTable[id].turns - 1 end
-			if mission.GloryTable[id].turns < 0 then Status.RemoveStatus(id, "Glory") end
-		end
-		if Game:GetTeamTurn() == TEAM_PLAYER then						--do confusion on player mechs: they move somewhere random
-			for i = 0, 2 do
-				local pawn = Board:GetPawn(i)
-				if mission.ConfusionTable[i] ~= nil and pawn and not pawn:IsDead() then
-					local targets = extract_table(Board:GetReachable(pawn:GetSpace(), pawn:GetMoveSpeed(), pawn:GetPathProf()))
-					local target = random_removal(targets)
-					if target == pawn:GetSpace() and #targets > 0 then target = random_removal(targets) end
-					--try to force actual movement if possible
-					if target ~= pawn:GetSpace() then
-						local ret = SkillEffect()
-						ret:AddMove(Board:GetPath(pawn:GetSpace(), target, pawn:GetPathProf()), FULL_DELAY)
-						Board:AddEffect(ret)
-						pawn:SetMovementSpent(true)
-					end
-				end
-			end
-		else															--do toxin check to propagate it		
-			for id, _ in pairs(mission.ToxinTable) do
-				local pawn = Board:GetPawn(id)
-				if (not pawn) or pawn:IsDead() then
-					mission.ToxinTable[id] = nil
-				elseif pawn:IsDamaged() then
-					local damage = SpaceDamage(pawn:GetSpace(), pawn:GetMaxHealth() - pawn:GetHealth())
-					if Board:IsDeadly(damage, pawn) then
-						Board:Ping(pawn:GetSpace(), GL_Color(100, 200, 100))
-						Board:AddAlert(pawn:GetSpace(), "Toxin Damage")
-						CustomAnim:rem(id, "StatusToxin")				--anim disappears after Vek emerge otherwise, which looks weird
-						for i = DIR_START, DIR_END do
-							local curr = pawn:GetSpace() + DIR_VECTORS[i]
-							local spreadTo = Board:GetPawn(curr)
-							if spreadTo then 
-								modApi:runLater(function() Status.ApplyToxin(spreadTo:GetId()) end)
-							end
-							
-						end
-					else
-						Status.RemoveStatus(id, "Toxin")
-					end
-					Board:DamageSpace(damage)
-				end
-			end
-		end
-		for id, recoverPerTurn in pairs(mission.WeakenTable) do
-			local pawn = Board:GetPawn(id)
-			if pawn and Game:GetTeamTurn() == pawn:GetTeam() and recoverPerTurn ~= 0 then
-				local hasWeakenedWeapon = false
-				for i = pawn:GetWeaponCount(), 1, -1 do
-					local weapon = pawn:GetWeaponBaseType(i)
-					if string.match(weapon, "^%dweaker") then 
-						local baseWeapon = _G[weapon].Original
-						local amount = tonumber(string.sub(weapon,1,1)) - recoverPerTurn
-						local newWeapon
-						if amount <= 0 then 
-							newWeapon = baseWeapon 
-						else 
-							newWeapon = amount.."weaker"..baseWeapon 
-							hasWeakenedWeapon = true
-						end
-						local target = pawn:GetQueuedTarget()
-						local indexQueued = pawn:GetQueuedWeaponId()
-						pawn:RemoveWeapon(i)
-						pawn:AddWeapon(newWeapon)
-						pawn:FireWeapon(target, indexQueued)
-					end
-				end
-				if not hasWeakenedWeapon then CustomAnim:rem(id, "StatusWeaken") end
-			end
-		end
-	end)
+	modApi:addNextTurnHook(function(mission) DoTurnStartStatus(mission, false) end)
+	modapiext:addResetTurnHook(function(mission) DoTurnStartStatus(mission, true) end)
 	local calculatingDodge = false
 	
 	local function DoDodge(mission, pawn, skillEffect)
