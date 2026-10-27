@@ -5725,7 +5725,7 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGrass" then damage.iRooted = 0 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusWater" then damage.iWet = 1 end
 				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" or Board:GetPawn(p1):GetCustomAnim() == "" then
+				if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" or Board:GetPawn(p1):GetCustomAnim() == "" and (targets[k].x == p1.x or targets[k].y == p1.y) then
 					damage.iPush = GetDirection(targets[k] - p1)
 					willDelay = true
 				end
