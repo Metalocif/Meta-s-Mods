@@ -1863,11 +1863,12 @@ local function EVENT_onModsLoaded()
 		local hash = function(point) return point.x * 10 + point.y end
 		local affectedTiles = {}	--store tiles the skillEffect will hit so we don't dodge into another one
 		
-		for _, fx in ipairs(extract_table(skillEffect.effect)) do
+		local skillEffectTable = extract_table(skillEffect.effect)
+		for _, fx in ipairs(skillEffectTable) do
 			affectedTiles[hash(fx.loc)] = fx.iDamage
 		end
 		
-		for _, fx in ipairs(extract_table(skillEffect.effect)) do
+		for _, fx in ipairs(skillEffectTable) do
 			local target = Board:GetPawn(fx.loc)
 			
 			local dodgeInfo = (target ~= nil) and Status.GetStatus(target:GetId(), "Dodge") or nil
@@ -1875,7 +1876,7 @@ local function EVENT_onModsLoaded()
 				local targetWasQueued = target:GetQueuedTarget() ~= Point(-1, -1) and target:GetTeam() == TEAM_ENEMY	--used to requeue attack for Vek
 				
 				local PawnBackup = Pawn; Pawn = pawn
-				local weapon = pawn:GetQueuedWeapon() or pawn:GetWeapons()[1] or _G[pawn:GetType()].SkillList[1]
+				local weapon = _G[pawn:GetQueuedWeapon()] or _G[pawn:GetBaseWeaponTypes()[1]] or _G[pawn:GetType()].SkillList[1]
 	
 				local actions = {}
 				local pathProfile = pawn:GetPathProf()
@@ -1887,16 +1888,21 @@ local function EVENT_onModsLoaded()
 				for _, loc in ipairs(reachable) do
 					-- move score
 					local moveScore = 0
-					if dodgeInfo.smart then moveScore = ScorePositioning(loc, pawn) end
-					if affectedTiles[hash(loc)] ~= DAMAGE_ZERO then moveScore = -100 end	--don't dodge into more damage
-					if Board:IsBlocked(loc, pawn:GetPathProf()) then moveScore = -100 end	--don't dodge into a tile you can't stand in
+					if affectedTiles[hash(loc)] and affectedTiles[hash(loc)] ~= DAMAGE_ZERO and affectedTiles[hash(loc)] > 0 then --don't dodge into more damage
+						moveScore = -100	
+					elseif Board:IsBlocked(loc, pawn:GetPathProf()) then 	--don't dodge into a tile you can't stand in
+						moveScore = -100 
+					elseif dodgeInfo.smart then 
+						moveScore = ScorePositioning(loc, pawn) 
+					end
+					
 					if targetWasQueued then
-						local targets = extract_table(weapon:GetTargetArea(loc))
+						local targets = weapon and extract_table(weapon:GetTargetArea(loc)) or {}
 						for _, target in ipairs(targets) do
 							if Board:IsValid(target) then
 								-- attack score
 								local attackScore = 0
-								if dodgeInfo.smart and targetWasQueued then attackScore = weapon:GetTargetScore(loc, target) end
+								if dodgeInfo.smart then attackScore = weapon:GetTargetScore(loc, target) end
 								
 								table.insert(
 									actions,
