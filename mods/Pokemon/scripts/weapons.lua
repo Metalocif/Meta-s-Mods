@@ -5708,6 +5708,8 @@ end
 	
 function Poke_Judgment:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local customAnim = Board:GetPawn(p1) and Board:GetPawn(p1):GetCustomAnim() or ""
+	if customAnim == "" then customAnim = "Poke_Arceus" end
 	if p1 == p2 then ret:AddDamage(SpaceDamage(p1)) return ret end
 	local targets = extract_table(general_DiamondTarget(p2, self.Range))
 	for i = 16, 1, -1 do	--iterate backwards to hit things further away from Arceus first to avoid pushing things into each other
@@ -5717,15 +5719,15 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 			local damage = SpaceDamage(targets[k], 2)
 			damage.sAnimation = "explo_gold"
 			if pawn and p1:Manhattan(targets[k]) == i then -- and targets[k] ~= p1 
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFire" then damage.iFire = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusIce" then damage.iChill = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusElectric" then damage.iShocked = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusPoison" then damage.iToxin = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGround" then damage.iCrack = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusGrass" then damage.iRooted = 0 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusWater" then damage.iWet = 1 end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
-				if Board:GetPawn(p1):GetCustomAnim() == "Poke_Arceus" or Board:GetPawn(p1):GetCustomAnim() == "" and (targets[k].x == p1.x or targets[k].y == p1.y) then
+				if customAnim == "Poke_ArceusFire" then damage.iFire = 1 end
+				if customAnim == "Poke_ArceusIce" then damage.iChill = 1 end
+				if customAnim == "Poke_ArceusElectric" then damage.iShocked = 1 end
+				if customAnim == "Poke_ArceusPoison" then damage.iToxin = 1 end
+				if customAnim == "Poke_ArceusGround" then damage.iCrack = 1 end
+				if customAnim == "Poke_ArceusGrass" then damage.iRooted = 0 end
+				if customAnim == "Poke_ArceusWater" then damage.iWet = 1 end
+				if customAnim == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
+				if customAnim == "Poke_Arceus" and (targets[k].x == p1.x or targets[k].y == p1.y) then
 					damage.iPush = GetDirection(targets[k] - p1)
 					willDelay = true
 				end
