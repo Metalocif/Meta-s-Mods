@@ -435,7 +435,7 @@ a.Poke_MegaCharizardXa = a.MechUnit:new{Image="units/player/MegaCharizardX_a.png
 a.Poke_MegaCharizardX_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaCharizardX_ns = a.Poke_Charizard_ns
 a.Poke_MegaCharizardY =a.MechUnit:new{Image="units/player/MegaCharizardY.png", PosX = -20, PosY = -4}
-a.Poke_MegaCharizardYa = a.MechUnit:new{Image="units/player/MegaCharizardY_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaCharizardYa = a.MechUnit:new{Image="units/player/MegaCharizardY_a.png",  PosX = -20, PosY = -4, NumFrames = 8, Frames = {1,5,2,6,0,4,3,7,0,4,2,6}, Time=0.2}
 a.Poke_MegaCharizardY_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaCharizardY_ns = a.Poke_Charizard_ns
 
