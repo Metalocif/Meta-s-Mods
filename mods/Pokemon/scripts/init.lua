@@ -239,7 +239,20 @@ function mod:load( options, version)
 			end
 		end
     end)
-	modApi:addMissionStartHook(function(mission)	--need to reassign graphics at mission start since the game forgets otherwise
+	
+	
+	
+	local function RemoveExtraWeapons(mission)
+		for id = 0, 2 do
+            local pawn = Game:GetPawn(id)
+			while pawn:GetWeaponCount() >= 3 do
+				LOG("removing a weapon")
+				pawn:RemoveWeapon(3) 
+			end
+		end
+	end
+	
+	local function PickBranchingEvos(mission)
 		GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
 		DoSaveGame()
 		if GAME.BranchingEvos == nil or #GAME.BranchingEvos < 3 then 	--prepare branching evos in first since the menu doesn't pause the game at mission end before evolution
@@ -276,23 +289,51 @@ function mod:load( options, version)
 				end
 			end
 		end
+	end
+	local function PokemonGraphicsWeapons(mission)	--need to reassign graphics at mission start since the game forgets otherwise
         for id = 0, 2 do
-            local pawn = Game:GetPawn(id)
-			local evo = GAME.Poke_Evolutions[id + 1]
-			local branch = GAME.BranchingEvos[id + 1]
-			while pawn:GetWeaponCount() == 3 do
-				LOG("removing a weapon")
-				pawn:RemoveWeapon(3) 
-			end
-			
-			if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
-			
-			if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
-				pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
-				LOG("Gave "..pawn:GetType().." ".._G[pawn:GetType()].KeepAdding[evo])
+            local pawn = Board:GetPawn(id)
+			if pawn then
+				local evo = GAME.Poke_Evolutions[id + 1]
+				local branch = GAME.BranchingEvos[id + 1]
+				while pawn:GetWeaponCount() >= 3 do
+					LOG("removing a weapon")
+					pawn:RemoveWeapon(3) 
+				end
+				
+				if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
+				
+				if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
+					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
+					LOG("Gave "..pawn:GetType().." ".._G[pawn:GetType()].KeepAdding[evo])
+				end
 			end
         end
-    end)
+    end
+	
+	modApi:addMissionStartHook(PokemonGraphicsWeapons)
+	modApi:addTestMechEnteredHook(function(mission)
+		modApi:conditionalHook(function()
+			return true and Pawn ~= nil 
+		end, 
+		function()
+			while Pawn:GetWeaponCount() >= 3 do
+				LOG("removing a weapon")
+				Pawn:RemoveWeapon(3) 
+			end
+			GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
+			local evo = GAME.Poke_Evolutions[Pawn:GetId() + 1]
+			if _G[Pawn:GetType()].KeepAdding ~= nil and _G[Pawn:GetType()].KeepAdding[evo] and _G[Pawn:GetType()].KeepAdding[evo] ~= "" then 
+				Pawn:AddWeapon(_G[Pawn:GetType()].KeepAdding[evo])
+				LOG("Gave "..Pawn:GetType().." ".._G[Pawn:GetType()].KeepAdding[evo])
+			end
+		end)
+	end)
+	
+	modApi:addMissionStartHook(PickBranchingEvos)
+	modApi:addTestMechExitedHook(RemoveExtraWeapons)
+	modApi:addMissionEndHook(RemoveExtraWeapons)
+	
 	modApi:addPostLoadGameHook(function()
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
 		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
