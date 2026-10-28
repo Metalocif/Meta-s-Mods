@@ -7790,8 +7790,8 @@ function Poke_PsychicDomain:GetSecondTargetArea(p1,p2)
 	local ret = PointList()
 	for i = 0, 7 do
 		for j = 0, 7 do
-			local area = math.abs(p2.x - i) * math.abs(p2.y - j)
-			if area % 12 == 0 then ret:push_back(Point(i, j)) end
+			local area = (math.abs(p2.x - i)+1) * (math.abs(p2.y - j)+1)
+			if 12 % area == 0 then ret:push_back(Point(i, j)) end
 		end
 	end
 	return ret
@@ -7805,12 +7805,45 @@ end
 
 function Poke_PsychicDomain:GetFinalEffect(p1,p2,p3)
 	local ret = SkillEffect()
-	local area = math.abs(p2.x - p3.x) * math.abs(p2.y - p3.y)
-	for i = math.min(p2.x, p3.x), math.max(p2.x, p3.x) do
-		for j = math.min(p2.y, p3.y), math.max(p2.y, p3.y) do
-			ret:AddDamage(SpaceDamage(Point(i, j), math.floor(self.Damage / area)))
-		end
-	end
+    local xMin, xMax = math.min(p2.x, p3.x), math.max(p2.x, p3.x)
+    local yMin, yMax = math.min(p2.y, p3.y), math.max(p2.y, p3.y)
+    local area = (xMax - xMin + 1) * (yMax - yMin + 1)
+    
+    local points = {}
+    local visited = {}
+    for i = xMin, xMax do
+        visited[i] = {}
+    end
+    
+    local x, y = xMin, yMin
+    local dx, dy = 1, 0
+    
+    for _ = 1, area do
+        table.insert(points, Point(x, y))
+        visited[x][y] = true
+        
+        local nx, ny = x + dx, y + dy
+        if nx < xMin or nx > xMax or ny < yMin or ny > yMax or visited[nx][ny] then
+            dx, dy = -dy, dx
+            nx, ny = x + dx, y + dy
+        end
+        x, y = nx, ny
+    end
+    
+    -- Add spiral pings with a delay inversely proportional to the area size
+    local delay = 0.6 / area
+    for _, pt in ipairs(points) do
+        ret:AddScript(string.format("Board:Ping(Point(%d, %d), GL_Color(255, 0, 255))", pt.x, pt.y))
+        ret:AddDelay(delay)
+    end
+    
+    -- Deal the damage across the area
+    for _, pt in ipairs(points) do
+		local damage = SpaceDamage(pt, math.floor(self.Damage / area))
+		damage.sAnimation = "confusionAnim"
+		ret:AddDamage(damage)
+		ret:AddDelay(delay)
+    end
 	--reverse mega evo
 	local user = Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
