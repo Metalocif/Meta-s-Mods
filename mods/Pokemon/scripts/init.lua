@@ -291,13 +291,14 @@ function mod:load( options, version)
 		end
 	end
 	local function PokemonGraphicsWeapons(mission)	--need to reassign graphics at mission start since the game forgets otherwise
-        for id = 0, 2 do
+        GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
+		GAME.BranchingEvos = GAME.BranchingEvos or {1, 1, 1}
+		for id = 0, 2 do
             local pawn = Board:GetPawn(id)
 			if pawn then
 				local evo = GAME.Poke_Evolutions[id + 1]
 				local branch = GAME.BranchingEvos[id + 1]
 				while pawn:GetWeaponCount() >= 3 do
-					LOG("removing a weapon")
 					pawn:RemoveWeapon(3) 
 				end
 				
@@ -310,15 +311,62 @@ function mod:load( options, version)
 			end
         end
     end
+	local function PokemonFlightMegas(mission)
+		modApi:conditionalHook(function()
+			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+		end,
+		function()
+			if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
+			-- if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
+			for id = 0,2 do
+				local pawn = Game:GetPawn(id)
+				local evo = GAME.Poke_Evolutions[id + 1]
+				
+				local branch = GAME.BranchingEvos[id + 1]
+				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
+				if GetCurrentMission().MegaEvolved == id then evo = evo + 1 end
+				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
+					local weaponToAdd = _G[pawn:GetType()].KeepAdding[evo]
+					local hasWeapon = false
+					for i = pawn:GetWeaponCount(), 1, -1 do
+						if pawn:GetWeaponBaseType(i) == weaponToAdd then hasWeapon = true end
+					end
+					if not hasWeapon then pawn:AddWeapon(weaponToAdd) end
+				end
+				
+				local groundedAboveLevel = _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] or -1
+				local flyingAboveLevel = _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] or 99
+				local startGrounded = flyingAboveLevel < 99
+				
+				local flyingTable = {}
+				for level = 0, 3 do
+					local canFly = startGrounded or false
+					if flyingAboveLevel and level >= flyingAboveLevel then canFly = true end
+					if groundedAboveLevel and level >= groundedAboveLevel then canFly = false end
+					if flyingAboveLevel > groundedAboveLevel and level >= flyingAboveLevel then canFly = true end
+					flyingTable[level] = canFly
+				end
+				
+				pawn:SetFlying(flyingTable[evo])
+				
+				if GetCurrentMission().MegaEvolved == id then
+					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
+					pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])
+				end
+			end
+		end)
+	end
 	
+	modApi:addMissionStartHook(PickBranchingEvos)
 	modApi:addMissionStartHook(PokemonGraphicsWeapons)
+	modApi:addMissionStartHook(PokemonFlightMegas)
+	
 	modApi:addTestMechEnteredHook(function(mission)
 		modApi:conditionalHook(function()
 			return true and Pawn ~= nil 
 		end, 
 		function()
 			while Pawn:GetWeaponCount() >= 3 do
-				LOG("removing a weapon")
 				Pawn:RemoveWeapon(3) 
 			end
 			GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
@@ -330,80 +378,16 @@ function mod:load( options, version)
 		end)
 	end)
 	
-	modApi:addMissionStartHook(PickBranchingEvos)
+	
 	modApi:addTestMechExitedHook(RemoveExtraWeapons)
 	modApi:addMissionEndHook(RemoveExtraWeapons)
 	
-	modApi:addPostLoadGameHook(function()
-		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
-		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
-		--We are not immediately in a mission after resetting turn, so I add a temporary hook that'll only trigger once we are
-		modApi:conditionalHook(function()
-			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
-		end, 
-		function()
-			for id = 0,2 do
-				local pawn = Game:GetPawn(id)
-				local evo = GAME.Poke_Evolutions[id + 1]
-				local branch = GAME.BranchingEvos[id + 1]
-				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
-				if _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
-				if _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
-				-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
-				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
-					local weaponToAdd = _G[pawn:GetType()].KeepAdding[evo]
-					local hasWeapon = false
-					for i = pawn:GetWeaponCount(), 1, -1 do
-						if pawn:GetWeaponBaseType(i) == weaponToAdd then hasWeapon = true end
-					end
-					if not hasWeapon then pawn:AddWeapon(weaponToAdd) end
-				end
-				
-				if _G[pawn:GetType()].BecomeFlyingAtLevel ~= nil and
-				   _G[pawn:GetType()].BecomeFlyingAtLevel[branch] and
-				   _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then
-					_G[pawn:GetType()].Flying = true
-				end
-				if _G[pawn:GetType()].LoseFlyingAtLevel ~= nil and 
-				   _G[pawn:GetType()].LoseFlyingAtLevel[branch] and
-				   _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then 
-				   _G[pawn:GetType()].Flying = false
-				end
-				
-				if GetCurrentMission().MegaEvolved == id then
-					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
-					pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])
-				end
-			end
-		end)
-    end)
-	modApi:addMissionNextPhaseCreatedHook(function()
-		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
-		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
-		--We are not immediately in a mission after falling into the Volcanic Cave, so I add a temporary hook that'll only trigger once we are
-		modApi:conditionalHook(function()
-			return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
-		end, 
-		function()
-			for id = 0, 2 do
-				local pawn = Game:GetPawn(id)
-				local evo = GAME.Poke_Evolutions[id + 1]
-				local branch = GAME.BranchingEvos[id + 1]
-				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
-				if _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] <= evo then pawn:SetFlying(true) end
-				if _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] <= evo then pawn:SetFlying(false) end
-				-- if _G[pawn:GetType()].HealthAtLevel and evo > 0 then pawn:SetMaxHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) pawn:SetHealth(pawn:GetHealth() + _G[pawn:GetType()].HealthAtLevel[evo]) end
-				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
-					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
-				end
-				if GetCurrentMission().MegaEvolved == id then
-					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
-					pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])
-				end
-			end
-		end)
-    end)
+	modApi:addPostLoadGameHook(PokemonFlightMegas)
+	
+	modApi:addMissionNextPhaseCreatedHook(PokemonFlightMegas)
+	
 	modApi:addNextTurnHook(function(mission)
+		--Mega Evolve a dead Pokemon
 		DoSaveGame()
 		if not GameData then return end
 		for id = 0, 2 do
@@ -425,12 +409,13 @@ function mod:load( options, version)
 			end
 		end
 	end)
+	
 	modApi.events.onPawnSelectedForDeployment:subscribe(function(pawnId)
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
-		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
+		local branches = GAME.BranchingEvos or {1, 1, 1}
 		if options["PokemonDeployment"] and options["PokemonDeployment"].enabled then
 			local pilotLevel = GameData and GameData.current["pilot"..pawnId].level or 0
-			local branch = GAME.BranchingEvos[pawnId+1]
+			local branch = branches[pawnId+1]
 			if _G[Board:GetPawn(pawnId):GetType()].EvoNames ~= nil and branch ~= nil then
 				LOG(_G[Board:GetPawn(pawnId):GetType()].EvoNames[branch][pilotLevel+1])
 				Board:AddAlert(Point(1, 1), _G[Board:GetPawn(pawnId):GetType()].EvoNames[branch][pilotLevel+1])
