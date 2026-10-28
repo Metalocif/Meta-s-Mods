@@ -403,6 +403,9 @@ function mod:load( options, version)
 					delay:AddDelay(0.1)
 					Board:AddEffect(delay)
 				end
+				while pawn:GetWeaponCount() >= 3 do
+					pawn:RemoveWeapon(3) 
+				end
 				pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
 				pawn:AddWeapon(_G[pawn:GetType()].MegaEvoMoves[branch])
 				mission.MegaEvolved = id	--max once per mission, even if more than one can mega evolve
