@@ -7691,12 +7691,13 @@ Poke_Outrage = Skill:new{
 	Description = "The user rampages, dealing damage in a large area. When this weapon runs out of uses, it recovers one use and the user becomes confused.",
 	Push = 1,--TOOLTIP HELPER
 	Damage = 3,
+	Range = 3,
 	SelfDamage = 0,
 	PathSize = 1,
 	PowerCost = 0,
 	Limited = 2,
 	Upgrades = 2,
-	UpgradeList = { "+1 Use", "+1 Use" },
+	UpgradeList = { "+1 Range", "+1 Use" },
 	UpgradeCost = { 1,2 },
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
@@ -7707,14 +7708,14 @@ Poke_Outrage = Skill:new{
 		CustomPawn = "Poke_Magikarp",
 	}
 }
-Poke_Outrage_A = Poke_Outrage:new{ UpgradeDescription = "Can be used one more time before confusion sets in.", Limited = 3,}
+Poke_Outrage_A = Poke_Outrage:new{ UpgradeDescription = "Increases range by one tile.", Range = 4,}
 Poke_Outrage_B = Poke_Outrage:new{ UpgradeDescription = "Can be used one more time before confusion sets in.", Limited = 3,}	
-Poke_Outrage_AB = Poke_Outrage:new{ Limited = 3,}
+Poke_Outrage_AB = Poke_Outrage:new{ Limited = 3, Range = 4,}
 
 function Poke_Outrage:GetTargetArea(p1)
 	local ret = PointList()
 	for i = DIR_START, DIR_END do
-		for j = 1, 3 do
+		for j = 1, self.Range do
 			ret:push_back(p1 + DIR_VECTORS[i]*j)
 		end
 	end

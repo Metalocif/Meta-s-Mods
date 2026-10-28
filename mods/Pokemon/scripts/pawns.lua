@@ -1031,6 +1031,7 @@ Poke_Arceus = Pawn:new{
 	Massive = true,
 	Corpse = true,
 	Flying = true,
+	LargeShield = true,
 	Image = "Poke_Arceus",
 	SkillList = {"Poke_Judgment" },
 	SoundLocation = "/enemy/jelly_1/",
@@ -1163,10 +1164,12 @@ Poke_Magikarp = Pawn:new{
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, false },
-	EvoGraphics = { { "Poke_Gyarados" } },
+	EvoGraphics = { { "Poke_Gyarados", "Poke_Gyarados" } },
 	EvoForget = { "Poke_Splash" },
 	EvoLearn = { { { "Poke_Outrage", "Poke_HyperBeam" } } },
 	IsDragon = true,
+	BecomeFlyingAtLevel = {1},
+	Flying = true,
 }
 
 
