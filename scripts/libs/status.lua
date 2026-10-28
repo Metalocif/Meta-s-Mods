@@ -1075,6 +1075,7 @@ function Status.ApplyTough(id, value)
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if Status.IsImmuneTo(pawn, "Tough") then return end
+	value = value or 1
 	mission.ToughTable = mission.ToughTable or {}
 	mission.ToughTable[id] = value
 	CustomAnim:add(id, "StatusTough")
