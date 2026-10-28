@@ -497,7 +497,7 @@ a.Poke_Gyaradosa = a.MechUnit:new{Image="units/player/Gyarados_a.png",  PosX = -
 a.Poke_Gyarados_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -42, PosY = -2 }
 a.Poke_Gyarados_ns = a.MechIcon:new{Image="units/player/Gyarados_ns.png"}
 a.Poke_Gyaradosw =a.MechUnit:new{Image="units/player/Gyarados_w.png", PosX = -35, PosY = -24}
-a.Poke_Gyaradosshell_ns = a.Poke_Gyarados_ns
+a.Poke_Gyarados_sleep = a.MechUnit:new{Image="units/player/Gyarados_sleep.png",  PosX = -32, PosY = -24, NumFrames = 6, Time = .5 }
 
 modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
