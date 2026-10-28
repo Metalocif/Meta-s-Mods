@@ -7743,6 +7743,7 @@ function Poke_Outrage:GetSkillEffect(p1,p2)
 		end
 	end
 	local pawn = Board:GetPawn(p1) 
+	if not pawn then return ret end
 	local weapons = pawn:GetEquippedWeapons() 
 	for i = 1, pawn:GetWeaponCount() do
 		if weapons[i] == "Poke_Outrage" and pawn:GetWeaponLimitedRemaining(i) <= 1 then
