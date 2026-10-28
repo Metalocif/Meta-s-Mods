@@ -8076,3 +8076,102 @@ function Poke_AbyssalEnd:GetSkillEffect(p1, p2)
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
     return ret
 end
+
+
+Poke_BlindRage=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/BlindRage.png",	
+	Rarity = 3,
+	Name = "Blind Rage",
+	Description = "Leap twice, dealing 3 damage and pushing adjacent units each time. The user becomes blind afterwards.",
+	Damage = 3,
+	PathSize = 8,	
+	PowerCost = 0,
+	TwoClick = true,
+	Upgrades = 0,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,1),
+		Enemy1 = Point(2,2),
+		Enemy1 = Point(2,3),
+		-- Second_Origin = Point(2,1),
+		Second_Target = Point(2,4),
+		Second_Click = Point(2,4),
+		CustomPawn = "Poke_Magikarp",
+	}
+}
+
+function Poke_BlindRage:GetTargetArea(p1)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			if p1:Manhattan(Point(i, j)) > 2 and p1:Manhattan(Point(i, j)) <= 5 and not Board:IsBlocked(Point(i, j), PATH_PROJECTILE) then ret:push_back(Point(i, j)) end
+		end
+	end
+	return ret
+end
+
+function Poke_BlindRage:GetSecondTargetArea(p1, p2)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			if p2:Manhattan(Point(i, j)) > 2 and p2:Manhattan(Point(i, j)) <= 5 and not Board:IsBlocked(Point(i, j), PATH_PROJECTILE) then ret:push_back(Point(i, j)) end
+		end
+	end
+	return ret
+end
+
+function Poke_BlindRage:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	local move = PointList()
+	move:push_back(p1)
+	move:push_back(p2)
+	ret:AddLeap(move, FULL_DELAY)
+	for i = DIR_START, DIR_END do
+		ret:AddDamage(SpaceDamage(p2+DIR_VECTORS[i], self.Damage, i))
+	end
+	local blind = SpaceDamage(p2)
+	blind.iBlind = 1
+	ret:AddDamage(blind)
+	return ret
+end
+
+function Poke_BlindRage:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	local user = Board:GetPawn(p1)
+	local move = PointList()
+	move:push_back(p1)
+	move:push_back(p2)
+	ret:AddLeap(move, FULL_DELAY)
+	ret:AddBounce(p2, -3)
+	for i = DIR_START, DIR_END do
+		ret:AddDamage(SpaceDamage(p2+DIR_VECTORS[i], self.Damage, i))
+	end
+	local move = PointList()
+	move:push_back(p2)
+	move:push_back(p3)
+	ret:AddLeap(move, FULL_DELAY)
+	ret:AddBounce(p2, -3)
+	for i = DIR_START, DIR_END do
+		ret:AddDamage(SpaceDamage(p2+DIR_VECTORS[i], self.Damage, i))
+	end
+	local blind = SpaceDamage(p3)
+	blind.iBlind = 1
+	ret:AddDamage(blind)
+	--reverse mega evo
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_BlindRage" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	if _G[user:GetType()].KeepAdding then user:AddWeapon(_G[user:GetType()].KeepAdding[2]) end
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+	return ret
+end

@@ -517,6 +517,9 @@ a.Poke_Gyarados_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX 
 a.Poke_Gyarados_ns = a.MechIcon:new{Image="units/player/Gyarados_ns.png"}
 a.Poke_Gyaradosw =a.MechUnit:new{Image="units/player/Gyarados_w.png", PosX = -35, PosY = -24}
 a.Poke_Gyarados_sleep = a.MechUnit:new{Image="units/player/Gyarados_sleep.png",  PosX = -32, PosY = -24, NumFrames = 6, Time = .5 }
+a.Poke_MegaGyarados =a.MechUnit:new{Image="units/player/Gyarados.png", PosX = -42, PosY = -24}
+a.Poke_MegaGyaradosa = a.MechUnit:new{Image="units/player/MegaGyarados_a.png",  PosX = -47, PosY = -29, NumFrames = 6, Frames={0,1,0,2,3,2,4,5,4,2,3,2} }
+a.Poke_MegaGyarados_ns = a.MechIcon:new{Image="units/player/Gyarados_ns.png"}
 
 modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
@@ -1202,6 +1205,9 @@ Poke_Magikarp = Pawn:new{
 	IsDragon = true,
 	BecomeFlyingAtLevel = {1},
 	Flying = true,
+	MegaEvos = { "Poke_MegaGyarados" },
+	MegaEvoMoves = { "Poke_BlindRage" },
+	MegaEvoNames = { "Mega Gyarados" },
 }
 
 
