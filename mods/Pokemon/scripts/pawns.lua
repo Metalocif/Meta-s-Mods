@@ -241,8 +241,8 @@ a.Poke_MegaGarchomp =a.MechUnit:new{Image="units/player/MegaGarchomp.png", PosX 
 a.Poke_MegaGarchompa = a.MechUnit:new{Image="units/player/MegaGarchomp_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
 a.Poke_MegaGarchomp_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaGarchomp_ns = a.MechIcon:new{Image="units/player/Garchomp_ns.png"}
-a.Poke_MegaGarchompZ =a.MechUnit:new{Image="units/player/MegaGarchompZ.png", PosX = -10, PosY = -4}
-a.Poke_MegaGarchompZa = a.MechUnit:new{Image="units/player/MegaGarchompZ_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaGarchompZ =a.MechUnit:new{Image="units/player/MegaGarchompZ.png", PosX = -10, PosY = -14}
+a.Poke_MegaGarchompZa = a.MechUnit:new{Image="units/player/MegaGarchompZ_a.png",  PosX = -20, PosY = -14, NumFrames = 6, Frames = {0,1,2,3,4,5,4,3,2,1}, }
 a.Poke_MegaGarchompZ_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaGarchompZ_ns = a.MechIcon:new{Image="units/player/Garchomp_ns.png"}
 a.Poke_MegaGarchompw =a.MechUnit:new{Image="units/player/MegaGarchomp_w.png", PosX = -20, PosY = 6}
@@ -874,7 +874,7 @@ Poke_Gible = Pawn:new{
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_FLESH,
 	HasEvolutions = { true, true },
-	EvoGraphics = { { "Poke_Gabite", "Poke_Garchomp" } },
+	EvoGraphics = { { "Poke_Gabite", "Poke_Garchomp" }, { "Poke_Gabite", "Poke_Garchomp" } },
 	EvoForget = { "Poke_Bite", "" },
 	EvoLearn = { { { "Poke_Crunch" }, { "Poke_Earthquake" } },
 				 { { "Poke_Crunch" }, { "Poke_Earthquake" } }	
