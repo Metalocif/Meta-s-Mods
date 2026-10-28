@@ -2446,7 +2446,7 @@ function Poke_TakeDown:GetSkillEffect(p1,p2)
 	local amountDealt = self.Damage
 	local pawnHit = Board:GetPawn(target)
 	if pawnHit then
-		if Board:GetPawn(p1):IsBoosted() then amountDealt = amountDealt + 1 end
+		if Board:GetPawn(p1) and Board:GetPawn(p1):IsBoosted() then amountDealt = amountDealt + 1 end
 		if pawnHit:IsAcid() then
 			amountDealt = amountDealt * 2
 		elseif pawnHit:IsArmor() then
@@ -2529,6 +2529,7 @@ function Poke_ZenHeadbutt:GetSkillEffect(p1,p2)
 	local target = p2
 	local distance = p1:Manhattan(target)
 	local user = Board:GetPawn(p1)
+	if not user then return ret end
 	local resetAnim
 	if user:GetCustomAnim() == "Poke_Metagross" and (p1:Manhattan(p2) > 1 or not Board:IsBlocked(p2, PATH_PROJECTILE)) and not Board:IsTipImage() then
 		resetAnim = true
@@ -2827,7 +2828,7 @@ Poke_Earthquake=Skill:new{
 	ZoneTargeting = ZONE_DIR,
 	TipImage = {
 		Unit = Point(2,4),
-		Target = Point(2,0),
+		Target = Point(2,1),
 		Enemy1 = Point(2,2),
 		Enemy2 = Point(1,1),
 		Building1 = Point(3,0),
@@ -7743,4 +7744,298 @@ function Poke_Outrage:GetSkillEffect(p1,p2)
 		end
 	end
 	return ret
+end
+
+
+
+Poke_PsychicDomain = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/PsychicDomain.png",	
+	Rarity = 3,
+	Name = "Psychic Domain",
+	Description = "Deal 12 damage evenly spread in a rectangle. Its area must be a divisor of 12.",
+	Push = 1,	
+	MinDamage = 1,
+	Damage = 12,
+	PathSize = 8,
+	PowerCost = 0,
+	Duration = 1,
+	Upgrades = 0,
+	TwoClick = true,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,2),
+		Enemy1 = Point(2,1),
+		Enemy2 = Point(1,2),
+		Water = Point(2,0),
+		Target = Point(1,1),
+		Second_Origin = Point(2,2),
+		Second_Target = Point(2,0),
+		Second_Click = Point(2,0),
+		CustomPawn = "Poke_Beldum",
+	}
+}
+
+function Poke_PsychicDomain:GetTargetArea(point)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			ret:push_back(Point(i, j))
+		end
+	end
+	return ret
+end
+
+function Poke_PsychicDomain:GetSecondTargetArea(p1,p2)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			local area = math.abs(p2.x - i) * math.abs(p2.y - j)
+			if area % 12 == 0 then ret:push_back(Point(i, j)) end
+		end
+	end
+	return ret
+end
+
+function Poke_PsychicDomain:GetSkillEffect(p1,p2)
+	local ret = SkillEffect()
+	ret:AddDamage(SpaceDamage(p2, self.Damage))
+	return ret
+end
+
+function Poke_PsychicDomain:GetFinalEffect(p1,p2,p3)
+	local ret = SkillEffect()
+	local area = math.abs(p2.x - p3.x) * math.abs(p2.y - p3.y)
+	for i = math.min(p2.x, p3.x), math.max(p2.x, p3.x) do
+		for j = math.min(p2.y, p3.y), math.max(p2.y, p3.y) do
+			ret:AddDamage(SpaceDamage(Point(i, j), math.floor(self.Damage / area)))
+		end
+	end
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_PsychicDomain" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+	return ret
+end
+
+Poke_DraconicBuster = LineArtillery:new{
+	Class = "TechnoVek",
+	Icon = "weapons/DraconicBuster.png",	
+	Rarity = 3,
+	Name = "Draconic Buster",
+	Description = "Throw a powerful projectile dealing 3 damage and cracking tiles in an area.",
+	Push = 1,--TOOLTIP HELPER
+	Damage = 3,
+	PathSize = 8,	--automatically makes a target area?
+	PowerCost = 0,
+	Upgrades = 0,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Building = Point(2,2),
+		Target = Point(2,1),
+		Enemy = Point(2,1),
+		CustomPawn = "Poke_Gible",
+	}
+}
+function Poke_DraconicBuster:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2, self.Damage)
+	damage.sAnimation = "ExploArt1"
+	damage.iCrack = 1
+	ret:AddArtillery(p1, damage, "effects/shotup_dragonrage.png", PROJ_DELAY)
+	for i = DIR_START, DIR_END do
+		local outerDamage = SpaceDamage(p2+DIR_VECTORS[i], self.Damage)
+		outerDamage.iCrack = 1
+		ret:AddDamage(outerDamage)
+	end
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_DraconicBuster" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+	return ret
+end
+
+
+Poke_ExtremeSpeed=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/ExtremeSpeed.png",	
+	Rarity = 3,
+	Name = "Extreme Speed",
+	Description = "Dash in 2 directions, phasing through terrain and units. Deals damage equal to distance crossed and pushes.",
+	Push = 1,--TOOLTIP HELPER
+	MinDamage = 1,
+	Damage = 8,
+	PathSize = 8,	
+	PowerCost = 0,
+	TwoClick = true,
+	Upgrades = 0,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,1),
+		Enemy1 = Point(2,2),
+		Enemy1 = Point(2,3),
+		-- Second_Origin = Point(2,1),
+		Second_Target = Point(2,4),
+		Second_Click = Point(2,4),
+		CustomPawn = "Poke_Dratini",
+	}
+}
+
+function Poke_ExtremeSpeed:GetTargetArea(p1)
+	local ret = PointList()
+	for dir = DIR_START, DIR_END do
+		for j = 1, 8 do
+			if not Board:IsBlocked(p1+DIR_VECTORS[dir] * j, PATH_PROJECTILE) then ret:push_back(p1+DIR_VECTORS[dir] * j) end
+		end
+	end
+	return ret
+end
+
+function Poke_ExtremeSpeed:GetSecondTargetArea(p1, p2)
+	local ret = PointList()
+	-- ret:push_back(p2)
+	for dir = DIR_START, DIR_END do
+		for i = 1, 8 do
+			local curr = p2 + DIR_VECTORS[dir] * i
+			if curr == p1 or not Board:IsBlocked(curr, PATH_PROJECTILE) then ret:push_back(curr) end
+		end
+	end
+	return ret
+end
+
+function Poke_ExtremeSpeed:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local dir = GetDirection(p2-p1)
+	local move = PointList()
+	move:push_back(p1)
+	move:push_back(p2)
+	local target = p1 + DIR_VECTORS[dir]
+	ret:AddCharge(move, FULL_DELAY)
+	if Board:IsValid(target) then ret:AddDamage(SpaceDamage(p2, p1:Manhattan(p2), dir)) end
+	return ret
+end
+
+function Poke_ExtremeSpeed:GetFinalEffect(p1, p2, p3)
+	local ret = SkillEffect()
+	local dir1 = GetDirection(p2-p1)
+	local move1 = PointList()
+	move1:push_back(p1)
+	move1:push_back(p2)
+	local dir2 = GetDirection(p3-p2)
+	local move2 = PointList()
+	move2:push_back(p2)
+	move2:push_back(p3)
+	local target1 = p2 + DIR_VECTORS[dir1]
+	local target2 = p3 + DIR_VECTORS[dir2]
+	ret:AddCharge(move1, FULL_DELAY)
+	if Board:IsValid(target1) then ret:AddDamage(SpaceDamage(target1, p1:Manhattan(p2), dir1)) end
+	ret:AddCharge(move1, FULL_DELAY)
+	if Board:IsValid(target2) then ret:AddDamage(SpaceDamage(target2, p2:Manhattan(p3), dir2)) end
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_ExtremeSpeed" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+	return ret
+end
+
+Poke_AbyssalEnd = Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/AbyssalEnd.png",	
+	Rarity = 3,
+	Name = "Abyssal End",
+	Description = "All sleeping enemy units are permanently moved to the Nightmare Realm.",
+	Damage = DAMAGE_DEATH,
+	PathSize = 8,
+	PowerCost = 0,
+	Duration = 1,
+	Upgrades = 0,
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,2),
+		Enemy1 = Point(2,1),
+		Enemy2 = Point(1,2),
+		Water = Point(2,0),
+		Target = Point(1,1),
+		Second_Origin = Point(2,2),
+		Second_Target = Point(2,0),
+		Second_Click = Point(2,0),
+		CustomPawn = "Poke_Beldum",
+	}
+}
+
+function Poke_AbyssalEnd:GetTargetArea(point)
+	local ret = PointList()
+	for i = 0, 7 do
+		for j = 0, 7 do
+			ret:push_back(Point(i, j))
+		end
+	end
+	return ret
+end
+
+function Poke_AbyssalEnd:GetSkillEffect(p1, p2)
+    local ret = SkillEffect()
+    for i = 0, 7 do
+        for j = 0, 7 do
+            local point = Point(i, j)
+            local pawn = Board:GetPawn(point)
+            if pawn and pawn:GetTeam() == TEAM_ENEMY and Status.GetStatus(pawn:GetId(), "Sleep") and not pawn:IsDead() then
+                local id = pawn:GetId()
+                ret:AddScript(string.format([[
+                    local function pingAndRemove(count, pawnId, pt)
+                        local target = Board:GetPawn(pawnId)
+                        if count > 0 then
+                            Board:Ping(pt, GL_Color(0, 0, 0))
+                            modApi:runLater(function()
+                                pingAndRemove(count - 1, pawnId, pt)
+                            end)
+                        else
+                            target:SetSpace(Point(-491, -491))
+                        end
+                    end
+                    pingAndRemove(10, %s, Point(%s, %s))
+                ]], id, i, j))
+                ret:AddDamage(SpaceDamage(point, DAMAGE_ZERO))
+            end
+        end
+    end
+	--reverse mega evo
+	local user = Board:GetPawn(p1)
+	for i = user:GetWeaponCount(), 1, -1 do
+		if user:GetWeaponBaseType(i) == "Poke_AbyssalEnd" then 
+			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
+			break 
+		end
+	end
+	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+	end	
+	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
+    return ret
 end
