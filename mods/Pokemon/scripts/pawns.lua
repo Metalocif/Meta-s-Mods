@@ -14,7 +14,7 @@
 -- EvoLearn: lists the weapons to learn on evolution. You can learn more than one per level; if they overflow into slots 3+ they seem to get removed randomly.
 -- EvoNames: solely here for the alert messages.
 -- KeepAdding: weapons to keep adding to the pawn at the start of each mission, since they seem to get removed otherwise. You can't upgrade these.
--- BecomeFlyingAtLevel: makes the pawn flying at that level.
+-- BecomeFlyingAtLevel: makes the pawn flying at that level. Counts Mega Evo, so level 3 means "only when mega evolved" and level 4 means "never".
 -- LoseFlyingAtLevel: makes the pawn not flying at that level.
 --   o It would make more sense for the above two to be a table of table of functions to run if we had a ton of such possibilities. 
 
@@ -71,6 +71,11 @@ a.Poke_Dragonite_broken = a.MechUnit:new{Image="units/player/HyperBall.png", Pos
 -- a.Poke_Dragonitew_broken = a.MechUnit:new{Image="units/player/Dragonite_w_broken.png", PosX = -15, PosY = 4 }
 a.Poke_Dragonite_ns = a.MechIcon:new{Image="units/player/Dragonite_ns.png"}
 a.Poke_Dragonite_sleep = a.MechUnit:new{Image="units/player/Dragonite_sleep.png", PosX = -15, PosY = -12, NumFrames = 2, Time = 1 }
+a.Poke_MegaDragonite =a.MechUnit:new{Image="units/player/MegaDragonite.png", PosX = -10, PosY = -4}
+a.Poke_MegaDragonitea = a.MechUnit:new{Image="units/player/MegaDragonite_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaDragonite_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaDragonite_ns = a.MechIcon:new{Image="units/player/Dragonite_ns.png"}
+a.Poke_MegaDragonite_sleep = a.MechUnit:new{Image="units/player/MegaDragonite_sleep.png", PosX = -15, PosY = -12, NumFrames = 2, Time = 1 }
 
 
 a.Poke_Mew =a.MechUnit:new{Image="units/player/Mew.png", PosX = -20, PosY = -4}
@@ -114,6 +119,11 @@ a.Poke_Darkrai =a.MechUnit:new{Image="units/player/Darkrai.png", PosX = -20, Pos
 a.Poke_Darkraia = a.MechUnit:new{Image="units/player/Darkrai_a.png",  PosX = -20, PosY = -14, NumFrames = 8 }
 a.Poke_Darkrai_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Darkrai_ns = a.MechIcon:new{Image="units/player/Darkrai_ns.png"}
+a.Poke_MegaDarkrai =a.MechUnit:new{Image="units/player/MegaDarkrai.png", PosX = -10, PosY = -4}
+a.Poke_MegaDarkraia = a.MechUnit:new{Image="units/player/MegaDarkrai_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaDarkrai_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaDarkrai_ns = a.MechIcon:new{Image="units/player/Darkrai_ns.png"}
+
 
 a.Poke_Deoxys =a.MechUnit:new{Image="units/player/Deoxys.png", PosX = -20, PosY = -4}
 a.Poke_Deoxysw =a.MechUnit:new{Image="units/player/Deoxys_w.png", PosX = -18, PosY = -1}
@@ -203,6 +213,11 @@ a.Poke_Metagross_hover = a.MechUnit:new{Image="units/player/Metagross_hover.png"
 a.Poke_Metagross_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -15, PosY = -2 }
 a.Poke_Metagross_ns = a.MechIcon:new{Image="units/player/Metagross_ns.png"}
 a.Poke_Metagrossw =a.MechUnit:new{Image="units/player/Metagross_w.png", PosX = -23, PosY = 9}
+a.Poke_MegaMetagross =a.MechUnit:new{Image="units/player/MegaMetagross.png", PosX = -10, PosY = -4}
+a.Poke_MegaMetagrossa = a.MechUnit:new{Image="units/player/MegaMetagross_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaMetagross_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaMetagross_ns = a.MechIcon:new{Image="units/player/Metagross_ns.png"}
+
 
 
 a.Poke_Gible =a.MechUnit:new{Image="units/player/Gible.png", PosX = -10, PosY = -4}
@@ -226,6 +241,10 @@ a.Poke_MegaGarchomp =a.MechUnit:new{Image="units/player/MegaGarchomp.png", PosX 
 a.Poke_MegaGarchompa = a.MechUnit:new{Image="units/player/MegaGarchomp_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
 a.Poke_MegaGarchomp_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaGarchomp_ns = a.MechIcon:new{Image="units/player/Garchomp_ns.png"}
+a.Poke_MegaGarchompZ =a.MechUnit:new{Image="units/player/MegaGarchompZ.png", PosX = -10, PosY = -4}
+a.Poke_MegaGarchompZa = a.MechUnit:new{Image="units/player/MegaGarchompZ_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaGarchompZ_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
+a.Poke_MegaGarchompZ_ns = a.MechIcon:new{Image="units/player/Garchomp_ns.png"}
 a.Poke_MegaGarchompw =a.MechUnit:new{Image="units/player/MegaGarchomp_w.png", PosX = -20, PosY = 6}
 a.Poke_DracoMeteor = a.MechUnit:new{Image="units/player/DracoMeteor.png",  PosX = -20, PosY = -4, NumFrames = 1, }
 a.Poke_DracoMeteora = a.Poke_DracoMeteor
@@ -580,6 +599,9 @@ Poke_Dratini = Pawn:new{
 	EvoLearn = { { { "Poke_Twister" }, { "Poke_Fly" } } },
 	EvoNames = { { "Dratini", "Dragonair", "Dragonite" } },
 	KeepAdding = { "", "Poke_HyperBeam" },
+	MegaEvos = { "Poke_MegaDragonite" },
+	MegaEvoMoves = { "Poke_ExtremeSpeed" },
+	MegaEvoNames = { "Mega Dragonite" },
 	BecomeFlyingAtLevel = {2},
 	Flying = true,
 	IsDragon = true,
@@ -687,6 +709,9 @@ Poke_Darkrai = Pawn:new{
 	HasEvolutions = { false, true },
 	EvoForget = { "", "Poke_Hypnosis" },
 	EvoLearn = { { { }, { "Poke_DarkVoid" } } },
+	MegaEvos = { "Poke_MegaDarkrai" },
+	MegaEvoMoves = { "Poke_AbyssalEnd" },
+	MegaEvoNames = { "Mega Darkrai" },
 }
 Poke_Deoxys = Pawn:new{
 	Name = "Deoxys",
@@ -829,7 +854,11 @@ Poke_Beldum = Pawn:new{
 	EvoForget = { "Poke_TakeDown", "Poke_MetalClaw" },
 	EvoLearn = { { { "Poke_MetalClaw", "Poke_ZenHeadbutt" }, { "Poke_MeteorMash" } } },
 	EvoNames = { { "Beldum", "Metang", "Metagross" } },
+	MegaEvos = { "Poke_MegaMetagross" },
+	MegaEvoMoves = { "Poke_PsychicDomain" },
+	MegaEvoNames = { "Mega Metagross" },
 	LoseFlyingAtLevel = {2},
+	BecomeFlyingAtLevel = {3},
 	SandstormImmune = true,
 }
 Poke_Gible = Pawn:new{
@@ -847,11 +876,14 @@ Poke_Gible = Pawn:new{
 	HasEvolutions = { true, true },
 	EvoGraphics = { { "Poke_Gabite", "Poke_Garchomp" } },
 	EvoForget = { "Poke_Bite", "" },
-	EvoLearn = { { { "Poke_Crunch" }, { "Poke_Earthquake" } } },
+	EvoLearn = { { { "Poke_Crunch" }, { "Poke_Earthquake" } },
+				 { { "Poke_Crunch" }, { "Poke_Earthquake" } }	
+			   },
 	EvoNames = { { "Gible", "Gabite", "Garchomp" } },
-	MegaEvos = { "Poke_MegaGarchomp" },
-	MegaEvoMoves = { "Poke_DracoMeteor" },
-	MegaEvoNames = { "Mega Garchomp" },
+	MegaEvos = { "Poke_MegaGarchomp", "Poke_MegaGarchompZ" },
+	MegaEvoMoves = { "Poke_DracoMeteor", "Poke_DraconicBuster" },
+	MegaEvoNames = { "Mega Garchomp", "Mega Garchomp Z" },
+	BecomeFlyingAtLevel = {4, 3},
 	IsDragon = true,
 	SandstormImmune = true,
 }
@@ -926,7 +958,7 @@ Poke_Ralts = Pawn:new{
 	EvoNames = { { "Ralts", "Kirlia", "Gardevoir" },
 				 { "Ralts", "Kirlia", "Gallade" },
 			   },
-    BecomeFlyingAtLevel = {2, 3},	--only happens in one branch
+    BecomeFlyingAtLevel = {2, 4},	--only happens in one branch
 	Flying = true,
 }
 Poke_Scyther = Pawn:new{
