@@ -7944,11 +7944,14 @@ end
 
 function Poke_ExtremeSpeed:GetSecondTargetArea(p1, p2)
 	local ret = PointList()
+	local prevDir = GetDirection(p2-p1)
 	-- ret:push_back(p2)
 	for dir = DIR_START, DIR_END do
-		for i = 1, 8 do
-			local curr = p2 + DIR_VECTORS[dir] * i
-			if curr == p1 or not Board:IsBlocked(curr, PATH_PROJECTILE) then ret:push_back(curr) end
+		if dir ~= prevDir and dir ~= (prevDir+2)%4 then
+			for i = 1, 8 do
+				local curr = p2 + DIR_VECTORS[dir] * i
+				if curr == p1 or not Board:IsBlocked(curr, PATH_PROJECTILE) then ret:push_back(curr) end
+			end
 		end
 	end
 	return ret
@@ -7960,14 +7963,15 @@ function Poke_ExtremeSpeed:GetSkillEffect(p1, p2)
 	local move = PointList()
 	move:push_back(p1)
 	move:push_back(p2)
-	local target = p1 + DIR_VECTORS[dir]
+	local target = p2 + DIR_VECTORS[dir]
 	ret:AddCharge(move, FULL_DELAY)
-	if Board:IsValid(target) then ret:AddDamage(SpaceDamage(p2, p1:Manhattan(p2), dir)) end
+	if Board:IsValid(target) then ret:AddDamage(SpaceDamage(target, p1:Manhattan(p2), dir)) end
 	return ret
 end
 
 function Poke_ExtremeSpeed:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
+	local user = Board:GetPawn(p1)
 	local dir1 = GetDirection(p2-p1)
 	local move1 = PointList()
 	move1:push_back(p1)
@@ -7983,7 +7987,6 @@ function Poke_ExtremeSpeed:GetFinalEffect(p1, p2, p3)
 	ret:AddCharge(move1, FULL_DELAY)
 	if Board:IsValid(target2) then ret:AddDamage(SpaceDamage(target2, p2:Manhattan(p3), dir2)) end
 	--reverse mega evo
-	local user = Board:GetPawn(p1)
 	for i = user:GetWeaponCount(), 1, -1 do
 		if user:GetWeaponBaseType(i) == "Poke_ExtremeSpeed" then 
 			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
@@ -7993,6 +7996,7 @@ function Poke_ExtremeSpeed:GetFinalEffect(p1, p2, p3)
 	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
 	end	
+	if _G[user:GetType()].KeepAdding then user:AddWeapon(_G[user:GetType()].KeepAdding[2]) end
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end
