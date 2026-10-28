@@ -5049,18 +5049,6 @@ function Poke_DracoMeteor_Boost:GetSkillEffect(p1, p2)
 			if pawn and _G[pawn:GetType()].IsDragon then ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)",pawn:GetId())) end
 		end
 	end
-	--reverse mega evo
-	local user = Board:GetPawn(p1)
-	for i = user:GetWeaponCount(), 1, -1 do
-		if user:GetWeaponBaseType(i) == "Poke_DracoMeteor" then 
-			ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", user:GetId(), i)) 
-			break 
-		end
-	end
-	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
-	end	
-	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end
 
