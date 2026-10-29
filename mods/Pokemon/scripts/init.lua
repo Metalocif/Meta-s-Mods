@@ -249,8 +249,8 @@ function mod:load( options, version)
 	
 	local function RemoveExtraWeapons(mission)
 		for id = 0, 2 do
-            local pawn = Game:GetPawn(id)
-			while pawn:GetWeaponCount() >= 3 do
+            local pawn = Game:GetPawn(id) or Board:GetPawn(id)
+			while pawn and pawn:GetWeaponCount() >= 3 do
 				LOG("removing a weapon")
 				pawn:RemoveWeapon(3) 
 			end
