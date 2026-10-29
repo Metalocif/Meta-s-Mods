@@ -6435,8 +6435,8 @@ function Poke_VineWhip:GetFinalEffect(p1,p2,p3)
 end
 
 Poke_VineWhip_A=Poke_VineWhip:new{ UpgradeDescription = "Can throw another vine in another direction. When doing so, both targets are pulled.", DoubleWhip = true }
-Poke_VineWhip_B=Poke_VineWhip:new{ UpgradeDescription = "Increases damage by 1.", Damage = 2 }
-Poke_VineWhip_AB=Poke_VineWhip:new{ DoubleWhip = true, Damage = 2 }
+Poke_VineWhip_B=Poke_VineWhip:new{ UpgradeDescription = "Increases damage by 1.", MinDamage = 2, Damage=3 }
+Poke_VineWhip_AB=Poke_VineWhip:new{ DoubleWhip = true, MinDamage = 2, Damage=3 }
 
 Poke_Growth = Skill:new{
 	Class = "TechnoVek",
