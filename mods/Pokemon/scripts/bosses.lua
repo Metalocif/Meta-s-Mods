@@ -1854,6 +1854,9 @@ function Poke_ArceusBoss2:GetDeathEffect(point)
 			Board:GetPawn(p):Kill(false)
 		end
 	end
+	for i = 0, 2 do
+		Status.RemoveStatus(i, "Glory")
+	end
 	GetCurrentMission().TurnLimit = Game:GetTurnCount()
 	return SkillEffect()
 end
@@ -2131,15 +2134,24 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()
 	if not Board:GetPawn(p1) then return ret end
+	if mission then mission.UnmadeStuff = mission.UnmadeStuff or 0 end
 	local dir = GetDirection(p2-p1)
 	ret:AddQueuedScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
 	ret:AddQueuedDelay(1)
 	local iStart, iEnd = 0, 7
 	local jStart, jEnd = 0, 7
-	if dir == 0 then iEnd = 3 end
-	if dir == 1 then jEnd = 3 end
-	if dir == 2 then iStart = 4 end
-	if dir == 3 then jStart = 4 end
+	if mission.UnmadeStuff > 0 then
+		if dir == 0 then iEnd = 3; jEnd = 3    
+		elseif dir == 1 then iStart = 4; jEnd = 3
+		elseif dir == 2 then iEnd = 3; jStart = 4  
+		elseif dir == 3 then iStart = 4; jStart = 4 
+		end
+	else
+		if dir == 0 then iEnd = 3 end
+		if dir == 1 then jEnd = 3 end
+		if dir == 2 then iStart = 4 end
+		if dir == 3 then jStart = 4 end
+	end
 	if mission and mission.Weather ~= "" and mission.WeatherLoc1 and mission.WeatherLoc2 and mission.WeatherLoc2 ~= Point(8, 8) then	--(8,8) means global weather
 	--We figure out the intersection of the weather and the unmade area
 		local weatherIStart = mission.WeatherLoc1.x
@@ -2155,7 +2167,7 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 			Point(math.min(iEnd, weatherIEnd), math.min(jEnd, weatherJEnd)))
 		end
 	end
-	if mission then mission.UnmadeStuff = mission.UnmadeStuff or 0 end
+	
 	ret:AddQueuedScript("GetCurrentMission().UnmadeStuff = GetCurrentMission().UnmadeStuff + 1")
 	for i = iStart, iEnd do
 		for j = jStart, jEnd do
@@ -2163,13 +2175,14 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 			ret:AddQueuedScript(string.format("Board:SetCustomTile(%s, %q)", p:GetString(), ""))
 			ret:AddQueuedScript(string.format("Board:SetItem(%s, %q)", p:GetString(), ""))
 			local damage = SpaceDamage(p, DAMAGE_DEATH)
+			if p == p1 then damage.iDamage = DAMAGE_ZERO end
 			if Board:IsCrackable(p) and not Board:GetTerrain(p) == TERRAIN_MOUNTAIN then
 				local crackDamage = SpaceDamage(p)
 				crackDamage.iCrack = 1
 				crackDamage.bHide = true
 				ret:AddQueuedDamage(crackDamage)
 			end
-			if Board:GetTerrain(p) == 17 then damage.iTerrain = TERRAIN_HOLE end
+			if Board:GetTerrain(p) == 17 or p == p1 then damage.iTerrain = TERRAIN_HOLE end
 			ret:AddQueuedDamage(damage)
 		end
 	end
