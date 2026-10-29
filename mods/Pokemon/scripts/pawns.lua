@@ -120,7 +120,7 @@ a.Poke_Darkraia = a.MechUnit:new{Image="units/player/Darkrai_a.png",  PosX = -20
 a.Poke_Darkrai_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Darkrai_ns = a.MechIcon:new{Image="units/player/Darkrai_ns.png"}
 a.Poke_MegaDarkrai =a.MechUnit:new{Image="units/player/MegaDarkrai.png", PosX = -10, PosY = -4}
-a.Poke_MegaDarkraia = a.MechUnit:new{Image="units/player/MegaDarkrai_a.png",  PosX = -20, PosY = -4, NumFrames = 3, Frames = {0,1,2,1}, }
+a.Poke_MegaDarkraia = a.MechUnit:new{Image="units/player/MegaDarkrai_a.png",  PosX = -35, PosY = -14, NumFrames = 6, }
 a.Poke_MegaDarkrai_broken = a.MechUnit:new{Image="units/player/HyperBall.png", PosX = -20, PosY = -2 }
 a.Poke_MegaDarkrai_ns = a.MechIcon:new{Image="units/player/Darkrai_ns.png"}
 
