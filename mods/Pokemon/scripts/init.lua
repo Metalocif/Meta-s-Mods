@@ -334,20 +334,22 @@ function mod:load( options, version)
 					if not hasWeapon then pawn:AddWeapon(weaponToAdd) end
 				end
 				
-				local groundedAboveLevel = _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] or -1
-				local flyingAboveLevel = _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] or 99
-				local startGrounded = flyingAboveLevel < 99
-				
-				local flyingTable = {}
-				for level = 0, 3 do
-					local canFly = startGrounded or false
-					if flyingAboveLevel and level >= flyingAboveLevel then canFly = true end
-					if groundedAboveLevel and level >= groundedAboveLevel then canFly = false end
-					if flyingAboveLevel > groundedAboveLevel and level >= flyingAboveLevel then canFly = true end
-					flyingTable[level] = canFly
+				if _G[pawn:GetType()].LoseFlyingAtLevel or _G[pawn:GetType()].BecomeFlyingAtLevel then
+					local groundedAboveLevel = _G[pawn:GetType()].LoseFlyingAtLevel and _G[pawn:GetType()].LoseFlyingAtLevel[branch] or -1
+					local flyingAboveLevel = _G[pawn:GetType()].BecomeFlyingAtLevel and _G[pawn:GetType()].BecomeFlyingAtLevel[branch] or 99
+					local startGrounded = flyingAboveLevel < 99
+					
+					local flyingTable = {}
+					for level = 0, 3 do
+						local canFly = startGrounded or false
+						if flyingAboveLevel and level >= flyingAboveLevel then canFly = true end
+						if groundedAboveLevel and level >= groundedAboveLevel then canFly = false end
+						if flyingAboveLevel > groundedAboveLevel and level >= flyingAboveLevel then canFly = true end
+						flyingTable[level] = canFly
+					end
+					
+					pawn:SetFlying(flyingTable[evo])
 				end
-				
-				pawn:SetFlying(flyingTable[evo])
 				
 				if GetCurrentMission().MegaEvolved == id then
 					pawn:SetCustomAnim(_G[pawn:GetType()].MegaEvos[branch])
