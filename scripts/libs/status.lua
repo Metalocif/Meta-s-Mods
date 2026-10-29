@@ -831,9 +831,9 @@ function Status.ApplyGlory(id, turns)
 			pawn:RemoveWeapon(i)
 			if _G[weapon] then
 				if _G[weapon].Upgrades == 2 and _G[weapon.."_AB"] ~= nil then
-					weapon = weapon.."_AB"
+					weapon = string.gsub(weapon.."_AB", "_AB_AB", "_AB")
 				elseif _G[weapon].Upgrades == 1 and _G[weapon.."_A"] ~= nil then
-					weapon = weapon.."_A"
+					weapon = string.gsub(weapon.."_A", "_A_A", "_A")
 				elseif _G[weapon].Class == "Enemy" then
 					if _G[string.sub(weapon, 1, -2).."B"] ~= nil then 
 						weapon = string.sub(weapon, 1, -2).."B"
@@ -1196,12 +1196,22 @@ function Status.RemoveStatus(id, status)
 		end
 		mission.SleepTable[id] = nil
 	elseif status == "Glory" then
-		for i = pawn:GetWeaponCount(), 1, -1 do
-			pawn:RemoveWeapon(i)
+		while pawn:GetWeaponCount() > 0 do
+			pawn:RemoveWeapon(1)
 		end
 		local weaponCount = #mission.GloryTable[id].weapons
-		for i = weaponCount, 1, -1 do
-			pawn:AddWeapon(mission.GloryTable[id].weapons[i], true)
+		for i = 1, weaponCount do
+			local weaponId = mission.GloryTable[id].weapons[i]
+			weaponId = string.gsub(weaponId, "_AB_A", "")
+			if _G[weaponId] ~= nil then
+				pawn:AddWeapon(weaponId, true)
+			else
+				LOG("Glory tried to return a nonexistent weapon: "..weaponId)
+				weaponId = string.gsub(weaponId, "_AB", "")
+				weaponId = string.gsub(weaponId, "_A", "")
+				weaponId = string.gsub(weaponId, "_B", "")
+				pawn:AddWeapon(weaponId, true)
+			end
 		end
 		CustomAnim:rem(id, "StatusGlory")
 		mission["GloryTable"][id] = nil 
