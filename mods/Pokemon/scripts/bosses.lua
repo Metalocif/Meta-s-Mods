@@ -2140,7 +2140,7 @@ function Poke_UnmakeBoss:GetSkillEffect(p1, p2)
 	if dir == 1 then jEnd = 3 end
 	if dir == 2 then iStart = 4 end
 	if dir == 3 then jStart = 4 end
-	if mission and mission.Weather ~= "" and mission.WeatherLoc2 ~= Point(8, 8) then	--(8,8) means global weather
+	if mission and mission.Weather ~= "" and mission.WeatherLoc1 and mission.WeatherLoc2 and mission.WeatherLoc2 ~= Point(8, 8) then	--(8,8) means global weather
 	--We figure out the intersection of the weather and the unmade area
 		local weatherIStart = mission.WeatherLoc1.x
 		local weatherIEnd = mission.WeatherLoc2.x
