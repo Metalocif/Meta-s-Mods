@@ -6129,10 +6129,11 @@ function Poke_Present:GetSkillEffect(p1, p2)
 				end
 			end
 			if #validGifts == 0 then return ret end
+			math.randomseed(Game:GetTurnCount())
 			local roll = random_removal(validGifts)
 			local damage = SpaceDamage(p2)
 			damage.sImageMark = "effects/shotup_present.png"
-			damage.sScript = string.format("Board:GetPawn(%s):AddWeapon(%q, true)", pawn:GetId(), roll)
+			damage.sScript = string.format("Board:GetPawn(%s):AddWeapon(%q, true) DoSaveGame()", pawn:GetId(), roll)
 			ret:AddArtillery(p1, damage, "effects/shotup_present.png", NO_DELAY)
 		else
 			local damage = SpaceDamage(p2, -1)
@@ -8071,7 +8072,7 @@ function Poke_AbyssalEnd:GetSkillEffect(p1, p2)
 		end
 	end
 	if GAME.BranchingEvos[user:GetId()+1] ~= nil then
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), _G[user:GetType()].EvoGraphics[GAME.BranchingEvos[user:GetId()+1]][2]))
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), "Poke_Darkrai"))
 	end	
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
     return ret
