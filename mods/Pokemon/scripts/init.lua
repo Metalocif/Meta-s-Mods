@@ -191,6 +191,7 @@ function mod:load( options, version)
 								elseif weapon then
 									--figure out whether this mech is supposed to have that weapon at all, as otherwise we can't add new weapons
 									local isOwnWeapon = false
+									local isMegaWeapon = false
 									for j = 1, #_G[pawn:GetType()].SkillList do
 										if weapon == _G[pawn:GetType()].SkillList[j] then isOwnWeapon = true end
 										--if it's natively on the pawn...
@@ -209,10 +210,14 @@ function mod:load( options, version)
 											end
 										end
 									end
+									if _G[pawn:GetType()].MegaEvoMoves and _G[pawn:GetType()].MegaEvoMoves[branch] then
+										if weapon == _G[pawn:GetType()].MegaEvoMoves[branch] then isMegaWeapon = true end
+										--if it's a mega weapon, remove it and don't put it in inventory
+									end
 									if not isOwnWeapon then
 										pawn:RemoveWeapon(i)
 										i=i+1
-										Game:AddWeapon(weapon)
+										if not isMegaWeapon then Game:AddWeapon(weapon) end
 										LOG("Moved "..weapon..", a non-Pokemon weapon, back to inventory.")
 										doneChecking = false
 									end
