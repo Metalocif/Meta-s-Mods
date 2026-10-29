@@ -2633,9 +2633,11 @@ CyborgWeapons_HunterReflexes_A=CyborgWeapons_HunterReflexes:new{UpgradeDescripti
 function CyborgWeapons_HunterReflexes:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	if not Board:IsTipImage() then return ret end
-	Board:GetPawn(Point(2, 1)):FireWeapon(Point(2, 2), 1)
-	ret:AddMelee(Point(2, 2), SpaceDamage(Point(2, 1), 1, DIR_UP))
-	ret:AddCharge(Board:GetSimplePath(Point(2, 2), Point(2, 3)), FULL_DELAY)
+	if Board:GetPawn(Point(2, 1)) then Board:GetPawn(Point(2, 1)):FireWeapon(Point(2, 2), 1) end
+	if Board:GetPawn(Point(2, 2)) then 
+		ret:AddMelee(Point(2, 2), SpaceDamage(Point(2, 1), 1, DIR_UP)) 
+		ret:AddCharge(Board:GetSimplePath(Point(2, 2), Point(2, 3)), FULL_DELAY)
+	end
 	return ret
 end
 
