@@ -315,6 +315,12 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Repulsive",
+		"Enable the Repulsive prefix",
+		"Check to allow Vek to be given the Repulsive prefix, making them push adjacent tiles the first time they are damaged (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"resetTutorials",
 		"Reset Tutorial Tooltips",
 		"Check to reset all tutorial tooltips for this profile.",

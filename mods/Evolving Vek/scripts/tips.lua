@@ -42,6 +42,9 @@ tips:Add{id = "Tip_Wet",title = "Wet",text = "The Wet prefix makes a Vek wet, wh
 tips:Add{id = "Tip_Flammable",title = "Flammable",text = "The Flammable prefix makes a Vek take 1 damage and deal 1 damage to adjacent tiles when first set on fire."}
 tips:Add{id = "Tip_Blessed",title = "Blessed",text = "The Blessed prefix makes a Vek's weapon the boss version for a turn."}
 tips:Add{id = "Tip_Reactive",title = "Reactive",text = "The Reactive prefix makes a Vek turn A.C.I.D. on itself into smoke on adjacent tiles."}
+tips:Add{id = "Tip_Swarming",title = "Swarming",text = "The Reactive prefix makes a Vek turn A.C.I.D. on itself into smoke on adjacent tiles."}
+tips:Add{id = "Tip_Nimble",title = "Nimble",text = "The Nimble prefix makes a Vek dodge the first incoming attack."}
+tips:Add{id = "Tip_Repulsive",title = "Repulsive",text = "The Repulsive prefix makes a Vek push adjacent tiles the first time it is damaged."}
 tips:Add{id = "Tip_Tyrannical",title = "Tyrannical",text = "The Tyrannical prefix grants a Psion a weak artillery weapon that will favor targeting units over buildings."}
 
 --Put the hooks in here for pawn creation
