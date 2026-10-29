@@ -1001,7 +1001,11 @@ function Status.ApplyShocked(id, doFirstFlip)
 	if not mission then return end
 	if Status.IsImmuneTo(pawn, "Shocked") then return end
 	if Status.GetStatus(id, "Shocked") or Status.GetStatus(id, "Wet") then 
-		pawn:ClearQueued()
+		if pawn:GetTeam() == TEAM_ENEMY then
+			pawn:ClearQueued()
+		elseif pawn:GetTeam() == TEAM_PLAYER then
+			Status.ApplySleep(id, 1)
+		end
 		Board:AddAnimation(pawn:GetSpace(),"Lightning_Hit",1)
 	else
 		CustomAnim:add(id, "StatusShocked")
