@@ -1595,7 +1595,13 @@ local function EVENT_onModsLoaded()
 				if mission.RootedTable[id] == 0 then statusDesc = "Immobilizes this unit. Removed by fire." end
 			end
 			if status == "Shatterburst" then statusDesc = "When frozen, deals 1 damage to adjacent tiles and frees the unit." end
-			if status == "Shocked" then statusDesc = "Flips attack direction on damage. When applied a second time or Wet, clears queued actions." end
+			if status == "Shocked" then 
+				if pawn:GetTeam() == TEAM_ENEMY then
+					statusDesc = "Flips attack direction on damage. When applied a second time or Wet, clears queued actions." 
+				elseif pawn:GetTeam() == TEAM_PLAYER then
+					statusDesc = "When applied a second time or Wet, causes one turn of Sleep."
+				end
+			end
 			if status == "Sleep" then statusDesc = "Prevents this unit from acting. Removed when the unit takes damage ("..mission.SleepTable[id].." turns left)." end
 			if status == "Targeted" then statusDesc = "Makes Vek want to attack this unit." end
 			if status == "Tough" then
