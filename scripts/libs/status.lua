@@ -1502,10 +1502,6 @@ local function ReaddInsanity()
 end
 
 local function DoTurnStartStatus(mission, wasResetTurn)					--this is for status that triggers each turn/after Vek actions
-	for id, _ in pairs(mission.NecrosisTable) do
-		local pawn = Board:GetPawn(id)
-		if pawn and not pawn:IsDead() then pawn:SetMaxHealth(pawn:GetHealth()) end
-	end
 	for id, _ in pairs(mission.BondedTable) do
 		local pawn = Board:GetPawn(id)
 		if pawn then CustomAnim:rem(id, "StatusBondedOff") end
