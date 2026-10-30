@@ -39,10 +39,10 @@ end]])
 
 Meta_DeadTankAcid = { Image = "combat/deadtankacid.png", Damage = acidtankeffect, Tooltip = "Meta_Acid_Tank_Tooltip", Icon = "combat/deadtankacid.png", UsedImage = ""}
 
-TILE_TOOLTIPS = {
+merge_table(TILE_TOOLTIPS, {
 	Meta_Freeze_Tank_Tooltip = {"Dead Freeze Tank", "A destroyed freeze tank. Step on it with a mech to get its weapon."},
 	Meta_Acid_Tank_Tooltip = {"Dead A.C.I.D. Tank", "A destroyed A.C.I.D. tank. Step on it with a mech to get its weapon."},
-}
+})
 
 Mission_Meta_DeadTanks = Mission_Infinite:new{
 	Name = "Avenge the Fallen",
