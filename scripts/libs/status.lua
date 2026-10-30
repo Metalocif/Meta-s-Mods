@@ -812,40 +812,32 @@ function Status.ApplyDry(id)
 	end
 end
 
+
 function Status.ApplyGlory(id, turns)
-	local pawn = Board:GetPawn(id)
-	if not pawn then return end
-	local mission = GetCurrentMission()
-	if not mission then return end
-	if Status.IsImmuneTo(pawn, "Glory") then return end
-	turns = turns or 1
-	if mission.GloryTable[id] ~= nil then
-		mission.GloryTable[id].turns = mission.GloryTable[id].turns + turns
-	else
-		mission.GloryTable[id] = {turns=turns,weapons = pawn:GetEquippedWeapons()}
-		CustomAnim:add(id, "StatusGlory")
-		Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 100))
-		local weaponCount = pawn:GetWeaponCount()
-		for i = weaponCount, 1, -1 do
-			local weapon = pawn:GetWeaponBaseType(i)
-			pawn:RemoveWeapon(i)
-			if _G[weapon] then
-				if _G[weapon].Upgrades == 2 and _G[weapon.."_AB"] ~= nil then
-					weapon = string.gsub(weapon.."_AB", "_AB_AB", "_AB")
-				elseif _G[weapon].Upgrades == 1 and _G[weapon.."_A"] ~= nil then
-					weapon = string.gsub(weapon.."_A", "_A_A", "_A")
-				elseif _G[weapon].Class == "Enemy" then
-					if _G[string.sub(weapon, 1, -2).."B"] ~= nil then 
-						weapon = string.sub(weapon, 1, -2).."B"
-					elseif _G[string.sub(weapon, 1, -2).."2"] ~= nil then 
-						weapon = string.sub(weapon, 1, -2).."2"
-					end
-				end
-			end
-			pawn:AddWeapon(weapon, true)
-		end
-	end
+    local pawn = Board:GetPawn(id)
+    if not pawn then return end
+    local mission = GetCurrentMission()
+    if not mission then return end
+    if Status.IsImmuneTo(pawn, "Glory") then return end
+    turns = turns or 1
+    mission.GloryTable = mission.GloryTable or {}
+    mission.GloryWeaponTable = mission.GloryWeaponTable or {}
+    -- Already affected: just extend the duration.
+    if mission.GloryTable[id] ~= nil then
+        mission.GloryTable[id] = mission.GloryTable[id] + turns
+        return
+    end
+    -- Replace weapons and capture the original loadout.
+    local originalWeapons = ApplyGloryWeapons(pawn)
+
+    if not originalWeapons then return end
+
+    mission.GloryWeaponTable[id] = originalWeapons
+    mission.GloryTable[id] = turns
+
+    CustomAnim:add(id, "StatusGlory")
 end
+
 
 function Status.ApplyGunk(id, anim)
 	local pawn = Board:GetPawn(id)
@@ -1195,26 +1187,20 @@ function Status.RemoveStatus(id, status)
 			CustomAnim:rem(id, "StatusSleep")
 		end
 		mission.SleepTable[id] = nil
+	
 	elseif status == "Glory" then
-		while pawn:GetWeaponCount() > 0 do
-			pawn:RemoveWeapon(1)
+
+		local entries = mission.GloryWeaponTable
+			and mission.GloryWeaponTable[id]
+
+		if entries then
+			RestoreGloryWeapons(pawn, entries)
+			mission.GloryWeaponTable[id] = nil
 		end
-		local weaponCount = #mission.GloryTable[id].weapons
-		for i = 1, weaponCount do
-			local weaponId = mission.GloryTable[id].weapons[i]
-			weaponId = string.gsub(weaponId, "_AB_A", "")
-			if _G[weaponId] ~= nil then
-				pawn:AddWeapon(weaponId, true)
-			else
-				LOG("Glory tried to return a nonexistent weapon: "..weaponId)
-				weaponId = string.gsub(weaponId, "_AB", "")
-				weaponId = string.gsub(weaponId, "_A", "")
-				weaponId = string.gsub(weaponId, "_B", "")
-				pawn:AddWeapon(weaponId, true)
-			end
-		end
+
 		CustomAnim:rem(id, "StatusGlory")
-		mission["GloryTable"][id] = nil 
+		mission.GloryTable[id] = nil
+
 	elseif status == "Insanity" then
 		CustomAnim:rem(id, "StatusInsanity"..mission["InsanityTable"][id])
 		mission["InsanityTable"][id] = nil 
@@ -1308,7 +1294,6 @@ end
 end
 
 
-
 local function ReapplyOverheal()
 	local mission = GetCurrentMission()
 	if not mission then return end
@@ -1395,6 +1380,67 @@ local function GenerateWeakenWeapons()
 	end
 end
 
+local function CreateGloryWeaponAlias(sourceName)
+	local source = _G[sourceName]
+
+	if type(source) ~= "table" or source.Class == "Enemy" then return nil end
+
+	local aliasName = "Glory" .. sourceName
+
+	if not _G[aliasName] then
+		local alias = {}
+		for k, v in pairs(source) do
+			alias[k] = v
+		end
+		alias.Upgrades = 0
+		alias.Original = sourceName
+
+		local meta = getmetatable(source)
+		if meta then setmetatable(alias, meta) end
+
+		_G[aliasName] = alias
+	end
+
+	-- Set localization, even if the alias already existed.
+	if modApi and modApi.setText then
+		modApi:setText(
+			aliasName .. "_Name",
+			(GetGloryText and GetGloryText(sourceName, "Name"))
+				or "Glorious Weapon"
+		)
+
+		modApi:setText(
+			aliasName .. "_Description",
+			(GetGloryText and GetGloryText(sourceName, "Description"))
+				or "A weapon temporarily empowered by Glory."
+		)
+	end
+
+	return aliasName
+end
+
+
+local function GenerateGloryWeapons()
+	local weapons = {}
+	for id, weapon in pairs(_G) do	
+		-- LOG(id)
+		if type(id) == "string"
+			and id:sub(1, 5) ~= "Glory"
+			and type(weapon) == "table"
+			and weapon.Damage ~= nil
+			and weapon.Class ~= nil
+			and weapon.Class ~= "Enemy"
+			and weapon.Original == nil
+		then
+			weapons[#weapons + 1] = id
+		end
+	end
+
+	for _, id in ipairs(weapons) do
+		CreateGloryWeaponAlias(id)
+	end
+end
+
 local function PrepareTables()						--setup all status tables here so we don't need to check everywhere
 	modApi:conditionalHook(function()			--we need the conditional hook for some reason
 		return true and Game ~= nil and GAME ~= nil and (GetCurrentMission() ~= nil)
@@ -1466,8 +1512,8 @@ local function DoTurnStartStatus(mission, wasResetTurn)					--this is for status
 	end
 	for id, gloryInfo in pairs(mission.GloryTable) do				--must happen after Vek performed queued actions
 		local pawn = Board:GetPawn(id)
-		if pawn and Game:GetTeamTurn() == pawn:GetTeam() then mission.GloryTable[id].turns = mission.GloryTable[id].turns - 1 end
-		if mission.GloryTable[id].turns < 0 then Status.RemoveStatus(id, "Glory") end
+		if pawn and Game:GetTeamTurn() == pawn:GetTeam() then mission.GloryTable[id] = mission.GloryTable[id] - 1 end
+		if mission.GloryTable[id] < 0 then Status.RemoveStatus(id, "Glory") end
 	end
 	if Game:GetTeamTurn() == TEAM_PLAYER or wasResetTurn then						--do confusion on player mechs: they move somewhere random
 		modApi:conditionalHook(function()								--we need the conditional hook for some reason
@@ -1546,6 +1592,27 @@ local function DoTurnStartStatus(mission, wasResetTurn)					--this is for status
 end
 
 local function EVENT_onModsLoaded()
+	modApi:addMissionEndHook(function()		--restore Glory weapons
+		local mission = GetCurrentMission()
+		if not mission or not mission.GloryWeaponTable then return end
+		for id, entries in pairs(mission.GloryWeaponTable) do
+			local pawn = Board:GetPawn(id)
+			if pawn and pawn:IsMech() then 
+				RestoreGloryWeapons(pawn, entries)
+				local weaponsToAdd = {}
+				while pawn:GetWeaponCount() > 0 do
+					local weapon = (((pawn:GetPoweredWeapons()[1]):gsub("_AB$", "")):gsub("_A$", "")):gsub("_B$", "")
+					pawn:RemoveWeapon(1)
+					weaponsToAdd[#weaponsToAdd+1] = weapon
+				end 
+				for i = 1, #weaponsToAdd do
+					pawn:AddWeapon(weaponsToAdd[i])
+				end
+				CustomAnim:rem(id, "StatusGlory")
+			end
+			mission.GloryWeaponTable[id] = nil
+		end
+	end)
 	modapiext:addPawnSelectedHook(function(mission, pawn)	--explanations
 		if not (pawn and sdlext.isShiftDown()) then return end
 		local pawnStatuses = Status.List(pawn)
@@ -1583,7 +1650,7 @@ local function EVENT_onModsLoaded()
 				else
 					statusDesc = "Glory fully upgrades mech weapons."
 				end
-				statusDesc = statusDesc.." ("..mission.GloryTable[id].turns.." turns left)."
+				statusDesc = statusDesc.." ("..mission.GloryTable[id].." turns left)."
 			end
 			if status == "Gunk" then statusDesc = "Covered in sticky gunk, which does nothing by itself but is consumed by some effects." end
 			if status == "Hemorrhage" then statusDesc = "When a hemorrhaging unit would heal, they take that much damage instead." end
@@ -1764,6 +1831,9 @@ local function EVENT_onModsLoaded()
 	
 	modApi:addPostStartGameHook(GenerateWeakenWeapons)					--generate the weapons Weaken replaces Vek weapons by
 	modApi:addPreLoadGameHook(GenerateWeakenWeapons)					--also do it on reload otherwise the game is not happy
+	
+	modApi:addPostStartGameHook(GenerateGloryWeapons)					--generate the weapons Weaken replaces Vek weapons by
+	modApi:addPreLoadGameHook(GenerateGloryWeapons)					--also do it on reload otherwise the game is not happy
 	
 	modApi:addMissionStartHook(PrepareTables)							--create tables for all statuses so we don't have to check everywhere
 	modApi:addMissionStartHook(ReaddInsanity)							
@@ -1957,11 +2027,11 @@ local function EVENT_onModsLoaded()
 			if dodgeInfo and not pawnsWhoDodged[dodger:GetId()] then	--don't dodge the same attack twice either
 				local targetWasQueued = dodger:GetQueuedTarget() ~= Point(-1, -1) and dodger:GetTeam() == TEAM_ENEMY	--used to requeue attack for Vek
 				
-				local PawnBackup = Pawn; Pawn = pawn
-				local weapon = _G[pawn:GetQueuedWeapon()] or _G[pawn:GetBaseWeaponTypes()[1]] or _G[pawn:GetType()].SkillList[1]
+				-- local PawnBackup = Pawn; Pawn = pawn
+				local weapon = _G[dodger:GetQueuedWeapon()] or _G[dodger:GetBaseWeaponTypes()[1]] or _G[dodger:GetType()].SkillList[1]
 	
 				local actions = {}
-				local pathProfile = pawn:GetPathProf()
+				local pathProfile = dodger:GetPathProf()
 				if dodgeInfo.movementType ~= "Walk" then pathProfile = PATH_FLYER end
 				local reachable = extract_table(Board:GetReachable(fx.loc, dodgeInfo.distance, pathProfile))
 				
@@ -1971,45 +2041,42 @@ local function EVENT_onModsLoaded()
 					-- move score
 					local moveScore = 0
 					if affectedTiles[hash(loc)] and affectedTiles[hash(loc)] ~= DAMAGE_ZERO and affectedTiles[hash(loc)] > 0 then --don't dodge into more damage
-						moveScore = -100	
-					elseif Board:IsBlocked(loc, pawn:GetPathProf()) then 	--don't dodge into a tile you can't stand in
+						moveScore = -50	
+					elseif Board:IsBlocked(loc, dodger:GetPathProf()) or not Board:IsValid(loc) then 	--don't dodge into a tile you can't stand in
 						moveScore = -100 
 					elseif tilesWithSpawns[hash(loc)] ~= nil then			--don't dodge into a tile that will contain a spawn
 						moveScore = -100
 					elseif dodgeInfo.smart then 
-						moveScore = ScorePositioning(loc, pawn) 
+						moveScore = ScorePositioning(loc, dodger) 
 					end
 					
 					if targetWasQueued then
 						local targets = weapon and extract_table(weapon:GetTargetArea(loc)) or {}
 						for _, dodger in ipairs(targets) do
 							if Board:IsValid(dodger) then
-								-- attack score
 								local attackScore = 0
 								if dodgeInfo.smart then attackScore = weapon:GetTargetScore(loc, dodger) end
 								
-								table.insert(actions, {loc = loc, dodger = dodger, score = moveScore + attackScore })
+								if moveScore > -100 then table.insert(actions, {loc = loc, dodger = dodger, score = moveScore + attackScore }) end
 							end
 						end
 					else
-						table.insert(actions, {loc = loc, dodger = nil, score = moveScore})
+						if moveScore > -100 then table.insert(actions, {loc = loc, dodger = nil, score = moveScore}) end
 					end
 				end
 				calculatingDodge = false
-				Pawn = PawnBackup
+				-- Pawn = PawnBackup
 				
 				if #actions == 0 then return end
 				
-				-- sort scores from high to low.
+				--sort scores
 				table.sort(actions, function(a,b) return a.score > b.score end)
-				
-				-- count #indices with same top score.
+				--count #indices with same top score.
 				local i = 1
 				while(actions[i+1] and actions[i+1].score == actions[1].score) do
 					i = i + 1
 				end
-				
-				-- pick one top score at random.
+				--pick one top score at random.
 				math.randomseed(Game:GetTurnCount() + dodger:GetId() + dodgeInfo.amount)
 				local bestAction = actions[math.random(1, i)]
 				
@@ -2040,16 +2107,16 @@ local function EVENT_onModsLoaded()
 					-- move away from danger
 					skillEffect:AddScript(string.format("Status.LowerDodge(%s)", dodger:GetId()))
 					if dodgeInfo.movementType == "Teleport" then
-						skillEffect:AddTeleport(fx.loc, bestAction.loc, NO_DELAY)
+						skillEffect:AddTeleport(dodger:GetSpace(), bestAction.loc, NO_DELAY)
 					elseif dodgeInfo.movementType == "Leap" then
 						local leapMovement = PointList()
-						leapMovement:push_back(fx.loc)
+						leapMovement:push_back(dodger:GetSpace())
 						leapMovement:push_back(bestAction.loc)
 						skillEffect:AddLeap(leapMovement, NO_DELAY)
 					elseif dodgeInfo.movementType == "Burrow" then
-						skillEffect:AddBurrow(Board:GetPath(fx.loc, bestAction.loc, PATH_FLYER), NO_DELAY)
+						skillEffect:AddBurrow(Board:GetPath(dodger:GetSpace(), bestAction.loc, PATH_FLYER), NO_DELAY)
 					else
-						skillEffect:AddMove(Board:GetPath(fx.loc, bestAction.loc, dodger:GetPathType()), NO_DELAY)
+						skillEffect:AddMove(Board:GetPath(dodger:GetSpace(), bestAction.loc, dodger:GetPathType()), NO_DELAY)
 					end
 				end
 				--Add in old effects
@@ -2216,40 +2283,166 @@ local function EVENT_onModsLoaded()
 	LOG("Status Library added its hooks.")
 end
 
--- modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
---fixes for Glory: replaces junk leaper boss weapon from vanilla, adds weapons to Moth and Burrower
---we check whether another mod added boss versions of Moth and Burrower first though
 
-LeaperAtkB = LeaperAtk1:new{ --just a weaker mosquito boss
-	Damage = DAMAGE_DEATH,
-	Class = "Enemy",
-	Name = "Vorpal Fangs",
-	Description = "Web a target, preparing to stab it with a devastating attack. Kills target.",
-}
 
-if _G["MothAtkB"] == nil then --ranged bouncer boss attack
-	MothAtkB = MothAtk1:new{
-		Class = "Enemy",
-		Name = "Abhorrent Pellets",
-		Description = "Launch an artillery attack at three tiles in a row, pushing shooter and targets.",
-		Damage = 3,
-	}
-	function MothAtkB:GetSkillEffect(p1, p2)
-		local ret = SkillEffect()
-		local dir = GetDirection(p2-p1)
-		local dirback = GetDirection(p1-p2)
-		
-		local damage = SpaceDamage(p1, 0, dirback)
-		damage.sAnimation = "airpush_"..dirback
-		ret:AddQueuedDamage(damage)
-		
-		ret:AddQueuedArtillery(SpaceDamage(p2, self.Damage, dir), self.Projectile)
-		ret:AddQueuedArtillery(SpaceDamage(p2 + DIR_VECTORS[(dir+1)%4], self.Damage, dir), self.Projectile)
-		ret:AddQueuedArtillery(SpaceDamage(p2 + DIR_VECTORS[(dir-1)%4], self.Damage, dir), self.Projectile)
-		return ret
-	end
+local function GlorySafeName(name)
+    return tostring(name):gsub("[^%w_]", "_")
 end
+
+-- Find the fully upgraded version of a weapon.
+local function GetGloryWeaponVariant(weaponName)
+
+    local weapon = _G[weaponName]
+    if type(weapon) ~= "table" then return nil end
+
+    if weapon.Class == "Enemy" then
+        local suffix = weaponName:sub(-1)
+        if suffix == "1" or suffix == "2" then
+            local prefix = weaponName:sub(1, -2)
+            if type(_G[prefix.."B"]) == "table" then
+                return prefix.."B"
+            elseif type(_G[prefix.."2"]) == "table" then
+                return prefix.."2"
+            else
+				return nil
+			end
+        end
+        return weaponName
+    else
+		local baseName = ((weaponName:gsub("_AB$", "")):gsub("_A$", "")):gsub("_B$", "")
+		local base = _G[baseName]
+		if type(base) ~= "table" or base.Upgrades == nil then
+			baseName = weaponName
+			base = weapon
+		end
+		if base.Upgrades == 2 and type(_G[baseName.."_AB"]) == "table" then
+			return baseName.."_AB"
+		elseif base.Upgrades == 1 and type(_G[baseName.."_A"]) == "table" then
+			return baseName.."_A"
+		end
+    end
+    return baseName
+end
+
+
+-- Retrieve a localization string without making the alias depend
+-- on the existence of a translation for the upgraded variant.
+local function GetGloryText(weaponName, suffix)
+    local candidates = {weaponName, weaponName:gsub("_AB$", ""):gsub("_A$", ""):gsub("_B$", "")}
+
+    if type(GetLocalizedText) == "function" then
+        for _, name in ipairs(candidates) do
+            local key = name.."_"..suffix
+            local ok, value = pcall(GetLocalizedText, key)
+
+            if ok and type(value) == "string" and value ~= "" and value ~= key then
+                return value
+            end
+        end
+    end
+
+    return nil
+end
+
+
+
+
+
+function ApplyGloryWeapons(pawn)
+
+    local entries = {}
+    local weaponCount = pawn:GetWeaponCount()
+
+    for i = 1, weaponCount do
+
+        local currentType = pawn:GetWeaponType(i)
+
+        if not currentType then
+            LOG("Glory: could not identify weapon in slot "..i)
+            return nil
+        end
+        local currentWeapon = _G[currentType]
+
+        local restoreId = currentType
+
+        local sourceName = GetGloryWeaponVariant(currentType)
+
+        if not sourceName or type(_G[sourceName]) ~= "table" then sourceName = currentType end
+
+        local aliasName = CreateGloryWeaponAlias(sourceName)
+		if _G[currentType].Class == "Enemy" then aliasName = GetGloryWeaponVariant(sourceName) end
+        if _G[currentType].Class ~= "Enemy" and not aliasName then
+            LOG("Glory: failed to create alias for "..tostring(sourceName))
+            return nil
+        end
+
+        local wasPowered = true
+
+        if type(pawn.IsWeaponTypePowered) == "function" then
+            local ok, result = pcall(function()
+                return pawn:IsWeaponTypePowered(currentType)
+            end)
+
+            if ok and result ~= nil then wasPowered = result end
+        end
+
+        local limitedUses = nil
+        local limitedRemaining = nil
+
+        if type(pawn.GetWeaponLimitedUses) == "function" then
+            local ok, result = pcall(function()
+                return pawn:GetWeaponLimitedUses(i)
+            end)
+            if ok then limitedUses = result end
+        end
+
+        if type(pawn.GetWeaponLimitedRemaining) == "function" then
+            local ok, result = pcall(function()
+                return pawn:GetWeaponLimitedRemaining(i)
+            end)
+            if ok then limitedRemaining = result end
+        end
+
+        entries[i] = {
+            restoreId = restoreId,
+            aliasName = aliasName,
+            wasPowered = wasPowered,
+            limitedUses = limitedUses,
+            limitedRemaining = limitedRemaining
+        }
+    end
+
+    for i = weaponCount, 1, -1 do
+        pawn:RemoveWeapon(i)
+    end
+
+    for i, entry in ipairs(entries) do
+        pawn:AddWeapon(entry.aliasName, true)
+    end
+
+    return entries
+end
+
+
+function RestoreGloryWeapons(pawn, entries)
+    if not pawn or not entries then return end
+    for i = pawn:GetWeaponCount(), 1, -1 do
+        pawn:RemoveWeapon(i)
+    end
+    for i, entry in ipairs(entries) do
+        pawn:AddWeapon(entry.restoreId, entry.wasPowered)
+        --fix weapons losing limited uses
+        if entry.limitedUses and entry.limitedUses > 0 then
+			pawn:SetWeaponLimitedUses(i, entry.limitedUses)
+            if entry.limitedRemaining ~= nil and type(pawn.SetWeaponLimitedRemaining) == "function" then
+                pawn:SetWeaponLimitedRemaining(i, math.min(entry.limitedRemaining, entry.limitedUses))
+            end
+        end
+    end
+end
+
+
 
 if _G["BurrowerAtkB"] == nil and _G["BurrowerAtk2"] ~= nil then
 	BurrowerAtkB = BurrowerAtk2:new{
@@ -2300,9 +2493,11 @@ if isNewerVersion then
 
     Status.finalizeInit = function(self)
         modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
+        -- modApi.events.onModsLoaded:subscribe(ModifySkillsForGlory)
 		SetupMetatable()
 		CreateStatusFunctions()
 		AlterScoringFunctions()
+		-- ModifySkillsForGlory()
         LOG("Status Library Version " .. self.version .. " finalized.")
     end
     local function onModsInitialized()
@@ -2317,6 +2512,7 @@ if isNewerVersion then
     end
     modApi.events.onModsInitialized:subscribe(onModsInitialized)
 end
+
 
 StatusLibLoaded = true
 return true	
