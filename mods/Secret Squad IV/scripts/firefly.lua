@@ -73,7 +73,7 @@ end
 
 function meta_firefly:GetSkillEffect(p1, p2, remainingShots)
 	local ret = SkillEffect()
-	local userID = Board:GetPawn(p1):GetId()
+	local userID = Board:GetPawn(p1) and Board:GetPawn(p1):GetId() or -1
 	local target = GetProjectileEnd(p1,p2)
 	local direction = GetDirection(p2-p1)
 	remainingShots = remainingShots or self.Shots
@@ -98,7 +98,7 @@ function meta_firefly:GetSkillEffect(p1, p2, remainingShots)
 	end
 	
 	-- Achievement
-	if saveData ~= nil then
+	if saveData ~= nil and userID > -1 then
 		local reactorTable = saveData.getPawnKey(userID, "reactor")
 		if reactorTable ~= nil then
 			local reactors = reactorTable["iNormalPower"] + reactorTable["iUsedPower"] + reactorTable["iBonusPower"] + reactorTable["iUsedBonus"]
