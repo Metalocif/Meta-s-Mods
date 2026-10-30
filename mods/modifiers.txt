@@ -1,8 +1,0 @@
-Modifiers:
-After every... boss? you have to pick 1 in 3 modifiers, which affect the rest of the run.
-- Add like 50 prefixes to the pool if prefix mod is active.
-- Next time pod contains nothing
-- Pilot $N starts battle confused/with 1 HP/on acid/cannot be healed/can only have 1 weapon
-
-- Your mechs don't repair at the end of missions?
-- Weather slows mechs?
