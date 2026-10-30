@@ -1,7 +1,7 @@
 local description = "Adds prefixes to enemies. Each enemy can have a random suitable buff. Prefixes are generated based on enemies you left alive at the end of previous missions. Check mod options to disable individual prefixes and learn what each prefix does."
 local mod = {
 	id = "Meta_EvolvingVek",
-	name = "Evolving Vek",
+	name = "Prefixed Vek",
 	version = "1.4.3",
 	requirements = {},
 	dependencies = { 
@@ -300,12 +300,6 @@ function mod:metadata()
 		"Enable_Reactive",
 		"Enable the Reactive prefix",
 		"Check to allow Vek to be given the Reactive prefix, making them turn A.C.I.D. into smoke on adjacent tiles (default: true).",
-		{ enabled = true }
-	)
-	modApi:addGenerationOption(
-		"Enable_Swarming",
-		"Enable the Swarming prefix",
-		"Check to allow Vek to be given the Swarming prefix, making them not count against the spawn limit (default: true).",
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
