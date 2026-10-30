@@ -853,6 +853,15 @@ function SpawnRepulsive()
 	return 1
 end
 
+function SpawnAmplifier()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyAmplifier(Pawn:GetId(), 99) end
+	return 1
+end
+
+function SpawnGuardian()
+	if Pawn:GetTurnCount() <= 1 then Status.ApplyGuardian(Pawn:GetId(), 99) end
+	return 1
+end
 
 -------------------------
 --Extra Weapon prefixes--

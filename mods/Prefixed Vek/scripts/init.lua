@@ -315,6 +315,18 @@ function mod:metadata()
 		{ enabled = true }
 	)
 	modApi:addGenerationOption(
+		"Enable_Amplifier",
+		"Enable the Amplifier prefix",
+		"Check to allow Vek to be given the Amplifier prefix, making them boost adjacent Vek that get damaged (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
+		"Enable_Guardian",
+		"Enable the Guardian prefix",
+		"Check to allow Vek to be given the Guardian prefix, making them heal adjacent Vek that get damaged (default: true).",
+		{ enabled = true }
+	)
+	modApi:addGenerationOption(
 		"resetTutorials",
 		"Reset Tutorial Tooltips",
 		"Check to reset all tutorial tooltips for this profile.",

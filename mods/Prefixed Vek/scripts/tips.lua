@@ -45,6 +45,8 @@ tips:Add{id = "Tip_Reactive",title = "Reactive",text = "The Reactive prefix make
 tips:Add{id = "Tip_Swarming",title = "Swarming",text = "The Reactive prefix makes a Vek turn A.C.I.D. on itself into smoke on adjacent tiles."}
 tips:Add{id = "Tip_Nimble",title = "Nimble",text = "The Nimble prefix makes a Vek dodge the first incoming attack."}
 tips:Add{id = "Tip_Repulsive",title = "Repulsive",text = "The Repulsive prefix makes a Vek push adjacent tiles the first time it is damaged."}
+tips:Add{id = "Tip_Guardian",title = "Guardian",text = "The Guardian prefix makes a Vek heal adjacent allies when they get damaged."}
+tips:Add{id = "Tip_Amplifier",title = "Amplifier",text = "The Amplifier prefix makes a Vek boost adjacent allies when they get damaged."}
 tips:Add{id = "Tip_Tyrannical",title = "Tyrannical",text = "The Tyrannical prefix grants a Psion a weak artillery weapon that will favor targeting units over buildings."}
 
 --Put the hooks in here for pawn creation
