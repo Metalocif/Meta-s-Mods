@@ -154,8 +154,19 @@ function mod:load( options, version)
 	{"Adaptive Beasts","Poke_Scyther", "Poke_Eevee", "Poke_Ralts", id = "Poke_AdaptiveBeasts"}, 
 	"Adaptive Beasts", "Trainers that privilege adaptation over all; they train Pokemon that have variable potentials.", 
 	self.resourcePath .. "img/chaos_icon.png")
-		
+	
+	local function RemoveExtraWeapons(mission)
+		for id = 0, 2 do
+            local pawn = Game:GetPawn(id) or Board:GetPawn(id)
+			while pawn and pawn:GetWeaponCount() >= 3 do
+				LOG("removing a weapon")
+				pawn:RemoveWeapon(3) 
+			end
+		end
+	end
+	
 	modApi:addMissionEndHook(function()		--revive dead pawns, do evolution stuff
+		RemoveExtraWeapons()
 		if GAME.Poke_Evolutions == nil then GAME.Poke_Evolutions = {0, 0, 0} end
 		if GAME.BranchingEvos == nil then GAME.BranchingEvos = {1, 1, 1} end
 		DoSaveGame()
@@ -182,7 +193,7 @@ function mod:load( options, version)
 							pawn = Game:GetPawn(id)
 							for i = 1, pawn:GetWeaponCount() do								--remove weapon
 								if pawn:GetWeaponCount() < i then break end
-								local weapon = pawn:GetWeaponBaseType(i)
+								local weapon = string.gsub(string.gsub(pawn:GetWeaponBaseType(i), "_AB$", ""), "_A$", "")
 								if weapon and weapon == _G[pawn:GetType()].EvoForget[pilotLevel] then 
 									pawn:RemoveWeapon(i) 
 									i=i+1
@@ -191,7 +202,7 @@ function mod:load( options, version)
 								elseif weapon then
 									--figure out whether this mech is supposed to have that weapon at all, as otherwise we can't add new weapons
 									local isOwnWeapon = false
-									local isMegaWeapon = false
+									local isTempWeapon = false
 									for j = 1, #_G[pawn:GetType()].SkillList do
 										if weapon == _G[pawn:GetType()].SkillList[j] then isOwnWeapon = true end
 										--if it's natively on the pawn...
@@ -211,13 +222,19 @@ function mod:load( options, version)
 										end
 									end
 									if _G[pawn:GetType()].MegaEvoMoves and _G[pawn:GetType()].MegaEvoMoves[branch] then
-										if weapon == _G[pawn:GetType()].MegaEvoMoves[branch] then isMegaWeapon = true end
+										if weapon == _G[pawn:GetType()].MegaEvoMoves[branch] then isTempWeapon = true end
 										--if it's a mega weapon, remove it and don't put it in inventory
+									end
+									if _G[pawn:GetType()].KeepAdding then
+										for j = 1, #_G[pawn:GetType()].KeepAdding do
+											if weapon == _G[pawn:GetType()].KeepAdding[j] then isTempWeapon = true end
+											--if it's a temp weapon, remove it and don't put it in inventory
+										end
 									end
 									if not isOwnWeapon then
 										pawn:RemoveWeapon(i)
 										i=i+1
-										if not isMegaWeapon then Game:AddWeapon(weapon) end
+										if not isTempWeapon then Game:AddWeapon(string.gsub(string.gsub(weapon, "_AB$", ""), "_A$", "")) end
 										LOG("Moved "..weapon..", a non-Pokemon weapon, back to inventory.")
 										doneChecking = false
 									end
@@ -233,7 +250,7 @@ function mod:load( options, version)
 						
 						Game:TriggerSound("/ui/map/flyin_rewards")
 						Board:Ping(pawn:GetSpace(), GL_Color(255, 255, 150))
-						if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" then --update graphics
+						if _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch] and _G[pawn:GetType()].EvoGraphics[branch][pilotLevel] ~= "" then --update graphics
 							pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][pilotLevel])
 						end 
 					end
@@ -247,20 +264,12 @@ function mod:load( options, version)
 	
 	
 	
-	local function RemoveExtraWeapons(mission)
-		for id = 0, 2 do
-            local pawn = Game:GetPawn(id) or Board:GetPawn(id)
-			while pawn and pawn:GetWeaponCount() >= 3 do
-				LOG("removing a weapon")
-				pawn:RemoveWeapon(3) 
-			end
-		end
-	end
+	
 	
 	local function PickBranchingEvos(mission)
 		GAME.Poke_Evolutions = GAME.Poke_Evolutions or {0, 0, 0}
 		DoSaveGame()
-		if GAME.BranchingEvos == nil or #GAME.BranchingEvos < 3 then 	--prepare branching evos in first since the menu doesn't pause the game at mission end before evolution
+		if GAME.BranchingEvos == nil or #GAME.BranchingEvos < 3 then 	--prepare branching evos in first battle since the menu doesn't pause the game at mission end before evolution
 			GAME.BranchingEvos = {}
 			for id = 0, 2 do
 				if GAME.BranchingEvos[id+1] == nil then
@@ -307,7 +316,10 @@ function mod:load( options, version)
 					pawn:RemoveWeapon(3) 
 				end
 				
-				if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
+				if _G[pawn:GetType()].HasEvolutions ~= nil and evo > 0 and _G[pawn:GetType()].EvoGraphics ~= nil 
+				and _G[pawn:GetType()].EvoGraphics[branch] and _G[pawn:GetType()].EvoGraphics[branch][evo] then 
+					pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo])
+				end
 				
 				if _G[pawn:GetType()].KeepAdding ~= nil and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 					pawn:AddWeapon(_G[pawn:GetType()].KeepAdding[evo]) 
@@ -328,7 +340,7 @@ function mod:load( options, version)
 				local evo = GAME.Poke_Evolutions[id + 1]
 				
 				local branch = GAME.BranchingEvos[id + 1]
-				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
+				if _G[pawn:GetType()].HasEvolutions and evo > 0 and _G[pawn:GetType()].EvoGraphics and _G[pawn:GetType()].EvoGraphics[branch] and _G[pawn:GetType()].EvoGraphics[branch][evo] then pawn:SetCustomAnim(_G[pawn:GetType()].EvoGraphics[branch][evo]) end
 				if GetCurrentMission().MegaEvolved == id then evo = evo + 1 end
 				if _G[pawn:GetType()].KeepAdding and _G[pawn:GetType()].KeepAdding[evo] and _G[pawn:GetType()].KeepAdding[evo] ~= "" and pawn:GetWeaponCount() < 3 then 
 					local weaponToAdd = _G[pawn:GetType()].KeepAdding[evo]
