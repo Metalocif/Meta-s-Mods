@@ -1652,7 +1652,7 @@ local function EVENT_onModsLoaded()
 		for k, status in ipairs(pawnStatuses) do	--I'd rather this were a table, but I need to insert data and stuff.
 			local statusDesc = ""
 			if status == "Amplifier" then 
-				if pawn:GetTeam() == TEAM_ENEMY then
+				if pawn:GetTeam() == TEAM_PLAYER then
 					statusDesc = "When adjacent mechs and friendly units get damaged, they become boosted."
 				else
 					statusDesc = "When adjacent Vek get damaged, they become boosted."
@@ -1691,7 +1691,7 @@ local function EVENT_onModsLoaded()
 				statusDesc = statusDesc.." ("..mission.GloryTable[id].." turns left)."
 			end
 			if status == "Guardian" then 
-				if pawn:GetTeam() == TEAM_ENEMY then
+				if pawn:GetTeam() == TEAM_PLAYER then
 					statusDesc = "When adjacent mechs and friendly units get damaged and survive, they heal 1."
 				else
 					statusDesc = "When adjacent Vek get damaged and survive, they heal 1."
@@ -1860,12 +1860,12 @@ local function EVENT_onModsLoaded()
 				local adjPawn = Board:GetPawn(curr)
 				if adjPawn and adjPawn:GetTeam() == pawn:GetTeam() and not adjPawn:IsDead() then
 					if Status.GetStatus(adjPawn:GetId(), "Guardian") then
-						pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), -1)
-						Board:Ping(curr, GL_COLOR(100, 255, 100))
+						pawn:ApplyDamage(SpaceDamage(pawn:GetSpace(), -1))
+						Board:Ping(curr, GL_Color(100, 255, 100))
 					end
 					if Status.GetStatus(adjPawn:GetId(), "Amplifier") then
 						pawn:SetBoosted(true)
-						Board:Ping(curr, GL_COLOR(150, 50, 255))
+						Board:Ping(curr, GL_Color(150, 50, 255))
 					end
 				end 
 			end
