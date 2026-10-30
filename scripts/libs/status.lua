@@ -486,7 +486,7 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 		end
         return
 	elseif key == "iSleep" then
-        if type(value) == "number" and (value == 2 or value == STATUS_REMOVE) then
+        if type(value) == "number" and (value == STATUS_REMOVE) then
 			SpaceDamageInstance.sImageMark = "libs/status/sleep_icon_remove.png"
 			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Sleep")
 		else
