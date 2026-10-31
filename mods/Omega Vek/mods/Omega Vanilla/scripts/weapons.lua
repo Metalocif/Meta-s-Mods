@@ -74,6 +74,8 @@ function OmegaBurnbugAtk2:GetSkillEffect(p1,p2)
 	return ret
 end
 
+OmegaBurnbugAtkB = OmegaBurnbugAtk2:new{Damage = 4,Class = "Enemy",Name = "Thrashing Proboscis"}
+
 OmegaMosquitoAtk2 = Skill:new{
 	PathSize = 1,
 	Damage = 2,
@@ -91,12 +93,12 @@ OmegaMosquitoAtk2 = Skill:new{
 	}
 }
 
+
 function OmegaMosquitoAtk2:GetSkillEffect(p1, p2)
 	--maybe have it swallow smoke once the attack is done?
 	local ret = SkillEffect()
 	local direction = GetDirection(p2 - p1)
 	
-	local sound = SpaceDamage(p2)
 	ret:AddDamage(SoundEffect(p2,self.SoundBase.."/attack_smoke"))
 	local damage = SpaceDamage(p1,0)
 	damage.sAnimation = ""
@@ -146,6 +148,8 @@ function OmegaMosquitoAtk2:GetTargetScore(p1,p2)
 	if Board:GetPawn(p2) and Board:GetPawn(p2):GetTeam() == TEAM_PLAYER then ret = ret + 5 end
     return ret
 end
+
+OmegaMosquitoAtkB = OmegaMosquitoAtk2:new{Damage = 4,Class = "Enemy",Name = "Tempest Tentacles"}
 
 OmegaScarabAtk2 = LineArtillery:new{   
 	ArtillerySize = 5,
@@ -199,6 +203,8 @@ function OmegaScarabAtk2:GetTargetScore(p1,p2)
     return ret
 end
 
+OmegaScarabAtkB = OmegaScarabAtk2:new{Damage = 2,Class = "Enemy",Name = "Stuttering Glands"}
+
 OmegaDiggerAtk2 = DiggerAtk1:new{
 	Damage = 1,
 	Push = true,
@@ -225,8 +231,8 @@ function OmegaDiggerAtk2:GetTargetScore(p1,p2)
 		local pawn1 = Board:GetPawn(curr)
 		local pawn2 = Board:GetPawn(curr + DIR_VECTORS[i])
 		if Board:GetTerrain(curr) == TERRAIN_BUILDING then ret = ret + 5 end
-		if pawn and pawn:GetTeam() == TEAM_PLAYER then ret = ret + 5 end
-		if pawn and pawn:GetTeam() == TEAM_ENEMY and pawn:GetQueuedTarget() ~= Point(-1, -1) then ret = ret - 5 end
+		if pawn1 and pawn1:GetTeam() == TEAM_PLAYER then ret = ret + 5 end
+		if pawn1 and pawn1:GetTeam() == TEAM_ENEMY and pawn1:GetQueuedTarget() ~= Point(-1, -1) then ret = ret - 5 end
 		local canSpawnRock = Board:IsBlocked(curr, PATH_PROJECTILE)
 		if canSpawnRock and pawn2 and pawn2:GetTeam() == TEAM_ENEMY and pawn2:GetQueuedTarget() ~= Point(-1, -1) then ret = ret - 5 end
 		if (Board:GetTerrain(curr + DIR_VECTORS[i]) == TERRAIN_BUILDING or pawn2 and pawn2:GetMoveSpeed() == 0) and canSpawnRock then ret = ret + 5 end
@@ -234,17 +240,20 @@ function OmegaDiggerAtk2:GetTargetScore(p1,p2)
     return ret
 end
 
+OmegaDiggerAtkB = OmegaDiggerAtk2:new{Damage = 2,Class = "Enemy",Name = "Thrusting Tusks"}
+
 
 OmegaDungAtk2 = DungAtk1:new{	--tumblebug
 	Damage = 1,
 	PathSize = 1,
 	RockCount = 1,
 	Name = "Incendiary Prizes",
-	Description = "Create an explosive boulder and set it on fire, then prepares to create another.",
+	Description = "Create an explosive boulder and set it on fire.",
 	Class = "Enemy",
 	SoundId = "dung_1",
 	LaunchSound = "",
 	Deployed = "BombRock",
+	AlsoQueued = false,
 	TipImage = {
 		Unit = Point(2,3),
 		Enemy = Point(2,1),
@@ -276,11 +285,18 @@ function OmegaDungAtk2:GetSkillEffect(p1, p2)
 
 	if self:CanSpawnRock(p2) then
 		ret:AddSound("/enemy/"..self.SoundId.."/spawn_rock")
-		ret:AddDamage(spawn)
-		-- if not Board:IsBlocked(p2, PATH_GROUND) then ret:AddQueuedDamage(spawn) end
+		ret:AddMelee(p1, spawn)
+		if self.AlsoQueued then
+			local secondSpawn = SpaceDamage(p2, self.Damage)
+			secondSpawn.sPawn = self.Deployed
+			ret:AddQueuedMelee(p1, secondSpawn)
+		end
 	end	
 	return ret
 end
+
+OmegaDungAtkB = OmegaDungAtk2:new{AlsoQueued = true,Class = "Enemy",Name = "Combustible Prizes", Description = "Create an explosive boulder and set it on fire, then prepares to create another.",}
+--sorry Jefepato
 
 
 OmegaFireflyAtk2 = Skill:new{
@@ -309,7 +325,6 @@ function OmegaFireflyAtk2:GetSkillEffect(p1,p2)
 			
 	local first_tar = GetProjectileEnd(p1,p2,PATH_PROJECTILE)  
 	local second_tar = GetProjectileEnd(first_tar,first_tar+DIR_VECTORS[dir],PATH_PROJECTILE)  
-	local damage = nil
 	if Board:IsValid(second_tar) and second_tar ~= first_tar then
 		
 		local damage = SpaceDamage(second_tar, self.Damage)
@@ -333,7 +348,7 @@ function OmegaFireflyAtk2:GetSkillEffect(p1,p2)
 	return ret
 end
 
-
+OmegaFireflyAtkB = OmegaFireflyAtk2:new{Damage=3, Class = "Enemy",Name = "Piercing Thorax", Description = "Launch a phasing mass of goo dealing 3 damage to the first two targets hit.",}
 
 OmegaCentipedeAtk2 = Skill:new{
 	Name = "Dissolving Vomit",
@@ -408,6 +423,7 @@ function OmegaCentipedeAtk2:GetSkillEffect(p1,p2)
 	return ret
 end
 
+OmegaCentipedeAtkB = OmegaCentipedeAtk2:new{Damage=3, Class = "Enemy",Name = "Dissolving Bile", Description = "Swallows A.C.I.D. on adjacent tiles to heal, then releases acidic vomit on adjacent tiles, dealing 3 damage. Applies A.C.I.D. on the user.",}
 
 OmegaBouncerAtk2 = Skill:new{
 	Name = "Ramming Horns",
@@ -441,6 +457,8 @@ function OmegaBouncerAtk2:GetSkillEffect(p1, p2)
 	
 	return ret
 end	
+
+OmegaBouncerAtkB = OmegaBouncerAtk2:new{Damage=4, Class = "Enemy",Name = "Shattering Horns", Description = "Deal 4 damage to the target and pushes it, then pushes itself into the target's tile.",}
 
 
 OmegaMothAtk2 = LineArtillery:new{   
@@ -484,11 +502,13 @@ function OmegaMothAtk2:GetSkillEffect(p1, p2)
 		damage.sAnimation = "airpush_"..i
 		ret:AddQueuedDamage(damage)
 	end
-	damage = SpaceDamage(p2, self.Damage, dir)
-	ret:AddQueuedArtillery(damage, self.Projectile)
+	local artDamage = SpaceDamage(p2, self.Damage, dir)
+	ret:AddQueuedArtillery(artDamage, self.Projectile)
 	
 	return ret
 end
+
+OmegaMothAtkB = OmegaMothAtk2:new{Damage = 5, Class = "Enemy", Name = "Anathema Pellets"}
 
 
 OmegaLeaperAtk2 = Skill:new{
@@ -526,12 +546,10 @@ end
 
 function OmegaLeaperAtk2:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	local direction = GetDirection(p2 - p1)
 
 	for i = DIR_START, DIR_END do
 		local curr = p1+DIR_VECTORS[i]
 		if (Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_PLAYER) or Board:GetTerrain(curr) == TERRAIN_BUILDING then
-			local sound = SpaceDamage(p2)
 			ret:AddDamage(SoundEffect(p2,self.SoundBase.."/attack_web"))
 			ret:AddGrapple(p1,curr,"hold")
 		end
@@ -545,6 +563,7 @@ function OmegaLeaperAtk2:GetSkillEffect(p1, p2)
 	return ret
 end	 
 
+OmegaLeaperAtkB = OmegaLeaperAtk2:new{Damage = 5, Class = "Enemy", Name = "Rending Fangs"}
 
 OmegaHornetAtk2 = Skill:new{
 	Name = "Propelled Stringer",
@@ -576,6 +595,8 @@ function OmegaHornetAtk2:GetSkillEffect(p1, p2)
 	ret:AddQueuedDamage(damage)
 	return ret
 end	
+
+OmegaHornetAtkB = OmegaHornetAtk2:new{Damage = 3, Class = "Enemy", Name = "Impaling Stringer"}
 
 
 OmegaBurrowerAtk2 = Skill:new{
@@ -624,6 +645,8 @@ function OmegaBurrowerAtk2:GetTargetArea(point)
 	end
     return ret
 end
+
+OmegaBurrowerAtkB = OmegaBurrowerAtk2:new{Damage = 3, Class = "Enemy", Name = "Crushing Carapace"}
 
 
 function OmegaBurrowerAtk2:GetSkillEffect(p1, p2)
@@ -707,6 +730,8 @@ function OmegaScorpionAtk2:GetTargetScore(p1,p2)
 	return ret
 end
 
+OmegaScorpionAtkB = OmegaScorpionAtk2:new{Damage = 4, Class = "Enemy", Name = "Rupturing Spinneret"}
+
 
 OmegaShamanAtk2 = ShamanAtk2:new{ 
 	Name = "Reviving Spores",
@@ -717,6 +742,7 @@ OmegaShamanAtk2 = ShamanAtk2:new{
 	ImpactSound = "/enemy/shaman_2/attack_impact",
 	LaunchSound = "/enemy/shaman_2/attack_launch",
 	Explosion = "",
+	DualSpawn = false,
 	TipImage = {
 		CustomPawn = "OmegaShaman2",
 		Unit = Point(3,3),
@@ -762,24 +788,34 @@ function OmegaShamanAtk2:GetSkillEffect(p1, p2)
 		ret:AddDamage(damage)
 	end
 	
+	if self.DualSpawn then
+		local secondSpawn = SpaceDamage(p2+DIR_VECTORS[GetDirection(p2-p1)])
+		secondSpawn.sPawn = self.MyPawn
+		ret:AddDamage(secondSpawn)
+	end
+	
 	for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
-		if Board:GetPawn(i) and not Board:GetPawn(i):IsMinor() and not Board:GetPawn(i):GetType() == "OmegaShaman2" then
+		if Board:GetPawn(i) and not Board:GetPawn(i):IsMinor() and Board:GetPawn(i):GetType() ~= "OmegaShaman2" then
 			if mission.hadCorpseBeforeOmegaPlasmodia[i] == nil then 
 				mission.hadCorpseBeforeOmegaPlasmodia[i] = Board:GetPawn(i):IsCorpse() 
 				LOG("storing corpse for "..Board:GetPawn(i):GetMechName())
 			end
-			Board:GetPawn(i):SetCorpse(true)
+			ret:AddScript(string.format("Board:GetPawn(%s):SetCorpse(true)", i))
 		end
 	end
 	
 	return ret
 end
 
+OmegaShamanAtkB = OmegaShamanAtk2:new{DualSpawn = true, Class = "Enemy", Name = "Resurrecting Spores"}
+
+
 OmegaTotemAtk2 = Skill:new{
 	Name = "Reviving Secretion",
 	Description = "Sacrifice self to launch a projectile that heals 1 HP. Can revive Vek corpses.",
 	Damage = -1,
 	PathSize = 1,
+	SelfDamage = 1,
 	Range = RANGE_PROJECTILE,
 	Class = "Enemy",
 	Icon = "weapons/enemy_firefly1.png",
@@ -851,6 +887,8 @@ OmegaCrabAtk2 = LineArtillery:new{
 	}
 }
 
+OmegaCrabAtkB = OmegaCrabAtk2:new{Damage = 3, Class = "Enemy", Name = "Unrelenting Expulsions"}
+
 
 function OmegaCrabAtk2:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
@@ -911,6 +949,9 @@ function OmegaBeetleAtk2:GetSkillEffect(p1,p2)
 	return ret
 end
 
+OmegaBeetleAtkB = OmegaBeetleAtk2:new{Damage = 5, Class = "Enemy", Name = "Cataclysmic Pincers"}
+
+
 OmegaSpiderAtk2 = Skill:new{
 	Name = "Hunter's Trap",
 	Description = "Web an adjacent target, preparing to strike it, and lays webs on other surrounding tiles. Webs slow down anything that steps into them, and cause adjacent spiders and spiderlings to attack.",
@@ -931,7 +972,6 @@ OmegaSpiderAtk2 = Skill:new{
 
 function OmegaSpiderAtk2:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
-	local direction = GetDirection(p2 - p1)
 	ret:AddDamage(SoundEffect(p2,self.SoundBase.."/attack_web"))
 	ret:AddGrapple(p1,p2,"hold")
 	
@@ -950,6 +990,9 @@ function OmegaSpiderAtk2:GetSkillEffect(p1, p2)
 	return ret
 end	
 
+OmegaSpiderAtkB = OmegaSpiderAtk2:new{Damage = 4, Class = "Enemy", Name = "Executioner's Trap"}
+
+
 merge_table(TILE_TOOLTIPS, { OmegaVek_Web_Text = {"Omega Spider Web", "Triggers attacks of opportunity from adjacent spiders and spiderlings."} } )
 
 local webdamage = SpaceDamage(0)
@@ -958,7 +1001,7 @@ OmegaVek_WebItem = { Image = "effects/omegaspiderwebitem.png", Damage = webdamag
 Location["effects/omegaspiderwebitem.png"] = Point(-20,0)
 
 BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
-	ret = SkillEffect()
+	local ret = SkillEffect()
     if removed_item == "OmegaVek_WebItem" then
         local pawn = Board:GetPawn(loc)
         if pawn then
@@ -987,6 +1030,7 @@ OmegaBlobberAtk2 = LineArtillery:new{
 	MyArtillery =  "effects/shotup_blobber2.png",
 	ImpactSound = "/impact/generic/blob",
 	OnlyEmpty = true,
+	DeployAdjacent = false,
 	Explosion = "",
 	TipImage = {
 		CustomPawn = "OmegaBlobber2",
@@ -1034,9 +1078,19 @@ function OmegaBlobberAtk2:GetSkillEffect(p1, p2)
 			damage = SpaceDamage(p2 + DIR_VECTORS[dir],0)
 			ret:AddDamage(damage)
 		end
+		if self.DeployAdjacent then
+			for dir = DIR_START, DIR_END do 
+				local bossSpawn = SpaceDamage(p1 + DIR_VECTORS[dir],0)
+				bossSpawn.sPawn = self.MyPawn
+				if not Board:IsBlocked(p1 + DIR_VECTORS[dir], PATH_GROUND) then ret:AddDamage(bossSpawn) end
+			end
+		end
 	end
 	return ret
 end
+
+OmegaBlobberAtkB = OmegaBlobberAtk2:new{DeployAdjacent = true, Class = "Enemy", Name = "Apocalyptic Growths", Description = "Throw a massive blob that cannot act but will explode when killed. Surrounds itself with the same. On the last turn, will kill all its blobs instead if any are alive.", }
+
 
 local function ClearBlobs(mission)
 	for i = 0, 7 do

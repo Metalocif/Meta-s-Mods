@@ -1,0 +1,19 @@
+
+
+Check every Omega Vextra has animations and portraits
+
+check stinkbug doesn't have a corpse on victory anymore
+
+check anthill spawns have the explode symbol floating away
+
+check omega ants
+
+check thunderbug
+
+Make basic B versions for all Omega vek so they can get gloried
+
+
+Status.ApplyGlory(Pawn:GetId(), 99)
+Status.RemoveStatus(Pawn:GetId(), "Glory")
+
+Pawn:FireWeapon(Pawn:GetQueuedTarget(), 1)

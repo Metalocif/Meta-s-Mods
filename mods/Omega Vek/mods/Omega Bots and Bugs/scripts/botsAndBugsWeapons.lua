@@ -46,6 +46,7 @@ function OmegaCrusherAtk2:GetSkillEffect(p1, p2)
 	return ret
 end
 
+OmegaCrusherAtkB = OmegaCrusherAtk2:new{Damage=5,Class = "Enemy",Name = "Imperator Blades"}
 
 
 OmegaFloaterAtk2 = SelfTarget:new{
@@ -54,7 +55,7 @@ OmegaFloaterAtk2 = SelfTarget:new{
 	Icon = "weapons/lmn_floater.png",
 	Class = "Enemy",
 	PathSize = 1,
-	Damage = 0,
+	Damage = -1,
 	TipImage = {
 		CustomPawn = "OmegaFloater2",
 		Unit = Point(2,2),
@@ -68,7 +69,7 @@ OmegaFloaterAtk2 = SelfTarget:new{
 function OmegaFloaterAtk2:GetTargetScore(p1, p2)
 	local score = 0
 	local pawn = Board:GetPawn(p1)
-	if not pawn then return ret end
+	if not pawn then return score end
 	local targets = extract_table(general_DiamondTarget(p1, 2))
 	for k = 1, #targets do
 		local pawn = Board:GetPawn(targets[k])
@@ -90,10 +91,18 @@ function OmegaFloaterAtk2:GetSkillEffect(p1, p2)
 	local targets = extract_table(general_DiamondTarget(p1, 2))
 	for k = 1, #targets do
 		local pawn = Board:GetPawn(targets[k])
-		if pawn and pawn:GetTeam() == TEAM_ENEMY then ret:AddDamage(SpaceDamage(targets[k], -1)) end
+		if pawn and pawn:GetTeam() == TEAM_ENEMY then 
+			if pawn:IsDead() then 
+				ret:AddScript(string.format("Board:GetPawn(%s):SetHealth(1)", pawn:GetId())) 
+			else
+				ret:AddDamage(SpaceDamage(targets[k], self.Damage)) 
+			end
+		end
 	end
 	return ret
 end
+
+OmegaFloaterAtkB = OmegaFloaterAtk2:new{Damage=-2,Class = "Enemy",Name = "Overmind's Yoke"}
 
 
 OmegaRoachAtk2 = Skill:new{
@@ -130,6 +139,8 @@ function OmegaRoachAtk2:GetSkillEffect(p1, p2)
 	return ret
 end
 
+OmegaRoachAtkB = OmegaRoachAtk2:new{Damage=3,Class = "Enemy",Name = "Lethal Spines"}
+
 
 OmegaSpitterAtk2 = Skill:new{
 	Name = "Hunter Killer",
@@ -161,6 +172,9 @@ function OmegaSpitterAtk2:GetSkillEffect(p1, p2)
 	ret:AddQueuedMelee(p1, damage)
 	return ret
 end
+
+OmegaSpitterAtkB = OmegaSpitterAtk2:new{Damage=3,Class = "Enemy",Name = "Tracker Killer",Description = "Apply A.C.I.D. to all adjacent tiles, preparing to slice one for 3 damage.",}
+
 
 --Omega Swarmer uses the Alpha's weapon.
 
@@ -219,3 +233,5 @@ function OmegaWyrmAtk2:GetSkillEffect(p1, p2)
 	end
 	return ret
 end
+
+OmegaWyrmAtkB = OmegaWyrmAtk2:new{Damage=3,Class = "Enemy",Name = "Prowling Wurm",}

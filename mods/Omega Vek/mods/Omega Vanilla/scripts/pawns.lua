@@ -11,6 +11,8 @@ local function IsTipImage()
 	return Board:GetSize() == Point(6,6)
 end
 
+TIER_OMEGA = 10
+
 -------------
 --   Art   --
 -------------
@@ -72,7 +74,7 @@ OmegaBurnbug2 = Pawn:new{
 	Portrait = "enemy/OmegaBurnbug2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBurnbug2")
 
@@ -88,7 +90,7 @@ OmegaFirefly2 = Pawn:new{
 	Portrait = "enemy/OmegaFirefly2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaFirefly2")
 
@@ -105,7 +107,7 @@ OmegaLeaper2 = Pawn:new{
 	Portrait = "enemy/OmegaLeaper2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaLeaper2")
 
@@ -121,7 +123,7 @@ OmegaScarab2 = Pawn:new{
 	Portrait = "enemy/OmegaScarab2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaScarab2")
 
@@ -138,13 +140,13 @@ OmegaMosquito2 = Pawn:new{
 	IgnoreSmoke = true,
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaMosquito2")
 
 OmegaDigger2 = Pawn:new{
 	Name = "Omega Digger",
-	Health = 2,
+	Health = 3,
 	MoveSpeed = 3,
 	Image = "Omegadigger",
 	ImageOffset = 1,
@@ -153,7 +155,7 @@ OmegaDigger2 = Pawn:new{
 	Portrait = "enemy/OmegaDigger2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaDigger2")
 
@@ -168,7 +170,7 @@ OmegaCentipede2 = Pawn:new{
 	Portrait = "enemy/OmegaCentipede2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaCentipede2")
 
@@ -183,7 +185,7 @@ OmegaBouncer2 = Pawn:new{
 	Portrait = "enemy/OmegaBouncer2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBouncer2")
 
@@ -200,7 +202,7 @@ OmegaMoth2 = Pawn:new{
 	Portrait = "enemy/OmegaMoth2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaMoth2")
 
@@ -215,7 +217,7 @@ OmegaDung2 = Pawn:new{
 	Portrait = "enemy/OmegaDung2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaDung2")
 
@@ -231,7 +233,7 @@ OmegaHornet2 = Pawn:new{
 	Flying = true,
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaHornet2")
 
@@ -250,7 +252,7 @@ OmegaBurrower2 = Pawn:new{
 	SoundLocation = "/enemy/burrower_2/",
 	Portrait = "enemy/OmegaBurrower2",
 	Pushable = false,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBurrower2")  
 
@@ -265,7 +267,7 @@ OmegaScorpion2 = Pawn:new{
 	Portrait = "enemy/OmegaScorpion2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaScorpion2")
 
@@ -281,7 +283,7 @@ OmegaShaman2 = Pawn:new{
 	Portrait = "enemy/OmegaShaman2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 	IsDeathEffect = true,
 }
 AddPawn("OmegaShaman2")
@@ -312,7 +314,7 @@ OmegaTotem2 = Pawn:new{
 	Portrait = "enemy/OmegaTotem2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaTotem2")
 
@@ -328,7 +330,7 @@ OmegaCrab2 = Pawn:new{
 	Portrait = "enemy/OmegaCrab2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaCrab2")
 
@@ -344,7 +346,7 @@ OmegaBeetle2 = Pawn:new{
 	Portrait = "enemy/OmegaBeetle2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBeetle2")
 
@@ -361,7 +363,7 @@ OmegaStarfish2 = Pawn:new{
 	Portrait = "enemy/OmegaStarfish2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 	IsDeathEffect = true,
 	DeathSpawn = "OmegaStarfish2Spawn"
 }
@@ -429,7 +431,7 @@ OmegaSpider2 = Pawn:new{
 	Portrait = "enemy/OmegaSpider2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaSpider2")
 
@@ -444,7 +446,7 @@ OmegaBlobber2 = Pawn:new{
 	Portrait = "enemy/OmegaBlobber2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBlobber2")
 
@@ -460,6 +462,6 @@ OmegaBlob2 = {
 	Portrait = "enemy/Blob2",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_BLOB,
-	Tier = TIER_ALPHA,
+	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaBlob2") 
