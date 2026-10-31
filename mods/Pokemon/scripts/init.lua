@@ -377,8 +377,26 @@ function mod:load( options, version)
 	end
 	
 	modApi:addMissionStartHook(PickBranchingEvos)
-	modApi:addMissionStartHook(PokemonGraphicsWeapons)
+	
 	modApi:addMissionStartHook(PokemonFlightMegas)
+	
+	modApi:addMissionEndHook(function()	--evolve weapons that eat upgrades
+		for i = 0, 2 do
+			local pawn=Board:GetPawn(i)
+			for j = 1, pawn:GetWeaponCount() do
+				local weapon = pawn:GetPoweredWeaponTypes()[j]
+				local turnInto = _G[weapon].BecomeWeapon
+				if turnInto then
+					pawn:RemoveWeapon(j)
+					pawn:AddWeapon(turnInto)
+					DoSaveGame()
+					break
+				end 
+			end
+		end
+	end)
+	
+	modApi:addMissionStartHook(PokemonGraphicsWeapons)
 	
 	modApi:addTestMechEnteredHook(function(mission)
 		modApi:conditionalHook(function()

@@ -400,22 +400,38 @@ a.Poke_GiratinaShadowa = a.MechUnit:new{Image="units/player/GiratinaShadow_a.png
 a.Poke_Arceus =a.MechUnit:new{Image="units/player/Arceus.png", PosX = -10, PosY = -4}
 a.Poke_Arceusa = a.MechUnit:new{Image="units/player/Arceus_a.png",  PosX = -25, PosY = -30, NumFrames = 8 }
 
-a.Poke_ArceusElectric =a.Poke_Arceus:new{Image="units/player/ArceusElectric.png"}
+a.Poke_ArceusElectric =a.Poke_Arceus:new{}
 a.Poke_ArceusElectrica = a.Poke_Arceusa:new{Image="units/player/ArceusElectric_a.png"}
-a.Poke_ArceusFairy =a.Poke_Arceus:new{Image="units/player/ArceusFairy.png"}
-a.Poke_ArceusFairya = a.Poke_Arceusa:new{Image="units/player/ArceusFairy_a.png"}
-a.Poke_ArceusFire =a.Poke_Arceus:new{Image="units/player/ArceusFire.png"}
+a.Poke_ArceusPsychic =a.Poke_Arceus:new{}
+a.Poke_ArceusPsychica = a.Poke_Arceusa:new{Image="units/player/ArceusPsychic_a.png"}
+a.Poke_ArceusFire =a.Poke_Arceus:new{}
 a.Poke_ArceusFirea = a.Poke_Arceusa:new{Image="units/player/ArceusFire_a.png"}
-a.Poke_ArceusGrass =a.Poke_Arceus:new{Image="units/player/ArceusGrass.png"}
+a.Poke_ArceusGrass =a.Poke_Arceus:new{}
 a.Poke_ArceusGrassa = a.Poke_Arceusa:new{Image="units/player/ArceusGrass_a.png"}
-a.Poke_ArceusGround =a.Poke_Arceus:new{Image="units/player/ArceusGround.png"}
+a.Poke_ArceusGround =a.Poke_Arceus:new{}
 a.Poke_ArceusGrounda = a.Poke_Arceusa:new{Image="units/player/ArceusGround_a.png"}
-a.Poke_ArceusIce =a.Poke_Arceus:new{Image="units/player/ArceusIce.png"}
+a.Poke_ArceusIce =a.Poke_Arceus:new{}
 a.Poke_ArceusIcea = a.Poke_Arceusa:new{Image="units/player/ArceusIce_a.png"}
-a.Poke_ArceusPoison =a.Poke_Arceus:new{Image="units/player/ArceusPoison.png"}
+a.Poke_ArceusPoison =a.Poke_Arceus:new{}
 a.Poke_ArceusPoisona = a.Poke_Arceusa:new{Image="units/player/ArceusPoison_a.png"}
-a.Poke_ArceusWater =a.Poke_Arceus:new{Image="units/player/ArceusWater.png"}
+a.Poke_ArceusWater =a.Poke_Arceus:new{}
 a.Poke_ArceusWatera = a.Poke_Arceusa:new{Image="units/player/ArceusWater_a.png"}
+a.Poke_ArceusFighting = a.Poke_Arceus:new{}
+a.Poke_ArceusFightinga = a.Poke_Arceusa:new{Image="units/player/ArceusFighting_a.png"}
+a.Poke_ArceusFlying = a.Poke_Arceus:new{}
+a.Poke_ArceusFlyinga = a.Poke_Arceusa:new{Image="units/player/ArceusFlying_a.png"}
+a.Poke_ArceusBug = a.Poke_Arceus:new{}
+a.Poke_ArceusBuga = a.Poke_Arceusa:new{Image="units/player/ArceusBug_a.png"}
+a.Poke_ArceusDragon = a.Poke_Arceus:new{}
+a.Poke_ArceusDragona = a.Poke_Arceusa:new{Image="units/player/ArceusDragon_a.png"}
+a.Poke_ArceusGhost = a.Poke_Arceus:new{}
+a.Poke_ArceusGhosta = a.Poke_Arceusa:new{Image="units/player/ArceusGhost_a.png"}
+a.Poke_ArceusDark = a.Poke_Arceus:new{}
+a.Poke_ArceusDarka = a.Poke_Arceusa:new{Image="units/player/ArceusDark_a.png"}
+a.Poke_ArceusSteel = a.Poke_Arceus:new{}
+a.Poke_ArceusSteela = a.Poke_Arceusa:new{Image="units/player/ArceusSteel_a.png"}
+a.Poke_ArceusRock = a.Poke_Arceus:new{}
+a.Poke_ArceusRocka = a.Poke_Arceusa:new{Image="units/player/ArceusRock_a.png"}
 
 a.Poke_Arceus_broken = a.MechUnit:new{Image="units/player/MasterBall.png", PosX = -15, PosY = -2 }
 a.Poke_Arceus_ns = a.MechIcon:new{Image="units/player/Arceus_ns.png"}

@@ -10,7 +10,25 @@ modApi:appendAssets("img/weapons/", "img/weapons/")
 modApi:appendAssets("img/effects/", "img/effects/")
 
 
-local tiles = { "tile_normal.png","tile_electric.png","tile_fairy.png","tile_fire.png","tile_grass.png","tile_ground.png","tile_ice.png","tile_poison.png","tile_water.png", }
+local tiles = {
+	"tile_normal.png",
+	"tile_electric.png",
+	"tile_fairy.png",
+	"tile_fire.png",
+	"tile_grass.png",
+	"tile_ground.png",
+	"tile_ice.png",
+	"tile_poison.png",
+	"tile_water.png",
+	"tile_fighting.png",
+	"tile_flying.png",
+	"tile_bug.png",
+	"tile_dragon.png",
+	"tile_ghost.png",
+	"tile_dark.png",
+	"tile_steel.png",
+	"tile_rock.png",
+}
 for _, tile in ipairs(tiles) do
 	Location["effects/"..tile] = Point(-27,3)
 end
@@ -5640,7 +5658,7 @@ Emitter_Wither_12 = Emitter_Wither_Base:new{ image = "effects/wither_12.png" }
 Poke_Judgment = Skill:new{
 	Class = "TechnoVek",
 	Icon = "weapons/Judgment.png",
-	Description = "Deals damage to every pawn in a large area. Pushes units on the same row or column as the user.",
+	Description = "Damages every pawn in a large area. Pushes pawns on the same row or column as the user.",
 	Name = "Judgment",
 	Damage = 2,
 	Range = 3,
@@ -5648,7 +5666,7 @@ Poke_Judgment = Skill:new{
 	PowerCost = 0,
 	Upgrades = 2,
 	UpgradeList = { "More Types", "More Types" },
-	UpgradeCost = { 2,2 },
+	UpgradeCost = { 1,1 },
 	ZoneTargeting = ZONE_CUSTOM,
 	TipImage = {
 		Unit = Point(2,3),
@@ -5661,9 +5679,360 @@ Poke_Judgment = Skill:new{
 		CustomPawn = "Poke_Arceus",
 	}
 }
-Poke_Judgment_A=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Fire: applies fire. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", TwoClick = true, TypesA = true }
-Poke_Judgment_B=Poke_Judgment:new{ UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips the attack direction of units hit.", TwoClick = true, TypesB = true }
-Poke_Judgment_AB=Poke_Judgment:new{ TwoClick = true, TypesA = true, TypesB = true }
+Poke_Judgment_A=Poke_Judgment:new{ TwoClick = true, TypesA = true, BecomeWeapon = "Poke_JudgmentA", UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", }
+Poke_Judgment_B=Poke_Judgment:new{ TwoClick = true, TypesB = true, BecomeWeapon = "Poke_JudgmentB", UpgradeDescription = "Unlocks the ability to switch between types by self-targeting. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.", }
+Poke_Judgment_AB = Poke_Judgment:new{TwoClick = true,TypesA = true,TypesB = true,BecomeWeapon = "Poke_JudgmentAB"}
+
+Poke_JudgmentA = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.",
+	TwoClick = true,
+	TypesA = true,
+	PowerCost = 1,
+}
+
+Poke_JudgmentA_A=Poke_Judgment:new{ TwoClick = true, TypesC = true, BecomeWeapon = "Poke_JudgmentAC", UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.", }
+Poke_JudgmentA_B=Poke_Judgment:new{ TwoClick = true, TypesB = true, BecomeWeapon = "Poke_JudgmentAB", UpgradeDescription = "Unlocks new types. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.", }
+Poke_JudgmentA_AB=Poke_Judgment:new{ TwoClick = true, TypesA = true, TypesB = true, TypesC = true, BecomeWeapon = "Poke_JudgmentABC" }
+
+Poke_JudgmentB = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+	TwoClick = true,
+	TypesB = true,
+	PowerCost = 1,
+}
+
+Poke_JudgmentB_A=Poke_Judgment:new{ TwoClick = true, TypesA = true, TypesB = true, BecomeWeapon = "Poke_JudgmentAB", UpgradeDescription = "Unlocks new types. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.", }
+Poke_JudgmentB_B=Poke_Judgment:new{ TwoClick = true, TypesB = true, TypesC = true, BecomeWeapon = "Poke_JudgmentBC", UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.", }
+Poke_JudgmentB_AB=Poke_Judgment:new{ TwoClick = true, TypesA = true, TypesB = true, TypesC = true, BecomeWeapon = "Poke_JudgmentABC" }
+
+Poke_JudgmentAB = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	PowerCost = 2,
+}
+
+Poke_JudgmentAC = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+	TwoClick = true,
+	TypesA = true,
+	TypesC = true,
+	PowerCost = 2,
+}
+
+Poke_JudgmentAD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesA = true,
+	TypesD = true,
+	PowerCost = 2,
+}
+
+Poke_JudgmentBC = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+	TwoClick = true,
+	TypesB = true,
+	TypesC = true,
+	PowerCost = 2,
+}
+
+Poke_JudgmentBD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesB = true,
+	TypesD = true,
+	PowerCost = 2,
+}
+
+Poke_JudgmentCD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesC = true,
+	TypesD = true,
+	PowerCost = 2,
+}
+
+-- AB: can add C or D
+
+Poke_JudgmentAB_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	BecomeWeapon = "Poke_JudgmentABC",
+	UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+}
+
+Poke_JudgmentAB_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABD",
+	UpgradeDescription = "Unlocks new types. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+}
+
+Poke_JudgmentAB_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+
+-- AC: can add B or D
+
+Poke_JudgmentAC_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	BecomeWeapon = "Poke_JudgmentABC",
+	UpgradeDescription = "Unlocks new types. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+}
+
+Poke_JudgmentAC_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentACD",
+	UpgradeDescription = "Unlocks new types. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+}
+
+Poke_JudgmentAC_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+
+-- AD: can add B or C
+
+Poke_JudgmentAD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABD",
+	UpgradeDescription = "Unlocks new types. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+}
+
+Poke_JudgmentAD_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentACD",
+	UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+}
+
+Poke_JudgmentAD_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+
+-- BC: can add A or D
+
+Poke_JudgmentBC_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	BecomeWeapon = "Poke_JudgmentABC",
+	UpgradeDescription = "Unlocks new types. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.",
+}
+
+Poke_JudgmentBC_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentBCD",
+	UpgradeDescription = "Unlocks new types. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+}
+
+Poke_JudgmentBC_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+
+-- BD: can add A or C
+
+Poke_JudgmentBD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABD",
+	UpgradeDescription = "Unlocks new types. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.",
+}
+
+Poke_JudgmentBD_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentBCD",
+	UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+}
+
+Poke_JudgmentBD_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+
+-- CD: can add A or B
+
+Poke_JudgmentCD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentACD",
+	UpgradeDescription = "Unlocks new types. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.",
+}
+
+Poke_JudgmentCD_B = Poke_Judgment:new{
+	TwoClick = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentBCD",
+	UpgradeDescription = "Unlocks new types. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+}
+
+Poke_JudgmentCD_AB = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true, TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+}
+
+--Triples
+
+Poke_JudgmentABC = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesC = true,
+	PowerCost = 3,
+	Upgrades = 1,
+	UpgradeList = { "More Types" },
+	UpgradeCost = { 1 },
+}
+
+Poke_JudgmentABD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesA = true, TypesB = true, TypesD = true,
+	PowerCost = 3,
+	Upgrades = 1,
+	UpgradeList = { "More Types" },
+	UpgradeCost = { 1 },
+}
+
+Poke_JudgmentACD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesA = true, TypesC = true, TypesD = true,
+	PowerCost = 3,
+	Upgrades = 1,
+	UpgradeList = { "More Types" },
+	UpgradeCost = { 1 },
+}
+
+Poke_JudgmentBCD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	TwoClick = true,
+	TypesB = true, TypesC = true, TypesD = true,
+	PowerCost = 3,
+	Upgrades = 1,
+	UpgradeList = { "More Types" },
+	UpgradeCost = { 1 },
+}
+
+-- ABC: add D
+
+Poke_JudgmentABC_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+	UpgradeDescription = "Unlocks new types. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+}
+
+
+-- ABD: add C
+
+Poke_JudgmentABD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+	UpgradeDescription = "Unlocks new types. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful.",
+}
+
+
+-- ACD: add B
+
+Poke_JudgmentACD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+	UpgradeDescription = "Unlocks new types. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips.",
+}
+
+
+-- BCD: add A
+
+Poke_JudgmentBCD_A = Poke_Judgment:new{
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	BecomeWeapon = "Poke_JudgmentABCD",
+	UpgradeDescription = "Unlocks new types. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin.",
+}
+
+
+Poke_JudgmentABCD = Poke_Judgment:new{
+	Class = "TechnoVek",
+	Description = "Damages every pawn in a large area. Can change types. Normal: pushes. Fire: burns. Ice: applies Chill. Electric: applies Shocked. Poison: applies Toxin. Ground: cracks hit tiles. Grass: applies Rooted. Water: applies Wet. Psychic: flips. Fighting: +1 damage. Flying: applies smoke. Bug: Heals Vek, damages buildings. Dragon: become Dreadful. Ghost: confuses. Dark: blinds. Steel: +3 damage to armored. Rock: create Stealth Rocks on spawns.",
+	PowerCost = 4,
+	TwoClick = true,
+	TypesA = true,
+	TypesB = true,
+	TypesC = true,
+	TypesD = true,
+	Upgrades = 0,
+	UpgradeList = {},
+	UpgradeCost = {},
+}
 
 function Poke_Judgment:GetTargetArea(p1)
 	local ret = PointList()
@@ -5692,6 +6061,16 @@ function Poke_Judgment:GetSecondTargetArea(p1,p2)
 			ret:push_back(p1 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4])
 		end
 	end
+	if self.TypesC then
+		for i = DIR_START, DIR_END do
+			ret:push_back(p1 + DIR_VECTORS[i] * 2)
+		end
+	end
+	if self.TypesD then
+		for i = DIR_START, DIR_END do
+			ret:push_back(p1 + (DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]) * 2)
+		end
+	end
 	return ret
 end
 	
@@ -5705,27 +6084,55 @@ function Poke_Judgment:GetSkillEffect(p1, p2)
 		local willDelay = false
 		for k = 1, #targets do
 			local pawn = Board:GetPawn(targets[k])
-			local damage = SpaceDamage(targets[k], 2)
+			local damage = SpaceDamage(targets[k], self.Damage)
 			damage.sAnimation = "explo_gold"
-			if pawn and p1:Manhattan(targets[k]) == i then -- and targets[k] ~= p1 
-				if customAnim == "Poke_ArceusFire" then damage.iFire = 1 end
-				if customAnim == "Poke_ArceusIce" then damage.iChill = 1 end
-				if customAnim == "Poke_ArceusElectric" then damage.iShocked = 1 end
-				if customAnim == "Poke_ArceusPoison" then damage.iToxin = 1 end
-				if customAnim == "Poke_ArceusGround" then damage.iCrack = 1 end
-				if customAnim == "Poke_ArceusGrass" then damage.iRooted = 0 end
-				if customAnim == "Poke_ArceusWater" then damage.iWet = 1 end
-				if customAnim == "Poke_ArceusFairy" then damage.iPush = DIR_FLIP end
+			if p1:Manhattan(targets[k]) == i then
+				local flag = false
+				--base
 				if customAnim == "Poke_Arceus" and (targets[k].x == p1.x or targets[k].y == p1.y) then
 					damage.iPush = GetDirection(targets[k] - p1)
 					willDelay = true
 				end
-				ret:AddDropper(damage, "effects/judgment.png")
-			elseif p1:Manhattan(targets[k]) == i then
-				ret:AddDamage(SpaceDamage(targets[k], DAMAGE_ZERO))
+				--first group
+				if customAnim == "Poke_ArceusFire" then damage.iFire = 1 end
+				if customAnim == "Poke_ArceusIce" then damage.iChill = 1 end
+				if customAnim == "Poke_ArceusElectric" then damage.iShocked = 1 end
+				if customAnim == "Poke_ArceusPoison" then damage.iToxin = 1 end
+				--second group
+				if customAnim == "Poke_ArceusGround" then damage.iCrack = 1 end
+				if customAnim == "Poke_ArceusGrass" then damage.iRooted = 0 end
+				if customAnim == "Poke_ArceusWater" then damage.iWet = 1 end
+				if customAnim == "Poke_ArceusPsychic" then damage.iPush = DIR_FLIP end
+				--third group
+				if customAnim == "Poke_ArceusFighting" then damage.iDamage = self.Damage + 1 end
+				if customAnim == "Poke_ArceusFlying" then damage.iSmoke = 1 end
+				if customAnim == "Poke_ArceusBug" then 
+					if Board:IsBuilding(targets[k]) then flag = true end
+					if pawn and pawn:GetTeam() == TEAM_ENEMY then damage.iDamage = -self.Damage end
+				end
+				--if customAnim == "Poke_ArceusDragon" then HANDLED LATER end
+				--fourth group
+				if customAnim == "Poke_ArceusGhost" then damage.iConfusion = 1 end
+				if customAnim == "Poke_ArceusDark" then damage.iBlind = 1 end
+				if customAnim == "Poke_ArceusSteel" and pawn:IsArmor() then damage.iDamage = self.Damage + 3 end
+				if customAnim == "Poke_ArceusRock" and Board:IsSpawning(targets[k]) then 
+					flag = true
+					damage.sItem = "Poke_StealthRock"
+				end
+				
+				if pawn or flag then 
+					ret:AddDropper(damage, "effects/judgment.png") 
+				elseif p1:Manhattan(targets[k]) == i then
+					ret:AddDamage(SpaceDamage(targets[k], DAMAGE_ZERO))
+				end
 			end
 		end
 		if willDelay then ret:AddDelay(0.1) end
+	end
+	if customAnim == "Poke_ArceusDragon" then
+		local dreadfulDamage = SpaceDamage(p1)
+		dreadfulDamage.iDreadful = -10
+		ret:AddDamage(dreadfulDamage)
 	end
 	return ret
 end
@@ -5733,7 +6140,7 @@ end
 function Poke_Judgment:GetFinalEffect(p1, p2, p3)
 	local ret = SkillEffect()
 	local userId = Board:GetPawn(p1):GetId()
-	if p1 == p2 and (self.TypesA or self.TypesB) then
+	if p1 == p2 and (self.TypesA or self.TypesB or self.TypesC or self.TypesD) then
 		local normalMark = SpaceDamage(p1)
 		normalMark.sImageMark = "effects/tile_normal.png"
 		ret:AddDamage(normalMark)
@@ -5765,10 +6172,39 @@ function Poke_Judgment:GetFinalEffect(p1, p2, p3)
 			fairyMark.sImageMark = "effects/tile_fairy.png"
 			ret:AddDamage(fairyMark)
 		end
+		if self.TypesC then
+			local fightingMark = SpaceDamage(p1 + DIR_VECTORS[0] * 2)
+			fightingMark.sImageMark = "effects/tile_fighting.png"
+			ret:AddDamage(fightingMark)
+			local flyingMark = SpaceDamage(p1 + DIR_VECTORS[1] * 2)
+			flyingMark.sImageMark = "effects/tile_flying.png"
+			ret:AddDamage(flyingMark)
+			local bugMark = SpaceDamage(p1 + DIR_VECTORS[2] * 2)
+			bugMark.sImageMark = "effects/tile_bug.png"
+			ret:AddDamage(bugMark)
+			local dragonMark = SpaceDamage(p1 + DIR_VECTORS[3] * 2)
+			dragonMark.sImageMark = "effects/tile_dragon.png"
+			ret:AddDamage(dragonMark)
+		end
+		if self.TypesD then
+			local ghostMark = SpaceDamage(p1 + (DIR_VECTORS[0] + DIR_VECTORS[1])*2)
+			ghostMark.sImageMark = "effects/tile_ghost.png"
+			ret:AddDamage(ghostMark)
+			local darkMark = SpaceDamage(p1 + (DIR_VECTORS[1] + DIR_VECTORS[2])*2)
+			darkMark.sImageMark = "effects/tile_dark.png"
+			ret:AddDamage(darkMark)
+			local steelMark = SpaceDamage(p1 + (DIR_VECTORS[2] + DIR_VECTORS[3])*2)
+			steelMark.sImageMark = "effects/tile_steel.png"
+			ret:AddDamage(steelMark)
+			local rockMark = SpaceDamage(p1 + (DIR_VECTORS[3] + DIR_VECTORS[0])*2)
+			rockMark.sImageMark = "effects/tile_rock.png"
+			ret:AddDamage(rockMark)
+		end
 	end
 	if p3 == p1 then	--normal
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_Arceus"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 255, 255))", p1:GetString()))
+		
 	elseif p3 == p1 + DIR_VECTORS[0] then	--fire
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusFire"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 84, 0))", p1:GetString()))
@@ -5781,6 +6217,7 @@ function Poke_Judgment:GetFinalEffect(p1, p2, p3)
 	elseif p3 == p1 + DIR_VECTORS[3] then	--poison
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusPoison"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(154, 45, 140))", p1:GetString()))
+	
 	elseif p3 == p1 + DIR_VECTORS[0] + DIR_VECTORS[1] then	--ground
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusGround"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(180, 110, 25))", p1:GetString()))
@@ -5790,8 +6227,34 @@ function Poke_Judgment:GetFinalEffect(p1, p2, p3)
 	elseif p3 == p1 + DIR_VECTORS[2] + DIR_VECTORS[3] then	--water
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusWater"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(0, 169, 255))", p1:GetString()))
-	elseif p3 == p1 + DIR_VECTORS[3] + DIR_VECTORS[0] then	--fairy
-		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusFairy"))
+	elseif p3 == p1 + DIR_VECTORS[3] + DIR_VECTORS[0] then	--psychic
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusPsychic"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 140, 215))", p1:GetString()))
+		
+	elseif p3 == p1 + DIR_VECTORS[0]*2 then	--fighting
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusFighting"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(229, 145, 33))", p1:GetString()))
+	elseif p3 == p1 + DIR_VECTORS[1]*2 then	--flying
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusFlying"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(200, 200, 255))", p1:GetString()))
+	elseif p3 == p1 + DIR_VECTORS[2]*2 then	--bug
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusBug"))	--top 10 anime betrayals
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 255, 0))", p1:GetString()))
+	elseif p3 == p1 + DIR_VECTORS[3]*2 then	--dragon
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusDragon"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(154, 45, 140))", p1:GetString()))
+		
+	elseif p3 == p1 + (DIR_VECTORS[0] + DIR_VECTORS[1])*2 then	--ghost
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusGhost"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(180, 110, 25))", p1:GetString()))
+	elseif p3 == p1 + (DIR_VECTORS[1] + DIR_VECTORS[2])*2 then	--dark
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusDark"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(0, 255, 0))", p1:GetString()))
+	elseif p3 == p1 + (DIR_VECTORS[2] + DIR_VECTORS[3])*2 then	--steel
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusSteel"))
+		ret:AddScript(string.format("Board:Ping(%s, GL_Color(0, 169, 255))", p1:GetString()))
+	elseif p3 == p1 + (DIR_VECTORS[3] + DIR_VECTORS[0])*2 then	--rock
+		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", userId, "Poke_ArceusRock"))
 		ret:AddScript(string.format("Board:Ping(%s, GL_Color(255, 140, 215))", p1:GetString()))
 	end
 	if Board:GetSize() ~= Point(6, 6) then ret:AddScript(string.format("modApi:runLater(function() Board:GetPawn(%s):SetActive(true) end)", userId)) end

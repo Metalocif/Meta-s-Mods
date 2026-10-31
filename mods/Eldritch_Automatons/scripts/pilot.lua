@@ -45,6 +45,7 @@ local function AbdulAlhazredInsanityRemoval(mission)
 		local pawn = Board:GetPawn(i)
 		if pawn and pawn:GetPersonality() == "AbdulAlhazred" then foundAbdul = true break end 
 	end
+	if not foundAbdul then return end
 	for i = 0, 2 do
 		local pawn = Board:GetPawn(i)
 		if pawn and Status.GetStatus(i, "Insanity") and Status.GetStatus(i, "Insanity") >= 5 then 
@@ -65,6 +66,7 @@ local function AbdulAlhazredInsanity(mission)
 				local curr = pawn:GetSpace() + DIR_VECTORS[dir]
 				if Board:GetPawn(curr) and Board:GetPawn(curr):IsMech() then Status.ApplyInsanity(Board:GetPawn(curr):GetId()) end
 			end
+			return
 		end
 	end
 end
