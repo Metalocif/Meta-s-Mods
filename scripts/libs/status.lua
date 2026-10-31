@@ -299,13 +299,13 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 		end
         return
 	elseif key == "iChill" or key == "iChilled" then
-		if value == 1 and value ~= STATUS_REMOVE and not pawn:IsFire() and not pawn:IsFrozen() then
+		if value >= 1 and value ~= STATUS_REMOVE and not pawn:IsFire() and not pawn:IsFrozen() then
 			if Status.GetStatus(id, "Chill") then
 				SpaceDamageInstance.iFrozen = 1
 				return oldNewIndex(SpaceDamageInstance, key, 0)
 			else
 				SpaceDamageInstance.sImageMark = "libs/status/chill_icon.png"
-				SpaceDamageInstance.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", id, value)
+				SpaceDamageInstance.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", id, (value == 2))
 			end
 		elseif value == STATUS_REMOVE or not pawn:IsFrozen() then
 			SpaceDamageInstance.sImageMark = "libs/status/chill_icon_remove.png"
