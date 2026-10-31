@@ -1422,6 +1422,10 @@ function Poke_RoarOfTimeBoss:GetTargetArea(point)
 	return ret
 end
 
+function Poke_RoarOfTimeBoss:GetTargetScore(p1,p2)
+	return 100
+end
+
 function Poke_RoarOfTimeBoss:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	if not Board:GetPawn(p1) then return ret end
@@ -1682,6 +1686,7 @@ function Poke_ShadowForceBoss:GetSkillEffect(p1, p2)
 	local mission = GetCurrentMission()
 	if not Board:GetPawn(p1) then return ret end
 	ret:AddScript(string.format("Board:AddAlert(%s, %q)", p1:GetString(), self.User.." used "..self.Name.."!"))
+	ret:AddScript(string.format("Board:Ping(%s, GL_Color(128, 128, 128)", p1:GetString()))
 	-- ret:AddScript("GetCurrentMission().ShadowForceTarget = "..p2:GetString())
 	
 	if mission then mission.ShadowForceTarget = p2 end
@@ -1794,6 +1799,7 @@ Poke_ArceusBoss = {
 	SleepImmune = true,
 	InfestedImmune = true,
 	BlindImmune = true,
+	GloryImmune = true,
 	-- Corpse = true,
 }
 AddPawn("Poke_ArceusBoss") 
@@ -1832,6 +1838,7 @@ Poke_ArceusBoss2 = {
 	SleepImmune = true,
 	InfestedImmune = true,
 	BlindImmune = true,
+	GloryImmune = true,
 	Corpse = true,
 }
 AddPawn("Poke_ArceusBoss2") 
@@ -2010,7 +2017,7 @@ Poke_SpatialRendArceus = Poke_SpatialRendBoss:new{
 	}
 }
 
-Poke_ShadowForceArceus = Poke_ShadowForce:new{
+Poke_ShadowForceArceus = Poke_ShadowForceBoss:new{
 	Class = "Enemy",
 	Icon = "weapons/NaturePower.png",	
 	Rarity = 3,
