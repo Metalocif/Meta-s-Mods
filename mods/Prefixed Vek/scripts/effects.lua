@@ -66,13 +66,13 @@ Meta_PushingWeapon = Skill:new{
 }
 
 function Meta_PushingWeapon:GetTargetArea(point)
-	return _G[Board:GetPawn(point):GetWeaponType(1)]:GetTargetArea(point)
+	return Board:GetPawn(point):GetWeaponCount() > 0 and _G[Board:GetPawn(point):GetWeaponType(1)]:GetTargetArea(point) or PointList()
 end
 
 function Meta_PushingWeapon:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
 	local dir = GetDirection(p2-p1)
-	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
+	if Board:GetPawn(p1) and Board:GetPawn(p1):GetWeaponCount() > 0 and _G[Board:GetPawn(p1):GetWeaponType(1)] ~= nil then	--otherwise we get errors on moving/death
 		local fx = _G[Board:GetPawn(p1):GetWeaponType(1)]:GetSkillEffect(p1, p2)
 		local new_damage_list = DamageList()
 		for i = 1, fx.q_effect:size() do
