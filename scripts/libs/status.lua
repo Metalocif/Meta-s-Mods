@@ -1428,11 +1428,13 @@ local function CreateGloryWeaponAlias(sourceName)
 		end
 		alias.Upgrades = 0
 		alias.Original = sourceName
-
-		local meta = getmetatable(source)
-		if meta then setmetatable(alias, meta) end
-
+		
 		_G[aliasName] = alias
+		_G[aliasName].GetName = function(self) return getWeaponKey(alias.Original, "Name") end
+		_G[aliasName].GetDescription = function(self) return getWeaponKey(alias.Original, "Description") end
+		_G[aliasName].GetIcon = function(self) return  getWeaponKey(alias.Original, "Icon") end
+		_G[aliasName].GetClass = function(self) return getWeaponKey(alias.Original, "Class") end
+		setmetatable(_G[aliasName], {__index = _G[sourceName]})
 	end
 
 	-- Set localization, even if the alias already existed.
