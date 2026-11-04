@@ -169,14 +169,14 @@ function Meta_TechnoMothWeapon:GetSkillEffect(p1,p2)
 	ret:AddBounce(p1, 1)
 	if self.TwoClick and Board:GetPawn(p1):GetMoveSpeed() >= 2 then
 		for dir = DIR_START, DIR_END do
-			damage = SpaceDamage(p1 + DIR_VECTORS[dir], 0, dir)
+			local damage = SpaceDamage(p1 + DIR_VECTORS[dir], 0, dir)
 			damage.sAnimation = "airpush_"..dir
 			if dir ~= direction or (options.Meta_MothNerf and not options.Meta_MothNerf.enabled) then ret:AddDamage(damage) end
 		end
 		local move = PointList()
 		move:push_back(p1)
 		move:push_back(p2)
-		ret:AddBounce(p1, 1)
+		-- ret:AddBounce(p1, 1)
 		ret:AddLeap(move,FULL_DELAY)
 	else
 		local damage = SpaceDamage(p2, self.Damage, direction)
@@ -191,7 +191,7 @@ function Meta_TechnoMothWeapon:GetSkillEffect(p1,p2)
 				if Board:IsPawnSpace(p1 + DIR_VECTORS[dir]) and Board:GetPawn(p1 + DIR_VECTORS[dir]):IsPushable() then achievementCounter = achievementCounter + 1 end
 			end
 		end
-		ret:AddBounce(p2, 2)
+		-- ret:AddBounce(p2, 2)
 	end
 	--if achievementCounter >= 5 and not achievements.Meta_BlownAway:isComplete() then achievements.Meta_BlownAway:addProgress{ complete = true } end
 	if achievementCounter >= 5 then ret:AddScript("completeBlownAway()") end
@@ -297,7 +297,7 @@ Meta_TechnoDiggerWeapon = Skill:new{
 		--Enemy2 = Point(2,3),
 		Enemy3 = Point(1,1),
 		Enemy4 = Point(1,0),
-		Target = Point(2,1),
+		Target = Point(1,2),
 		Water = Point(3,2),
 		Building = Point(1,2),
 		Building2 = Point(3,1),
@@ -338,10 +338,10 @@ function Meta_TechnoDiggerWeapon:GetSkillEffect(p1,p2)
 			if mission then
 				if not mission.EncasedBuildings then mission.EncasedBuildings = {} end
 				if Board:IsUniqueBuilding(curr) then 
-					mission.EncasedBuildings[curr:GetString()] = tostring(Board:GetUniqueBuilding(curr)) 
+					ret:AddScript(string.format("GetCurrentMission().EncasedBuildings[%q] = %s", curr:GetString(), Board:GetUniqueBuilding(curr)))
 					damage.sScript = string.format("Board:SetUniqueBuilding(%s, \"\")", curr:GetString())	--probably unneeded
 				else 
-					mission.EncasedBuildings[curr:GetString()] = Board:GetHealth(curr) .. Board:GetMaxHealth(curr) 
+					ret:AddScript(string.format("GetCurrentMission().EncasedBuildings[%q] = %s", curr:GetString(), Board:GetHealth(curr) .. Board:GetMaxHealth(curr)))
 					--we store both current and max HP so we can remake a half-destroyed building later
 				end
 				local encasedCount = 0
@@ -439,116 +439,94 @@ Wall2 =
 	}
 AddPawn("Wall2") 
 
-EncasedBuilding = 
-	{
-		Name = "Encased Building",
-		Health = 1,
-		Neutral = true,
-		MoveSpeed = 0,
-		IsPortrait = false,
-		LargeShield = true,
-		Pushable = false,				--both logical and necessary so we can find the encased building back on death
-		IsDeathEffect = true,			--finds the encased buildings back to respawn them
-		Image = "encasedbuilding",
-		SoundLocation = "/support/rock/",
-		DefaultTeam = TEAM_NONE,		--I'm not sure Vek AI cares about these, in which case they should be TEAM_PLAYER?
-		ImpactMaterial = IMPACT_ROCK,	--can throw shrapnel
-	}
-AddPawn("EncasedBuilding") 
 
-function EncasedBuilding:GetDeathEffect(point)
+function EncasedBuildingDeathEffect(pawn, point)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()
-	--check string is number, if yes spawn normal building & set health
-	if tonumber(mission.EncasedBuildings[point:GetString()]) then 
-		--means it's a number, ie. we saved the building's health earlier so it's not unique
-		local currHealth = mission.EncasedBuildings[point:GetString()]:sub(1, 1)
-		local maxHealth = mission.EncasedBuildings[point:GetString()]:sub(2, 2)
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-		ret:AddScript(string.format("Board:SetHealth(%s, %s, %s)", point:GetString(), currHealth, maxHealth))
-	else
-		ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
+	if point and Board:GetTerrain(point) ~= TERRAIN_HOLE then
+		--check string is number, if yes spawn normal building & set health
+		if tonumber(mission.EncasedBuildings[point:GetString()]) then 
+			--means it's a number, ie. we saved the building's health earlier so it's not unique
+			local currHealth = tostring(mission.EncasedBuildings[point:GetString()]):sub(1, 1)
+			local maxHealth = tostring(mission.EncasedBuildings[point:GetString()]):sub(2, 2)
+			ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
+			ret:AddScript(string.format("Board:SetHealth(%s, %s, %s)", point:GetString(), currHealth, maxHealth))
+		else
+			ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
+			ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
+		end
 	end
 	return ret
 end
 
+EncasedBuilding = 
+{
+	Name = "Encased Building",
+	Health = 1,
+	Neutral = true,
+	MoveSpeed = 0,
+	IsPortrait = false,
+	LargeShield = true,
+	Pushable = false,				--both logical and necessary so we can find the encased building back on death
+	IsDeathEffect = true,			--finds the encased buildings back to respawn them
+	Image = "encasedbuilding",
+	SoundLocation = "/support/rock/",
+	DefaultTeam = TEAM_PLAYER,		
+	ImpactMaterial = IMPACT_ROCK,	--can throw shrapnel
+	GetDeathEffect = EncasedBuildingDeathEffect,
+}
+AddPawn("EncasedBuilding") 
+
+
+
 EncasedBuildingStout = EncasedBuilding:new	--what is inherited and what is not is a complete mystery to me
-	{
-		Name = "Encased Building",
-		Image = "rock1",
-		Health = 1,
-		LargeShield = false,
-		Pushable = false,
-		IsPortrait = false,
-	}
+{
+	Name = "Encased Building",
+	Image = "rock1",
+	Health = 1,
+	LargeShield = false,
+	Pushable = false,
+	IsPortrait = false,
+	GetDeathEffect = EncasedBuildingDeathEffect,
+}
 AddPawn("EncasedBuildingStout") 
 
 EncasedBuilding2 = EncasedBuilding:new
-	{
-		Name = "Encased Building",
-		Image = "encasedbuilding",
-		Health = 2,
-		Pushable = false,
-		LargeShield = true,
-		IsPortrait = false,
-	}
+{
+	Name = "Encased Building",
+	Image = "encasedbuilding",
+	Health = 2,
+	Pushable = false,
+	LargeShield = true,
+	IsPortrait = false,
+	GetDeathEffect = EncasedBuildingDeathEffect,
+}
 AddPawn("EncasedBuilding2") 
 
 EncasedBuildingStout2 = EncasedBuildingStout:new
-	{
-		Name = "Encased Building",
-		Image = "rock1",
-		Health = 2,
-		Pushable = false,
-		IsPortrait = false,
-	}
+{
+	Name = "Encased Building",
+	Image = "rock1",
+	Health = 2,
+	Pushable = false,
+	IsPortrait = false,
+	GetDeathEffect = EncasedBuildingDeathEffect,
+}
 AddPawn("EncasedBuildingStout2") 
 
-function EncasedBuildingStout:GetDeathEffect(point)
-	local ret = SkillEffect()
-	local mission = GetCurrentMission()
-	if tonumber(mission.EncasedBuildings[point:GetString()]) then 
-		local currHealth = mission.EncasedBuildings[point:GetString()]:sub(1, 1)
-		local maxHealth = mission.EncasedBuildings[point:GetString()]:sub(2, 2)
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-		ret:AddScript(string.format("Board:SetHealth(%s, %s, %s)", point:GetString(), currHealth, maxHealth))
-	else
-		ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-	end
-	return ret
+
+local function EVENT_onModsLoaded()
+	modApi:addMissionEndHook(function()		--clear rocks
+		for i = 0, 7 do
+			for j = 0, 7 do
+				if GetCurrentMission().EncasedBuildings[Point(i,j):GetString()] then Board:GetPawn(Point(i,j)):Kill(false) end
+			end
+		end
+	end)
 end
 
-function EncasedBuilding2:GetDeathEffect(point)
-	local ret = SkillEffect()
-	local mission = GetCurrentMission()
-	if tonumber(mission.EncasedBuildings[point:GetString()]) then 
-		local currHealth = mission.EncasedBuildings[point:GetString()]:sub(1, 1)
-		local maxHealth = mission.EncasedBuildings[point:GetString()]:sub(2, 2)
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-		ret:AddScript(string.format("Board:SetHealth(%s, %s, %s)", point:GetString(), currHealth, maxHealth))
-	else
-		ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-	end
-	return ret
-end
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
 
-function EncasedBuildingStout2:GetDeathEffect(point)
-	local ret = SkillEffect()
-	local mission = GetCurrentMission()
-	if tonumber(mission.EncasedBuildings[point:GetString()]) then 
-		local currHealth = mission.EncasedBuildings[point:GetString()]:sub(1, 1)
-		local maxHealth = mission.EncasedBuildings[point:GetString()]:sub(2, 2)
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-		ret:AddScript(string.format("Board:SetHealth(%s, %s, %s)", point:GetString(), currHealth, maxHealth))
-	else
-		ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
-		ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
-	end
-	return ret
-end
 
 --Tumblebug artillery: 
 --You can target things beyond something so it's not a two-click and it instead auto-selects the first thing in the line, so to speak
@@ -721,7 +699,8 @@ function Meta_TechnoTumblebugWeapon:TossStuff(ret, p1, p2)
 			if fireBoom or acidBoom then
 				for i = DIR_START, DIR_END do
 					local damage = SpaceDamage(p2 + DIR_VECTORS[i])
-					if fireBoom then damage.iFire = 1 else damage.iAcid = 1 end
+					if fireBoom then damage.iFire = 1 end
+					if acidBoom then damage.iAcid = 1 end
 					ret:AddDamage(damage)
 				end
 			end
@@ -748,7 +727,7 @@ function Meta_TechnoTumblebugWeapon:TossStuff(ret, p1, p2)
 				visual = "effects/shotdown_rock.png"
 			end
 			if self.ToSpawn == "BombRockNoBoom" then visual = "effects/upshot_bombrock.png" end
-			if (Board:IsAcid(p1 + DIR_VECTORS[direction]) or Board:IsFire(p1 + DIR_VECTORS[direction])) and self.ToSpawn == "BombRockNoBoom" then visual = visual.sub(1, -9).."bomb"..visual.sub(-8) end
+			if (Board:IsAcid(p1 + DIR_VECTORS[direction]) or Board:IsFire(p1 + DIR_VECTORS[direction])) and self.ToSpawn == "BombRockNoBoom" then visual = visual:sub(1, -9).."bomb"..visual:sub(-8) end
 			ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(Point(-1, -1))", Point(p1 + DIR_VECTORS[direction]):GetString()))
 			if _G[Board:GetPawn(rockID):GetType()].Explodes then
 				damage.iDamage = damage.iDamage + 1 
@@ -758,7 +737,6 @@ function Meta_TechnoTumblebugWeapon:TossStuff(ret, p1, p2)
 				
 				local explosionAnim 
 				explosionAnim = "ExploArt2"
-				LOG(visual)
 				if visual == "effects/upshot_firebombrock.png" then explosionAnim = "explo_fire1" end
 				if visual == "effects/upshot_acidbombrock.png" then explosionAnim = "ExploArtCrab2" end
 				if visual == "effects/upshot_acidfirebombrock.png" then explosionAnim = "ExploArt3" ret:AddScript("completeRenfieldWho()") end
@@ -802,7 +780,6 @@ function Meta_TechnoTumblebugWeapon:TossStuff(ret, p1, p2)
 				ret:AddDelay(0.1)
 				didSidePush = true
 				ret:AddAnimation(p2, explosionAnim)
-				didSidePush = true
 				for dir = DIR_START, DIR_END do
 					local exploDamage = SpaceDamage(p2 + DIR_VECTORS[dir], 1)
 					exploDamage.sAnimation = "exploout2_"..dir
@@ -845,9 +822,9 @@ function Meta_TechnoTumblebugWeapon:TossStuff(ret, p1, p2)
 				
 				local explosionAnim 
 				explosionAnim = "ExploArt2"
-				if visual == "effect/upshot_firebombrock.png" then explosionAnim = "explo_fire1" end
-				if visual == "effect/upshot_acidbombrock.png" then explosionAnim = "ExploArtCrab2" end
-				if visual == "effect/upshot_acidfirebombrock.png" then explosionAnim = "ExploArt3" end
+				if visual == "effects/upshot_firebombrock.png" then explosionAnim = "explo_fire1" end
+				if visual == "effects/upshot_acidbombrock.png" then explosionAnim = "ExploArtCrab2" end
+				if visual == "effects/upshot_acidfirebombrock.png" then explosionAnim = "ExploArt3" end
 				ret:AddAnimation(p2, explosionAnim)
 				didSidePush = true
 				for dir = DIR_START, DIR_END do
@@ -941,7 +918,7 @@ Meta_Geomancy_A = Meta_Geomancy:new{
 }
 
 function Meta_Geomancy:GetTargetArea(point)
-	ret = PointList()
+	local ret = PointList()
 	for _, tile in ipairs(Board) do
 		ret:push_back(tile)
 	end
@@ -949,7 +926,7 @@ function Meta_Geomancy:GetTargetArea(point)
 end
 
 function Meta_Geomancy:GetSecondTargetArea(p1, p2)
-	ret = PointList()
+	local ret = PointList()
 	for _, tile in ipairs(Board) do
 		if tile ~= p2 then ret:push_back(tile) end
 	end
@@ -994,7 +971,7 @@ function Meta_Geomancy:DoStuff(ret, p1, p2)
 		for i = DIR_START, DIR_END do
 			local target = GetProjectileEnd(p2, p2 + DIR_VECTORS[i], PATH_PROJECTILE)
 			local damage = SpaceDamage(target, 1)
-			ret:AddProjectile(p2, damage, shrapnel..math.random(1,5), NO_DELAY)
+			ret:AddProjectile(p2, damage, "effects/shrapnel"..math.random(1,5), NO_DELAY)
 		end
 	elseif terrain == TERRAIN_WATER then							   --rain/acid rain: put out fires, replacing with smoke
 		if Board:IsAcid(p2) then
@@ -1042,7 +1019,7 @@ function Meta_Geomancy:DoStuff(ret, p1, p2)
 		ret:AddDamage(damage)	
 	elseif terrain == TERRAIN_FOREST or Board:IsForestFire(p2) then													--yeet the trees
 		for _, tile in ipairs(Board) do
-			if (Board:GetTerrain(tile) == TERRAIN_FOREST or Board:IsForestFire(p2)) and Board:GetPawn(tile) then 
+			if (Board:GetTerrain(tile) == TERRAIN_FOREST or Board:IsForestFire(tile)) and Board:GetPawn(tile) then 
 				ret:AddAnimation(tile, "explo_viridian", NO_DELAY)
 				ret:AddSafeDamage(SpaceDamage(tile, 0, DIR_FLIP)) 
 			end
