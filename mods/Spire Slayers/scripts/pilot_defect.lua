@@ -29,8 +29,6 @@ function this:init(mod)
 		Icon = "img/weapons/repair_Defect.png",
 		IsActive = function(pawn)
 			if not GAME then return false end
-			-- local mission = GAME.GetMission and GetCurrentMission()
-			-- if not mission then return false end
 			return pawn:IsAbility("StSDefectSkill") and GAME.StSDefectOrb == "Lightning"
 		end
 	}
@@ -39,8 +37,6 @@ function this:init(mod)
 		Icon = "img/weapons/repair_Defect.png",
 		IsActive = function(pawn)
 			if not GAME then return false end
-			-- local mission = GAME.GetMission and GetCurrentMission()
-			-- if not mission then return false end
 			return pawn:IsAbility("StSDefectSkill") and GAME.StSDefectOrb == "Frost"
 		end
 	}
@@ -49,8 +45,6 @@ function this:init(mod)
 		Icon = "img/weapons/repair_Defect.png",
 		IsActive = function(pawn)
 			if not GAME then return false end
-			-- local mission = GAME.GetMission and GetCurrentMission()
-			-- if not mission then return false end
 			return pawn:IsAbility("StSDefectSkill") and GAME.StSDefectOrb == "Dark"
 		end
 	}
@@ -59,8 +53,6 @@ function this:init(mod)
 		Icon = "img/weapons/repair_Defect.png",
 		IsActive = function(pawn)
 			if not GAME then return false end
-			-- local mission = GAME.GetMission and GetCurrentMission()
-			-- if not mission then return false end
 			return pawn:IsAbility("StSDefectSkill") and GAME.StSDefectOrb == "Plasma"
 		end
 	}
