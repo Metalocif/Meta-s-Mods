@@ -455,6 +455,7 @@ function EncasedBuildingDeathEffect(pawn, point)
 			ret:AddScript(string.format("Board:SetUniqueBuilding(%s, %q)", point:GetString(), mission.EncasedBuildings[point:GetString()]))
 			ret:AddScript(string.format("Board:SetTerrain(%s, TERRAIN_BUILDING)", point:GetString()))
 		end
+		mission.EncasedBuildings[point:GetString()] = nil
 	end
 	return ret
 end
@@ -517,9 +518,10 @@ AddPawn("EncasedBuildingStout2")
 
 local function EVENT_onModsLoaded()
 	modApi:addMissionEndHook(function()		--clear rocks
+		if GetCurrentMission().EncasedBuildings == nil then return end
 		for i = 0, 7 do
 			for j = 0, 7 do
-				if GetCurrentMission().EncasedBuildings[Point(i,j):GetString()] then Board:GetPawn(Point(i,j)):Kill(false) end
+				if Board:GetPawn(Point(i,j)):GetType():sub(1, 15) == "EncasedBuilding" then Board:GetPawn(Point(i,j)):Kill(false) end
 			end
 		end
 	end)
