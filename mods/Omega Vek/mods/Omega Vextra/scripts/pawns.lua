@@ -168,10 +168,6 @@ OmegaDNT_Dragonfly2 = Pawn:new
 }
 AddPawn("OmegaDNT_Dragonfly2")
 
-function StartDodgy()
-	if Pawn:GetTurnCount() <= 1 then Status.ApplyDodge(Pawn:GetId(), 1, 1, "Leap", true) end
-	return 1
-end
 OmegaDNT_Fly2 = Pawn:new
 {
 	Name = "Omega Fly",
@@ -186,7 +182,6 @@ OmegaDNT_Fly2 = Pawn:new
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
 	Tier = TIER_OMEGA,
-	GetWeapon = StartDodgy,
 }
 AddPawn("OmegaDNT_Fly2")
 
@@ -224,10 +219,6 @@ OmegaDNT_Mantis2 = Pawn:new
 }
 AddPawn("OmegaDNT_Mantis2")
 
-function StartTough()
-	if Pawn:GetTurnCount() <= 1 then Status.ApplyTough(Pawn:GetId(), 1) end
-	return 1
-end
 OmegaDNT_Pillbug2 = Pawn:new{
 	Name = "Omega Isopod",
 	Health = 4,
@@ -242,14 +233,9 @@ OmegaDNT_Pillbug2 = Pawn:new{
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_FLESH,
 	Tier = TIER_OMEGA,
-	GetWeapon = StartTough,		--mostly to test Tough
 }
 AddPawn("OmegaDNT_Pillbug2")
 
-function StartRepulsive()
-	if Pawn:GetTurnCount() <= 1 then Status.ApplyRepulsive(Pawn:GetId(), 0) end
-	return 1
-end
 OmegaDNT_Silkworm2 = Pawn:new
 {
 	Name = "Omega Silkworm",
@@ -263,7 +249,6 @@ OmegaDNT_Silkworm2 = Pawn:new
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
 	Tier = TIER_OMEGA,
-	GetWeapon = StartRepulsive,
 }
 
 AddPawn("OmegaDNT_Silkworm2")
@@ -353,3 +338,17 @@ OmegaDNT_Thunderbug2 = Pawn:new{
 	Tier = TIER_OMEGA,
 }
 AddPawn("OmegaDNT_Thunderbug2")
+
+
+local HOOK_pawnTracked = function(mission, pawn)
+	if not mission or not pawn then return end
+	if pawn:GetType() == "OmegaDNT_Fly2" then Status.ApplyDodge(pawn:GetId(), 1, 1, "Leap", false) end
+	if pawn:GetType() == "OmegaDNT_Pillbug2" then Status.ApplyTough(Pawn:GetId(), 1) end
+	if pawn:GetType() == "OmegaDNT_Silkworm2" then Status.StartRepulsive(pawn:GetId(), 0) end
+end
+
+local function EVENT_onModsLoaded()
+	modapiext:addPawnTrackedHook(HOOK_pawnTracked)
+end
+
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
