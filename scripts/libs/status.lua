@@ -2073,33 +2073,48 @@ local function EVENT_onModsLoaded()
 		if dodgersCount == 0 then return end
 		
 		local hash = function(point) return point.x * 10 + point.y end
-		local affectedTiles = {}	--store tiles the skillEffect will hit so we don't dodge into another one
 		
-		local skillEffectTable = extract_table(skillEffect.effect)
-		for _, fx in ipairs(skillEffectTable) do
-			affectedTiles[hash(fx.loc)] = fx.iDamage
-		end
-		
+		local originalEffect = skillEffect.effect or DamageList()
+		local originalQEffect = skillEffect.q_effect or DamageList()
+
+		local skillEffectTable = {}
+		local affectedTiles = {}
 		local tilesWithSpawns = {}
-		for _, fx in ipairs(skillEffectTable) do
-			if fx.sPawn ~= "" then tilesWithSpawns[hash(fx.loc)] = fx.loc end
+
+		for i = 1, originalEffect:size() do
+			local fx = originalEffect:index(i)
+			local loc = fx.loc
+
+			local entry = {loc = Point(loc.x, loc.y), iDamage = fx.iDamage, sPawn = fx.sPawn, iPush = fx.iPush}
+
+			table.insert(skillEffectTable, entry)
+			affectedTiles[hash(entry.loc)] = {iDamage = entry.iDamage, iPush = entry.iPush}
+
+			if entry.sPawn and entry.sPawn ~= "" then
+				tilesWithSpawns[hash(entry.loc)] = entry.loc
+			end
 		end
+
+		local dodgeEffect = SkillEffect()	--store stuff to prepend in here, prepend it at the end so we only mess with the SkillEffect once
 		local tilesDodgersMovedTo = {}
 		
 		for _, fx in ipairs(skillEffectTable) do
 			local dodger = Board:GetPawn(fx.loc)
-			-- Board:Ping(fx.loc, GL_Color(0, 0, 255))
 			
 			local dodgeInfo = (dodger ~= nil) and Status.GetStatus(dodger:GetId(), "Dodge") or nil
 			if dodgeInfo and not pawnsWhoDodged[dodger:GetId()] then	--don't dodge the same attack twice either
 				local targetWasQueued = dodger:GetQueuedTarget() ~= Point(-1, -1) and dodger:GetTeam() == TEAM_ENEMY	--used to requeue attack for Vek
-				local currPosScore = -10 * fx.iDamage
-				-- local PawnBackup = Pawn; Pawn = pawn
+				local pathProfile = dodger:GetPathProf()
+				local currPosScore = tonumber(-10 * fx.iDamage)
+				if dodgeInfo.smart then currPosScore = currPosScore + ScorePositioning(fx.loc, dodger) end
+				
+				if fx.iPush ~= DIR_NONE and fx.iPush ~= DIR_FLIP and Board:IsBlocked(fx.loc + DIR_VECTORS[fx.iPush], pathProfile) then currPosScore = currPosScore - 10 end
+				--take being pushed into something into account otherwise they won't dodge lethal push damage
 				local weapon = _G[dodger:GetQueuedWeapon()] or _G[dodger:GetBaseWeaponTypes()[1]] or _G[dodger:GetType()].SkillList[1]
 	
 				local actions = {}
-				local pathProfile = dodger:GetPathProf()
-				if dodgeInfo.movementType ~= "Walk" then pathProfile = PATH_FLYER end
+				
+				-- if dodgeInfo.movementType ~= "Walk" then pathProfile = PATH_FLYER end
 				local reachable = extract_table(Board:GetReachable(fx.loc, dodgeInfo.distance, pathProfile))
 				
 				-- create a list of all possible moves.
@@ -2107,8 +2122,16 @@ local function EVENT_onModsLoaded()
 				for _, loc in ipairs(reachable) do
 					-- move score
 					local moveScore = 0
-					if affectedTiles[hash(loc)] and affectedTiles[hash(loc)] ~= DAMAGE_ZERO and affectedTiles[hash(loc)] > 0 then --don't dodge into more damage
-						moveScore = -10 * affectedTiles[hash(loc)]
+					if affectedTiles[hash(loc)] then 
+					    if affectedTiles[hash(loc)].iDamage ~= DAMAGE_ZERO and affectedTiles[hash(loc)].iDamage > 0 then 
+							--don't dodge into more damage
+							moveScore = -10 * affectedTiles[hash(loc)].iDamage
+						end
+					    if affectedTiles[hash(loc)].iPush ~= DIR_NONE and affectedTiles[hash(loc)].iPush ~= DIR_FLIP and
+							Board:IsBlocked(loc + DIR_VECTORS[affectedTiles[hash(loc)].iPush], pathProfile) then
+							--also take being pushed into something into account otherwise they will dodge into lethal push damage
+						    moveScore = moveScore - 10
+						end
 						-- Board:Ping(loc, GL_Color(255 + moveScore * 2, 255 + moveScore * 2, 0))
 					elseif Board:IsBlocked(loc, dodger:GetPathProf()) or not Board:IsValid(loc) then 	--don't dodge into a tile you can't stand in
 						moveScore = -100 
@@ -2116,16 +2139,15 @@ local function EVENT_onModsLoaded()
 					elseif tilesWithSpawns[hash(loc)] or tilesDodgersMovedTo[hash(loc)] then	--don't dodge into a tile that will contain a spawn/other dodger
 						moveScore = -100
 						-- Board:Ping(loc, GL_Color(0, 0, 255))
-					elseif false then --dodgeInfo.smart then 
+					elseif dodgeInfo.smart then 
 						moveScore = ScorePositioning(loc, dodger) 
 						-- Board:Ping(loc, GL_Color(0, 255, 0))
 					else
 						-- Board:Ping(loc, GL_Color(0, 255, 0))
 					end
 					--keeping the pings in case I need to investigate more bugs
-					-- LOG(moveScore..", "..currPosScore)
 					if targetWasQueued then
-						if false then --dodgeInfo.smart then
+						if dodgeInfo.smart then
 							local targets = weapon and extract_table(weapon:GetTargetArea(loc)) or {}
 							for _, newTarget in ipairs(targets) do
 								if Board:IsValid(newTarget) then
@@ -2145,8 +2167,6 @@ local function EVENT_onModsLoaded()
 					end
 				end
 				
-				-- Pawn = PawnBackup
-				-- LOG(#actions)
 				if #actions > 0 then 
 					--sort scores
 					table.sort(actions, function(a,b) return a.score > b.score end)
@@ -2159,49 +2179,27 @@ local function EVENT_onModsLoaded()
 					math.randomseed(Game:GetTurnCount() + dodger:GetId() + dodgeInfo.amount)
 					local bestAction = actions[math.random(1, i)]
 					
-					--Save old effect
-					local oldEffect = skillEffect.effect or DamageList()
-					local oldEffectCopy = DamageList()
-					--Make a copy
-					if oldEffect then 
-						for i = 1, oldEffect:size() do
-							local oldDamage = oldEffect:index(i);
-							oldEffectCopy:push_back(oldDamage)
-						end
-					end
-					--Reset
-					skillEffect.effect = DamageList()
-					--Prepend
 					if bestAction then 
-						LOG("adding movement")
 						-- move away from danger
-						skillEffect:AddScript(string.format("Status.LowerDodge(%s)", dodger:GetId()))
+						dodgeEffect:AddScript(string.format("Status.LowerDodge(%s)", dodger:GetId()))
 						if dodgeInfo.movementType == "Teleport" then
-							skillEffect:AddTeleport(dodger:GetSpace(), bestAction.loc, NO_DELAY)
+							dodgeEffect:AddTeleport(dodger:GetSpace(), bestAction.loc, NO_DELAY)
 						elseif dodgeInfo.movementType == "Leap" then
 							local leapMovement = PointList()
 							leapMovement:push_back(dodger:GetSpace())
 							leapMovement:push_back(bestAction.loc)
-							skillEffect:AddLeap(leapMovement, NO_DELAY)
+							dodgeEffect:AddLeap(leapMovement, NO_DELAY)
 						elseif dodgeInfo.movementType == "Burrow" then
-							skillEffect:AddBurrow(Board:GetPath(dodger:GetSpace(), bestAction.loc, PATH_FLYER), NO_DELAY)
+							dodgeEffect:AddBurrow(Board:GetPath(dodger:GetSpace(), bestAction.loc, PATH_FLYER), NO_DELAY)
 						else
-							skillEffect:AddMove(Board:GetPath(dodger:GetSpace(), bestAction.loc, dodger:GetPathType()), NO_DELAY)
+							dodgeEffect:AddMove(Board:GetPath(dodger:GetSpace(), bestAction.loc, dodger:GetPathType()), NO_DELAY)
 						end
 						tilesDodgersMovedTo[hash(bestAction.loc)] = bestAction.loc
 					end
-					--Add in old effects
-					for i = 1, oldEffectCopy:size() do
-						local oldDamage = oldEffectCopy:index(i);
-						skillEffect.effect:push_back(oldDamage)
-					end
-					-- for _, fx in ipairs(extract_table(skillEffectTable.effect)) do
-						-- skillEffect.effect:push_back(fx:Clone())
-					-- end
 					
 					if bestAction and targetWasQueued then
 						-- fire the pawn's weapon in the chosen direction
-						skillEffect:AddScript(string.format([[
+						dodgeEffect:AddScript(string.format([[
 							modApi:runLater(function()
 								local pawn = Board:GetPawn(%s)
 								if pawn then pawn:FireWeapon(%s, 1) end
@@ -2210,7 +2208,7 @@ local function EVENT_onModsLoaded()
 					end
 					
 					--if skill effect makes the user move, the dodger can end up sharing a tile with them
-					skillEffect:AddScript(string.format([[
+					dodgeEffect:AddScript(string.format([[
 					modApi:conditionalHook(
 					function() 
 						return not Board:IsBusy()
@@ -2241,6 +2239,16 @@ local function EVENT_onModsLoaded()
 				calculatingDodge = false
 				pawnsWhoDodged[dodger:GetId()] = true
 			end
+		end
+		
+		--Recombine the stuff to prepend and the original SkillEffect
+		if dodgeEffect.effect:size() > 0 or dodgeEffect.q_effect:size() > 0 then
+			local combinedEffect = SkillEffect()
+			combinedEffect.effect:AppendAll(dodgeEffect.effect)
+			combinedEffect.effect:AppendAll(originalEffect)
+			combinedEffect.q_effect:AppendAll(originalQEffect)
+			skillEffect.effect = combinedEffect.effect
+			skillEffect.q_effect = combinedEffect.q_effect
 		end
 	end
 	
