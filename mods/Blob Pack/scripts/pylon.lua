@@ -18,17 +18,6 @@ end
 
 local name = "pylongoo" 
 
-modApi:appendAsset(writepath..name..".png", readpath..name..".png")
-modApi:appendAsset(writepath..name.."2.png", readpath..name.."2.png")
-modApi:appendAsset(writepath.."pylon.png", readpath.."pylon.png")
-modApi:appendAsset(writepath.."pylond.png", readpath.."pylond.png")
-modApi:appendAsset(writepath.."pylone.png", readpath.."pylone.png")
-modApi:appendAsset(writepath.."pylonw.png", readpath.."pylonw.png")
-
--- modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
--- modApi:appendAsset(writepath.."emergegoo.png", readpath.."emergegoo.png")
--- modApi:appendAsset(writepath..name.."_death.png", readpath..name.."_death.png")
-
 local base = a.EnemyUnit:new{Image = imagepath .. name..".png", PosX = -20, PosY = 5, Height = 1}
 local baseEmerge = a.BaseEmerge:new{Image = imagepath .. "emergegoobig.png", PosX = -20, PosY = 5, NumFrames = 12, Height = 1}
 

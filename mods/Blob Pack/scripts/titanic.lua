@@ -8,17 +8,6 @@ local imagepath = writepath:sub(5,-1)
 
 local weaponPreview = require(path .."scripts/libs/weaponPreview")
 
-modApi:appendAsset(writepath .."titanicgoo.png", readpath .."titanicgoo.png")
-modApi:appendAsset(writepath .."deathgootitanic.png", readpath .."deathgootitanic.png")
--- modApi:appendAsset(writepath .."titanicgoo_death.png", readpath .."titanicgoo_death.png")
--- modApi:appendAsset(writepath .."titanicgoo_emerge.png", readpath .."titanicgoo_emerge.png")
-modApi:appendAsset(writepath .."titanicgoow.png", readpath .."titanicgoow.png") --should never be used but just in case
-
-modApi:appendAsset("img/effects/shotup_giganticgoo.png", path.."img/effects/shotup_giganticgoo.png")
-modApi:appendAsset("img/combat/tiles_grass/gooacid.png", path.."img/combat/tiles_grass/gooacid.png")
-modApi:appendAsset("img/combat/tiles_grass/goohole.png", path.."img/combat/tiles_grass/goohole.png")
-modApi:appendAsset("img/combat/tiles_grass/goolava.png", path.."img/combat/tiles_grass/goolava.png")
-modApi:appendAsset("img/combat/tiles_grass/goowater.png", path.."img/combat/tiles_grass/goowater.png")
 Location["img/combat/tiles_grass/gooacid.png"] = Point(-26,2)
 Location["img/combat/tiles_grass/goohole.png"] = Point(-26,2)
 Location["img/combat/tiles_grass/goolava.png"] = Point(-26,2)
@@ -46,7 +35,7 @@ Mission_TitanicGooBoss = Mission_Boss:new{
 local adjOffsets = { VEC_UP, VEC_UP + VEC_RIGHT, VEC_RIGHT * 2, VEC_RIGHT * 2 + VEC_DOWN, VEC_DOWN * 2, VEC_DOWN * 2 + VEC_RIGHT, VEC_LEFT, VEC_LEFT + VEC_DOWN }
 
 function Mission_TitanicGooBoss:NextPawn(pawn_tables, name_only)
-	local goos = { "Meta_nestedgoo", "Meta_splittinggoo", "Meta_pylongoo", "Meta_shapeshifter", "Meta_spikygoo", "Meta_sludgegoo" }
+	local goos = { "Meta_nestedgoo", "Meta_splittinggoo", "Meta_pylongoo", "Meta_shapeshifter", "Meta_spikygoo", "Meta_sludgegoo", "Meta_lavagoo" }
 	local diff = GetDifficulty()
 	local island = GetSector()
 	local alphaRate = math.min(diff / 6 + island / 10, 1)

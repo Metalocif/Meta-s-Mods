@@ -1,9 +1,9 @@
-local description = "Adds six goo enemies and a goo boss."
+local description = "Adds seven goo enemies and a goo boss."
 
 local mod = {
 	id = "Meta_BlobPack",
 	name = "Goo Enemies",
-	version = "1.0.0",
+	version = "1.1.0",
 	requirements = {},
 	dependencies = { 
 		modApiExt = "1.21",
@@ -24,11 +24,18 @@ function mod:init()
 	require(self.scriptPath.."splitting")
 	require(self.scriptPath.."nested")
 	require(self.scriptPath.."sludge")
+	require(self.scriptPath.."lava")
 	require(self.scriptPath.."titanic")
 	require(self.scriptPath.."enemyList")
 	require(self.scriptPath.."libs/weaponPreview")
 	require(self.scriptPath.."libs/swimmingIcon")
 	require(self.scriptPath .."libs/boardEvents")
+	
+	modApi:appendAssets("img/effects/", "img/effects/")
+	modApi:appendAssets("img/portraits/enemy/", "img/portraits/enemy/")
+	modApi:appendAssets("img/units/aliens/", "img/units/aliens/")
+	modApi:appendAssets("img/combat/tiles_grass/", "img/combat/tiles_grass/")
+	modApi:appendAssets("img/combat/icons/", "img/combat/icons/")
 end
 
 function mod:load(options, version)

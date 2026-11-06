@@ -18,34 +18,6 @@ end
 
 local name = "shapeshifter" 
 
-modApi:appendAsset(writepath..name..".png", readpath..name..".png")
--- modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
-modApi:appendAsset(writepath.."emergegoo.png", readpath.."emergegoo.png")
-modApi:appendAsset(writepath.."emergegoobig.png", readpath.."emergegoobig.png")
-modApi:appendAsset(writepath.."emergegoohuge.png", readpath.."emergegoohuge.png")
-modApi:appendAsset(writepath.."deathgoo.png", readpath.."deathgoo.png")
-modApi:appendAsset(writepath.."deathgoobig.png", readpath.."deathgoobig.png")
-modApi:appendAsset(writepath.."deathgoohuge.png", readpath.."deathgoohuge.png")
--- modApi:appendAsset(writepath..name.."_death.png", readpath..name.."_death.png")
-modApi:appendAsset("img/effects/goomosquito_D.png", resourcePath.."img/effects/goomosquito_D.png")
-modApi:appendAsset("img/effects/goomosquito_L.png", resourcePath.."img/effects/goomosquito_L.png")
-modApi:appendAsset("img/effects/goomosquito_R.png", resourcePath.."img/effects/goomosquito_R.png")
-modApi:appendAsset("img/effects/goomosquito_U.png", resourcePath.."img/effects/goomosquito_U.png")
-
-modApi:appendAsset("img/effects/goostarfish_D.png", resourcePath.."img/effects/goostarfish_D.png")
-modApi:appendAsset("img/effects/goostarfish_L.png", resourcePath.."img/effects/goostarfish_L.png")
-modApi:appendAsset("img/effects/goostarfish_R.png", resourcePath.."img/effects/goostarfish_R.png")
-modApi:appendAsset("img/effects/goostarfish_U.png", resourcePath.."img/effects/goostarfish_U.png")
-
-modApi:appendAsset("img/portraits/enemy/Goo.png", resourcePath.."img/portraits/enemy/Goo.png")
-
-modApi:appendAsset(writepath..name.."_centipedea.png", readpath..name.."_centipedea.png")
-modApi:appendAsset(writepath..name.."_centipeded.png", readpath..name.."_centipeded.png")
-modApi:appendAsset(writepath..name.."_centipedee.png", readpath..name.."_centipedee.png")
-modApi:appendAsset(writepath..name.."_starfisha.png", readpath..name.."_starfisha.png")
-modApi:appendAsset(writepath..name.."_starfishd.png", readpath..name.."_starfishd.png")
-modApi:appendAsset(writepath..name.."_starfishe.png", readpath..name.."_starfishe.png")
-
 local base = a.EnemyUnit:new{Image = imagepath .. name..".png", PosX = -23, PosY = -5, Height = 1}
 local baseEmerge = a.BaseEmerge:new{Image = imagepath .. "emergegoo.png", PosX = -23, PosY = -5, NumFrames = 10, Height = 1}
 

@@ -24,24 +24,10 @@ end
 
 local name = "sludge" 
 
-modApi:appendAsset(writepath..name..".png", readpath..name..".png")
-modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
--- modApi:appendAsset(writepath..name.."2.png", readpath..name.."2.png")
-modApi:appendAsset("img/effects/gunk.png", resourcePath.."img/effects/gunk.png")
-
--- modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
--- modApi:appendAsset(writepath.."emergegoo.png", readpath.."emergegoo.png")
--- modApi:appendAsset(writepath..name.."_death.png", readpath..name.."_death.png")
-
 a.Meta_sludgegoo = a.EnemyUnit:new{Image = imagepath .. name..".png", PosX = -20, PosY = -8, Height = 1}
 a.Meta_sludgegooe = a.BaseEmerge:new{Image = imagepath .. "emergegoo.png", PosX = -23, PosY = -5, NumFrames = 10, Height = 1}
 a.Meta_sludgegood = a.BaseEmerge:new{Image = imagepath .. "deathgoo.png", PosX = -23, PosY = 7, NumFrames = 7, Height = 1}
 a.Meta_sludgegooa = a.Meta_sludgegoo:new{ Image = imagepath..name.."a.png", NumFrames = 8 }
-
--- a.Meta_sludgegoo2 = a.EnemyUnit:new{Image = imagepath .. name.."2.png", PosX = -23, PosY = -5, Height = 1}
--- a.Meta_sludgegoo2e = a.BaseEmerge:new{Image = imagepath .. "emergegoobig.png", PosX = -23, PosY = -5, NumFrames = 12, Height = 1}
--- a.Meta_sludgegoo2d = a.BaseEmerge:new{Image = imagepath .. "deathgoobig.png", PosX = -23, PosY = 5, NumFrames = 7, Height = 1}
--- a.Meta_sludgegoo2a = a.Meta_sludgegoo:new{ Image = imagepath..name.."2.png", NumFrames = 1 }
 
 
 

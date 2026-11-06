@@ -18,14 +18,6 @@ end
 
 local name = "nestedgoo" 
 
-modApi:appendAsset(writepath..name..".png", readpath..name..".png")
-modApi:appendAsset(writepath..name.."2.png", readpath..name.."2.png")
-modApi:appendAsset(writepath..name.."3.png", readpath..name.."3.png")
-
--- modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
--- modApi:appendAsset(writepath.."emergegoo.png", readpath.."emergegoo.png")
--- modApi:appendAsset(writepath..name.."_death.png", readpath..name.."_death.png")
-
 a.Meta_nestedgoo1 = a.EnemyUnit:new{Image = imagepath .. name..".png", PosX = -17, PosY = 10, Height = 1}
 a.Meta_nestedgoo1e = a.BaseEmerge:new{Image = imagepath .. "emergegoo.png", PosX = -20, PosY = 5, NumFrames = 10, Height = 1}
 a.Meta_nestedgoo1d = a.BaseEmerge:new{Image = imagepath .. "deathgoo.png", PosX = -20, PosY = 5, NumFrames = 7, Height = 1, Loop = false}

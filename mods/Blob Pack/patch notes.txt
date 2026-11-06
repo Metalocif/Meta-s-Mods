@@ -1,3 +1,6 @@
+v1.1.0
+- Added a lava goo enemy.
+
 v1.0.2
 - Bug fixes.
   - Gunk tooltip was not working with other mods that add item tooltips.

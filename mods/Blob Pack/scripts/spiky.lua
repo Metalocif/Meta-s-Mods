@@ -18,19 +18,6 @@ end
 
 local name = "spikygoo" 
 
-modApi:appendAsset(writepath..name..".png", readpath..name..".png")
-modApi:appendAsset(writepath..name.."2.png", readpath..name.."2.png")
-
--- modApi:appendAsset(writepath..name.."a.png", readpath..name.."a.png")
--- modApi:appendAsset(writepath.."emergegoo.png", readpath.."emergegoo.png")
--- modApi:appendAsset(writepath..name.."_death.png", readpath..name.."_death.png")
-
-modApi:appendAsset("img/effects/shotup_goospikes.png", resourcePath.."img/effects/shotup_goospikes.png")
-modApi:appendAsset("img/effects/goorocker_D.png", resourcePath.."img/effects/goorocker_D.png")
-modApi:appendAsset("img/effects/goorocker_U.png", resourcePath.."img/effects/goorocker_U.png")
-modApi:appendAsset("img/effects/goorocker_R.png", resourcePath.."img/effects/goorocker_R.png")
-modApi:appendAsset("img/effects/goorocker_L.png", resourcePath.."img/effects/goorocker_L.png")
-
 a.Meta_spikygoo = a.EnemyUnit:new{Image = imagepath .. name..".png", PosX = -20, PosY = -5, Height = 1}
 a.Meta_spikygooe = a.BaseEmerge:new{Image = imagepath .. "emergegoo.png", PosX = -23, PosY = -5, NumFrames = 10, Height = 1}
 a.Meta_spikygooa = a.Meta_spikygoo:new{ Image = imagepath..name..".png", NumFrames = 1 }
