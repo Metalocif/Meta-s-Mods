@@ -31,13 +31,6 @@ end
 
 function mod:metadata()
 	modApi:addGenerationOption(
-		"Omegalmn_Wyrm",
-		"Omega Wyrm spawn settings",
-		"Pick the percentage of Alpha Wyrms that will be replaced by Omega Wyrms. Can default to the overall percentage defined above.",
-		{ strings = { "Default", "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" }, 
-		  values = { "Default", 0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1 } }
-	)
-	modApi:addGenerationOption(
 		"Omegalmn_Crusher",
 		"Omega Crusher spawn settings",
 		"Pick the percentage of Alpha Crushers that will be replaced by Omega Crushers. Can default to the overall percentage defined above.",
