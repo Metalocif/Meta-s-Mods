@@ -80,7 +80,7 @@ AddPawn("OmegaBurnbug2")
 
 OmegaFirefly2 = Pawn:new{
 	Name = "Omega Firefly",
-	Health = 5,
+	Health = 4,
 	MoveSpeed = 2,
 	Image = "Omegafirefly",
 	ImageOffset = 1,
