@@ -674,7 +674,7 @@ end
 OmegaScorpionAtk2 = Skill:new{
 	Name = "Pressurized Spinneret",
 	Description = "Web an adjacent target, preparing to fire a short-ranged projectile in its direction for 2 damage.",
-	PathSize = 1,
+	PathSize = 2,
 	Icon = "weapons/enemy_scorpion1.png",	
 	Damage = 2,
 	Range = 2,
@@ -928,19 +928,20 @@ function OmegaBeetleAtk2:GetSkillEffect(p1,p2)
 		doDamage = false
 		target = target + DIR_VECTORS[direction]
 	end
-	if not Board:IsPawnSpace(target) and (Board:GetTerrain(target) == TERRAIN_WATER or Board:GetTerrain(target) == TERRAIN_HOLE) then ---run into water/hole and die!
+	if not Board:IsPawnSpace(target) and (Board:GetTerrain(target) == TERRAIN_WATER or Board:GetTerrain(target) == TERRAIN_HOLE) then --run into water/hole and die!
 		doDamage = false
 		target = target + DIR_VECTORS[direction]
 	end
-	local delay = self.Fire and NO_DELAY or FULL_DELAY
-	ret:AddQueuedCharge(Board:GetSimplePath(p1, target - DIR_VECTORS[direction]), delay)
+	local dest = target - DIR_VECTORS[direction]
+	ret:AddQueuedCharge(Board:GetSimplePath(p1, dest), FULL_DELAY)
 	if doDamage then 
 		for i = DIR_START, DIR_END do
-			local damage = SpaceDamage(target - DIR_VECTORS[direction] + DIR_VECTORS[i], self.Damage, i)
+			local curr = dest + DIR_VECTORS[i]
+			local damage = SpaceDamage(curr, self.Damage, i)
 			damage.sAnimation = "exploout2_"..i
 			ret:AddQueuedDamage(damage)
 		end
-		local selfDamage = SpaceDamage(target - DIR_VECTORS[direction], 1)
+		local selfDamage = SpaceDamage(dest, 1)
 		selfDamage.sAnimation = "ExploArt2"
 		selfDamage.sSound = "/enemy/beetle_1/attack_impact"
 		ret:AddQueuedDamage(selfDamage)
