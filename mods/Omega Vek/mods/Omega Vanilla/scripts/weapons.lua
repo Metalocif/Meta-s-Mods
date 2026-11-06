@@ -1007,7 +1007,6 @@ BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
         local pawn = Board:GetPawn(loc)
         if pawn then
 			local damage = SpaceDamage(loc)
-			-- damage.sScript=string.format("Board:GetPawn(%s):SetMoveSpeed(%s)",Board:GetPawn(loc):GetId(), Board:GetPawn(loc):GetMoveSpeed() - 1)
 			Board:DamageSpace(damage)
 			for i = DIR_START, DIR_END do
 				local curr = loc + DIR_VECTORS[i]
@@ -1023,7 +1022,7 @@ end)
 
 OmegaBlobberAtk2 = LineArtillery:new{ 
 	Name = "Explosive Growths",
-	Description = "Throw a massive blob that cannot act but will explode when killed. On the last turn, will kill all its blobs instead if any are alive.", 
+	Description = "Throw a massive blob that cannot act but will explode when killed. On the last turn, if any blobs are alive, will attack by killing all of them instead.", 
 	ScoreNothing = 0, 
 	MyPawn = "OmegaBlob2",
 	Class = "Enemy",
@@ -1045,7 +1044,6 @@ OmegaBlobberAtk2 = LineArtillery:new{
 }
 
 function OmegaBlobberAtk2:GetTargetScore(p1,p2)
-	--Omega Spore kills allies on last turn, so it needs help doing that
 	local ret = 0
 	if GetCurrentMission():IsFinalTurn() then
 		for _, i in ipairs(extract_table(Board:GetPawns(TEAM_ENEMY))) do
@@ -1118,11 +1116,6 @@ local function PlasmodiaCorpsifier(mission)
 				break
 			end
 		end
-		-- if mission.hadCorpseBeforeOmegaPlasmodia ~= nil then
-			-- for _, id in ipairs(extract_table(mission.hadCorpseBeforeOmegaPlasmodia)) do
-				-- if Board:GetPawn(id) then Board:GetPawn(id):SetCorpse(mission.hadCorpseBeforeOmegaPlasmodia[id]) end
-			-- end
-		-- end
 	end)
 end
 
