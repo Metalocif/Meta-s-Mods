@@ -71,6 +71,7 @@ function mod:init()
 				table.insert(copy, "Poke_Metanitar")
 				table.insert(copy, "Poke_Tyrachomp")
 				table.insert(copy, "Poke_Magikarp")
+				table.insert(copy, "Poke_Missingno")
 				return copy
 			end
 

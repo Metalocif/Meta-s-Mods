@@ -23,6 +23,8 @@ local mod = modApi:getCurrentMod()
 local path = mod_loader.mods[modApi.currentMod].resourcePath
 -- local tileToScreen = require(path .."scripts/libs/tileToScreen")
 local mechPath = mod_loader.mods[modApi.currentMod].resourcePath .."img/units/player/"
+local personalities = require(path .. "scripts/libs/personality")
+local dialog = require(path .. "scripts/pilots/personality_missingno")
 
 modApi:appendAssets("img/units/player/", "img/units/player/")
 
@@ -537,6 +539,11 @@ a.Poke_MegaGyarados =a.MechUnit:new{Image="units/player/Gyarados.png", PosX = -4
 a.Poke_MegaGyaradosa = a.MechUnit:new{Image="units/player/MegaGyarados_a.png",  PosX = -47, PosY = -29, NumFrames = 6, Frames={0,1,0,2,3,2,4,5,4,2,3,2} }
 a.Poke_MegaGyarados_ns = a.MechIcon:new{Image="units/player/Gyarados_ns.png"}
 
+a.Poke_Missingno =a.MechUnit:new{Image="units/player/Missingno.png", PosX = -10, PosY = -4}
+a.Poke_Missingnoa = a.MechUnit:new{Image="units/player/Missingno_a.png",  PosX = -5, PosY = -10, NumFrames = 9, Frames={0,1,2,1,0,1,3,1,0,4,2,1,0,1,2,1,0,1,2,1,5,1,6,1,0,1,2,1,0,7,1,0,1,2,1,0,1,2,1,8,1,2,1} }
+a.Poke_Missingno_broken = a.MechUnit:new{Image="units/player/PokeBall.png", PosX = -9, PosY = -2 }
+a.Poke_Missingno_ns = a.MechIcon:new{Image="units/player/Missingno_ns.png"}
+
 modApi:appendAssets("img/portraits/pilots/", "img/portraits/pilots/")
 
 
@@ -574,6 +581,12 @@ CreatePilot{Id = "Pilot_Poke_Bulbasaur", Personality = "Vek", Name = "Green", Se
 CreatePilot{Id = "Pilot_Poke_Squirtle", Personality = "Vek", Name = "Blue", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
 
 CreatePilot{Id = "Pilot_Poke_Magikarp", Personality = "Vek", Name = "Jonah", Sex = SEX_VEK, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+
+CreatePilot{Id = "Pilot_Poke_Missingno", Personality = "Missingno", Name = "Missingno", Sex = SEX_MALE, GetSkill = function() IsPokemon = true; return "Survive_Death" end, Rarity = 0, Blacklist = {"Invulnerable", "Popular"},}
+
+local personality = personalities:new{ Label = "Missingno" }
+personality:AddDialog(dialog)
+Personality["Missingno"] = personality
 
 
 Poke_Abra= Pawn:new{
@@ -1224,6 +1237,26 @@ Poke_Magikarp = Pawn:new{
 	MegaEvos = { "Poke_MegaGyarados" },
 	MegaEvoMoves = { "Poke_BlindRage" },
 	MegaEvoNames = { "Mega Gyarados" },
+}
+
+Poke_Missingno = Pawn:new{
+	Name = "Missingno.",
+	Class = "TechnoVek",
+	Health = 2,
+	MoveSpeed = 3,
+	Massive = true,
+	Corpse = true,
+	GhostMovement = true,
+	Flying = true,
+	Image = "Poke_Missingno",
+	SkillList = {"Poke_Glitch" },
+	-- SoundLocation = "/enemy/bouncer_1/",
+	DefaultTeam = TEAM_PLAYER,
+	ImpactMaterial = IMPACT_NONE,
+	HasEvolutions = { false, false },
+	-- EvoForget = { "", "" },
+	-- EvoLearn = { { { "Poke_DarkTendrils" }, { } } },
+	-- KeepAdding = { "", "Poke_ShadowForce" },
 }
 
 

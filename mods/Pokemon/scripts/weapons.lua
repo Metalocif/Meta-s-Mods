@@ -8639,3 +8639,339 @@ function Poke_BlindRage:GetFinalEffect(p1, p2, p3)
 	ret:AddScript("GetCurrentMission().MegaEvolved = -1")
 	return ret
 end
+
+
+
+
+
+
+Poke_Glitch=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Glitch.png",	
+	Rarity = 3,
+	Name = "Glitch",
+	Description = "Use one of two randomly generated effects. Effects change each turn.",
+	-- Damage = 3,
+	-- PathSize = 8,	
+	PowerCost = 0,
+	TwoClick = true,
+	EffectCount = 2,
+	Upgrades = 2,
+	UpgradeList = { "+1 Effect", "+1 Effect" },
+	UpgradeCost = { 1,1 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,4),
+		CustomPawn = "Poke_Missingno",
+	}
+}
+
+Poke_Glitch_A = Poke_Glitch:new{ UpgradeDescription = "Generates another effect to choose from.", EffectCount = 3,}
+Poke_Glitch_B = Poke_Glitch:new{ UpgradeDescription = "Generates another effect to choose from.", EffectCount = 3,}	
+Poke_Glitch_AB = Poke_Glitch:new{ EffectCount = 4,}
+
+function Poke_Glitch:GetTargetArea(p1)
+	local ret = PointList()
+	if not Board:GetPawn(p1) then return ret end
+	if Board:IsTipImage() then 
+		ret:push_back(p1)
+		return ret
+	end
+	ret:push_back(p1+DIR_VECTORS[DIR_DOWN])
+	ret:push_back(p1+DIR_VECTORS[DIR_UP])
+	if self.EffectCount >= 3 then ret:push_back(p1+DIR_VECTORS[DIR_LEFT]) end
+	if self.EffectCount >= 4 then ret:push_back(p1+DIR_VECTORS[DIR_RIGHT]) end
+	return ret
+end
+
+function Poke_Glitch:GetSecondTargetArea(p1, p2)
+	if not Board:GetPawn(p1) then return PointList() end
+	if Board:IsTipImage() then 
+		local ret = PointList()
+		ret:push_back(p1)
+		return ret
+	end
+	local offset = (Game and (Game:GetTurnCount()) or 0) + 1 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetTargetArea(p1)
+end
+
+function Poke_Glitch:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2)
+	ret:AddDamage(damage)
+	return ret
+end
+
+function Poke_Glitch:GetFinalEffect(p1, p2, p3)
+	if not Board:GetPawn(p1) then return SkillEffect() end
+	if Board:IsTipImage() then return SkillEffect() end
+	local offset = (Game and (Game:GetTurnCount()) or 0) + 1 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetSkillEffect(p1, p3)
+end
+
+--deduplicate weapons; they can all refer to a single function instead of creating 1000 copies of a function
+
+local function GenerateGlitchWeapons()
+	local _, profile = next(modApi:getProfileList()) 
+	LOG("  Glitch seed: "..profile.stat_tracker.games)
+	math.randomseed(profile.stat_tracker.games)	--should be stable over a playthrough; reloading the game will generate the same weapons
+	local explosions = {}
+	local sounds = {}
+	local projectiles = {}
+	local upshots = {}
+	for id, weapon in pairs(_G) do
+		if weapon and type(weapon) == "table" and weapon.Class then
+			if weapon.ImpactSound and weapon.ImpactSound ~= "" and type(weapon.ImpactSound) == "string" then sounds[#sounds+1] = weapon.ImpactSound end
+			if weapon.LaunchSound and weapon.LaunchSound ~= "" and type(weapon.LaunchSound) == "string" then sounds[#sounds+1] = weapon.LaunchSound end
+			if weapon.Explosion and weapon.Explosion ~= "" and type(weapon.Explosion) == "string" then explosions[#explosions+1] = weapon.Explosion end
+			if weapon.Projectile and weapon.Projectile ~= "" and type(weapon.Projectile) == "string" then 
+				if weapon.Projectile:sub(-4) == ".png" then	--it's an upshot
+					upshots[#upshots+1] = weapon.Projectile 
+				else
+					projectiles[#projectiles+1] = weapon.Projectile
+				end
+			end
+		end
+	end 
+	local targetingTypes =  {"Melee", "Melee", "Melee", "Artillery", "Artillery", "Projectile", "Projectile", "Distance", "Any"}
+	local targetingRestrictions =  {"NextToTerrain", "OnTerrain", "Damaged", "FullHealth", "NextToMech"}
+	local targetingAdditions = {"None", "None", "None", "AdjacentToTarget", "OthersSameDistance", "AdjacentToUser"}
+	local areaShapes =  {"Plus", "Square", "Point", "Point", "Row", "Column", "X", "All"}
+	local effectKeys = {"Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Shield", "Status", "Status"}
+	local pushDirs = {DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_FLIP} --, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE}
+	local pushType = {"Relative from p1", "Relative from p2", "Relative from p1", "Relative from p2", "Absolute"}
+	local plausibleStatus = {"Blind","Bloodthirsty","Bonded","Chill","Confusion","Dreadful","Dry","Gunk","Hemorrhage","Necrosis","Powder","Reactive","Repulsive","Regen","Rooted","Shatterburst","Shocked","Targeted","Tough","Toxin","Wet"}
+	local validTerrains = {TERRAIN_MOUNTAIN, TERRAIN_BUILDING, TERRAIN_ROAD, TERRAIN_WATER}
+	
+	
+	for i = 1, 1000 do
+		local damageAmount1 = math.random(0, 1) + math.random(-1, 1) + math.random(0, 1) * math.random(0, 1) + math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local damageAmount2 = math.random(0, 1) + math.random(-1, 1) + math.random(0, 1) * math.random(0, 1) + math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local willShield = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local willSmoke = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local willFreeze = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local willFire = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		local willAcid = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		
+		local centerEffect = effectKeys[math.random(#effectKeys)]
+		local outerEffect = effectKeys[math.random(#effectKeys)]
+		if (willShield == 1 and centerEffect == "Shield") or (willFreeze == 1 and centerEffect == "Frozen") then damageAmount1 = 0 end
+		if (willShield == 1 and outerEffect == "Shield") or (willFreeze == 1 and outerEffect == "Frozen") then damageAmount2 = 0 end
+		local pushDir = pushDirs[math.random(#pushDirs)]
+		if pushDir == DIR_NONE and damageAmount1 >= 0 then damageAmount1 = damageAmount1+1 end
+		if pushDir == DIR_NONE and damageAmount2 >= 0 then damageAmount2 = damageAmount2+1 end
+		
+		local targetingType = targetingTypes[math.random(#targetingTypes)]
+		local projectile = (targetingType == "Artillery" or targetingType == "Distance") and upshots[math.random(#upshots)] or projectiles[math.random(#projectiles)]
+		
+		_G["Poke_GlitchWeapon"..i] = Skill:new{
+			Name = "", --generateRandomName(),
+			Description = "", --generateRandomDescription(),
+			Icon = "weapons/Glitch.png",
+			Class = "TechnoVek",
+			Damage = damageAmount1,
+			MinDamage = math.random(0, 1) + math.random(-1, 1) + math.random(0, 1) * math.random(0, 1) + math.random(0, 1) * math.random(0, 1) * math.random(0, 1),
+			OuterDamage = damageAmount2,
+			SelfDamage = math.random(0, 1) * math.random(0, 1) * math.random(0, 1),
+			Range = 4 + math.random(0, 1) + math.random(0, 1) + math.random(0, 1),
+			MinRange = math.random(1, 2),
+			TargetingType = targetingType,
+			TargetingRestriction = targetingRestrictions[math.random(#targetingRestrictions)],
+			Terrain = validTerrains[math.random(#validTerrains)],
+			Status = plausibleStatus[math.random(#plausibleStatus)],	--we can only pick status that can apply with the simplest syntax
+			--Fire: 3/32 to occur, 1/32 to remove
+			Fire = willFire,
+			--Smoke: 3/32 to occur, 1/32 to remove
+			Smoke = willSmoke,
+			Acid = willAcid,
+			Frozen = willFreeze,
+			Shield = willShield,
+			Push = pushDir,
+			PushType = pushType[math.random(#pushType)],
+			Crack = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1),
+			CenterEffect = centerEffect,
+			OuterEffect = outerEffect,
+			AoEShape = areaShapes[math.random(#areaShapes)],
+			LaunchSound = sounds[math.random(#sounds)],
+			ImpactSound = sounds[math.random(#sounds)],
+			Explosion = explosions[math.random(#explosions)],
+			Projectile = projectile,	--needs to check whether we are artillery or not
+		}
+		_G["Poke_GlitchWeapon"..i].GetTargetArea = function(self, point)
+			-- use TargetingRestriction
+			local ret = PointList()
+			if self.TargetingType == "Melee" then
+				for dir = DIR_START, DIR_END do
+					ret:push_back(point+DIR_VECTORS[dir])
+				end
+			elseif self.TargetingType == "Artillery" then
+				for dir = DIR_START, DIR_END do
+					for j = self.MinRange, self.Range do
+						ret:push_back(point+DIR_VECTORS[dir]*j)
+					end
+				end
+			elseif self.TargetingType == "Projectile" then
+				for dir = DIR_START, DIR_END do
+					for j = 1, self.Range do
+						ret:push_back(point+DIR_VECTORS[dir]*j)
+						if Board:IsBlocked(point+DIR_VECTORS[dir]*j, PATH_PROJECTILE) then break end
+					end
+				end
+			elseif self.TargetingType == "Distance" then
+				for x = 0, 7 do
+					for y = 0, 7 do
+						if Point(x, y):Manhattan(point) >= self.MinRange and Point(x, y):Manhattan(point) <= self.Range then
+							ret:push_back(Point(x, y))
+						end
+					end
+				end
+			elseif self.TargetingType == "Any" then
+				for x = 0, 7 do
+					for y = 0, 7 do
+						if Point(x, y) ~= point then ret:push_back(Point(x, y)) end
+					end
+				end
+			end
+			return ret
+		end
+		_G["Poke_GlitchWeapon"..i].GetSkillEffect = function(self, p1, p2)
+			local ret = SkillEffect()
+			local dir = p1 ~= p2 and GetDirection(p2-p1) or DIR_NONE	--won't work quite right for tiles at diagonals; this is glitchy so it's fine
+			--Self-damage.
+			if self.SelfDamage ~= 0 then ret:AddDamage(SpaceDamage(p1, self.SelfDamage)) end
+			--Base damage on the target tile
+			local damage = SpaceDamage(p2, self.Damage)
+			damage.sSound = self.ImpactSound
+			damage.sAnimation = self.Explosion
+			if self.CenterEffect == "Status" then
+				damage["i"..self.Status] = 1
+			else
+				damage["i"..self.CenterEffect] = self[self.CenterEffect]
+			end
+			if self.Push ~= DIR_NONE then
+				if self.PushType == "Absolute" or self.Push == DIR_FLIP then
+					damage.iPush = self.Push
+				else
+					damage.iPush = (dir + self.Push)%4
+				end
+			end
+			if self.TargetingType == "Melee" then
+				ret:AddMelee(p1, damage)
+			elseif self.TargetingType == "Artillery" then
+				ret:AddArtillery(p1, damage, self.Projectile, PROJ_DELAY)
+			elseif self.TargetingType == "Projectile" and (p1.x == p2.x or p1.y == p2.y) then
+				ret:AddProjectile(p1, damage, self.Projectile, PROJ_DELAY)
+			else
+				ret:AddDamage(damage)
+			end
+			if self.AoEShape == "Point" then return ret end
+			-- LOG("doing AoE for "..self.AoEShape)
+			local outerTiles = {}
+			--Extra damages on the other tiles
+			for dir2 = DIR_START, DIR_END do
+				if self.AoEShape == "Plus" or self.AoEShape == "Square" then
+					if Board:IsValid(p2 + DIR_VECTORS[dir2]) then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] end
+				end
+				if self.AoEShape == "X" or self.AoEShape == "Square" then
+					if Board:IsValid(p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4]) then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4] end
+				end
+			end
+			if self.AoEShape == "Row" then 
+				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+1)%4]
+				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+3)%4]
+			end
+			if self.AoEShape == "Column" then 
+				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+2)%4]
+				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir]
+			end
+			if self.AoEShape == "All" then
+				for x = 0, 7 do
+					for y = 0, 7 do
+						local flag = true
+						if Point(x, y) == p2 then flag = false end
+						if self.TargetingRestriction == "NextToTerrain" then
+							local adjacentToTerrain = false
+							for dir2 = DIR_START, DIR_END do
+								if Board:GetTerrain(Point(x, y) + DIR_VECTORS[dir2]) == self.Terrain then
+									adjacentToTerrain = true
+								end
+							end
+							if not adjacentToTerrain then flag = false end
+						elseif self.TargetingRestriction == "OnTerrain" then
+							if Board:GetTerrain(Point(x, y)) ~= self.Terrain then
+								flag = false
+							end
+						elseif self.TargetingRestriction == "Damaged" then
+							if not (Board:GetPawn(Point(x, y)) and Board:GetPawn(Point(x, y)):IsDamaged())  then
+								flag = false
+							end
+						elseif self.TargetingRestriction == "FullHealth" then
+							if not (Board:GetPawn(Point(x, y)) and not Board:GetPawn(Point(x, y)):IsDamaged())  then
+								flag = false
+							end
+						elseif self.TargetingRestriction == "NextToMech" then
+							local adjacentToMech = false
+							for dir2 = DIR_START, DIR_END do
+								if Board:GetPawn(Point(x, y) + DIR_VECTORS[dir2]) and Board:GetPawn(Point(x, y) + DIR_VECTORS[dir2]):IsMech() then
+									adjacentToMech = true
+								end
+							end
+							if not adjacentToMech then flag = false end
+						end
+						if flag then
+							outerTiles[#outerTiles+1] = Point(x, y) 
+						end
+					end
+				end
+			elseif self.TargetingAdditions ~= "None" then
+				if self.TargetingAdditions == "AdjacentToUser" then
+					for dir2 = DIR_START, DIR_END do
+						if p1 + DIR_VECTORS[dir2] ~= p2 then outerTiles[#outerTiles+1] = p1 + DIR_VECTORS[dir2] end
+					end
+				end
+				if self.TargetingAdditions == "AdjacentToTarget" then
+					for dir2 = DIR_START, DIR_END do
+						outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2]
+					end
+				end
+				if self.TargetingAdditions == "OthersSameDistance" then
+					for x = 0, 7 do
+						for y = 0, 7 do
+							if Point(x, y):Manhattan(p1) == p2:Manhattan(p1) and p2 ~= Point(x, y) then outerTiles[#outerTiles+1] = Point(x, y) end
+						end
+					end
+				end
+			end
+			for index = 1, #outerTiles do
+				local outerDamage = SpaceDamage(outerTiles[index], self.OuterDamage)
+				outerDamage.sSound = self.ImpactSound
+				outerDamage.sAnimation = self.Explosion
+				if self.OuterEffect == "Status" then
+					outerDamage["i"..self.Status] = 1
+				else
+					outerDamage["i"..self.OuterEffect] = self[self.OuterEffect]
+				end
+				if self.Push ~= DIR_NONE then
+					if self.PushType == "Absolute" or self.Push == DIR_FLIP then
+						outerDamage.iPush = self.Push
+					elseif self.PushType == "Relative from p1" then
+						outerDamage.iPush = (dir + self.Push)%4
+					else --if self.PushType == "Relative from p2" then
+						outerDamage.iPush = (GetDirection(outerTiles[index] - p2) + self.Push)%4
+					end
+				end
+				ret:AddDamage(outerDamage)
+			end
+			return ret
+		end
+	end
+end
+
+
+local function EVENT_onModsLoaded()
+	modApi:addPostLoadGameHook(GenerateGlitchWeapons)
+	sdlext.addHangarExitedHook(GenerateGlitchWeapons)
+end
+
+modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
