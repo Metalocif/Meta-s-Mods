@@ -39,7 +39,8 @@ ANIMS.StatusDodge3 = ANIMS.StatusBase:new{ Image = "libs/status/dodge3.png"}
 ANIMS.StatusDoomed = ANIMS.StatusBase:new{ Image = "libs/status/doomed_icon.png"}
 ANIMS.StatusGlory = ANIMS.StatusBase:new{ Image = "libs/status/glory_icon.png", PosX = -5}
 ANIMS.StatusGuardian = ANIMS.StatusBase:new{ Image = "libs/status/guardian_icon.png", PosX = 5}
-ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunk.png", PosX = -5, NumFrames = 6}
+ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunk1.png", PosX = -5, NumFrames = 6}
+ANIMS.GunkPuddle_Explode = Animation:new{Image = "effects/explo_gunkpuddle.png", NumFrames = 4, Time = 0.1, PosX = -30, PosY = -25}
 ANIMS.StatusHemorrhage = ANIMS.StatusBase:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2}
 ANIMS.StatusLeechSeed = ANIMS.StatusBase:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5}
 ANIMS.StatusNecrosis = ANIMS.StatusBase:new{ Image = "libs/status/necrosis_icon.png"}
@@ -677,6 +678,8 @@ end
 local function CreateStatusFunctions()
 function Status.IsImmuneTo(pawn, status)
 	if not pawn or not status or status == "" then return false end
+	if type(pawn) == "number" then pawn = Board:GetPawn(pawn) end
+	if not pawn then return false end
 	if _G[pawn:GetType()][status.."Immune"] then return true end
 	if pawn:GetAbility() ~= "" and modapiext.pawn:getPilotId(pawn:GetId()) and _G[modapiext.pawn:getPilotId(pawn:GetId())] and
 	_G[modapiext.pawn:getPilotId(pawn:GetId())][status.."Immune"] then return true end
@@ -1356,7 +1359,9 @@ end
 TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
 TILE_TOOLTIPS.Status_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}
 
-Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = SpaceDamage(0), Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
+local gunk_damage = SpaceDamage(0)
+gunk_damage.sAnimation = "GunkPuddle_Explode"
+Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = gunk_damage, Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
 Status_Puddle = { Image = "libs/status/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Status_Puddle_Text", Icon = "libs/status/item_puddle.png", UsedImage = ""}
 Location["libs/status/gunk.png"] = Point(-22,6)
 Location["libs/status/gunkused.png"] = Point(-22,6)
