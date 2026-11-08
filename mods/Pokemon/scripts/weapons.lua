@@ -8710,6 +8710,72 @@ function Poke_Glitch:GetFinalEffect(p1, p2, p3)
 	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetSkillEffect(p1, p3)
 end
 
+Poke_GlitchTwo=Skill:new{
+	Class = "TechnoVek",
+	Icon = "weapons/Glitch.png",	
+	Rarity = 3,
+	Name = "Glitch",
+	Description = "Use one of two randomly generated effects. Effects change each turn.",
+	-- Damage = 3,
+	-- PathSize = 8,	
+	PowerCost = 0,
+	TwoClick = true,
+	EffectCount = 2,
+	Upgrades = 2,
+	UpgradeList = { "+1 Effect", "+1 Effect" },
+	UpgradeCost = { 1,1 },
+	ZoneTargeting = ZONE_DIR,
+	TipImage = {
+		Unit = Point(2,4),
+		Target = Point(2,4),
+		CustomPawn = "Poke_Missingno",
+	}
+}
+
+Poke_GlitchTwo_A = Poke_GlitchTwo:new{ UpgradeDescription = "Generates another effect to choose from.", EffectCount = 3,}
+Poke_GlitchTwo_B = Poke_GlitchTwo:new{ UpgradeDescription = "Generates another effect to choose from.", EffectCount = 3,}	
+Poke_GlitchTwo_AB = Poke_GlitchTwo:new{ EffectCount = 4,}
+
+function Poke_GlitchTwo:GetTargetArea(p1)
+	local ret = PointList()
+	if not Board:GetPawn(p1) then return ret end
+	if Board:IsTipImage() then 
+		ret:push_back(p1)
+		return ret
+	end
+	ret:push_back(p1+DIR_VECTORS[DIR_DOWN])
+	ret:push_back(p1+DIR_VECTORS[DIR_UP])
+	if self.EffectCount >= 3 then ret:push_back(p1+DIR_VECTORS[DIR_LEFT]) end
+	if self.EffectCount >= 4 then ret:push_back(p1+DIR_VECTORS[DIR_RIGHT]) end
+	return ret
+end
+
+function Poke_GlitchTwo:GetSecondTargetArea(p1, p2)
+	if not Board:GetPawn(p1) then return PointList() end
+	if Board:IsTipImage() then 
+		local ret = PointList()
+		ret:push_back(p1)
+		return ret
+	end
+	local offset = (Game and (Game:GetTurnCount()) or 0) + 5 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetTargetArea(p1)
+end
+
+function Poke_GlitchTwo:GetSkillEffect(p1, p2)
+	local ret = SkillEffect()
+	local damage = SpaceDamage(p2)
+	ret:AddDamage(damage)
+	return ret
+end
+
+function Poke_GlitchTwo:GetFinalEffect(p1, p2, p3)
+	if not Board:GetPawn(p1) then return SkillEffect() end
+	if Board:IsTipImage() then return SkillEffect() end
+	local offset = (Game and (Game:GetTurnCount()) or 0) + 5 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetSkillEffect(p1, p3)
+end
+
+
 --deduplicate weapons; they can all refer to a single function instead of creating 1000 copies of a function
 
 local function GenerateGlitchWeapons()

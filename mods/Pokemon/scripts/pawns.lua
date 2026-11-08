@@ -1253,10 +1253,9 @@ Poke_Missingno = Pawn:new{
 	-- SoundLocation = "/enemy/bouncer_1/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_NONE,
-	HasEvolutions = { false, false },
-	-- EvoForget = { "", "" },
-	-- EvoLearn = { { { "Poke_DarkTendrils" }, { } } },
-	-- KeepAdding = { "", "Poke_ShadowForce" },
+	HasEvolutions = { true, false },
+	EvoLearn = { { { "Poke_GlitchTwo" } } },
+	EvoForget = { },
 }
 
 
