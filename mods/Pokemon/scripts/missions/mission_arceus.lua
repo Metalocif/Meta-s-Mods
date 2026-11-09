@@ -64,8 +64,12 @@ function Mission_Poke_Arceus:NextTurn()
 			end
 		end)
 	else
+		local suffix = ""
+		for i = 0, 2 do
+			if Board:GetPawn(i) and Board:GetPawn(i):GetType() == "Poke_Missingno" then suffix = "_Missingno" end
+		end
 		if Board:GetPawn(self.Target) and Game:GetTurnCount() >= 0 and Game:GetTurnCount() <= 4 and Game:GetTeamTurn() == TEAM_ENEMY then
-			modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Turn"..Game:GetTurnCount() + 1, {main = self.Target})
+			modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Turn"..tostring(Game:GetTurnCount() + 1)..suffix, {main = self.Target})
 		end
 	end
 	if Board:GetPawn(self.Target) and Game:GetTeamTurn() == TEAM_ENEMY then

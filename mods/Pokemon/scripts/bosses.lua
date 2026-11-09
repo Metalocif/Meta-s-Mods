@@ -1811,7 +1811,11 @@ function Poke_ArceusBoss:GetDeathEffect(point)
 		Board:AddPawn(arceus, point)
 		GetCurrentMission().Target = arceus:GetId()
 		Board:Ping(point, GL_Color(255, 255, 150))
-		modApi:runLater(function() modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_SecondForm", {main = arceus:GetId()}) end)
+		local suffix = ""
+		for i = 0, 2 do
+			if Board:GetPawn(i) and Board:GetPawn(i):GetType() == "Poke_Missingno" then suffix = "_Missingno" end
+		end
+		modApi:runLater(function() modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_SecondForm"..suffix, {main = arceus:GetId()}) end)
 	end)
 	return SkillEffect()
 end
@@ -1846,9 +1850,12 @@ AddPawn("Poke_ArceusBoss2")
 function Poke_ArceusBoss2:GetDeathEffect(point)
 	local arceusSpeaker = PAWN_FACTORY:CreatePawn("Poke_ArceusBoss")
 	Board:AddPawn(arceusSpeaker, Point(-12, 42))
-	
+	local suffix = ""
+	for i = 0, 2 do
+		if Board:GetPawn(i) and Board:GetPawn(i):GetType() == "Poke_Missingno" then suffix = "_Missingno" end
+	end
 	arceusSpeaker:SetInvisible(true)
-	modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Death", {main = arceusSpeaker:GetId()})
+	modapiext.dialog:triggerRuledDialog("Pokemon_Arceus_Death"..suffix, {main = arceusSpeaker:GetId()})
 	modApi:runLater(function() Board:RemovePawn(arceusSpeaker) DoSaveGame() end)
 	Board:GetPawn(point):SetCorpse(false)
 	local ball = PAWN_FACTORY:CreatePawn("Poke_MasterBall")
