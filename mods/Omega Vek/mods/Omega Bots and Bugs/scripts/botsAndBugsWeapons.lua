@@ -165,7 +165,7 @@ function OmegaSpitterAtk2:GetSkillEffect(p1, p2)
 		local curr = p1 + DIR_VECTORS[i]
 		local acidDamage = SpaceDamage(curr)
 		acidDamage.iAcid = EFFECT_CREATE
-		ret:AddDamage(acidDamage)
+		if not Board:IsPod(curr) then ret:AddDamage(acidDamage) end
 	end
 	local damage = SpaceDamage(p2, self.Damage)
 	damage.sAnimation = "SwipeClaw1"
