@@ -8692,7 +8692,7 @@ function Poke_Glitch:GetSecondTargetArea(p1, p2)
 		ret:push_back(p1)
 		return ret
 	end
-	local offset = (Game and (Game:GetTurnCount()) or 0) + 1 + GetDirection(p2-p1)
+	local offset = (GAME and GAME.TotalTurns or 0) * 8 + 1 + GetDirection(p2-p1)
 	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetTargetArea(p1)
 end
 
@@ -8706,7 +8706,7 @@ end
 function Poke_Glitch:GetFinalEffect(p1, p2, p3)
 	if not Board:GetPawn(p1) then return SkillEffect() end
 	if Board:IsTipImage() then return SkillEffect() end
-	local offset = (Game and (Game:GetTurnCount()) or 0) + 1 + GetDirection(p2-p1)
+	local offset = (GAME and GAME.TotalTurns or 0) * 8 + 1 + GetDirection(p2-p1)
 	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetSkillEffect(p1, p3)
 end
 
@@ -8757,8 +8757,8 @@ function Poke_GlitchTwo:GetSecondTargetArea(p1, p2)
 		ret:push_back(p1)
 		return ret
 	end
-	local offset = (Game and (Game:GetTurnCount()) or 0) + 5 + GetDirection(p2-p1)
-	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetTargetArea(p1)
+	local offset = (GAME and GAME.TotalTurns or 0) * 8 + 5 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 1000 + offset]:GetTargetArea(p1)
 end
 
 function Poke_GlitchTwo:GetSkillEffect(p1, p2)
@@ -8771,12 +8771,9 @@ end
 function Poke_GlitchTwo:GetFinalEffect(p1, p2, p3)
 	if not Board:GetPawn(p1) then return SkillEffect() end
 	if Board:IsTipImage() then return SkillEffect() end
-	local offset = (Game and (Game:GetTurnCount()) or 0) + 5 + GetDirection(p2-p1)
-	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 100 + offset]:GetSkillEffect(p1, p3)
+	local offset = (GAME and GAME.TotalTurns or 0) * 8 + 5 + GetDirection(p2-p1)
+	return _G["Poke_GlitchWeapon"..Board:GetPawn(p1):GetId() * 1000 + offset]:GetSkillEffect(p1, p3)
 end
-
-
---deduplicate weapons; they can all refer to a single function instead of creating 1000 copies of a function
 
 local function GenerateGlitchWeapons()
 	local _, profile = next(modApi:getProfileList()) 
@@ -8800,20 +8797,36 @@ local function GenerateGlitchWeapons()
 			end
 		end
 	end 
-	local targetingTypes =  {"Melee", "Melee", "Melee", "Artillery", "Artillery", "Projectile", "Projectile", "Distance", "Any"}
+	local targetingTypes =  {"Melee", "Melee", "Melee", "Artillery", "Artillery", "Projectile", "Projectile", "Laser", "Distance", "Any"}
 	local targetingRestrictions =  {"NextToTerrain", "OnTerrain", "Damaged", "FullHealth", "NextToMech"}
 	local targetingAdditions = {"None", "None", "None", "AdjacentToTarget", "OthersSameDistance", "AdjacentToUser"}
 	local areaShapes =  {"Plus", "Square", "Point", "Point", "Row", "Column", "X", "All"}
 	local effectKeys = {"Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Shield", "Status", "Status"}
-	local pushDirs = {DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_FLIP} --, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE}
+	local pushDirs = {DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_FLIP, DIR_NONE, DIR_NONE, DIR_NONE} --, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE}
 	local pushType = {"Relative from p1", "Relative from p2", "Relative from p1", "Relative from p2", "Absolute"}
 	local plausibleStatus = {"Blind","Bloodthirsty","Bonded","Chill","Confusion","Dreadful","Dry","Gunk","Hemorrhage","Necrosis","Powder","Reactive","Repulsive","Regen","Rooted","Shatterburst","Shocked","Targeted","Tough","Toxin","Wet"}
 	local validTerrains = {TERRAIN_MOUNTAIN, TERRAIN_BUILDING, TERRAIN_ROAD, TERRAIN_WATER}
 	
 	
-	for i = 1, 1000 do
+	for i = 1, 3000 do
 		local damageAmount1 = math.random(0, 1) + math.random(-1, 1) + math.random(0, 1) * math.random(0, 1) + math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
 		local damageAmount2 = math.random(0, 1) + math.random(-1, 1) + math.random(0, 1) * math.random(0, 1) + math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
+		if i % 1000 > 200 then
+			damageAmount1 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+			damageAmount2 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+		end
+		if i % 1000 > 400 then
+			damageAmount1 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+			damageAmount2 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+		end
+		if i % 1000 > 600 then
+			damageAmount1 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+			damageAmount2 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+		end
+		if i % 1000 > 800 then
+			damageAmount1 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+			damageAmount2 = damageAmount1 + math.random(0, 1) * math.random(0, 1)
+		end
 		local willShield = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
 		local willSmoke = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
 		local willFreeze = math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1) * math.random(0, 1)
@@ -8865,7 +8878,6 @@ local function GenerateGlitchWeapons()
 			Projectile = projectile,	--needs to check whether we are artillery or not
 		}
 		_G["Poke_GlitchWeapon"..i].GetTargetArea = function(self, point)
-			-- use TargetingRestriction
 			local ret = PointList()
 			if self.TargetingType == "Melee" then
 				for dir = DIR_START, DIR_END do
@@ -8877,7 +8889,7 @@ local function GenerateGlitchWeapons()
 						ret:push_back(point+DIR_VECTORS[dir]*j)
 					end
 				end
-			elseif self.TargetingType == "Projectile" then
+			elseif self.TargetingType == "Projectile" or self.TargetingType == "Laser" then
 				for dir = DIR_START, DIR_END do
 					for j = 1, self.Range do
 						ret:push_back(point+DIR_VECTORS[dir]*j)
@@ -8901,13 +8913,19 @@ local function GenerateGlitchWeapons()
 			end
 			return ret
 		end
+
 		_G["Poke_GlitchWeapon"..i].GetSkillEffect = function(self, p1, p2)
 			local ret = SkillEffect()
 			local dir = p1 ~= p2 and GetDirection(p2-p1) or DIR_NONE	--won't work quite right for tiles at diagonals; this is glitchy so it's fine
 			--Self-damage.
 			if self.SelfDamage ~= 0 then ret:AddDamage(SpaceDamage(p1, self.SelfDamage)) end
 			--Base damage on the target tile
-			local damage = SpaceDamage(p2, self.Damage)
+			
+			local target = p2
+			if (self.TargetingType == "Projectile" or self.TargetingType == "Laser") and (p1.x == p2.x or p1.y == p2.y) then
+				target = GetProjectileEnd(p1, p1+DIR_VECTORS[dir])
+			end
+			local damage = SpaceDamage(target, self.Damage)
 			damage.sSound = self.ImpactSound
 			damage.sAnimation = self.Explosion
 			if self.CenterEffect == "Status" then
@@ -8928,34 +8946,40 @@ local function GenerateGlitchWeapons()
 				ret:AddArtillery(p1, damage, self.Projectile, PROJ_DELAY)
 			elseif self.TargetingType == "Projectile" and (p1.x == p2.x or p1.y == p2.y) then
 				ret:AddProjectile(p1, damage, self.Projectile, PROJ_DELAY)
+			elseif self.TargetingType == "Laser" then
+				for i = 1, p1:Manhattan(target) do
+					damage.loc = p1 + DIR_VECTORS[dir] * i
+					ret:AddDamage(damage)
+					ret:AddDelay(0.15)
+				end
 			else
 				ret:AddDamage(damage)
 			end
-			if self.AoEShape == "Point" then return ret end
-			-- LOG("doing AoE for "..self.AoEShape)
+			if self.AoEShape == "Point" or self.TargetingType == "Laser" then return ret end
+			
 			local outerTiles = {}
 			--Extra damages on the other tiles
 			for dir2 = DIR_START, DIR_END do
 				if self.AoEShape == "Plus" or self.AoEShape == "Square" then
-					if Board:IsValid(p2 + DIR_VECTORS[dir2]) then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] end
+					if Board:IsValid(p2 + DIR_VECTORS[dir2]) and p2 + DIR_VECTORS[dir2] ~= p1 then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] end
 				end
 				if self.AoEShape == "X" or self.AoEShape == "Square" then
 					if Board:IsValid(p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4]) then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4] end
 				end
 			end
 			if self.AoEShape == "Row" then 
-				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+1)%4]
-				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+3)%4]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+1)%4]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+3)%4]
 			end
 			if self.AoEShape == "Column" then 
-				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[(dir+2)%4]
-				outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+2)%4]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[dir]
 			end
 			if self.AoEShape == "All" then
 				for x = 0, 7 do
 					for y = 0, 7 do
 						local flag = true
-						if Point(x, y) == p2 then flag = false end
+						if Point(x, y) == target then flag = false end
 						if self.TargetingRestriction == "NextToTerrain" then
 							local adjacentToTerrain = false
 							for dir2 = DIR_START, DIR_END do
@@ -8998,7 +9022,7 @@ local function GenerateGlitchWeapons()
 				end
 				if self.TargetingAdditions == "AdjacentToTarget" then
 					for dir2 = DIR_START, DIR_END do
-						outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2]
+						if p1 + DIR_VECTORS[dir2] ~= target then outerTiles[#outerTiles+1] = target + DIR_VECTORS[dir2] end
 					end
 				end
 				if self.TargetingAdditions == "OthersSameDistance" then
@@ -9024,7 +9048,7 @@ local function GenerateGlitchWeapons()
 					elseif self.PushType == "Relative from p1" then
 						outerDamage.iPush = (dir + self.Push)%4
 					else --if self.PushType == "Relative from p2" then
-						outerDamage.iPush = (GetDirection(outerTiles[index] - p2) + self.Push)%4
+						outerDamage.iPush = (GetDirection(outerTiles[index] - target) + self.Push)%4
 					end
 				end
 				ret:AddDamage(outerDamage)
@@ -9037,6 +9061,9 @@ end
 
 local function EVENT_onModsLoaded()
 	modApi:addPostLoadGameHook(GenerateGlitchWeapons)
+	modApi:addPreEnvironmentHook(function()
+		GAME.TotalTurns = GAME.TotalTurns and GAME.TotalTurns + 1 or 1
+	end)
 	sdlext.addHangarExitedHook(GenerateGlitchWeapons)
 end
 
