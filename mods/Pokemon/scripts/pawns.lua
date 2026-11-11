@@ -1263,7 +1263,6 @@ local oldMove = Move.GetTargetArea
 function Move:GetTargetArea(p, ...)
 	local mover = Board:GetPawn(p)
 	if mover and _G[mover:GetType()].GhostMovement then
-		local pathType
 		local area = extract_table(general_DiamondTarget(p, mover:GetMoveSpeed()))
 		local ret = PointList()
 		for _, v in ipairs(area) do
@@ -1274,7 +1273,6 @@ function Move:GetTargetArea(p, ...)
 		end
 		return ret
 	elseif mover and _G[mover:GetType()].FastTeleporter then
-		local pathType
 		local area = extract_table(general_DiamondTarget(p, mover:GetMoveSpeed()))
 		local ret = PointList()
 		for _, v in ipairs(area) do
