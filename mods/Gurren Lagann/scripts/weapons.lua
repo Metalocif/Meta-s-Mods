@@ -493,7 +493,7 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 		if Board:GetPawn(curr) and Board:GetPawn(curr):IsEnemy() and i < dist then achievementCounter = achievementCounter + 1 end	--we're presumably killing that pawn
 	end
 	if targetPawn then 
-		if targetPawn:IsGuarding() or not Board:IsValid(p2 - DIR_VECTORS[dir] * 2) then
+		if targetPawn:IsGuarding() or not Board:IsValid(p2 - DIR_VECTORS[dir] * 2) or Board:GetTerrain(p2 - DIR_VECTORS[dir] * 2) == TERRAIN_BUILDING or Board:GetTerrain(p2 - DIR_VECTORS[dir] * 2) == TERRAIN_MOUNTAIN then
 			if Meta_Stinger_CanKill(targetPawn, p2, self.Damage) and targetPawn:IsEnemy() then achievementCounter = achievementCounter + 1 end
 			ret:AddDamage(SpaceDamage(p2, self.Damage))
 		else
