@@ -478,6 +478,7 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 	local targetPawn = Board:GetPawn(p2)
 	local destination = p2
 	if targetPawn then destination = p2 - DIR_VECTORS[dir] end
+	local blockingPawn = Board:GetPawn(destination) 
 	local dist = p1:Manhattan(destination)
 	ret:AddCharge(Board:GetPath(p1, destination, PATH_FLYER), NO_DELAY)
 	for i = 0, dist do
@@ -485,6 +486,7 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 		ret:AddEmitter(curr, "Emitter_Dust")
 		local damage = SpaceDamage(curr, self.Damage)
 		if i > 0 and i < dist then ret:AddDamage(damage) end
+		if i == dist and dist > 0 and targetPawn and blockingPawn then ret:AddScript(string.format("Board:GetPawn(%s):Kill(false)", blockingPawn:GetId())) end
 		ret:AddDelay(0.1)
 		ret:AddBounce(curr, 2)
 		curr = curr + DIR_VECTORS[dir]
