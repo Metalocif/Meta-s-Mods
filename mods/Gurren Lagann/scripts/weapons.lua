@@ -210,7 +210,7 @@ function Meta_SunglassesBoomerang:GetSecondTargetArea(p1,p2)
 		local curr = p1 + DIR_VECTORS[dir] * j
 		local canPathTo = true
 		for i = trueDist+1, j do
-			if Board:IsBlocked(p1+DIR_VECTORS[dir] * i +DIR_VECTORS[dir2], PATH_PROJECTILE) then Board:Ping(p2+DIR_VECTORS[dir] * i +DIR_VECTORS[dir2], GL_Color(255, 0, 0)) canPathTo = false end
+			if Board:IsBlocked(p1+DIR_VECTORS[dir] * i +DIR_VECTORS[dir2], PATH_PROJECTILE) then canPathTo = false end
 		end
 		if canPathTo then ret:push_back(curr) end
 	end
