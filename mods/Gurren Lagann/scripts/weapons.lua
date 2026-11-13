@@ -168,12 +168,12 @@ function Meta_SunglassesBoomerang:GetTargetArea(point)
 			local side1 = (i+1)%4
 			local side2 = (i-1)%4
 			local canPathTo = true
-			for k = 0, j do
+			for k = 0, j-1 do
 				if Board:IsBlocked(point + DIR_VECTORS[side1] + DIR_VECTORS[i] * k, PATH_PROJECTILE) then canPathTo = false end
 			end
 			if canPathTo then ret:push_back(point + DIR_VECTORS[i] * j  + DIR_VECTORS[side1]) end
 			canPathTo = true
-			for k = 0, j do
+			for k = 0, j-1 do
 				if Board:IsBlocked(point + DIR_VECTORS[side2] + DIR_VECTORS[i] * k, PATH_PROJECTILE) then canPathTo = false end
 			end
 			if canPathTo then ret:push_back(point + DIR_VECTORS[i] * j  + DIR_VECTORS[side2]) end
