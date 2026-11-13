@@ -506,7 +506,7 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 			ret:AddBounce(p2 - DIR_VECTORS[dir] * 2, self.Damage * 2)
 		end
 	end
-	if GetCurrentMission() and achievementCounter >= 1 then ret:AddScript("completeHandleTheRabble()") end
+	if GetCurrentMission() and achievementCounter >= 3 then ret:AddScript("completeHandleTheRabble()") end
 	return ret
 end
 
