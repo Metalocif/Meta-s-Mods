@@ -2,7 +2,7 @@ local description = "Adds another cyborg squad."
 
 local mod = {
 	id = "Meta_SecretSquad4",
-	name = "Secret Squad 4",
+	name = "Secret Squad IV",
 	version = "1.0.0",
 	requirements = {},
 	dependencies = { 
