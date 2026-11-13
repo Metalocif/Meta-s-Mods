@@ -1,6 +1,6 @@
 
 ---------------------------------------------------------------------
--- Status effects v2.1 - code library
+-- Status effects v2.1.1 - code library
 ---------------------------------------------------------------------
 -- A library that adds status effects to the game. Weapons and pilot skills can apply status effects.
 -- See the wiki for info: https://github.com/Metalocif/Meta-s-Mods/wiki/Status-Library
@@ -12,7 +12,7 @@
 -- These typically check whether a pawn with the given ID exists and whether a mission is ongoing, then adds the ID to the status' table and an animation.
 -- These tables are checked when relevant in the hooks below.
 
-local VERSION = "2.1.0"
+local VERSION = "2.1.1"
 
 local isNewerVersion = false
     or Status == nil             -- First time loading
@@ -36,7 +36,8 @@ ANIMS.StatusDry = ANIMS.StatusBase:new{ Image = "libs/status/dry.png", NumFrames
 ANIMS.StatusDodge1 = ANIMS.StatusBase:new{ Image = "libs/status/dodge1.png"}
 ANIMS.StatusDodge2 = ANIMS.StatusBase:new{ Image = "libs/status/dodge2.png"}
 ANIMS.StatusDodge3 = ANIMS.StatusBase:new{ Image = "libs/status/dodge3.png"}
-ANIMS.StatusDoomed = ANIMS.StatusBase:new{ Image = "libs/status/doomed_icon.png"}
+ANIMS.StatusDoom = ANIMS.StatusBase:new{ Image = "libs/status/doom_icon.png"}
+ANIMS.StatusOppression = ANIMS.StatusBase:new{ Image = "libs/status/oppressed_icon.png"}
 ANIMS.StatusGlory = ANIMS.StatusBase:new{ Image = "libs/status/glory_icon.png", PosX = -5}
 ANIMS.StatusGuardian = ANIMS.StatusBase:new{ Image = "libs/status/guardian_icon.png", PosX = 5}
 ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunk1.png", PosX = -5, NumFrames = 6}
@@ -89,8 +90,8 @@ Location["libs/status/confusion_icon_remove.png"] = Point(-5,0)
 Location["libs/status/dodge_icon.png"] = Point(-5,0)
 Location["libs/status/dodge_icon_remove.png"] = Point(-5,0)
 
-Location["libs/status/doomed_icon.png"] = Point(-5,0)
-Location["libs/status/doomed_icon_remove.png"] = Point(-5,0)
+Location["libs/status/doom_icon.png"] = Point(-5,0)
+Location["libs/status/doom_icon_remove.png"] = Point(-5,0)
 
 Location["libs/status/dreadful_icon.png"] = Point(-5,0)
 Location["libs/status/dreadful_icon_remove.png"] = Point(-5,0)
@@ -115,6 +116,9 @@ Location["libs/status/leechseed_icon_remove.png"] = Point(-5,0)
 
 Location["libs/status/necrosis_icon.png"] = Point(-5,0)
 Location["libs/status/necrosis_icon_remove.png"] = Point(-5,0)
+
+Location["libs/status/oppression_icon.png"] = Point(-5,0)
+Location["libs/status/oppression_icon_remove.png"] = Point(-5,0)
 
 Location["libs/status/powder_icon.png"] = Point(-5,0)
 Location["libs/status/powder_icon_trigger.png"] = Point(-5,0)
@@ -306,7 +310,7 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 				return oldNewIndex(SpaceDamageInstance, key, 0)
 			else
 				SpaceDamageInstance.sImageMark = "libs/status/chill_icon.png"
-				SpaceDamageInstance.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", id, (value == 2))
+				SpaceDamageInstance.sScript = string.format("modApi:runLater(function() Status.ApplyChill(%s, %s) end)", id, tostring(value == 2))
 			end
 		elseif value == STATUS_REMOVE or not pawn:IsFrozen() then
 			SpaceDamageInstance.sImageMark = "libs/status/chill_icon_remove.png"
@@ -331,18 +335,27 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Dodge")
 		end
         return
-	elseif key == "iDoomed" or key == "iDoom" then
+	elseif key == "iDoom" or key == "iDoom" then
+		if value and value ~= STATUS_REMOVE then
+			SpaceDamageInstance.sImageMark = "libs/status/doom_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyDoom(%s, %s)", id, value)
+		else
+			SpaceDamageInstance.sImageMark = "libs/status/doom_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Doom")
+		end
+        return
+	elseif key == "iOppression" or key == "iOppressed" then
 		if value and value ~= STATUS_REMOVE then
 			if type(value) == "table" then 
 				value.amount = value.amount or 1
 			else
-				value = {source = -1, amount = value or 1 }
+				value = {source = value, amount = 1 }
 			end
-			SpaceDamageInstance.sImageMark = "libs/status/doomed_icon.png"
-			SpaceDamageInstance.sScript = string.format("Status.ApplyDoomed(%s, %s, %s)", id, value.source, value.amount)
+			SpaceDamageInstance.sImageMark = "libs/status/oppressed_icon.png"
+			SpaceDamageInstance.sScript = string.format("Status.ApplyOppression(%s, %s, %s)", id, value.source, value.amount)
 		else
-			SpaceDamageInstance.sImageMark = "libs/status/doomed_icon_remove.png"
-			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Doomed")
+			SpaceDamageInstance.sImageMark = "libs/status/oppressed_icon_remove.png"
+			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Oppression")
 		end
         return
 	elseif key == "iDreadful" then
@@ -816,16 +829,27 @@ function Status.LowerDodge(id)
 	end
 end
 
-function Status.ApplyDoomed(id, source, amount)
+function Status.ApplyOppression(id, source, amount)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
-	if Status.IsImmuneTo(pawn, "Doomed") then return end
+	if Status.IsImmuneTo(pawn, "Oppression") then return end
 	source = source or -1
 	amount = amount or 1
-	mission.DoomedTable[id] = {amount = amount, source = source}
-	CustomAnim:add(id, "StatusDoomed")
+	mission.OppressionTable[id] = {amount = amount, source = source}
+	CustomAnim:add(id, "StatusOppression")
+end
+
+function Status.ApplyDoom(id, amount)
+	local pawn = Board:GetPawn(id)
+	if not pawn then return end
+	local mission = GetCurrentMission()
+	if not mission then return end
+	if Status.IsImmuneTo(pawn, "Doom") then return end
+	amount = amount or 1
+	mission.DoomTable[id] = amount
+	CustomAnim:add(id, "StatusDoom")
 end
 
 function Status.ApplyDreadful(id, amount)
@@ -1086,7 +1110,7 @@ end
 function Status.ApplyRooted(id, amount)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
-	if pawn:IsFire() or Board:IsFire(pawn:GetSpace()) then return end
+	if pawn:IsFire() or Board:IsFire(pawn:GetSpace()) or pawn:IsBurrower() then return end
 	local mission = GetCurrentMission()
 	if not mission then return end
 	if Status.IsImmuneTo(pawn, "Rooted") then return end
@@ -1270,8 +1294,15 @@ function Status.GetStatus(id, status)
 end
 
 function Status.List(pawn)
-	if not pawn then
-		return {"Amplifier","Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Dodge","Doomed","Dreadful","Dry","Glory","Guardian","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Repulsive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Tough","Toxin","Weaken","Wet","Insanity"}
+	if pawn == nil then
+		return {"Amplifier","Alluring","Blind","Bloodthirsty","Bonded","Chill","Confusion","Dodge","Doom","Oppression","Dreadful","Dry","Glory","Guardian","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Reactive","Repulsive","Regen","Rooted","Shatterburst","Shocked","Sleep","Targeted","Tough","Toxin","Weaken","Wet","Insanity"}
+	end
+	if type(pawn) == "string" then
+		if pawn == "Buffs" then
+			return {"Amplifier","Dodge","Dreadful","Glory","Guardian","Reactive","Repulsive","Regen","Shatterburst","Tough"}
+		elseif pawn == "Debuffs" then
+			return {"Blind","Bloodthirsty","Bonded","Chill","Confusion","Doom","Oppression","Dry","Gunk","Hemorrhage","Infested","LeechSeed","Necrosis","Powder","Rooted","Shocked","Sleep","Targeted","Toxin","Weaken","Wet"}
+		end
 	else
 		local result = {}
 		local mission = GetCurrentMission()
@@ -1601,6 +1632,18 @@ local function DoTurnStartStatus(mission, wasResetTurn)					--this is for status
 				Board:DamageSpace(damage)
 			end
 		end
+	elseif Game:GetTeamTurn() == TEAM_ENEMY then --do doom check after toxin so toxin spreads		
+		for id, _ in pairs(mission.DoomTable) do
+			local pawn = Board:GetPawn(id)
+			if (not pawn) or pawn:IsDead() then
+				mission.DoomTable[id] = nil
+			elseif pawn:GetHealth() <= mission.DoomTable[id] then
+				pawn:Kill(true)
+				Board:Ping(pawn:GetSpace(), GL_Color(100, 0, 100))
+				Board:AddAlert(pawn:GetSpace(), "Doom Damage")
+				CustomAnim:rem(id, "StatusDoom")				--anim disappears after Vek emerge otherwise, which looks weird
+			end
+		end
 	end
 	for id, recoverPerTurn in pairs(mission.WeakenTable) do
 		local pawn = Board:GetPawn(id)
@@ -1682,11 +1725,14 @@ local function EVENT_onModsLoaded()
 				statusDesc = statusDesc.." ("..mission.ConfusionTable[id].." turns left)."
 			end
 			if status == "Dodge" then statusDesc = "Dodges incoming instant attacks by moving to a nearby tile. Vek queued attacks are unaffected." end
-			if status == "Doomed" then 
-				if mission.DoomedTable[id].amount > 0 then statusDesc = "Takes "..mission.DoomedTable[id].amount.." damage every turn. " end
+			if status == "Doom" then statusDesc = "If a unit has more Doom than their current HP, they die after Vek attack (currently "..mission.DoomTable[id]..")." end
+			if status == "Oppression" then 
+				if mission.OppressionTable[id].amount > 0 then statusDesc = "Takes "..mission.OppressionTable[id].amount.." damage every turn. " end
 				statusDesc = statusDesc.."On death, the pawn's tile turns into lava. "
-				if Board:GetPawn(mission.DoomedTable[id].source) then
-					statusDesc = statusDesc.."Removed by killing the source of the status (."..Board:GetPawn(mission.DoomedTable[id].source):GetName()..")." 
+				if Board:GetPawn(mission.OppressionTable[id].source) then
+					if mission.OppressionTable[id].source and mission.OppressionTable[id].source >= 0 and Board:GetPawn(mission.OppressionTable[id].source) then
+						statusDesc = statusDesc.."Removed by killing the source of the status (."..Board:GetPawn(mission.OppressionTable[id].source):GetMechName()..")." 
+					end
 				end
 			end
 			if status == "Dreadful" then statusDesc = "Prevents Vek from queuing attacks adjacent to this pawn and makes them avoid being adjacent to this pawn." end
@@ -1881,10 +1927,10 @@ local function EVENT_onModsLoaded()
 		end
 		Status.RemoveStatus(id, "Sleep")
 	end)
-	modapiext:addPawnKilledHook(function(mission, pawn)					--doomed, refresh overheal
+	modapiext:addPawnKilledHook(function(mission, pawn)					--oppression, refresh overheal
 		if not (mission and pawn) then return end
 		local id = pawn:GetId()
-		if mission.DoomedTable[id] ~= nil then
+		if mission.OppressionTable[id] ~= nil then
 			local damage = SpaceDamage(pawn:GetSpace(), DAMAGE_DEATH)
 			damage.sAnimation = "tentacles"
 			damage.iTerrain = TERRAIN_LAVA
@@ -1892,8 +1938,8 @@ local function EVENT_onModsLoaded()
 			Board:DamageSpace(damage)
 		end
 		mission.DodgeTable[id] = nil
-		for doomedID, doomedInformation in pairs(mission.DoomedTable) do
-			if id == doomedInformation.source then Status.RemoveStatus(doomedID, "Doomed") end
+		for oppressionID, oppressionInformation in pairs(mission.OppressionTable) do
+			if id == oppressionInformation.source then Status.RemoveStatus(oppressionID, "Oppression") end
 		end
 		if _G[pawn:GetType()].Leader == LEADER_BOSS or _G[pawn:GetType()].Leader == LEADER_HEALTH then 
 			modApi:runLater(function() ReapplyOverheal() end)
@@ -1961,15 +2007,15 @@ local function EVENT_onModsLoaded()
                 end
             end
         end
-		for id, doomedInformation in pairs(mission.DoomedTable) do
+		for id, oppressionInformation in pairs(mission.OppressionTable) do
 			local pawn = Board:GetPawn(id)
 			if pawn then
-				if pawn:IsDead() or (type(doomedInformation.source) == "number" and doomedInformation.source ~= -1 and 
-				(not Board:GetPawn(doomedInformation.source) or Board:GetPawn(doomedInformation.source):IsDead())) then			
+				if pawn:IsDead() or (type(oppressionInformation.source) == "number" and oppressionInformation.source ~= -1 and 
+				(not Board:GetPawn(oppressionInformation.source) or Board:GetPawn(oppressionInformation.source):IsDead())) then			
 				--doublechecking with pawnIsKilled, but something could have removed the pawn without killing
-					Status.RemoveStatus(id, "Doomed")
+					Status.RemoveStatus(id, "Oppression")
 				else
-					local damage = SpaceDamage(pawn:GetSpace(), doomedInformation.amount)
+					local damage = SpaceDamage(pawn:GetSpace(), oppressionInformation.amount)
 					damage.sAnimation = "PsionAttack_Back"
 					Board:AddAnimation(pawn:GetSpace(), "PsionAttack_Front", ANIM_NO_DELAY)
 					if Board:GetTerrain(pawn:GetSpace()) == TERRAIN_WATER and Board:IsAcid(pawn:GetSpace()) then
@@ -1980,7 +2026,7 @@ local function EVENT_onModsLoaded()
 						Board:AddAnimation(pawn:GetSpace(), "Splash", ANIM_NO_DELAY)
 					end
 					pawn:ApplyDamage(damage)
-					if type(doomedInformation.source) == "number" and doomedInformation.source ~= -1 and Board:GetPawn(doomedInformation.source) then Board:Ping(Board:GetPawn(doomedInformation.source):GetSpace(), GL_Color(100, 100, 0)) end
+					if type(oppressionInformation.source) == "number" and oppressionInformation.source ~= -1 and Board:GetPawn(oppressionInformation.source) then Board:Ping(Board:GetPawn(oppressionInformation.source):GetSpace(), GL_Color(100, 100, 0)) end
 					--here to let the player visualise the source of the effect
 				end
 			end
