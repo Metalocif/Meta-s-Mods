@@ -123,7 +123,7 @@ Meta_EldritchTentacles = Skill:new{
 	Push = 1,
 	PowerCost = 0,
 	Upgrades = 2,
-	UpgradeList = { "Doom",  "+1 Damage"  },
+	UpgradeList = { "Oppression",  "+1 Damage"  },
 	UpgradeCost = { 2 , 2 },
 	Self = "Meta_EldritchTentacles",
 	UsesInsanity = true,
@@ -139,9 +139,9 @@ Meta_EldritchTentacles = Skill:new{
 	}
 }
 
-Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Attacks inflict Doomed. Doomed pawns take damage every turn and turn their tile into lava on death.",Doom=true}
+Meta_EldritchTentacles_A = Meta_EldritchTentacles:new{UpgradeDescription = "Attacks inflict Oppression. Oppressed pawns take damage every turn and turn their tile into lava on death.",Oppression=true}
 Meta_EldritchTentacles_B = Meta_EldritchTentacles:new{UpgradeDescription = "Deals 1 more damage.",Damage=2}
-Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Doom = true,Damage=2}
+Meta_EldritchTentacles_AB = Meta_EldritchTentacles:new{Oppression = true,Damage=2}
 
 function Meta_EldritchTentacles:GetTargetArea(point)
 	local ret = PointList()
@@ -191,7 +191,7 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 				damage.sAnimation = "eldritchtentaclediaganim_"..i
 				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
 				--use different sounds; make sure it's either 1 or 2 in case another mod changes weapon damage
-				if self.Doom then damage.iDoomed = userId end
+				if self.Oppression then damage.iOppressed = userId end
 				ret:AddDamage(damage)
 				if pawn then toastCounter=toastCounter+1 end
 			end
@@ -202,7 +202,7 @@ function Meta_EldritchTentacles:GetSkillEffect(p1,p2)
 				local damage = SpaceDamage(curr, self.Damage, i)
 				damage.sAnimation = "eldritchtentacleanim_"..i
 				damage.sSound = "/enemy/starfish_"..math.max(math.min(self.Damage, 2), 1).."/attack"
-				if self.Doom then damage.iDoomed = userId end
+				if self.Oppression then damage.iOppressed = userId end
 				ret:AddDamage(damage)
 				if pawn then toastCounter=toastCounter+1 end
 			end
@@ -251,9 +251,9 @@ function Meta_EldritchTentacles:GetFinalEffect(p1, p2, p3)
 	
 	local userId = Board:GetPawn(p1):GetId()
 	local damage1 = SpaceDamage(p2, self.Damage)
-	if self.Doom then damage1.iDoomed = userId end
+	if self.Oppression then damage1.iOppressed = userId end
 	local damage2 = SpaceDamage(p3, self.Damage)
-	if self.Doom then damage2.iDoomed = userId end
+	if self.Oppression then damage2.iOppressed = userId end
 	
 	if p1:Manhattan(p2) == 1 then				--push
 		damage1.iPush = GetDirection(p2 - p1)
