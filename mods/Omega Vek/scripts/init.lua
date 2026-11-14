@@ -35,6 +35,14 @@ function mod:metadata()
 		  value = 0.5 }	--defaults to 50%
 	)
 	modApi:addGenerationOption(
+		"OmegaVekLimit",
+		"Omega Vek hard cap",
+		"Pick the maximum number of Omega Vek that can be on the board at once. Any Omega Vek that would exceed this limit will be a regular Alpha Vek instead.",
+		{ strings = { "No limit","1","2","3","4","5","6","7","8","9","10" }, 
+		  values = { 0,1,2,4,5,5,6,7,8,9,10 }, 
+		  value = 0 }	--defaults to no limit
+	)
+	modApi:addGenerationOption(
 		"OmegaFirefly",
 		"Omega Firefly spawn settings",
 		"Pick the percentage of Alpha Fireflies that will be replaced by Omega Fireflies. Can default to the overall percentage defined above.",
