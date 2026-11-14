@@ -30,7 +30,7 @@ function OmegaDragonflyAtk2:GetSkillEffect(p1, p2)
 	end
 	
 	if Board:IsSmoke(p1) then
-		local damage = SpaceDamage(p1, DAMAGE_KILL)
+		local damage = SpaceDamage(p1, DAMAGE_DEATH)
 		ret:AddQueuedDamage(damage)
 		for i = DIR_START, DIR_END do
 			ret:AddQueuedDamage(SpaceDamage(p1+DIR_VECTORS[i], self.Damage))
