@@ -50,6 +50,7 @@ AddPawn("Omegalmn_Blobberling2")
 
 function Omegalmn_Blobberling2:GetDeathEffect(point)
 	local ret = SkillEffect()
+	if not point then return ret end
 	for i = DIR_START, DIR_END do
 		local curr = point + DIR_VECTORS[i]
 		local damage = SpaceDamage(curr)
@@ -91,7 +92,7 @@ Omegalmn_Floater2 = Pawn:new{
 AddPawn("Omegalmn_Floater2")
 
 function Omegalmn_Floater2:GetDeathEffect(point)
-	if not Board:IsBlocked(point, PATH_GROUND) then Board:AddPawn("Omegalmn_Blobberling2", point) end
+	if point and not Board:IsBlocked(point, PATH_GROUND) then Board:AddPawn("Omegalmn_Blobberling2", point) end
 end
 
 Omegalmn_Roach2 = Pawn:new{
