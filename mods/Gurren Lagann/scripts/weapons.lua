@@ -199,20 +199,19 @@ function Meta_SunglassesBoomerang:GetSecondTargetArea(p1,p2)
 	for i = DIR_START, DIR_END do
 		for j = 2, 4 do
 			local curr = p1 + DIR_VECTORS[i] * j
-			if curr:Manhattan(p2) <= 1 then 
+			if Board:IsValid(curr) and curr:Manhattan(p2) <= 1 then 
 				dir = i 
-				dir2 = GetDirection(curr-p2) 
+				dir2 = GetDirection(p2-curr) 
 				trueDist = j
 			end
 		end
 	end
-	for j = trueDist, 7 do
-		local curr = p1 + DIR_VECTORS[dir] * j
-		local canPathTo = true
-		for i = trueDist+1, j do
-			if Board:IsBlocked(p1+DIR_VECTORS[dir] * i +DIR_VECTORS[dir2], PATH_PROJECTILE) then canPathTo = false end
-		end
-		if canPathTo then ret:push_back(curr) end
+	
+	ret:push_back(p1 + DIR_VECTORS[dir] * trueDist) 
+	for j = trueDist+1, 7 do
+		if (not Board:IsValid(p1+DIR_VECTORS[dir] * j +DIR_VECTORS[dir2])) then break end
+		if Board:IsBlocked(p1+DIR_VECTORS[dir] * j +DIR_VECTORS[dir2], PATH_PROJECTILE) then break end
+		ret:push_back(p1 + DIR_VECTORS[dir] * j) 
 	end
 	return ret
 end
@@ -261,6 +260,7 @@ function Meta_SunglassesBoomerang:GetFinalEffect(p1, p2, p3)
 	local user = Board:GetPawn(p1)
 	local dir = -1
 	local dir2 = -1
+	local dist2 = p2:Manhattan(p3)
 	if user:GetType() == "Mech_GurrenLagann" and not Board:IsTipImage() then
 		ret:AddScript(string.format("Board:GetPawn(%s):SetCustomAnim(%q)", user:GetId(), "mech_gurrenlagann_noglasses"))
 	end
