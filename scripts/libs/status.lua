@@ -253,7 +253,7 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 			local p = %s
 			for i = DIR_START, DIR_END do
 				Board:DamageSpace(SpaceDamage(p + DIR_VECTORS[i], 1))
-			end]], id, "Shatterburst", SpaceDamageInstance.loc)
+			end]], id, "Shatterburst", tostring(SpaceDamageInstance.loc))
 			return oldNewIndex(SpaceDamageInstance, key, 0)
 		end
 	end
