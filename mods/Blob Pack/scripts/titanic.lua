@@ -257,14 +257,14 @@ function Meta_TitanicGooAtk1:GetSkillEffect(p1,p2)
 	if Board:GetPawn(p2) then 
 		food = food + 1 
 		damage.sScript = string.format("Board:GetPawn(%s):SetCorpse(false)", p2:GetString())
-		if CustomAnim:get(Board:GetPawn(p2):GetId(), "gunk") then food = food + 1 end
+		if CustomAnim:get(Board:GetPawn(p2):GetId(), "StatusGunk") then food = food + 1 end
 	end
 	ret:AddQueuedDamage(damage)
 	damage = SpaceDamage(p3, DAMAGE_DEATH)
 	if Board:GetPawn(p3) then 
 		food = food + 1 
 		damage.sScript = string.format("Board:GetPawn(%s):SetCorpse(false)", p3:GetString())
-		if CustomAnim:get(Board:GetPawn(p3):GetId(), "gunk") then food = food + 1 end
+		if CustomAnim:get(Board:GetPawn(p3):GetId(), "StatusGunk") then food = food + 1 end
 	end
 	ret:AddQueuedDamage(damage)
 	if Board:GetTerrain(p2) == TERRAIN_WATER and Board:IsTerrain(p2,TERRAIN_LAVA) then
@@ -360,7 +360,7 @@ function Meta_TitanicGooAtk2:GetSkillEffect(p1,p2)
 		if Board:GetPawn(tile) then 
 			food = food + 1 
 			ret:AddQueuedScript(string.format("Board:GetPawn(%s):SetCorpse(false)", tile:GetString()))
-			if CustomAnim:get(Board:GetPawn(tile):GetId(), "gunk") then food = food + 1 end
+			if CustomAnim:get(Board:GetPawn(tile):GetId(), "StatusGunk") then food = food + 1 end
 		end
 	end
 	local healing = SpaceDamage(p2, -1 * food)
