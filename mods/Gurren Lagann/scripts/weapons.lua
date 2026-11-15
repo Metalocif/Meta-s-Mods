@@ -438,14 +438,6 @@ Meta_Stinger_A = Meta_Stinger:new{UpgradeDescription = "Deals 1 more damage.", D
 Meta_Stinger_B = Meta_Stinger:new{UpgradeDescription = "Deals 1 more damage.", Damage=2}
 Meta_Stinger_AB = Meta_Stinger:new{Damage=3}
 
-local function Meta_Stinger_CanKill(pawn, loc, damage)
-	if not pawn or pawn:IsShield() or pawn:IsFrozen() or Board:GetCustomTile(loc) == "tosx_rocks_0.png" then
-		return false
-	end
-	if not pawn:IsFlying() and Board:IsCracked(loc) and damage > 0 then return true end
-	return pawn:IsDeadly(SpaceDamage(loc, damage))
-end
-
 function Meta_Stinger:GetTargetArea(p1)
 	local ret = PointList()
 	local user = Board:GetPawn(p1)
@@ -462,11 +454,11 @@ function Meta_Stinger:GetTargetArea(p1)
 
 			local pawn = Board:GetPawn(curr)
 
-			if (user:IsFlying() or (terrain ~= TERRAIN_WATER or terrain ~= TERRAIN_LAVA)) or (pawn and not Meta_Stinger_CanKill(pawn, curr, self.Damage)) then
+			if (user:IsFlying() or (terrain ~= TERRAIN_WATER or terrain ~= TERRAIN_LAVA)) or (pawn and not Board:IsDeadly(SpaceDamage(curr, self.Damage), user)) then
 				ret:push_back(curr)
 			end
 
-			if pawn and not Meta_Stinger_CanKill(pawn, curr, self.Damage) then break end
+			if pawn and not Board:IsDeadly(SpaceDamage(curr, self.Damage), user) then break end
 		end
 	end
 
@@ -475,6 +467,7 @@ end
 
 function Meta_Stinger:GetSkillEffect(p1, p2)
 	local ret = SkillEffect()
+	local user = Board:GetPawn(p1)
 	local dir = GetDirection(p2 - p1)
 	local achievementCounter = 0
 	local curr = p1
@@ -496,17 +489,21 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 		if Board:GetPawn(curr) and Board:GetPawn(curr):IsEnemy() and i < dist then achievementCounter = achievementCounter + 1 end	--we're presumably killing that pawn
 	end
 	if targetPawn then 
-		if targetPawn:IsGuarding() or not Board:IsValid(p2 - DIR_VECTORS[dir] * 2) or Board:GetTerrain(p2 - DIR_VECTORS[dir] * 2) == TERRAIN_BUILDING or Board:GetTerrain(p2 - DIR_VECTORS[dir] * 2) == TERRAIN_MOUNTAIN then
-			if Meta_Stinger_CanKill(targetPawn, p2, self.Damage) and targetPawn:IsEnemy() then achievementCounter = achievementCounter + 1 end
+		local tossDest = p2 - DIR_VECTORS[dir] * 2
+		if targetPawn:IsGuarding() or not Board:IsValid(tossDest) or Board:GetTerrain(tossDest) == TERRAIN_BUILDING or Board:GetTerrain(tossDest) == TERRAIN_MOUNTAIN then
+			if Board:IsDeadly(SpaceDamage(p2, self.Damage), user) and targetPawn:IsEnemy() then achievementCounter = achievementCounter + 1 end
 			ret:AddDamage(SpaceDamage(p2, self.Damage))
 		else
 			local move = PointList()
 			move:push_back(p2)
-			move:push_back(p2 - DIR_VECTORS[dir] * 2)
+			move:push_back(tossDest)
 			ret:AddLeap(move, FULL_DELAY)
-			if Meta_Stinger_CanKill(targetPawn, p2 - DIR_VECTORS[dir] * 2, self.Damage) and targetPawn:IsEnemy() then achievementCounter = achievementCounter + 1 end
-			ret:AddDamage(SpaceDamage(p2 - DIR_VECTORS[dir] * 2, self.Damage))
-			ret:AddBounce(p2 - DIR_VECTORS[dir] * 2, self.Damage * 2)
+			if targetPawn:IsEnemy() then 
+				ret:AddScript(string.format("if Board:IsDeadly(SpaceDamage(%s, %s), Board:GetPawn(%s) then achievementCounter = achievementCounter + 1 end", 
+				tossDest:GetString(), self.Damage, user:GetId())) 
+			end
+			ret:AddDamage(SpaceDamage(tossDest, self.Damage))
+			ret:AddBounce(tossDest, self.Damage * 2)
 		end
 	end
 	if GetCurrentMission() and achievementCounter >= 3 then ret:AddScript("completeHandleTheRabble()") end
