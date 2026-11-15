@@ -1166,20 +1166,19 @@ function Status.ApplyWeaken(id, amount, recoverPerTurn, recoverOnDamage)
 	recoverPerTurn = recoverPerTurn or 0
 	amount = amount or 1
 	if amount == 0 then return end
+	mission.WeakenAmountsTable = mission.WeakenAmountsTable or {}
+	mission.WeakenAmountsTable[id] = mission.WeakenAmountsTable[id] or 0
+	mission.WeakenAmountsTable[id] = mission.WeakenAmountsTable[id] + amount
 	for i = pawn:GetWeaponCount(), 1, -1 do
 		local weapon = pawn:GetWeaponBaseType(i)
-		if string.match(weapon, "^%dweaker") then
-			amount = amount + tonumber(string.sub(weapon,1,1))
-			weapon = string.sub(weapon, 8)
-		end
-		if amount > _G[pawn:GetWeaponBaseType(i)].Damage then amount = _G[weapon].Damage end
+		if mission.WeakenAmountsTable[id] > _G[pawn:GetWeaponBaseType(i)].Damage then amount = _G[weapon].Damage end
 		local newWeapon = amount.."weaker"..weapon
 		if amount <= 0 then newWeapon = weapon end
 		pawn:RemoveWeapon(i)
 		pawn:AddWeapon(newWeapon)
 	end
 	CustomAnim:add(id, "StatusWeaken")
-	if mission.WeakenTable[id] == nil then mission.WeakenTable[id] = 0 end
+	mission.WeakenTable[id] = mission.WeakenTable[id] or 0
 	mission.WeakenTable[id] = mission.WeakenTable[id] + recoverPerTurn
 	if recoverOnDamage then
 		mission.WeakenDamageRecoveryTable = mission.WeakenDamageRecoveryTable or {}
@@ -1286,6 +1285,7 @@ function Status.RemoveStatus(id, status)
 		end
 		CustomAnim:rem(id, "StatusWeaken")
 		mission.WeakenTable[id] = nil 
+		mission.WeakenAmountsTable[id] = nil 
 	else
 		CustomAnim:rem(id, "Status"..status)
 		mission[status.."Table"][id] = nil 
@@ -2451,7 +2451,7 @@ local function EVENT_onModsLoaded()
 	end)
 	modapiext:addQueuedSkillEndHook(function(mission, pawn, weaponId, p1, p2)
 		if weakenRecoveryAmount > 0 then
-			if weakenRecoveryAmount >= mission.WeakenTable[pawn:GetId()] then
+			if weakenRecoveryAmount >= mission.WeakenAmountsTable[pawn:GetId()] then
 				Status.RemoveStatus(pawn:GetId(), "Weaken")
 			else
 				Status.ApplyWeaken(pawn:GetId(), -weakenRecoveryAmount)
