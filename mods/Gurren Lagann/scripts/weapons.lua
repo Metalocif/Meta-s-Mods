@@ -83,8 +83,8 @@ Meta_DrillStrike = Skill:new{
 	Icon = "weapons/DrillStrike.png",
 	Description = "Damages an adjacent enemy. Deals +1 damage to Alpha-tier Vek. Deals +2 damage to Leader-tier Vek.",	--also works against Omega
 	Rarity = 3,
-	Damage = 2,
-	MaxDamage = 4,
+	MinDamage = 2,
+	Damage = 4,
 	ZoneTargeting = ZONE_DIR,
 	PathSize = 1,
 	PowerCost = 0,
@@ -104,17 +104,20 @@ Meta_DrillStrike = Skill:new{
 }
 
 Meta_DrillStrike_A = Meta_DrillStrike:new{UpgradeDescription = "When this attack kills a unit, boost all mechs.",Boost=true}
-Meta_DrillStrike_B = Meta_DrillStrike:new{UpgradeDescription = "Deals 1 more damage.",Damage=3, MaxDamage = 5}
-Meta_DrillStrike_AB = Meta_DrillStrike:new{Boost = true, Damage=3, MaxDamage = 5}
+Meta_DrillStrike_B = Meta_DrillStrike:new{UpgradeDescription = "Deals 1 more damage.",MinDamage=3, Damage = 5}
+Meta_DrillStrike_AB = Meta_DrillStrike:new{Boost = true, MinDamage=3, Damage = 5}
 
 function Meta_DrillStrike:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
+	local user = Board:GetPawn(p1)
 	local target = Board:GetPawn(p2)
-	local damage = SpaceDamage(p2, self.Damage)
-	if target and (_G[target:GetType()].Tier == TIER_ALPHA or _G[target:GetType()].Tier == TIER_OMEGA) then damage.iDamage = self.Damage + 1 end
-	if target and _G[target:GetType()].Tier == TIER_BOSS then damage.iDamage = self.MaxDamage end
+	local damage = SpaceDamage(p2, self.MinDamage)
+	if target and (_G[target:GetType()].Tier == TIER_ALPHA or _G[target:GetType()].Tier == TIER_OMEGA) then damage.iDamage = self.MinDamage + 1 end
+	if target and _G[target:GetType()].Tier == TIER_BOSS then damage.iDamage = self.Damage end
+	
+	if Board:IsDeadly(damage, user) then damage.bKO_Effect = true end
 	ret:AddMelee(p1, damage)
-	if Board:IsDeadly(damage, target) then
+	if Board:IsDeadly(damage, user) then
 		if _G[target:GetType()].Tier == TIER_BOSS and not target:IsDamaged() then ret:AddScript("completeBelieveInMe()") end
 		if self.Boost then
 			for i = 0, 2 do
@@ -122,7 +125,7 @@ function Meta_DrillStrike:GetSkillEffect(p1,p2)
 					local booster = SpaceDamage(Board:GetPawn(i):GetSpace())
 					booster.sImageMark = "combat/icons/icon_boosted_glow.png"
 					booster.sScript = string.format("modApi:runLater(function() Board:GetPawn(%s):SetBoosted(true) end)", i)
-					ret:AddDamage(booster)
+					if user:GetId() == i or not Board:GetPawn(i):IsBoosted() then ret:AddDamage(booster) end
 				end
 			end
 		end
