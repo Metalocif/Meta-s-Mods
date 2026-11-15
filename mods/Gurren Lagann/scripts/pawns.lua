@@ -82,7 +82,7 @@ Mech_GurrenLagann = Pawn:new{
 	Image = "mech_gurrenlagann",
 	ImageOffset = modApi:getPaletteImageOffset("Meta_GurrenLagannPalette"),
 	SkillList = {"Meta_DrillStrike", "Meta_SunglassesBoomerang"},
-	SoundLocation = "/enemy/blobber_2/",
+	SoundLocation = "/mech/prime/laser_mech/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
 }
@@ -98,7 +98,7 @@ Mech_Dayakkaiser = Pawn:new{
 	Image = "mech_dayakkaiser",
 	ImageOffset = modApi:getPaletteImageOffset("Meta_DayakkaiserPalette"),
 	SkillList = {"Meta_RepeatingCannon"},
-	SoundLocation = "/enemy/burrower_2/",
+	SoundLocation = "/mech/distance/artillery/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
 }
@@ -114,7 +114,7 @@ Mech_Kittan = Pawn:new{
 	Image = "mech_kittan",
 	ImageOffset = modApi:getPaletteImageOffset("Meta_KingKittanPalette"),
 	SkillList = {"Meta_Stinger"},
-	SoundLocation = "/enemy/blobber_2/",
+	SoundLocation = "/mech/prime/punch_mech/",
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
 }
