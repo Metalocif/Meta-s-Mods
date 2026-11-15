@@ -571,11 +571,12 @@ mt.__newindex = function(SpaceDamageInstance, key, value)
 			if type(value) == "table" then 
 				value.amount = value.amount or 1
 				value.recoverPerTurn = value.recoverPerTurn or 0
+				value.recoverOnDamage = value.recoverOnDamage or false
 			else
 				value = {recoverPerTurn = 0, amount = value or 1 }
 			end
 			SpaceDamageInstance.sImageMark = "libs/status/weaken_icon.png"
-			SpaceDamageInstance.sScript = string.format("Status.ApplyWeaken(%s, %s, %s)", id, value.amount, value.recoverPerTurn)
+			SpaceDamageInstance.sScript = string.format("Status.ApplyWeaken(%s, %s, %s)", id, value.amount, value.recoverPerTurn, value.recoverOnDamage)
 		else
 			SpaceDamageInstance.sImageMark = "libs/status/weaken_icon_remove.png"
 			SpaceDamageInstance.sScript = string.format("Status.RemoveStatus(%s, %q)", id, "Weaken")
@@ -1155,7 +1156,7 @@ function Status.ApplyToxin(id)
 	CustomAnim:add(id, "StatusToxin")
 end
 
-function Status.ApplyWeaken(id, amount, recoverPerTurn)
+function Status.ApplyWeaken(id, amount, recoverPerTurn, recoverOnDamage)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	if pawn:GetTeam() ~= TEAM_ENEMY then return end
@@ -1180,6 +1181,10 @@ function Status.ApplyWeaken(id, amount, recoverPerTurn)
 	CustomAnim:add(id, "StatusWeaken")
 	if mission.WeakenTable[id] == nil then mission.WeakenTable[id] = 0 end
 	mission.WeakenTable[id] = mission.WeakenTable[id] + recoverPerTurn
+	if recoverOnDamage then
+		mission.WeakenDamageRecoveryTable = mission.WeakenDamageRecoveryTable or {}
+		mission.WeakenDamageRecoveryTable[id] = true
+	end
 end	
 
 function Status.ApplyWet(id)
@@ -1279,6 +1284,8 @@ function Status.RemoveStatus(id, status)
 				pawn:AddWeapon(weapon)
 			end
 		end
+		CustomAnim:rem(id, "StatusWeaken")
+		mission.WeakenTable[id] = nil 
 	else
 		CustomAnim:rem(id, "Status"..status)
 		mission[status.."Table"][id] = nil 
@@ -1799,9 +1806,10 @@ local function EVENT_onModsLoaded()
 			if status == "Toxin" then statusDesc = "After its turn, a unit with Toxin takes damage equal to its missing health; if this kills, adjacent units are applied Toxin. Removed by A.C.I.D. and healing." end
 			if status == "Weaken" then
 				local amount = tonumber(string.sub(pawn:GetWeaponBaseType(1),1,1))
-				if mission.WeakenTable[id] > 0 then statusDesc = "Lowers damage dealt by "..amount..". Effect decreases by "..mission.WeakenTable[id].." every turn." end
-				if mission.WeakenTable[id] < 0 then statusDesc = "Lowers damage dealt by "..amount..". Effect increases by "..mission.WeakenTable[id].." every turn." end
-				if mission.WeakenTable[id] == 0 then statusDesc = "Lowers damage dealt by "..amount.."." end
+				statusDesc = "Lowers damage dealt by "..amount.."."
+				if mission.WeakenTable[id] > 0 then statusDesc = statusDesc.." Effect decreases by "..mission.WeakenTable[id].." every turn." end
+				if mission.WeakenTable[id] < 0 then statusDesc = statusDesc.." Effect increases by "..mission.WeakenTable[id].." every turn." end
+				if mission.WeakenDamageRecoveryTable[id] then statusDesc = statusDesc.." When hitting units and buildings, effect decreases by the base damage the original weapon would have dealt." end
 			end
 			if status == "Wet" then statusDesc = "Cancels fire, dry, and powder. Wet + Chill freezes. Wet + Shocked clears queued actions." end
 			
@@ -2427,6 +2435,29 @@ local function EVENT_onModsLoaded()
 				targetArea:push_back(point)
 			end
 		end
+	end)
+	
+	local weakenRecoveryAmount = 0
+	modapiext:addQueuedSkillStartHook(function(mission, pawn, weaponId, p1, p2)
+		mission.WeakenDamageRecoveryTable = mission.WeakenDamageRecoveryTable or {}
+		mission.WeakenTable = mission.WeakenTable or {}
+		if mission.WeakenDamageRecoveryTable[pawn:GetId()] and mission.WeakenTable[pawn:GetId()] then
+			local skillEffect = _G[weaponId]:GetSkillEffect(p1, p2)
+			for _, fx in ipairs(extract_table(skillEffect.q_effect)) do
+				local target = Board:GetPawn(fx.loc)
+				if ((target and not target:IsDead()) or Board:GetTerrain(fx.loc) == TERRAIN_BUILDING) and fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO then weakenRecoveryAmount = weakenRecoveryAmount + fx.iDamage end
+			end
+		end
+	end)
+	modapiext:addQueuedSkillEndHook(function(mission, pawn, weaponId, p1, p2)
+		if weakenRecoveryAmount > 0 then
+			if weakenRecoveryAmount >= mission.WeakenTable[pawn:GetId()] then
+				Status.RemoveStatus(pawn:GetId(), "Weaken")
+			else
+				Status.ApplyWeaken(pawn:GetId(), -weakenRecoveryAmount)
+			end
+		end
+		weakenRecoveryAmount = 0
 	end)
 	LOG("Status Library added its hooks.")
 end
