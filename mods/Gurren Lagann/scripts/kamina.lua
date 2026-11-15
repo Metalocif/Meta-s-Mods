@@ -2,7 +2,6 @@ local this = {}
 
 local mod = mod_loader.mods[modApi.currentMod]
 local path = mod.scriptPath
-local pilotSkill_tooltip = mod.libs.pilotSkill_tooltip
 local repairApi = mod.libs.repairApi
 -- local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 local path2 = mod_loader.mods[modApi.currentMod].resourcePath
@@ -20,7 +19,8 @@ local pilot = {
 
 function this:init(mod)
 	CreatePilot(pilot)
-	pilotSkill_tooltip.Add(pilot.Skill, PilotSkill("Spiral Power", "Using Repair boosts this unit; when the unit is boosted, it turns into Giga Drill Breaker."))
+	modApi:setText("Pilot_KaminaSkill_Title", "Spiral Power")
+	modApi:setText("Pilot_KaminaSkill_Text", "Using Repair boosts this unit; when the unit is boosted, it turns into Giga Drill Breaker.")
 	repairApi:SetRepairSkill{
 		Weapon = "KaminaSkill_Link",
 		Icon = "img/weapons/repair_Kamina.png",
