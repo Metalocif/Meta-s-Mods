@@ -792,7 +792,7 @@ function Status.ApplyConfusion(id, turns)
 end
 
 
-function Status.ApplyDodge(id, amount, distance, movementType, smart)
+function Status.ApplyDodge(id, amount, distance, movementType, smart, onlyIfAligned)
 	local pawn = Board:GetPawn(id)
 	if not pawn then return end
 	local mission = GetCurrentMission()
@@ -808,7 +808,7 @@ function Status.ApplyDodge(id, amount, distance, movementType, smart)
 		mission.DodgeTable[id].amount = math.min(mission.DodgeTable[id].amount + amount, 3)
 		CustomAnim:add(id, "StatusDodge"..mission.DodgeTable[id].amount)
 	else	
-		mission.DodgeTable[id] = {amount = amount, distance = distance, movementType = movementType, smart = smart}
+		mission.DodgeTable[id] = {amount = amount, distance = distance, movementType = movementType, smart = smart, onlyIfAligned = onlyIfAligned or false}
 		CustomAnim:add(id, "StatusDodge"..amount)
 	end
 end
@@ -1724,7 +1724,16 @@ local function EVENT_onModsLoaded()
 				end
 				statusDesc = statusDesc.." ("..mission.ConfusionTable[id].." turns left)."
 			end
-			if status == "Dodge" then statusDesc = "Dodges incoming instant attacks by moving to a nearby tile. Vek queued attacks are unaffected." end
+			if status == "Dodge" then 
+				local dodgeRange = mission.DodgeTable[id].distance
+				if dodgeRange == 1 then
+					statusDesc = "Dodges incoming instant attacks by moving to an adjacent tile. Vek queued attacks are unaffected." 
+				else
+					statusDesc = "Dodges incoming instant attacks by moving to a nearby tile within "..mission.DodgeTable[id].distance.." tiles. Vek queued attacks are unaffected." 
+				end
+				if mission.DodgeTable[id].amount > 1 then statusDesc = statusDesc.." Can dodge "..mission.DodgeTable[id].amount.." more times." end
+				if mission.DodgeTable[id].onlyIfAligned then statusDesc = statusDesc.." Can only dodge away from attackers, and only if the attacker is on the same row or column." end
+			end
 			if status == "Doom" then statusDesc = "If a unit has more Doom than their current HP, they die after Vek attack (currently "..mission.DoomTable[id]..")." end
 			if status == "Oppression" then 
 				if mission.OppressionTable[id].amount > 0 then statusDesc = "Takes "..mission.OppressionTable[id].amount.." damage every turn. " end
@@ -2153,11 +2162,16 @@ local function EVENT_onModsLoaded()
 			local dodger = Board:GetPawn(fx.loc)
 			
 			local dodgeInfo = (dodger ~= nil) and Status.GetStatus(dodger:GetId(), "Dodge") or nil
-			if dodgeInfo and not pawnsWhoDodged[dodger:GetId()] then	--don't dodge the same attack twice either
+			if dodgeInfo and not pawnsWhoDodged[dodger:GetId()] and																		--don't dodge the same attack twice 
+			(pawn:GetSpace().x == dodger:GetSpace().x or pawn:GetSpace().y == dodger:GetSpace().y or not dodgeInfo.onlyIfAligned) then	--have an option to only dodge if aligned
 				local targetWasQueued = dodger:GetQueuedTarget() ~= Point(-1, -1) and dodger:GetTeam() == TEAM_ENEMY	--used to requeue attack for Vek
 				local pathProfile = dodger:GetPathProf()
 				local currPosScore = tonumber(-10 * fx.iDamage)
 				if dodgeInfo.smart then currPosScore = currPosScore + ScorePositioning(fx.loc, dodger) end
+				local attackDirectionReverse = DIR_NONE
+				if dodger:GetQueuedTarget() ~= Point(-1, -1) and (dodger:GetQueuedTarget().x == fx.loc.x or dodger:GetQueuedTarget().y == fx.loc.y) then 
+					attackDirectionReverse = GetDirection(dodger:GetQueuedTarget() - fx.loc) 
+				end
 				
 				if fx.iPush ~= DIR_NONE and fx.iPush ~= DIR_FLIP and Board:IsBlocked(fx.loc + DIR_VECTORS[fx.iPush], pathProfile) then currPosScore = currPosScore - 10 end
 				--take being pushed into something into account otherwise they won't dodge lethal push damage
@@ -2187,6 +2201,8 @@ local function EVENT_onModsLoaded()
 					elseif Board:IsBlocked(loc, dodger:GetPathProf()) or not Board:IsValid(loc) then 	--don't dodge into a tile you can't stand in
 						moveScore = -100 
 						-- Board:Ping(loc, GL_Color(255, 0, 0))
+					elseif dodgeInfo.onlyIfAligned and attackDirectionReverse ~= GetDirection(loc-fx.loc) then
+						moveScore = -100
 					elseif tilesWithSpawns[hash(loc)] or tilesDodgersMovedTo[hash(loc)] then	--don't dodge into a tile that will contain a spawn/other dodger
 						moveScore = -100
 						-- Board:Ping(loc, GL_Color(0, 0, 255))
@@ -2198,6 +2214,7 @@ local function EVENT_onModsLoaded()
 					end
 					--keeping the pings in case I need to investigate more bugs
 					if targetWasQueued then
+						if attackDirectionReverse == GetDirection(loc-fx.loc) then moveScore = moveScore + 1 end
 						if dodgeInfo.smart then
 							local targets = weapon and extract_table(weapon:GetTargetArea(loc)) or {}
 							for _, newTarget in ipairs(targets) do
