@@ -70,6 +70,7 @@ Omegalmn_Crusher2 = Pawn:new{
 	SoundLocation = "/enemy/goo_boss/",
 	DefaultTeam = TEAM_ENEMY,
 	ImpactMaterial = IMPACT_INSECT,
+	Tier = TIER_OMEGA,
 	Portrait = "enemy/lmn_Crusher2",
 	Massive = true,
 }
@@ -87,6 +88,7 @@ Omegalmn_Floater2 = Pawn:new{
 	SoundLocation = "/enemy/jelly/",
 	Portrait = "enemy/lmn_Floater2",
 	Flying = true,
+	Tier = TIER_OMEGA,
 	IsDeathEffect = true,	--makes an Omega Blobberling
 }
 AddPawn("Omegalmn_Floater2")
@@ -125,6 +127,7 @@ Omegalmn_Spitter2 = Pawn:new{
 	SkillList = { "OmegaSpitterAtk2" },
 	SoundLocation = "/enemy/centipede_2/",
 	DefaultTeam = TEAM_ENEMY,
+	Tier = TIER_OMEGA,
 	ImpactMaterial = IMPACT_INSECT,
 	Portrait = "enemy/lmn_Spitter2",
 }
@@ -140,6 +143,7 @@ Omegalmn_Swarmer2 = Pawn:new{
 	SkillList = { "lmn_SwarmerAtk2" },
 	SoundLocation = "/enemy/spiderling_1/",
 	DefaultTeam = TEAM_ENEMY,
+	Tier = TIER_OMEGA,
 	ImpactMaterial = IMPACT_INSECT,
 	HalfSpawn = true,
 	Clones = 2,
