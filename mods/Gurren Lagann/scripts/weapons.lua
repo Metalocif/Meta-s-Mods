@@ -490,7 +490,7 @@ function Meta_Stinger:GetSkillEffect(p1, p2)
 	end
 	if targetPawn then 
 		local tossDest = p2 - DIR_VECTORS[dir] * 2
-		if targetPawn:IsGuarding() or not Board:IsValid(tossDest) or Board:GetTerrain(tossDest) == TERRAIN_BUILDING or Board:GetTerrain(tossDest) == TERRAIN_MOUNTAIN then
+		if targetPawn:IsGuarding() or not Board:IsValid(tossDest) or Board:GetTerrain(tossDest) == TERRAIN_BUILDING or Board:GetTerrain(tossDest) == TERRAIN_MOUNTAIN or (dist == 1 and Board:GetPawn(tossDest)) then
 			if Board:IsDeadly(SpaceDamage(p2, self.Damage), user) and targetPawn:IsEnemy() then achievementCounter = achievementCounter + 1 end
 			ret:AddDamage(SpaceDamage(p2, self.Damage))
 		else
