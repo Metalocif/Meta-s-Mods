@@ -51,6 +51,8 @@ modApi:appendAssets("img/effects/", "img/effects/")
 --   Pawns   --
 ---------------
 
+TIER_OMEGA = 10
+
 
 OmegaDNT_Anthill2 = Pawn:new
 {

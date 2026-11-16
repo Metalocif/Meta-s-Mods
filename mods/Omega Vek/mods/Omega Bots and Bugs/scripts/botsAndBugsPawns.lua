@@ -30,6 +30,8 @@ end
 --   Pawns   --
 ---------------
 
+TIER_OMEGA = 10
+
 Omegalmn_Blobberling2 = Pawn:new{
 	Name = "Omega Blobberling",
 	Health = 3,
