@@ -1,5 +1,3 @@
-easyEdit.bossList:get("archive"):addBoss("Mission_TitanicGooBoss")
-
 local mod = mod_loader.mods[modApi.currentMod]
 local path = mod.resourcePath
 local writepath = "img/units/aliens/"
