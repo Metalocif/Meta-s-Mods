@@ -738,43 +738,6 @@ function Regenerating()
 	return 1
 end
 
--- function Wrathful()
-	-- modApi:conditionalHook(
-		-- function()
-			-- GAME.WrathfulPawnId = Pawn:GetId()
-			-- return Pawn and Pawn:IsQueued() and string.find(Pawn:GetType(), "Wrathful") 
-		-- end,
-		-- function()
-			-- ret = SkillEffect()
-			-- ret:AddScript(string.format("Board:GetPawn(%s):SetBoosted(true)", GAME.WrathfulPawnId))
-			-- Board:AddEffect(ret)
-		-- end
-	-- )
-	-- return 1
--- end
-
--- function Webbing()
-	-- modApi:conditionalHook(
-		-- function()
-			-- GAME.WebbingPawnId = Pawn:GetId()
-			-- return Pawn and Pawn:IsQueued() and not Pawn:IsActive() and string.find(Pawn:GetType(), "Webbing") 
-		-- end,
-		-- function()
-			-- local pawn = Board:GetPawn(GAME.WebbingPawnId)
-			-- ret = SkillEffect()
-			-- for i = DIR_START, DIR_END do
-				-- local curr = pawn:GetSpace() + DIR_VECTORS[i]
-				-- Board:Ping(curr, COLOR_BLACK)
-				-- if Board:GetPawn(curr) and Board:GetPawn(curr):IsPlayer() then
-					-- ret:AddGrapple(pawn:GetSpace(), curr, "hold")
-				-- end
-			-- end
-			-- Board:AddEffect(ret)
-		-- end
-	-- )
-	-- return 1
--- end
-
 function Splitting()
 	--we'll only spawn something if we are not above liquid/chasm, we could move to something adjacent, and we wouldn't move into fire/landmine
 	--we have to move somewhere adjacent because I want the spawn's position to be the previous position of the spawner
