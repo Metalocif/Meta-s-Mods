@@ -8800,7 +8800,7 @@ local function GenerateGlitchWeapons()
 	local targetingTypes =  {"Melee", "Melee", "Melee", "Artillery", "Artillery", "Projectile", "Projectile", "Laser", "Distance", "Any"}
 	local targetingRestrictions =  {"NextToTerrain", "OnTerrain", "Damaged", "FullHealth", "NextToMech"}
 	local targetingAdditions = {"None", "None", "None", "AdjacentToTarget", "OthersSameDistance", "AdjacentToUser"}
-	local areaShapes =  {"Plus", "Square", "Point", "Point", "Row", "Column", "X", "All"}
+	local areaShapes =  {"Plus", "Square", "Point", "Point", "Point", "Row", "Column", "Chevron", "V", "X", "All"}
 	local effectKeys = {"Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Frozen", "Shield", "Crack", "Fire", "Smoke", "Acid", "Shield", "Status", "Status"}
 	local pushDirs = {DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_FLIP, DIR_NONE, DIR_NONE, DIR_NONE} --, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE, DIR_NONE}
 	local pushType = {"Relative from p1", "Relative from p2", "Relative from p1", "Relative from p2", "Absolute"}
@@ -8966,6 +8966,14 @@ local function GenerateGlitchWeapons()
 				if self.AoEShape == "X" or self.AoEShape == "Square" then
 					if Board:IsValid(p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4]) then outerTiles[#outerTiles+1] = p2 + DIR_VECTORS[dir2] + DIR_VECTORS[(dir2+1)%4] end
 				end
+			end
+			if self.AoEShape == "Chevron" then 
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+1)%4] + DIR_VECTORS[(dir+2)%4]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+2)%4] + DIR_VECTORS[(dir+3)%4]
+			end
+			if self.AoEShape == "V" then 
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+1)%4] + DIR_VECTORS[dir]
+				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+3)%4] + DIR_VECTORS[dir]
 			end
 			if self.AoEShape == "Row" then 
 				outerTiles[#outerTiles+1] = target + DIR_VECTORS[(dir+1)%4]
