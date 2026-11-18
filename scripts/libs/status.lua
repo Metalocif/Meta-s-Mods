@@ -1436,7 +1436,7 @@ end
 local function GenerateWeakenWeapons()
 	for id, weapon in pairs(_G) do
 		if weapon and type(weapon) == "table" and weapon.Class and 
-		((weapon.Damage and weapon.Damage > 0) or (weapon.MinDamage and weapon.MinDamage > 0) or (weapon.OuterDamage and weapon.OuterDamage > 0)) and 
+		((weapon.Damage and weapon.Damage > 0) or (weapon.MinDamage and weapon.MinDamage > 0) or (weapon.OuterDamage and weapon.OuterDamage > 0) or (weapon.LineDamage and weapon.LineDamage > 0)) and 
 		(weapon.Class == "Enemy" or weapon.Class == "") and weapon.Original == nil then
 			local i = 1
 			local amount = 1
@@ -1446,6 +1446,7 @@ local function GenerateWeakenWeapons()
 				_G[i.."weaker"..id] =  _G[id]:new{ Damage = weapon.Damage - amount, Original = id, }
 				if weapon.MinDamage and weapon.MinDamage > 0 then _G[i.."weaker"..id].MinDamage = math.max(weapon.MinDamage - amount, 0) end
 				if weapon.OuterDamage and weapon.OuterDamage > 0 then _G[i.."weaker"..id].OuterDamage = math.max(weapon.OuterDamage - amount, 0) end
+				if weapon.LineDamage and weapon.LineDamage > 0 then _G[i.."weaker"..id].LineDamage = math.max(weapon.LineDamage - amount, 0) end
 				_G[i.."weaker"..id].GetName = function(self) return getWeaponKey(self.Original, "Name") end
 				_G[i.."weaker"..id].GetDescription = function(self) return getWeaponKey(self.Original, "Description") end
 				_G[i.."weaker"..id].GetIcon = function(self) return "weapons/enemy_scorpion1.png" end
