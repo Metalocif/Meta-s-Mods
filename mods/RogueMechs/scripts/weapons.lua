@@ -1205,7 +1205,7 @@ end
 
 RMMechMinerAtk1 = Deployable:new{
 	Name = "Bomb Dispenser",
-	Description = "Launch a Walking Bomb. Unused bombs dismantle after the enemy turn.",
+	Description = "Launch a Walking Bomb.",
 	Deployed = "RMBombling",
 	Icon = "advanced/weapons/Ranged_DeployBomb.png",
 	Projectile = "advanced/effects/shotup_bombling.png",
@@ -1256,7 +1256,7 @@ end
 
 RMMechMinerAtk2 = RMMechMinerAtk1:new{
 	Name = "Bomb Dispenser",
-	Description = "Launch a Walking Bomb. Unused bombs dismantle after the enemy turn.",
+	Description = "Launch a Walking Bomb.",
 	Deployed = "RMBombling",
 	Icon = "advanced/weapons/Ranged_DeployBomb.png",
 	Projectile = "advanced/effects/shotup_bombling.png",
@@ -1324,6 +1324,8 @@ end
 
 
 RMRainingDeath = LineArtillery:new{
+	Name = "Raining Death",
+	Description = "Launch a projectile that rains weak explosions on all tiles between the launcher and its target.",
 	ArtillerySize = 7,
 	Class = "Enemy",
 	UpShot = "effects/shotup_ignite_fireball.png",
