@@ -1,4 +1,4 @@
-local description = "Adds variants to all vanilla Alpha Vek called Omega Vek. Unfold this mod to enable separate modules; all are enabled by default. See mod options."
+local description = "Adds variants to all vanilla Alpha Vek called Omega Vek. Unfold this mod to enable separate modules; all are enabled by default and will enable required mods. See mod options."
 
 local mod = {
 	id = "Meta_OmegaVek",
