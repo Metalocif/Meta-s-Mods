@@ -42,3 +42,9 @@ Titanic:
   - On turn 2, it will use its main attack, hitting as many buildings + mechs as possible.
   - So if you made it leap at a location where it can only hit 1 building at a time and give it 2 mechs to hit...
 - Mechs it kills cannot be revived.
+
+King:
+- It has low HP but spawns a small goo every turn.
+- Set its tile on fire to take care of the small goo for free.
+- If you block its destination tile, it will instead attack all adjacent tiles and will not spawn anything.
+- Deploy your mechs in a V pattern to bait its initial attack.
