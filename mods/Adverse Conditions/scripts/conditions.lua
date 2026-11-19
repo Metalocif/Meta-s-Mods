@@ -1,117 +1,148 @@
 local mod = modApi:getCurrentMod()
 local options = mod_loader.currentModContent[mod.id].options
 
---final mission phase 2 is longer?
---don't make healthy psions if Permanent Psions is enabled
---don't make Vek leave corpses if Permanent Psions is using the necro psions
+-- final mission phase 2 is longer?
+-- don't make healthy psions if Permanent Psions is enabled
+-- don't make Vek leave corpses if Permanent Psions is using the necro psions
 
-
-baseModifiers = {
-	"ForestFire", 
-	"IceIsLava", 
-	"CrackHalfTile", 
-	"Tyrant",
-	"WaterIsChasms",
-	"AcidHurts",
-	"HealthyPsions",
-	"VekLeaveCorpses",
-	"LongerMissions",
-	"ShorterMissions",
-	"BigBuildings",
-	"Mech1LowHP",
-	"Mech2LowHP",
-	"Mech3LowHP",
-	"NoShields",
-	"NoRepairs",
-	"ExplosiveBuildings",
-	"LongerFinalPhase",
-}
-baseModifiersText = {
-	"All forests are on fire.", 
-	"All ice is lava.", 
-	"50% of tiles are cracked.", 
-	"Every second turn, mechs take 1 damage.",
-	"All water is chasms.",
-	"Applying A.C.I.D. damages your pawns.",
-	"Psions are shielded.",
-	"Vek leave a corpse when they die.",
-	"All missions are 1 turn longer.",
-	"All missions are 1 turn shorter.",
-	"All buildings have 4 health.",
-	"Your first mech starts with 1 HP.",
-	"Your second mech starts with 1 HP.",
-	"Your third mech starts with 1 HP.",
-	"Mechs cannot be shielded.",
-	"Mechs do not repair between missions.",
-	"Destroyed buildings explode.",
-	"The final battle is 1 turn longer.",
-}
-baseModifiersValidation = {
-	function() return not GAME.MetaModifiers.ForestFire end,		--could check whether Archive and Pinnacle were done? But Meridia/Nautilus... Look at tilesets?
-	function() return not GAME.MetaModifiers.IceIsLava end,		--could check whether Pinnacle was done?
-	function() return not GAME.MetaModifiers.CrackHalfTile end,
-	function() return not GAME.MetaModifiers.Tyrant end,
-	function() return not GAME.MetaModifiers.WaterIsChasms end,
-	function() return not GAME.MetaModifiers.AcidHurts end,
-	function() return not (GAME.MetaModifiers.HealthyPsions or mod_loader.currentModContent["Meta_PermanentPsions"] ~= nil) end,
-	function() return not GAME.MetaModifiers.VekLeaveCorpses end,
-	function() return not (GAME.MetaModifiers.ShorterMissions or GAME.MetaModifiers.LongerMissions) end,
-	function() return not (GAME.MetaModifiers.ShorterMissions or GAME.MetaModifiers.LongerMissions) end,
-	function() return not GAME.MetaModifiers.BigBuildings end,		--does that work with pylons?
-	function() return not (GAME.MetaModifiers.NoRepairs or GAME.MetaModifiers.Mech1LowHP) end,
-	function() return not (GAME.MetaModifiers.NoRepairs or GAME.MetaModifiers.Mech2LowHP) end,
-	function() return not (GAME.MetaModifiers.NoRepairs or GAME.MetaModifiers.Mech3LowHP) end,
-	function() return not GAME.MetaModifiers.NoShields end,
-	function() return not (GAME.MetaModifiers.Mech1LowHP or GAME.MetaModifiers.Mech2LowHP or GAME.MetaModifiers.Mech3LowHP or GAME.MetaModifiers.NoRepairs) end,
-	function() return not (GAME.MetaModifiers.ExplosiveBuildings) end,
-	function() return not GAME.MetaModifiers.LongerFinalPhase end,
-}
-
-local function tablelength(T)
-  local count = 0
-  for _ in pairs(T) do count = count + 1 end
-  return count
+local function hasModifier(id)
+	return GAME ~= nil and GAME.MetaModifiers ~= nil and GAME.MetaModifiers[id] == true
 end
 
+local modifiers = {
+	{
+		id = "ForestFire",
+		text = "All forests are on fire.",
+		valid = function() return not hasModifier("ForestFire") end,
+	},
+	{
+		id = "IceIsLava",
+		text = "All ice is lava.",
+		valid = function() return not hasModifier("IceIsLava") end,
+	},
+	{
+		id = "CrackHalfTile",
+		text = "50% of tiles are cracked.",
+		valid = function() return not hasModifier("CrackHalfTile") end,
+	},
+	{
+		id = "Tyrant",
+		text = "Every second turn, mechs take 1 damage.",
+		valid = function() return not hasModifier("Tyrant") end,
+	},
+	{
+		id = "WaterIsChasms",
+		text = "All water is chasms.",
+		valid = function() return not hasModifier("WaterIsChasms") end,
+	},
+	{
+		id = "AcidHurts",
+		text = "Applying A.C.I.D. damages your pawns.",
+		valid = function() return not hasModifier("AcidHurts") end,
+	},
+	{
+		id = "HealthyPsions",
+		text = "Psions are shielded.",
+		valid = function()
+			return not (hasModifier("HealthyPsions")
+				or mod_loader.currentModContent["Meta_PermanentPsions"] ~= nil)
+		end,
+	},
+	{
+		id = "VekLeaveCorpses",
+		text = "Vek leave a corpse when they die.",
+		valid = function() return not hasModifier("VekLeaveCorpses") end,
+	},
+	{
+		id = "LongerMissions",
+		text = "All missions are 1 turn longer.",
+		valid = function()
+			return not (hasModifier("LongerMissions") or hasModifier("ShorterMissions"))
+		end,
+	},
+	{
+		id = "ShorterMissions",
+		text = "All missions are 1 turn shorter.",
+		valid = function()
+			return not (hasModifier("LongerMissions") or hasModifier("ShorterMissions"))
+		end,
+	},
+	{
+		id = "BigBuildings",
+		text = "All buildings have 4 health.",
+		valid = function() return not hasModifier("BigBuildings") end,	-- does that work with pylons?
+	},
+	{
+		id = "Mech1LowHP",
+		text = "Your first mech starts with 1 HP.",
+		valid = function() return not (hasModifier("NoRepairs") or hasModifier("Mech1LowHP")) end,
+	},
+	{
+		id = "Mech2LowHP",
+		text = "Your second mech starts with 1 HP.",
+		valid = function() return not (hasModifier("NoRepairs") or hasModifier("Mech2LowHP")) end,
+	},
+	{
+		id = "Mech3LowHP",
+		text = "Your third mech starts with 1 HP.",
+		valid = function() return not (hasModifier("NoRepairs") or hasModifier("Mech3LowHP")) end,
+	},
+	{
+		id = "NoShields",
+		text = "Mechs cannot be shielded.",
+		valid = function() return not hasModifier("NoShields") end,
+	},
+	{
+		id = "NoRepairs",
+		text = "Mechs do not repair between missions.",
+		valid = function()
+			return not (hasModifier("Mech1LowHP") or hasModifier("Mech2LowHP")
+				or hasModifier("Mech3LowHP") or hasModifier("NoRepairs"))
+		end,
+	},
+	{
+		id = "ExplosiveBuildings",
+		text = "Destroyed buildings explode.",
+		valid = function() return not hasModifier("ExplosiveBuildings") end,
+	},
+	{
+		id = "LongerFinalPhase",
+		text = "The final battle is 1 turn longer.",
+		valid = function() return not hasModifier("LongerFinalPhase") end,
+	},
+}
 
 local function ChooseCondition(corporation, island)
 	GAME.MetaModifiers = GAME.MetaModifiers or {}
-	modifiers = modifiers or baseModifiers
-	modifiersText = modifiersText or baseModifiersText
-	modifiersValidation = modifiersValidation or baseModifiersValidation
-	LOG(Game:GetSector(), tostring(options.SectorsToAddConditions.value[Game:GetSector()]))
-	if options.SectorsToAddConditions and options.SectorsToAddConditions.value[Game:GetSector()] then 
-		chosenModifiers = {}
-		chosenModifiersText = {}
-		for count = 1, 3 do
-		 local i
-		 local OK = false
-		 repeat			
-			i = math.random(1, tablelength(modifiers))
-			if modifiersValidation[i] then 
-				OK = true 
-			else 
-				modifiers[i] = nil
-				modifiersText[i] = nil
-				modifiersValidation[i] = nil
-			end
-			if tablelength(modifiers) == 0 then 
-				modifiers = baseModifiers
-				modifiersText = baseModifiersText
-				modifiersValidation = baseModifiersValidation
-			end
-		 until OK
-		 chosenModifiers[tablelength(chosenModifiers)+1] = modifiers[i]
-		 chosenModifiersText[tablelength(chosenModifiersText)+1] = modifiersText[i]
-		 LOG(modifiers[i], modifiersText[i])
-		 
-		end
-			
-		sdlext.showAlertDialog(
-			"Choose your next modifier.",
-			"Choose which of the following modifiers will apply to the rest of the run.",
-			function(buttonIndex) GAME.MetaModifiers[chosenModifiers[buttonIndex]] = true end, 1200, 400, chosenModifiersText[1],chosenModifiersText[2],chosenModifiersText[3])
+	if not (options.SectorsToAddConditions and options.SectorsToAddConditions.value[Game:GetSector()]) then return end
+
+	local pool = {}
+	for _, modifier in ipairs(modifiers) do
+		if modifier.valid() then pool[#pool + 1] = modifier end
 	end
+
+	local offerCount = math.min(3, #pool)
+	if offerCount == 0 then return end
+
+	for n = 1, offerCount do
+		local j = math.random(n, #pool)
+		pool[n], pool[j] = pool[j], pool[n]
+	end
+
+	local ids, texts = {}, {}
+	for n = 1, offerCount do
+		ids[n] = pool[n].id
+		texts[n] = pool[n].text
+	end
+
+	sdlext.showAlertDialog(
+		"Choose your next modifier.",
+		"Choose which of the following modifiers will apply to the rest of the run.",
+		function(buttonIndex)
+			local id = ids[buttonIndex]
+			if id then GAME.MetaModifiers[id] = true end
+		end,
+		1200, 400, unpack(texts))
 end
 
 
@@ -219,7 +250,7 @@ local function ConditionNoRepairsStoreHP(mission)
 	GAME.MetaModifiers.NoRepairsTable = GAME.MetaModifiers.NoRepairsTable or {}
 	for i = 0, 2 do
 		local mech = Board:GetPawn(i)
-		if mech then GAME.MetaModifiers.NoRepairsTable[i] = mech:GetHealth() else GAME.MetaModifiers.NoRepairsTable[i] = 1 end
+		if mech and not mech:IsDead() then GAME.MetaModifiers.NoRepairsTable[i] = mech:GetHealth() else GAME.MetaModifiers.NoRepairsTable[i] = 1 end
 	end
 	LOG("stored no repairs HP")
 end
@@ -234,7 +265,7 @@ local function ConditionNoRepairsRetrieveHP(mission)
 end
 
 local function ConditionHealthyPsions(mission, pawn)
-	--maybe this doesn't work on mission start?	
+	-- maybe this doesn't work on mission start?	
 	if not GAME.MetaModifiers.HealthyPsions then return end
 	if string.match(pawn:GetType(), "Jelly") then 
 		pawn:SetShield(true)
@@ -244,23 +275,33 @@ end
 local function ConditionExplosiveBuildings(mission, buildingData)
 	if not GAME.MetaModifiers.ExplosiveBuildings then return end
 	if not (Game:GetTurnCount() > 0) then return end
-	--some missions "destroy" a building to spawn unique buildings
+	-- some missions "destroy" a building to spawn unique buildings
 	Board:AddAnimation(buildingData.loc, "explo_fire1", ANIM_NO_DELAY)
 	for dir = DIR_START, DIR_END do
 		local exploDamage = SpaceDamage(buildingData.loc + DIR_VECTORS[dir], 1)
 		exploDamage.sAnimation = "exploout2_"..dir
-		Board:DamageSpace(exploDamage)
+		if Board:IsValid(buildingData.loc + DIR_VECTORS[dir]) then Board:DamageSpace(exploDamage) end
 	end
 end
 
 local function ConditionLongerFinalPhase(prevMission, nextMission)
 	if not GAME.MetaModifiers.LongerFinalPhase then return end
 	modApi:conditionalHook(function()
-		return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() ~= Mission_Test 
+		return true and Game ~= nil and GAME ~= nil and GetCurrentMission() ~= nil and GetCurrentMission() == nextMission
 	end, 
 	function()
 		GetCurrentMission().TurnLimit = GetCurrentMission().TurnLimit + 1
 	end)
+end
+
+local function ConditionVekLeaveCorpses(mission, pawn)
+	if not GAME.MetaModifiers.VekLeaveCorpses then return end
+	pawn:SetCorpse(true)
+end
+
+local function ConditionAcidHurts(mission, pawn, isAcid)
+	if not GAME.MetaModifiers.AcidHurts then return end
+	if pawn:IsMech() and isAcid then pawn:SetHealth(pawn:GetHealth() - 1) end
 end
 
 local function EVENT_onModsLoaded()
@@ -281,7 +322,8 @@ local function EVENT_onModsLoaded()
 	modApi:addMissionEndHook(ConditionNoRepairsStoreHP)
 	modapiext:addPawnTrackedHook(ConditionHealthyPsions)
 	modapiext:addBuildingDestroyedHook(ConditionExplosiveBuildings)
-	-- modapiext:addPawnTrackedHook(ConditionVekLeaveCorpses)
+	modapiext:addPawnTrackedHook(ConditionVekLeaveCorpses)
+	modapiext:addPawnIsAcidHook(ConditionAcidHurts)
 	modApi:addMissionNextPhaseCreatedHook(ConditionLongerFinalPhase)
 end
 
