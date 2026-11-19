@@ -1,4 +1,4 @@
-local description = "Adds seven goo enemies and a goo boss."
+local description = "Adds seven goo enemies and two goo bosses."
 
 local mod = {
 	id = "Meta_BlobPack",
@@ -13,7 +13,6 @@ local mod = {
 	modApiVersion = "2.9.2",
 	icon = "img/mod_icon.png",
 	description = description,
-	--metadata = metadata,
 }
 
 
@@ -26,6 +25,7 @@ function mod:init()
 	require(self.scriptPath.."sludge")
 	require(self.scriptPath.."lava")
 	require(self.scriptPath.."titanic")
+	require(self.scriptPath.."kingslime")
 	require(self.scriptPath.."enemyList")
 	require(self.scriptPath.."libs/weaponPreview")
 	require(self.scriptPath.."libs/swimmingIcon")
@@ -62,5 +62,15 @@ function mod:load(options, version)
 		end)
     end)
 end
+
+function mod:metadata()
+	modApi:addGenerationOption(
+		"Meta_KingSlimeIsCrowned",
+		"King Goo has a crown",
+		"Check to allow the King Goo to wear a crown (default: false). This is purely cosmetic. Requires reloading the game to take effect.",
+		{ enabled = false }
+	)
+end
+
 
 return mod
