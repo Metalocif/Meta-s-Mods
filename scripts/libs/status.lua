@@ -40,7 +40,7 @@ ANIMS.StatusDoom = ANIMS.StatusBase:new{ Image = "libs/status/doom_icon.png"}
 ANIMS.StatusOppression = ANIMS.StatusBase:new{ Image = "libs/status/oppressed_icon.png"}
 ANIMS.StatusGlory = ANIMS.StatusBase:new{ Image = "libs/status/glory_icon.png", PosX = -5}
 ANIMS.StatusGuardian = ANIMS.StatusBase:new{ Image = "libs/status/guardian_icon.png", PosX = 5}
-ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunk1.png", PosX = -5, NumFrames = 6}
+ANIMS.StatusGunk = ANIMS.StatusBase:new{ Image = "libs/status/gunkanim.png", PosX = -5, NumFrames = 6}
 ANIMS.GunkPuddle_Explode = Animation:new{Image = "effects/explo_gunkpuddle.png", NumFrames = 4, Time = 0.1, PosX = -30, PosY = -25}
 ANIMS.StatusHemorrhage = ANIMS.StatusBase:new{ Image = "libs/status/hemorrhage.png", PosX = -5, PosY = 10, NumFrames = 6, Time = 0.2}
 ANIMS.StatusLeechSeed = ANIMS.StatusBase:new{ Image = "libs/status/leechseed.png", PosX = -5, PosY = 5}
@@ -1394,34 +1394,36 @@ local function ResetOverheal()
 		end
 	end
 end
-TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
-TILE_TOOLTIPS.Status_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}
 
 local gunk_damage = SpaceDamage(0)
 gunk_damage.sAnimation = "GunkPuddle_Explode"
-Meta_BlobGunk = { Image = "libs/status/gunk.png", Damage = gunk_damage, Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunk.png", UsedImage = "libs/status/gunkused.png"}
-Status_Puddle = { Image = "libs/status/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Status_Puddle_Text", Icon = "libs/status/item_puddle.png", UsedImage = ""}
-Location["libs/status/gunk.png"] = Point(-22,6)
+Location["libs/status/gunkpuddle.png"] = Point(-22,6)
 Location["libs/status/gunkused.png"] = Point(-22,6)
 Location["libs/status/item_puddle.png"] = Point(-22,6)
+local function SetupItems()
+	TILE_TOOLTIPS.Meta_BlobGunk_Text = {"Gunk", "Blobs heal 1 damage. Other units are inflicted with Gunk."}
+	TILE_TOOLTIPS.Status_Puddle_Text = {"Puddle", "Extinguishes fires, then turns into smoke."}
 
-BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
-    local pawn = Board:GetPawn(loc)
-	if removed_item == "Status_Puddle" then
-		if (pawn and pawn:IsFire()) or Board:IsFire(loc) then
-			local smokeDamage = SpaceDamage(loc)
-			smokeDamage.iSmoke = 1
-			Board:DamageSpace(smokeDamage)
-		elseif pawn then
-			Status.ApplyWet(pawn:GetId())
+	Meta_BlobGunk = { Image = "libs/status/gunkpuddle.png", Damage = gunk_damage, Tooltip = "Meta_BlobGunk_Text", Icon = "libs/status/gunkpuddle.png", UsedImage = "libs/status/gunkused.png"}
+	Status_Puddle = { Image = "libs/status/item_puddle.png", Damage = SpaceDamage(0), Tooltip = "Status_Puddle_Text", Icon = "libs/status/item_puddle.png", UsedImage = ""}
+
+	BoardEvents.onItemRemoved:subscribe(function(loc, removed_item)
+		local pawn = Board:GetPawn(loc)
+		if removed_item == "Status_Puddle" then
+			if (pawn and pawn:IsFire()) or Board:IsFire(loc) then
+				local smokeDamage = SpaceDamage(loc)
+				smokeDamage.iSmoke = 1
+				Board:DamageSpace(smokeDamage)
+			elseif pawn then
+				Status.ApplyWet(pawn:GetId())
+			end
+		elseif removed_item == "Meta_BlobGunk" then
+			local pawn = Board:GetPawn(loc)
+			if pawn then Status.ApplyGunk(pawn:GetId()) end
+			Board:AddAnimation(loc, "Djinn_explo_gunkpuddle", ANIM_NO_DELAY)
 		end
-	elseif removed_item == "Meta_BlobGunk" then
-        local pawn = Board:GetPawn(loc)
-        if pawn then Status.ApplyGunk(pawn:GetId()) end
-		Board:AddAnimation(loc, "Djinn_explo_gunkpuddle", ANIM_NO_DELAY)
-    end
-end)
-
+	end)
+end
 
 local function getWeaponKey(id, key)		--helper function to generate the extra Weaken weapons
 	Assert.Equals("string", type(id), "ID must be a string")
@@ -2677,6 +2679,7 @@ if isNewerVersion then
 		SetupMetatable()
 		CreateStatusFunctions()
 		AlterScoringFunctions()
+		SetupItems()
 		-- ModifySkillsForGlory()
         LOG("Status Library Version " .. self.version .. " finalized.")
     end
