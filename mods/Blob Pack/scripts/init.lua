@@ -54,7 +54,7 @@ function mod:load(options, version)
 				for id, _ in pairs(GetCurrentMission().GunkTable) do
 					local pawn = Board:GetPawn(id)
 					if pawn then 
-						CustomAnim:add(id, "gunk")
+						CustomAnim:add(id, "StatusGunk")
 						pawn:SetMoveSpeed(pawn:GetMoveSpeed() - 1)
 					end
 				end
