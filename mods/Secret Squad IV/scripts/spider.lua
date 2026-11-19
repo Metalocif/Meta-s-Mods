@@ -99,7 +99,10 @@ function meta_spider:GetSkillEffect(p1,p2)
 	end
 	if p1 ~= p2 and Board:GetPawn(p1) then
 		local spawn = ""
-		if Board:GetPawn(p2) then spawn = "meta_Spiderling" end
+		if Board:GetPawn(p2) then 
+			spawn = "meta_Spiderling" 
+			if Board:IsDeadly(damage, Board:GetPawn(p1)) then damage.bKO_Effect = true end
+		end
 		if Board:GetPawn(p2) and (Status.GetStatus(Board:GetPawn(p2):GetId(), "Gunk") or IsGooey(Board:GetPawn(p2):GetType())) then boost = true end
 		ret:AddMelee(p1, damage)
 		ret:AddScript(string.format([[
