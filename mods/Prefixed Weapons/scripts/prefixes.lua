@@ -174,7 +174,7 @@ function CanRecoil(id)
 end
 
 function CanReckless(id)
-	return IsDamaging(id) and _G[id].SelfDamage == 0 and _G[id].Damage < DAMAGE_DEATH and not IsSelfDamaging(id)
+	return IsDamaging(id) and _G[id].SelfDamage == 0 and _G[id].Damage and _G[id].Damage < DAMAGE_DEATH and _G[id].Damage ~= DAMAGE_ZERO and not IsSelfDamaging(id)
 	--Self-Destruct is coded as not having self-damage
 end
 
@@ -250,6 +250,7 @@ end
 
 function JanusWeaponSE(self,p1,p2)
 	local ret = SkillEffect()
+	if p1 == p2 or (p1.x ~= p2.x and p1.y ~= p2.y) then return _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2) end
 	local dist = p1:Manhattan(p2)
 	local revDir = GetDirection(p1-p2)
 	local target = p1
@@ -269,6 +270,7 @@ end
 
 function RecoilingWeaponSE(self,p1,p2)
 	local ret = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
+	if p1 == p2 or (p1.x ~= p2.x and p1.y ~= p2.y) then return ret end
 	local dir = GetDirection(p2-p1)
 	ret:AddDamage(SpaceDamage(p1, 0, (dir+2)%4))
 	return ret
@@ -292,6 +294,7 @@ end
 
 function DoubledWeaponSE(self,p1,p2)
 	local ret = SkillEffect()
+	if p1 == p2 or (p1.x ~= p2.x and p1.y ~= p2.y) then return _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2) end
 	local dir = GetDirection(p2-p1)
 	if Board:GetPawn(p1) then
 		local fx = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
@@ -306,6 +309,7 @@ end
 
 function BerserkWeaponSE(self,p1,p2)
 	local ret = SkillEffect()
+	if p1 == p2 or (p1.x ~= p2.x and p1.y ~= p2.y) then return _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2) end
 	local dir = GetDirection(p2-p1)
 	if Board:GetPawn(p1) then	--otherwise we get errors on moving/death
 		local fx = _G[self.OriginalUpgrade]:GetSkillEffect(p1,p2)
@@ -380,37 +384,38 @@ function EVENT_onModsLoaded()
 		local weapon = _G[id]
 		if weapon and weapon.Original == nil and weapon.Passive == "" and not weapon.TwoClick then
 			local upgrades = {"", "_A", "_B", "_AB"}
-			modApi:addWeaponDrop("Freezing"..id)
-			for _, upgrade in ipairs(upgrades) do
-				if _G[id..upgrade] ~= nil then --and _G[id.."_AB"].TwoClick == nil then
-				--my code doesn't work with two click weapons because I only alter the SkillEffect
-					_G["Freezing"..id..upgrade] = _G[id..upgrade]:new{
-						Original = id,
-						OriginalUpgrade = id..upgrade,
-						UpgradeCost = _G[id..upgrade].UpgradeCost,
-						Damage = 0,
-						PowerCost = _G[id..upgrade].PowerCost + 1,
-						Rarity = 4,
-						Explosion = "ExplIce1",UpShot = "effects/shotup_ice.png",ProjectileArt = "effects/shot_tankice",	--cosmetic
-					}
-					_G["Freezing"..id..upgrade].GetName = function(self) return "Freezing "..getWeaponKey(self.Original, "Name") end
-					_G["Freezing"..id..upgrade].GetDescription = function(self) return getWeaponKey(self.Original, "Description").."\nFreezes instead of damaging." end
-					_G["Freezing"..id..upgrade].GetUpgrades = function(self) return _G[self.Original].Upgrades end
-					_G["Freezing"..id..upgrade].GetIcon = function(self) return _G[self.Original].Icon end
-					_G["Freezing"..id..upgrade].GetClass = function(self) return _G[self.Original].Class end
-					_G["Freezing"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
-					_G["Freezing"..id..upgrade].GetSkillEffect = FreezingWeaponSE
-					_G["Freezing"..id..upgrade].IsValid = IsNotFreezing
-					setmetatable(_G["Freezing"..id..upgrade], {__index = _G[id..upgrade]})
+			if weapon.Damage > 0 and weapon.Damage ~= DAMAGE_ZERO then
+				modApi:addWeaponDrop("Freezing"..id)
+				for _, upgrade in ipairs(upgrades) do
+					if _G[id..upgrade] ~= nil then --and _G[id.."_AB"].TwoClick == nil then
+					--my code doesn't work with two click weapons because I only alter the SkillEffect
+						_G["Freezing"..id..upgrade] = _G[id..upgrade]:new{
+							Original = id,
+							OriginalUpgrade = id..upgrade,
+							UpgradeCost = _G[id..upgrade].UpgradeCost,
+							Damage = 0,
+							PowerCost = _G[id..upgrade].PowerCost + 1,
+							Rarity = 4,
+							Explosion = "ExplIce1",UpShot = "effects/shotup_ice.png",ProjectileArt = "effects/shot_tankice",	--cosmetic
+						}
+						_G["Freezing"..id..upgrade].GetName = function(self) return "Freezing "..getWeaponKey(self.Original, "Name") end
+						_G["Freezing"..id..upgrade].GetDescription = function(self) return getWeaponKey(self.Original, "Description").."\nFreezes instead of damaging." end
+						_G["Freezing"..id..upgrade].GetUpgrades = function(self) return _G[self.Original].Upgrades end
+						_G["Freezing"..id..upgrade].GetIcon = function(self) return _G[self.Original].Icon end
+						_G["Freezing"..id..upgrade].GetClass = function(self) return _G[self.Original].Class end
+						_G["Freezing"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
+						_G["Freezing"..id..upgrade].GetSkillEffect = FreezingWeaponSE
+						_G["Freezing"..id..upgrade].IsValid = IsNotFreezing
+						setmetatable(_G["Freezing"..id..upgrade], {__index = _G[id..upgrade]})
+					end
 				end
+				if Weapon_Texts[id.."_Upgrade1"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] end
+				-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then modApi:setText("Freezing"..id.."_Upgrade1", "Test value") end
+				-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then 
+					-- modApi.modLoaderDictionary["Freezing"..id.."_Upgrade1"] = _G[id].UpgradeList[1]
+				-- end
+				if Weapon_Texts[id.."_Upgrade2"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] end
 			end
-			if Weapon_Texts[id.."_Upgrade1"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] end
-			-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then modApi:setText("Freezing"..id.."_Upgrade1", "Test value") end
-			-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then 
-				-- modApi.modLoaderDictionary["Freezing"..id.."_Upgrade1"] = _G[id].UpgradeList[1]
-			-- end
-			if Weapon_Texts[id.."_Upgrade2"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] end
-			
 			
 			modApi:addWeaponDrop("Overclocked"..id)
 			for _, upgrade in ipairs(upgrades) do
@@ -645,39 +650,41 @@ function EVENT_onModsLoaded()
 			if Weapon_Texts[id.."_Upgrade1"] ~= nil then Weapon_Texts["Shielding"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] end
 			if Weapon_Texts[id.."_Upgrade2"] ~= nil then Weapon_Texts["Shielding"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] end
 			
-			modApi:addWeaponDrop("Kamikaze"..id)
-			for _, upgrade in ipairs(upgrades) do
-				if _G[id..upgrade] ~= nil then
-					_G["Kamikaze"..id..upgrade] = _G[id..upgrade]:new{
-						Original = id,
-						OriginalUpgrade = id..upgrade,
-						UpgradeCost = _G[id..upgrade].UpgradeCost,
-						Damage = _G[id..upgrade].Damage * 2,
-						SelfDamage = DAMAGE_DEATH,
-						PowerCost = _G[id..upgrade].PowerCost,
-						Rarity = 4,
-					}
-					_G["Kamikaze"..id..upgrade].GetName = function(self) return "Kamikaze "..getWeaponKey(self.Original, "Name") end
-					_G["Kamikaze"..id..upgrade].GetDescription = function(self) return getWeaponKey(self.Original, "Description").."\nAlso kills the user." end
-					_G["Kamikaze"..id..upgrade].GetUpgrades = function(self) return _G[self.Original].Upgrades end
-					_G["Kamikaze"..id..upgrade].GetIcon = function(self) return _G[self.Original].Icon end
-					_G["Kamikaze"..id..upgrade].GetClass = function(self) return _G[self.Original].Class end
-					_G["Kamikaze"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
-					_G["Kamikaze"..id..upgrade].GetSkillEffect = KamikazeWeaponSE
-					_G["Kamikaze"..id..upgrade].IsValid = CanReckless
-					setmetatable(_G["Kamikaze"..id..upgrade], {__index = _G[id..upgrade]})
+			if weapon.Damage > 0 and weapon.Damage ~= DAMAGE_ZERO and weapon.Damage ~= DAMAGE_DEATH then
+				modApi:addWeaponDrop("Kamikaze"..id)
+				for _, upgrade in ipairs(upgrades) do
+					if _G[id..upgrade] ~= nil then
+						_G["Kamikaze"..id..upgrade] = _G[id..upgrade]:new{
+							Original = id,
+							OriginalUpgrade = id..upgrade,
+							UpgradeCost = _G[id..upgrade].UpgradeCost,
+							Damage = _G[id..upgrade].Damage * 2,
+							SelfDamage = DAMAGE_DEATH,
+							PowerCost = _G[id..upgrade].PowerCost,
+							Rarity = 4,
+						}
+						_G["Kamikaze"..id..upgrade].GetName = function(self) return "Kamikaze "..getWeaponKey(self.Original, "Name") end
+						_G["Kamikaze"..id..upgrade].GetDescription = function(self) return getWeaponKey(self.Original, "Description").."\nAlso kills the user." end
+						_G["Kamikaze"..id..upgrade].GetUpgrades = function(self) return _G[self.Original].Upgrades end
+						_G["Kamikaze"..id..upgrade].GetIcon = function(self) return _G[self.Original].Icon end
+						_G["Kamikaze"..id..upgrade].GetClass = function(self) return _G[self.Original].Class end
+						_G["Kamikaze"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
+						_G["Kamikaze"..id..upgrade].GetSkillEffect = KamikazeWeaponSE
+						_G["Kamikaze"..id..upgrade].IsValid = CanReckless
+						setmetatable(_G["Kamikaze"..id..upgrade], {__index = _G[id..upgrade]})
+					end
+				end
+				if Weapon_Texts[id.."_Upgrade1"] ~= nil then 
+					Weapon_Texts["Kamikaze"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] 
+				end
+				if Weapon_Texts[id.."_Upgrade2"] ~= nil then 
+					Weapon_Texts["Kamikaze"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] 
 				end
 			end
-			if Weapon_Texts[id.."_Upgrade1"] ~= nil then 
-				Weapon_Texts["Kamikaze"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] 
-			end
-			if Weapon_Texts[id.."_Upgrade2"] ~= nil then 
-				Weapon_Texts["Kamikaze"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] 
-			end
 			
 			
 			
-			LOG("added prefixed versions of "..id)
+			-- LOG("added prefixed versions of "..id)
 		end
 		
 	end
@@ -690,8 +697,7 @@ function EVENT_onModsLoaded()
 		for id, enabled in pairs(modApi.weaponDeck) do
 			local weapon = _G[id]
 			if weapon and weapon.Original ~= nil then
-				LOG("checking "..id)
-				if not weapon.IsValid(weapon.Original) then modApi:addWeaponDrop(id, false) LOG("removed "..id) end	--with false, this prevents from dropping
+				if not weapon.IsValid(weapon.Original) then modApi:addWeaponDrop(id, false) end	--with false, this prevents from dropping
 			end
 		end
 	end)
