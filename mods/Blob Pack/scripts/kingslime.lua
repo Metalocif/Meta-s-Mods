@@ -125,6 +125,7 @@ function KingSlimeBossAtk:GetSkillEffect(p1, p2)
 
 	local spawner = SpaceDamage(p1)
 	spawner.sPawn = "BlobBossSmall"
+	spawner.sImageMark = artiArrows.ColorUp(dir)
 	if destination ~= p1 then ret:AddQueuedDropper(spawner, "units/aliens/slime_B3.png") end
 	return ret
 end	
