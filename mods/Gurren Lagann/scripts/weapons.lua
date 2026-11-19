@@ -378,7 +378,9 @@ function Meta_RepeatingCannon:GetSkillEffect(p1, p2)
 	local dir = GetDirection(p2-p1)
 	if GetCurrentMission() then GetCurrentMission().CrackShotCounter = GetCurrentMission().CrackShotCounter or 0 end
 	if Board:GetPawn(p2) and GetCurrentMission() then ret:AddScript("GetCurrentMission().CrackShotCounter = GetCurrentMission().CrackShotCounter + 1") end
-	ret:AddArtillery(p1, SpaceDamage(p2, self.Damage, dir), "effects/shotup_tricrack.png", PROJ_DELAY)
+	local damage = SpaceDamage(curr, self.Damage, dir)
+	damage.sAnimation = pawn:IsBoosted() and "ExploArt3" or "ExploArt2"
+	ret:AddArtillery(p1, damage, "effects/shotup_tricrack.png", PROJ_DELAY)
 	if GetCurrentMission() then ret:AddScript("if GetCurrentMission().CrackShotCounter >= 8 then completeCrackShot() end") end
 	return ret
 end	
@@ -393,7 +395,9 @@ function Meta_RepeatingCannon:GetFinalEffect(p1, p2, p3)
 	for i = 0, dist do
 		local curr = p2
 		if p3~=p2 then curr = p2 + DIR_VECTORS[GetDirection(p3-p2)] * i end
-		ret:AddArtillery(p1, SpaceDamage(curr, self.Damage, dir), "effects/shotup_tricrack.png", dir == dir2 and PROJ_DELAY or 0.15)
+		local damage = SpaceDamage(curr, self.Damage, dir)
+		damage.sAnimation = pawn:IsBoosted() and "ExploArt3" or "ExploArt2"
+		ret:AddArtillery(p1, damage, "effects/shotup_tricrack.png", dir == dir2 and PROJ_DELAY or 0.15)
 		if GetCurrentMission() and Board:GetPawn(p2) then ret:AddScript("GetCurrentMission().CrackShotCounter = GetCurrentMission().CrackShotCounter + 1") end
 	end
 	if GetCurrentMission() then ret:AddScript("if GetCurrentMission().CrackShotCounter >= 8 then completeCrackShot() end") end
