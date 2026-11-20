@@ -406,15 +406,16 @@ function EVENT_onModsLoaded()
 						_G["Freezing"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 						_G["Freezing"..id..upgrade].GetSkillEffect = FreezingWeaponSE
 						_G["Freezing"..id..upgrade].IsValid = IsNotFreezing
+						
+						if _G[id].Upgrades == 2 then 
+							_G["Freezing"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+						elseif _G[id].Upgrades == 1 then 
+							_G["Freezing"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+						end
+						
 						setmetatable(_G["Freezing"..id..upgrade], {__index = _G[id..upgrade]})
 					end
 				end
-				if Weapon_Texts[id.."_Upgrade1"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade1"] = Weapon_Texts[id.."_Upgrade1"] end
-				-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then modApi:setText("Freezing"..id.."_Upgrade1", "Test value") end
-				-- if Weapon_Texts[id.."_Upgrade1"] ~= nil then 
-					-- modApi.modLoaderDictionary["Freezing"..id.."_Upgrade1"] = _G[id].UpgradeList[1]
-				-- end
-				if Weapon_Texts[id.."_Upgrade2"] ~= nil then Weapon_Texts["Freezing"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] end
 			end
 			
 			modApi:addWeaponDrop("Overclocked"..id)
@@ -436,6 +437,13 @@ function EVENT_onModsLoaded()
 					_G["Overclocked"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Overclocked"..id..upgrade].GetSkillEffect = OverclockedWeaponSE
 					_G["Overclocked"..id..upgrade].IsValid = IsDamaging
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Overclocked"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Overclocked"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+						
 					setmetatable(_G["Overclocked"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -462,6 +470,13 @@ function EVENT_onModsLoaded()
 					_G["Cracking"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Cracking"..id..upgrade].GetSkillEffect = CrackingWeaponSE
 					_G["Cracking"..id..upgrade].IsValid = IsNotCracking
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Cracking"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Cracking"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Cracking"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -488,6 +503,13 @@ function EVENT_onModsLoaded()
 					_G["Janus"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Janus"..id..upgrade].GetSkillEffect = JanusWeaponSE
 					_G["Janus"..id..upgrade].IsValid = IsProjectile
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Janus"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Janus"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Janus"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -514,6 +536,13 @@ function EVENT_onModsLoaded()
 					_G["Recoiling"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Recoiling"..id..upgrade].GetSkillEffect = RecoilingWeaponSE
 					_G["Recoiling"..id..upgrade].IsValid = CanRecoil	--immobile + not self-target + colinear
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Recoiling"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Recoiling"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Recoiling"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -541,6 +570,13 @@ function EVENT_onModsLoaded()
 					_G["Reckless"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Reckless"..id..upgrade].GetSkillEffect = RecklessWeaponSE
 					_G["Reckless"..id..upgrade].IsValid = CanReckless	--no self-damage + has damage
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Reckless"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Reckless"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Reckless"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -567,6 +603,13 @@ function EVENT_onModsLoaded()
 					_G["Doubled"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Doubled"..id..upgrade].GetSkillEffect = DoubledWeaponSE
 					_G["Doubled"..id..upgrade].IsValid = CanDoubled	--no self-damage + has damage
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Doubled"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Doubled"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Doubled"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -593,6 +636,13 @@ function EVENT_onModsLoaded()
 					_G["Berserk"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Berserk"..id..upgrade].GetSkillEffect = BerserkWeaponSE
 					_G["Berserk"..id..upgrade].IsValid = CanBerserk	--melee + not self-target
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Berserk"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Berserk"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Berserk"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -619,6 +669,13 @@ function EVENT_onModsLoaded()
 					_G["Pushing"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Pushing"..id..upgrade].GetSkillEffect = PushingWeaponSE
 					_G["Pushing"..id..upgrade].IsValid = CanPushing
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Pushing"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Pushing"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Pushing"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -644,6 +701,13 @@ function EVENT_onModsLoaded()
 					_G["Shielding"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 					_G["Shielding"..id..upgrade].GetSkillEffect = ShieldingWeaponSE
 					_G["Shielding"..id..upgrade].IsValid = IsNotShielding
+					
+					if _G[id].Upgrades == 2 then 
+						_G["Shielding"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+					elseif _G[id].Upgrades == 1 then 
+						_G["Shielding"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+					end
+					
 					setmetatable(_G["Shielding"..id..upgrade], {__index = _G[id..upgrade]})
 				end
 			end
@@ -671,6 +735,13 @@ function EVENT_onModsLoaded()
 						_G["Kamikaze"..id..upgrade].GetUpgradeDescription = function(self) return getWeaponKey(self.OriginalUpgrade, "UpgradeDescription") end
 						_G["Kamikaze"..id..upgrade].GetSkillEffect = KamikazeWeaponSE
 						_G["Kamikaze"..id..upgrade].IsValid = CanReckless
+						
+						if _G[id].Upgrades == 2 then 
+							_G["Kamikaze"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1"),GetLocalizedText(id.."_Upgrade2")}
+						elseif _G[id].Upgrades == 1 then 
+							_G["Kamikaze"..id..upgrade].UpgradeList = {GetLocalizedText(id.."_Upgrade1")}
+						end
+					
 						setmetatable(_G["Kamikaze"..id..upgrade], {__index = _G[id..upgrade]})
 					end
 				end
@@ -681,10 +752,6 @@ function EVENT_onModsLoaded()
 					Weapon_Texts["Kamikaze"..id.."_Upgrade2"] = Weapon_Texts[id.."_Upgrade2"] 
 				end
 			end
-			
-			
-			
-			-- LOG("added prefixed versions of "..id)
 		end
 		
 	end
@@ -701,7 +768,6 @@ function EVENT_onModsLoaded()
 			end
 		end
 	end)
-	return "done"
 end
 
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
