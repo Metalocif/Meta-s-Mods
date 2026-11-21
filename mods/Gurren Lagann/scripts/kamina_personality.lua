@@ -1,7 +1,7 @@
 return {
 	--Custom lines
 	GIGADRILLBREAKER = {
-		"Giga... Drill... BREAKER!",
+		"Giga...\nDrill...\nBREAKER!",
 		-- "This drill is humanity's soul! It's my soul! Do you seriously think it's gonna be wiped out by the likes of you?!"
 	},
 	
