@@ -68,6 +68,7 @@ function this:init(mod)
 			--BREAKER
 			ret:AddVoice("GIGADRILLBREAKER", user:GetId())
 			ret:AddDelay(1)
+			ret:AddSound("/props/conveyor_belt")
 			local direction = GetDirection(p2-p1)
 			local dummydamage = SpaceDamage(p2)
 			dummydamage.bHide = true
@@ -83,6 +84,7 @@ function this:init(mod)
 					ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(Point(-1, -1))", user:GetId()))
 					local endDamage = SpaceDamage(p2 ,DAMAGE_DEATH)
 					endDamage.sImageMark = "effects/GIGADRILLBREAKER_killicon.png"
+					if not Board:GetPawn(p2) then endDamage.iDamage = 0 end
 					ret:AddDamage(endDamage)
 					ret:AddScript(string.format("Board:GetPawn(%s):SetSpace(%s)", user:GetId(), p2:GetString()))
 				end	
