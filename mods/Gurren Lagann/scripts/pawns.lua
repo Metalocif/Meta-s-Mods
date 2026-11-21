@@ -13,7 +13,7 @@ a.mech_gurrenlagann_ns = a.MechIcon:new{Image="units/player/mech_gurrenlagann_ns
 
 a.mech_dayakkaiser =	a.MechUnit:new{Image = "units/player/mech_dayakkaiser.png", PosX = -20, PosY = -7}
 a.mech_dayakkaisera =	a.MechUnit:new{Image = "units/player/mech_dayakkaiser_a.png", PosX = -20, PosY = -7, NumFrames = 6, Frames = {0,1,2,1,3,4,5,4}, Time = 0.5}
-a.mech_dayakkaiserw =	a.MechUnit:new{Image = "units/player/mech_dayakkaiser_w.png", PosX = -20, PosY = -7 }
+a.mech_dayakkaiserw =	a.MechUnit:new{Image = "units/player/mech_dayakkaiser_w.png", PosX = -20, PosY = -4 }
 a.mech_dayakkaiser_broken = a.MechUnit:new{Image="units/player/mech_dayakkaiser_broken.png", PosX = -20, PosY = -7 }
 a.mech_dayakkaiserw_broken = a.MechUnit:new{Image="units/player/mech_dayakkaiser_w_broken.png", PosX = -20, PosY = -7 }
 a.mech_dayakkaiser_ns = a.MechIcon:new{Image="units/player/mech_dayakkaiser_ns.png"}
