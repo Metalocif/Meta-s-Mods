@@ -63,7 +63,7 @@ modApi:appendAsset("img/portraits/enemy/OmegaTotem2.png", resourcePath.."img/por
 ---------------
 
 OmegaBurnbug2 = Pawn:new{
-	Name = "Omega Burnbug",
+	Name = "Omega Gastropod",
 	Health = 4,
 	MoveSpeed = 3,
 	Image = "Omegaburnbug",
@@ -336,7 +336,7 @@ AddPawn("OmegaCrab2")
 
 OmegaBeetle2 = Pawn:new{
 	Name = "Omega Beetle",
-	Health = 5,
+	Health = 4,
 	MoveSpeed = 2,
 	Image = "Omegabeetle",
 	ImageOffset = 1,
