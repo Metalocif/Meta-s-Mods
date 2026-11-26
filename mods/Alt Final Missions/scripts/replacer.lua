@@ -927,10 +927,13 @@ Meta_FluorousVek = Pawn:new{
 	Health = 7,
 	Image = "Meta_FluorousVek",
 	MoveSpeed = 3,
-	SkillList = { "ScorpionAtk2", "ScorpionAtkB" },
-	GetWeapon = function()
+	GetSkillList = function()
 		local options = mod_loader.currentModContent["Meta_AltFinalMissions"].options
-		return options.Meta_FluorousVekHasBossAttack.enabled and 2 or 1
+		if options.Meta_FluorousVekHasBossAttack.enabled then
+			return { "ScorpionAtkB" }
+		else
+			return { "ScorpionAtk2" }
+		end
 	end,
 	SoundLocation = "/enemy/scorpion_soldier_2/",
 	DefaultTeam = TEAM_ENEMY,
