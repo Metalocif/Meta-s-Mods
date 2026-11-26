@@ -16,6 +16,7 @@ Adds a massive amount of content.
 - Hunting Missions: adds four missions that have you hunt a special Vek with unique mechanics.
 - Rock Leader: a joke mod based on the existence of a boss-colored rock in the files. It's a boss that buffs other Vek.
 - Rogue Mechs: adds a single mission that has you face three Vek-controlled mechs. Not only do the mechs come from a pool of 12, they also have different stats and weapons based on the current island.
+- Alt Final Missions: adds three final mission variants, including a multitile boss, the Hive Queen.
 
 # Gameplay Modifiers
 - Permanent Psions: Psions cannot spawn, and a Psion effect of your choice is permanently active. Makes for fun challenge runs. With Vextra, you can have two kinds of effects active at once.
