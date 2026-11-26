@@ -66,13 +66,20 @@ function mod:metadata()
 			values = { 7, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 79}, value = 20
 		}
 	)
+	
 	modApi:addGenerationOption(
 		"Meta_HiveQueenInvincibleThreshold",
 		"Hive Queen invincibility value",
 		"Choose the maximum amount of damage the Hive Queen can take from a single attack. Default is 4.",
 		{
-			values = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100}, value = 4
+			values = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "Disabled"}, value = 4
 		}
+	)
+	modApi:addGenerationOption(
+		"Meta_HiveQueenBeatOfDeath",
+		"Hive Queen extra passive",
+		"If this is enabled, when the Hive Queen is damaged during your turn, all mechs take 1 damage. Disabled by default.",
+		{ enabled = false }
 	)
 end
 
