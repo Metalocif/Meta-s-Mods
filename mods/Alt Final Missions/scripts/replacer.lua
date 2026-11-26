@@ -207,10 +207,24 @@ local function GetQueen()
 end
 
 trait:add{
-	pawnType = "Meta_HiveQueen",
+	func = function(self, pawn) 
+		local optionValue = mod_loader.currentModContent["Meta_AltFinalMissions"].options.Meta_HiveQueenInvincibleThreshold.value
+		return (pawn and pawn:GetType() == "Meta_HiveQueen" and optionValue ~= "Disabled")
+	end,
+	-- pawnType = "Meta_HiveQueen",
 	icon = resourcePath.."img/combat/traits/invincible.png",
 	desc_title = "Invincible",
 	desc_text = "Can only take up to "..mod_loader.currentModContent["Meta_AltFinalMissions"].options.Meta_HiveQueenInvincibleThreshold.value.." damage in a single attack.",
+}
+trait:add{
+	func = function(self, pawn) 
+		local beatofdeathActive = mod_loader.currentModContent["Meta_AltFinalMissions"].options.Meta_HiveQueenBeatOfDeath.enabled
+		return (pawn and pawn:GetType() == "Meta_HiveQueen" and beatofdeathActive)
+	end,
+	-- pawnType = "Meta_HiveQueen",
+	icon = resourcePath.."img/combat/traits/beatofdeath.png",
+	desc_title = "Beat of Death",
+	desc_text = "When damaged during your turn, all mechs take 1 damage.",
 }
 trait:add{
 	func = function(self, pawn) 
@@ -831,6 +845,20 @@ local function EVENT_onModsLoaded()
 				Board:AddPawn(bomb, loc)
 				bomb:SetInvisible(true)
 				bomb:Kill(true)	--invisible but still deals 1 true damage
+			end
+		end
+	end)
+	modapiext:addPawnDamagedHook(function(mission, pawn, damageTaken)
+		if damageTaken <= 0 or not (mission and pawn and pawn:GetType() == "Meta_HiveQueen") then return end
+		if not mod_loader.currentModContent["Meta_AltFinalMissions"].options.Meta_HiveQueenBeatOfDeath.enabled then return end
+		for i = 0, 2 do
+			local pawn = Board:GetPawn(i)
+			if pawn then
+				local tile = pawn:GetSpace()
+				local damage = SpaceDamage(tile, 1)
+				damage.sAnimation = "PsionAttack_Front"
+				Board:DamageSpace(damage)
+				Board:AddAnimation(tile, "PsionAttack_Back", ANIM_NO_DELAY)
 			end
 		end
 	end)
