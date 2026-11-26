@@ -104,7 +104,7 @@ Meta_HiveQueen = {
 	Supermassive = true,	--uses a tweaked Tosx code to make it immune to holes/liquids
 	Flying = true,			--here for Tosx's code
 	IgnoreFlip = true,
-	IgnoreFire = true,		--there's a weird issue if you use SetFire(false) on an extra space
+	--IgnoreFire = true,		--there's a weird issue if you use SetFire(false) on an extra space
 	IgnoreSmoke = true,	
 	Image = "Meta_HiveQueen",
 	Name = "Hive Queen",
@@ -728,26 +728,40 @@ local function EVENT_onModsLoaded()
 			if bestTarget then pawn:FireWeapon(bestTarget, weaponId) end
 		end
 	end)
-	local function CapDamage(skillEffect, key)	--implement Invincible
+	local function CapDamage(skillEffect, key)	--implement Invincible, also block fire
 		local damageLeft = mod_loader.currentModContent["Meta_AltFinalMissions"].options.Meta_HiveQueenInvincibleThreshold.value
+		local foundFire = false
 		for _, fx in ipairs(extract_table(skillEffect[key])) do
 			local target = Board:GetPawn(fx.loc)
 			
-			if (target and target:GetType() == "Meta_HiveQueen" and not target:IsDead())
-			and fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO then 
-				if damageLeft <= 0 then
-					fx.iDamage = DAMAGE_ZERO
-				else
-					local factor = target:IsAcid() and 2 or 1
-					local allowed = math.floor(damageLeft / factor)
-
-					if fx.iDamage == DAMAGE_DEATH or fx.iDamage * factor > damageLeft then
-						fx.iDamage = allowed
-						damageLeft = damageLeft - allowed * factor
+			if (target and target:GetType() == "Meta_HiveQueen" and not target:IsDead()) then
+				if fx.iFire == EFFECT_CREATE then
+					fx.iFire = 0
+					fx.sImageMark = "combat/icons/icon_fire_glow.png"
+					foundFire = true
+				end
+				if fx.iDamage > 0 and fx.iDamage ~= DAMAGE_ZERO then 
+					if damageLeft <= 0 then
+						fx.iDamage = DAMAGE_ZERO
 					else
-						damageLeft = damageLeft - fx.iDamage * factor
+						local factor = target:IsAcid() and 2 or 1
+						local allowed = math.floor(damageLeft / factor)
+
+						if fx.iDamage == DAMAGE_DEATH or fx.iDamage * factor > damageLeft then
+							fx.iDamage = allowed
+							damageLeft = damageLeft - allowed * factor
+						else
+							damageLeft = damageLeft - fx.iDamage * factor
+						end
 					end
 				end
+			end
+		end
+		if foundFire then
+			if key == "effect" then
+				skillEffect:AddScript(string.format("Board:GetPawn(%s):SetFire(true)", GetQueen()))
+			else
+				skillEffect:AddQueuedScript(string.format("Board:GetPawn(%s):SetFire(true)", GetQueen()))
 			end
 		end
 	end
@@ -898,8 +912,12 @@ local function EVENT_onModsLoaded()
 			end
 		end
 	end)
-	modApi:addVoiceEventHook(function(eventInfo, customOdds, suppress)	--don't say move lines related to Renfield bomb when doing something else
-		return GAME.Meta_AltFinalMission ~= "Normal" and eventInfo.id == "MissionFinal_BombResponse" 
+	modApi:addVoiceEventHook(function(eventInfo, customOdds, suppress)	--don't say lines related to Renfield bomb when doing something else
+		if GAME.Meta_AltFinalMission ~= "Normal" and eventInfo.id == "MissionFinal_BombResponse" then
+			suppress = true
+			return true
+		end
+		return false
 	end)
 end
 modApi.events.onModsLoaded:subscribe(EVENT_onModsLoaded)
@@ -1003,6 +1021,7 @@ function Mission_Final_Cave:UpdateMission()
 		pawn:SetCorpse(true)			--just in case
 		for _, offset in ipairs(offsets) do
 			local tile = p1 + offset
+			-- Board:SetFire(tile, false)
 			if Board:GetTerrain(tile) == TERRAIN_WATER or Board:GetTerrain(tile) == TERRAIN_HOLE then
 				Board:SetTerrain(tile, TERRAIN_ROAD)
 			end
