@@ -1165,13 +1165,13 @@ function CyborgWeapons_EvolvingBonespear0:GetSkillEffect(p1,p2)
 	local maxDamage = self.MaxDamagePerTarget
 	--if Board:GetPawn(p1):IsBoosted() then maxDamage = maxDamage + 1 end
 	local last_origin = p1
-	local targetHealth
-	local willKill
+	
 	local curr = p1 + DIR_VECTORS[direction]
 	
 	
 	while true do
 		local target = curr
+		local targetHealth = 0
 		if not Board:IsBlocked(curr,PATH_PROJECTILE) and Board:IsValid(curr + DIR_VECTORS[direction]) then
 			target = GetProjectileEnd(curr,curr + DIR_VECTORS[direction],PATH_PROJECTILE)
 		end
@@ -1185,8 +1185,7 @@ function CyborgWeapons_EvolvingBonespear0:GetSkillEffect(p1,p2)
 		remainingDamage = remainingDamage - damageToDeal
 		local damage = SpaceDamage(target, damageToDeal)
 		
-		willKill = false
-		if Board:GetPawn(target) and Board:IsDeadly(damage,Board:GetPawn(target)) then willKill = true end
+		if Board:GetPawn(target) and Board:IsDeadly(damage, Board:GetPawn(p1)) then damage.bKO_Effect = true end
 		
 		--local animation = damage.bKO_Effect and self.ExploKO or self.Exploart..direction
 		local GraphicLevel = math.floor(self.BonespearLevel / 2)
@@ -1196,7 +1195,7 @@ function CyborgWeapons_EvolvingBonespear0:GetSkillEffect(p1,p2)
 		--ret:AddAnimation(damage.loc,animation,ANIM_NO_DELAY)
 		
 		--bail out if this isn't a pawn or it won't kill the pawn
-		if not willKill then break end
+		if not damage.bKO_Effect then break end
 		
 		ret:AddSound(self.LaunchSound)
 		last_origin = target
@@ -1204,7 +1203,7 @@ function CyborgWeapons_EvolvingBonespear0:GetSkillEffect(p1,p2)
 	end
 	--Note that this doesn't work if not equipped to a pawn and ran by a tooltip, so we check whether we are in a tooltip
 	if not Board:IsTipImage() and self.BonespearLevel < 15 then
-		if string.sub(Board:GetPawn(p1):GetWeaponType(1), 31) == "CyborgWeapons_EvolvingBonespear" then IdToRemove = 1 else IdToRemove = 2 end
+		if string.sub(Board:GetPawn(p1):GetWeaponType(1), 1, 31) == "CyborgWeapons_EvolvingBonespear" then IdToRemove = 1 else IdToRemove = 2 end
 		local remainingUses = Board:GetPawn(p1):GetWeaponLimitedRemaining(IdToRemove)
 		ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)",Board:GetPawn(p1):GetId(), IdToRemove))
 		ret:AddScript(string.format("Board:GetPawn(%s):AddWeapon(\"CyborgWeapons_EvolvingBonespear%s\")",Board:GetPawn(p1):GetId(), string.match(self.__Id, "%d+") + 1))
@@ -1443,7 +1442,7 @@ function CyborgWeapons_WeakPheromones:GetSkillEffect(p1, p2)
 		ret:AddScript(string.format("CustomAnim:add(%s, \"frighteningPheromoneAnim\")", Point(targets[k]):GetString()))
 		-- if mission then mission.frightenedTiles[#mission.frightenedTiles+1] = targets[k] end
 		-- if mission then ret:AddScript(string.format("mission.frightenedTiles[%s] = %s", #mission.frightenedTiles+1, Point(targets[k]):GetString())) end
-		if mission then ret:AddScript(string.format("mission.frightenedTiles[%s] = %s", #mission.frightenedTiles+k, Point(targets[k]):GetString())) end
+		if mission then ret:AddScript(string.format("GetCurrentMission().frightenedTiles[%s] = %s", #mission.frightenedTiles+k, Point(targets[k]):GetString())) end
 		local pawn = Board:GetPawn(targets[k])
 		if pawn and pawn:IsEnemy() and pawn:GetWeaponCount() > 0 then
 			-- local weaponName = pawn:GetQueuedWeapon()
@@ -1456,12 +1455,12 @@ function CyborgWeapons_WeakPheromones:GetSkillEffect(p1, p2)
 			--if it's an alpha's weapon and the devolved version exists, remove it and add normal version
 				ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", pawn:GetId(), weaponID))
 				ret:AddScript(string.format("Board:GetPawn(%s):AddWeaponVanilla(%q)", pawn:GetId(), weaponName:sub(1, -2).."1"))
-				ret:AddScript(string.format("mission.deleveledVeks[%s] = %s", #mission.deleveledVeks+1, pawn:GetId()))
+				ret:AddScript(string.format("GetCurrentMission().deleveledVeks[%s] = %s", #mission.deleveledVeks+1, pawn:GetId()))
 			elseif weaponName:sub(-1, -1) == "B" and _G[weaponName:sub(1, -2).."2"] then
 			--if it's a boss' weapon and the devolved version exists, remove it and add alpha version
 				ret:AddScript(string.format("Board:GetPawn(%s):RemoveWeapon(%s)", pawn:GetId(), weaponID))
 				ret:AddScript(string.format("Board:GetPawn(%s):AddWeaponVanilla(%q)", pawn:GetId(), weaponName:sub(1, -2).."2"))
-				ret:AddScript(string.format("mission.deleveledVeks[%s] = %s", #mission.deleveledVeks+1, pawn:GetId()))
+				ret:AddScript(string.format("GetCurrentMission().deleveledVeks[%s] = %s", #mission.deleveledVeks+1, pawn:GetId()))
 			end
 		end
 	end 
@@ -1680,7 +1679,7 @@ ANIMS.DNATwirl = Animation:new{
 
 function CyborgWeapons_Metabolize:GetTargetArea(point)
 	local ret = PointList()
-	if Board:IsTipImage() then ret:push_back(Point(2, 1)) return ret end
+	if (not GAME) or Board:IsTipImage() then ret:push_back(Point(2, 1)) return ret end
 	if not GAME.Metabolized or IsTestMechScenario() then	--if we have no weapon stored, this is a melee attack; we don't metabolize in test scenario
 		for i = DIR_START, DIR_END do
 			local curr = point + DIR_VECTORS[i]
@@ -1691,24 +1690,23 @@ function CyborgWeapons_Metabolize:GetTargetArea(point)
 				ret:push_back(curr) 
 			end
 		end
-	else
+	elseif GAME.Metabolized then
 		ret = _G[GAME.Metabolized]:GetTargetArea(point)				--if we do, it has the target area of the stored skill
 		--check whether it has a charge/projectile in a skilleffect, if so extend range
 		local foundCharge = false
-		for k = 1, 4 do
-			local skillEffect = _G[GAME.Metabolized]:GetSkillEffect(point, ret[k])
+		for _, p2 in ipairs(extract_table(_G[GAME.Metabolized]:GetTargetArea(point))) do
+			local skillEffect = _G[GAME.Metabolized]:GetSkillEffect(point, p2)
 			for _, spaceDamage in ipairs(extract_table(skillEffect.q_effect)) do
 				if (spaceDamage:IsMovement() and spaceDamage:GetMoveType() == 2) or spaceDamage:GetType() == 2 then
 					foundCharge = true
 					for i = DIR_START, DIR_END do
 						for j = 1, 7 do
-							local curr = Point(point + DIR_VECTORS[i] * j)
-							if Board:IsBlocked(curr, PATH_PROJECTILE) and spaceDamage:GetType() ~= 2 then break end	
-							--not sure whether to put this before or after, works better here for the Beetle
-							--if it's blocked and we are charging, don't add to target area
-							if Board:IsValid(curr) then ret:push_back(curr) else break end
-							if Board:IsBlocked(curr, PATH_PROJECTILE) then break end
-							
+							local curr = point + DIR_VECTORS[i] * j
+							if not Board:IsValid(curr) then break end
+							local blocked = Board:IsBlocked(curr, PATH_PROJECTILE)
+							if blocked and spaceDamage:GetType() ~= 2 then break end
+							ret:push_back(curr)
+							if blocked then break end
 						end
 					end
 					break
@@ -1763,7 +1761,9 @@ function CyborgWeapons_Metabolize:GetSkillEffect(p1,p2)
 				copied = _G[pawnType].SkillList[1]
 			end
 		else
-			copied = Board:GetPawn(p2):GetWeaponType(1)
+			local id = Board:GetPawn(p2):GetQueuedWeaponId()
+			if id == -1 then id = 1 end
+			copied = Board:GetPawn(p2):GetWeaponType(id)
 		end
 		ret:AddScript(string.format("GAME.Metabolized = %q", copied))
 		ret:AddMelee(p1, SpaceDamage(p2, self.Damage))
@@ -1917,11 +1917,11 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 	local mission = GetCurrentMission()
 	local user = Board:GetPawn(p1)
 	if mission then
-		if not mission.AssimilateDamage then mission.AssimilateDamage = SpaceDamage(point) end
+		if not mission.AssimilateDamage then mission.AssimilateDamage = SpaceDamage(p2) end
 		if self.HealSelf then
 			if user:IsFire() or Board:IsFire(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end	
 			--second check if on a fire space and with Thick Skin
-			if user:IsAcid() or (Board:IsAcid(p1) and not Board:GetTerrain(p1) == TERRAIN_WATER) then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
+			if user:IsAcid() or (Board:IsAcid(p1) and Board:GetTerrain(p1) ~= TERRAIN_WATER) then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
 			--second check is because the pawn might be flying above acid water, in which case it wouldn't make sense to purify it
 			if Board:IsSmoke(p1) then ret:AddScript("GetCurrentMission().AssimilateDamage.iSmoke = EFFECT_CREATE") end
 			--only relevant with Camilla?
@@ -1946,13 +1946,13 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 		end 
 		if distance == 1 then
 			local damage = mission.AssimilateDamage
-			if mission.AssimilateDamage.iAcid == EFFECT_CREATE then ret:AddScript(string.format("Board:GetPawn(%s):SetAcid(true)", p2:GetString())) end
+			if mission.AssimilateDamage.iAcid == EFFECT_CREATE and Board:GetPawn(p2) then ret:AddScript(string.format("Board:GetPawn(%s):SetAcid(true)", p2:GetString())) end
 			--we apply acid before damage because otherwise the weapon deals fairly low damage, ACID+fire is a 5 damage melee attack which is okay
 			damage.loc = p2
 			damage.iDamage = 2
 			local addFire, addAcid, addSmoke
 			if (Board:GetPawn(p2) and Board:GetPawn(p2):IsFire()) or Board:IsFire(p2) then addFire = true end	--we look before applying damage because this might remove the status if we break a tile/kill a dude
-			if (Board:GetPawn(p2) and Board:GetPawn(p2):IsAcid()) or (Board:IsAcid(p2) and not Board:GetTerrain(p2) == TERRAIN_WATER) then addAcid = true end
+			if (Board:GetPawn(p2) and Board:GetPawn(p2):IsAcid()) or (Board:IsAcid(p2) and Board:GetTerrain(p2) ~= TERRAIN_WATER) then addAcid = true end
 			if Board:IsSmoke(p2) then addSmoke = true end 
 			if Board:GetItem(p2) ~= "" and self.EatItems then
 				ret:AddScript(string.format("GetCurrentMission().AssimilateDamage.sItem = %q", Board:GetItem(p2)))
@@ -1960,8 +1960,8 @@ function CyborgWeapons_Assimilate:GetSkillEffect(p1,p2)
 			end
 			
 			if mission.AssimilateDamage.Chill then damage.iChill = 1 end
-			if mission.AssimilateDamage.Powder then damage.iChill = 1 end
-			if mission.AssimilateDamage.Toxin then damage.iChill = 1 end
+			if mission.AssimilateDamage.Powder then damage.iPowder = 1 end
+			if mission.AssimilateDamage.Toxin then damage.iToxin = 1 end
 			ret:AddMelee(p1, damage)
 			if addFire then ret:AddScript("GetCurrentMission().AssimilateDamage.iFire = EFFECT_CREATE") end
 			if addAcid then ret:AddScript("GetCurrentMission().AssimilateDamage.iAcid = EFFECT_CREATE") end
@@ -2255,6 +2255,9 @@ SheddedTail_AB = Pawn:new{
 	Corpse = true,
 }
 AddPawn("SheddedTail") 
+AddPawn("SheddedTail_A") 
+AddPawn("SheddedTail_B") 
+AddPawn("SheddedTail_AB") 
 
 Tail_Taunt = SelfTarget:new{  
 	Name = "Taunt",
@@ -2291,7 +2294,7 @@ end
 
 
 function CyborgWeapons_ShedTail:GetTargetArea(point)
-	ret = PointList()
+	local ret = PointList()
 	for i = DIR_START, DIR_END do
 		for j = 1, 8 do
 			local curr = point + DIR_VECTORS[i] * j
@@ -2305,7 +2308,7 @@ function CyborgWeapons_ShedTail:GetTargetArea(point)
 end
 
 function CyborgWeapons_ShedTail:GetSkillEffect(p1, p2)
-	ret = SkillEffect()
+	local ret = SkillEffect()
 	local direction = GetDirection(p2-p1)
 	local distance = p1:Manhattan(p2)
 	local selfDamage = SpaceDamage(p1, 1) --push ourselves to move one tile
@@ -2326,12 +2329,14 @@ function CyborgWeapons_ShedTail:GetSkillEffect(p1, p2)
 	if distance > 1 then
 		ret:AddArtillery(spawnDamage, "effects/shotup_spider.png")
 	else
-		ret:AddSafeDamage(spawnDamage)
+		ret:AddDamage(spawnDamage)
 	end
 	ret:AddScript(string.format([[
-    local palette = Board:GetPawn(%s):GetImageOffset()
-    unit:SetOwner(%s)
-    unit:SetImageOffset(palette)]], userId, userId))
+	local user = Board:GetPawn(%s)
+	local tail = Board:GetPawn(%s)
+    local palette = user:GetImageOffset()
+    tail:SetOwner(user)
+    tail:SetImageOffset(palette)]], userId, loc:GetString()))
 	ret:AddScript(string.format("Board:GetPawn(%s):FireWeapon(%s, 1)", loc:GetString(), loc:GetString()))
 	ret:AddScript(string.format("Status.ApplyTargeted(Board:GetPawn(%s):GetId())", loc:GetString()))
 	return ret
@@ -2574,6 +2579,7 @@ function CyborgWeapons_Adrenaline:GetSkillEffect(p1, p2)
 		ret:AddScript(string.format("Board:GetPawn(%s):SetActive(true)", pawn:GetId()))
 	elseif pawn:IsQueued() then
 		local skillEffect = _G[pawn:GetQueuedWeapon()]:GetSkillEffect(p2,pawn:GetQueuedTarget())
+		local addedMelee = false
 		for _, spaceDamage in ipairs(extract_table(skillEffect.q_effect)) do
 			if spaceDamage:IsMovement() then
 				if spaceDamage:GetMoveType() == 1 then --leap	
@@ -2587,7 +2593,6 @@ function CyborgWeapons_Adrenaline:GetSkillEffect(p1, p2)
 				else
 				end
 			else
-				if spaceDamage.iDamage > 0 and spaceDamage.iDamage ~= DAMAGE_DEATH then spaceDamage.iDamage = spaceDamage.iDamage + self.DamageUp end
 				if spaceDamage:GetType() == 1 then ret:AddArtillery(p2, spaceDamage, spaceDamage:GetProjectileArt(), NO_DELAY) end
 				if spaceDamage:GetType() == 2 then ret:AddProjectile(p2, spaceDamage, spaceDamage:GetProjectileArt(), NO_DELAY) end
 				if spaceDamage:GetType() == 0 then 
@@ -2643,7 +2648,7 @@ end
 
 local function HunterReflexesBonusMove(mission, pawn, weaponId, p1, p2)
 	if not mission or not mission.giveBonusMove then return end
-	if pawn:IsDead() or tostring(weaponId) == "Move" or not pawn:GetClass() == "TechnoVek" then return end
+	if pawn:IsDead() or tostring(weaponId) == "Move" or pawn:GetClass() ~= "TechnoVek" then return end
 	modApi:runLater(function() 
 		modApi:runLater(function() 
 			if not pawn:IsActive() then
@@ -2883,7 +2888,7 @@ function CyborgWeapons_ReactiveFire:GetSkillEffect(p1, p2)
 end
 
 local function ReactiveFirePassive(mission)
-	ret = SkillEffect()
+	local ret = SkillEffect()
 	if mission.reactivefirepassive and Game:GetTeamTurn() == TEAM_PLAYER then
 		for i = 0, 2 do
 			local pawn = Board:GetPawn(i)
@@ -2901,7 +2906,7 @@ local function ReactiveFirePassive(mission)
 							if distance == 1 then 
 								ret:AddMelee(pawn:GetSpace(), SpaceDamage(vek:GetSpace(), mission.reactivefirepassive))
 							else
-								ret:AddArtillery(pawn:GetSpace(), "effects/shotup_scarab"..mission.reactivefireranged..".png")
+								ret:AddArtillery(pawn:GetSpace(), SpaceDamage(vek:GetSpace(), mission.reactivefirepassive)"effects/shotup_scarab"..mission.reactivefirepassive..".png", PROJ_DELAY)
 							end
 						end
 					end
@@ -2929,7 +2934,7 @@ local function CheckCyborgPassives(mission)
 			if weapons[1] == "CyborgWeapons_OpportunisticHunting_A" or weapons[2] == "CyborgWeapons_OpportunisticHunting_A" then mission.opportunity = 2 end
 			if weapons[1] == "CyborgWeapons_Overdrive" or weapons[2] == "CyborgWeapons_Overdrive" then mission.overdrive = true end
 			if weapons[1] == "CyborgWeapons_ReactiveFire" or weapons[2] == "CyborgWeapons_ReactiveFire" then mission.reactivefirepassive = 1 end
-			if weapons[1] == "CyborgWeapons_ReactiveFire_B" or weapons[2] == "CyborgWeapons_ReactiveFire_B" or weapons[1] == "CyborgWeapons_ReactiveFire_AB" or weapons[2] == "CyborgWeapons_ReactiveFire_AB" then mission.reactivefirepassive = 1 end
+			if weapons[1] == "CyborgWeapons_ReactiveFire_B" or weapons[2] == "CyborgWeapons_ReactiveFire_B" or weapons[1] == "CyborgWeapons_ReactiveFire_AB" or weapons[2] == "CyborgWeapons_ReactiveFire_AB" then mission.reactivefirepassive = 2 end
 			if weapons[1] == "CyborgWeapons_ReactiveFire_A" or weapons[2] == "CyborgWeapons_ReactiveFire_A" or weapons[1] == "CyborgWeapons_ReactiveFire_AB" or weapons[2] == "CyborgWeapons_ReactiveFire_AB" then mission.reactivefireranged = true end
 		end
 	end
