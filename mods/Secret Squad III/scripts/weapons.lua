@@ -521,7 +521,7 @@ local function EVENT_onModsLoaded()
 		if GetCurrentMission().EncasedBuildings == nil then return end
 		for i = 0, 7 do
 			for j = 0, 7 do
-				if Board:GetPawn(Point(i,j)):GetType():sub(1, 15) == "EncasedBuilding" then Board:GetPawn(Point(i,j)):Kill(false) end
+				if Board:GetPawn(Point(i, j)) and Board:GetPawn(Point(i, j)):GetType():sub(1, 15) == "EncasedBuilding" then Board:GetPawn(Point(i,j)):Kill(false) end
 			end
 		end
 	end)
