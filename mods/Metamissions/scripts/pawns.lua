@@ -70,6 +70,7 @@ local path = mod_loader.mods[modApi.currentMod].resourcePath
 		PosY = -4
 	}
 
+local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
 
 Meta_UndyingVek = Pawn:new{
 	Name = "Undying Vek",
@@ -91,6 +92,7 @@ AddPawn("Meta_UndyingVek")
 function Meta_UndyingVek:GetDeathEffect(point)
 	local ret = SkillEffect()
 	local mission = GetCurrentMission()
+	if not mission then return ret end
 	if not mission.KilledCount then mission.KilledCount = 0 end
 	if mission.KilledCount < 2 and Board:GetTerrain(point) ~= TERRAIN_HOLE then
 		mission.KilledCount = mission.KilledCount + 1
@@ -112,10 +114,10 @@ function Meta_UndyingVek:GetDeathEffect(point)
 			local curr2 = point + DIR_VECTORS[dir]
 			local damage = SpaceDamage(curr2)
 			damage.sAnimation = "undyingPlague_"..dir
-			if Board:GetPawn(curr2) and Board:GetPawn(curr2):GetTeam() == TEAM_VEK then 
+			if Board:GetPawn(curr2) and Board:GetPawn(curr2):GetTeam() == TEAM_ENEMY then 
 				damage.sScript = string.format([[
 				local pawn = Board:GetPawn(%s)
-				if pawn:GetTeam() == TEAM_VEK then 
+				if pawn and pawn:GetTeam() == TEAM_ENEMY then 
 					pawn:SetCorpse(true) 
 					if pawn:IsDead() then pawn:SetHealth(2) else Board:DamageSpace(%s, 2) end
 				end]], curr2:GetString(), curr2:GetString())
@@ -125,7 +127,7 @@ function Meta_UndyingVek:GetDeathEffect(point)
 		end
 		
 		
-	elseif Board:GetTerrain(point) ~= TERRAIN_HOLE then
+	elseif Board:GetTerrain(point) ~= TERRAIN_HOLE and Board:GetPawn(point) then
 		Board:GetPawn(point):SetCorpse(false)
 	end
 	return ret
@@ -150,15 +152,13 @@ Meta_UndyingVekAtk = Skill:new{
 }
 
 function Meta_UndyingVekAtk:GetTargetScore(p1,p2)
-	local effect = SkillEffect()
-	
 	local targetScore = 1
 	for i = DIR_START, DIR_END do
 		local p = p2 + DIR_VECTORS[i] + DIR_VECTORS[(i+1)%4]
 		if Board:GetPawn(p) and Board:GetPawn(p):GetTeam() == TEAM_PLAYER and not Board:GetPawn(p):IsDead() then targetScore = targetScore + 10 end
 		if Board:IsBuilding(p) then targetScore = targetScore + 10 end
 		local curr = p2 + DIR_VECTORS[i]
-		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_VEK then 
+		if Board:GetPawn(curr) and Board:GetPawn(curr):GetTeam() == TEAM_ENEMY then 
 			if Board:GetPawn(curr):IsDead() then			--revives dead Vek, very good
 				targetScore = targetScore + 15
 			elseif Board:GetPawn(curr):IsDamaged() then		--heals Vek, good
@@ -189,10 +189,10 @@ function Meta_UndyingVekAtk:GetSkillEffect(p1, p2)
 		local damage = SpaceDamage(curr2)
 		damage.sImageMark = "combat/icons/icon_revive.png"
 		damage.sAnimation = "undyingPlague_"..dir
-		if Board:GetPawn(curr2) and Board:GetPawn(curr2):GetTeam() == TEAM_VEK then 
+		if Board:GetPawn(curr2) and Board:GetPawn(curr2):GetTeam() == TEAM_ENEMY then 
 			damage.sScript = string.format([[
 			local pawn = Board:GetPawn(%s)
-			if pawn:GetTeam() == TEAM_VEK then 
+			if pawn and pawn:GetTeam() == TEAM_ENEMY then 
 				pawn:SetCorpse(true) 
 				if pawn:IsDead() then pawn:SetHealth(2) else Board:DamageSpace(%s, 2) end
 			end]], curr2:GetString(), curr2:GetString())
@@ -326,7 +326,6 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 	local direction = GetDirection(p2 - p1)
 
 	local pathing = PATH_PROJECTILE
-	local doDamage = true
 	local target = p1 + DIR_VECTORS[direction]
 	local damageAmount = 1
 	if Board:GetPawn(p1):IsBoosted() then damageAmount = 2 end
@@ -339,7 +338,6 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 			Board:GetPawn(target):IsFrozen() or
 			Board:GetPawn(target):IsShield() or
 			Board:GetCustomTile(target) == "tosx_rocks_0.png" or
-			Board:GetPawn(target):IsCorpse() or
 			Board:GetPawn(target):IsDead() or
 			(Board:GetPawn(target):IsAcid() and Board:GetPawn(target):GetHealth() > damageAmount * 2)) then break end
 		if not Board:IsValid(target + DIR_VECTORS[direction]) then break end
@@ -348,18 +346,19 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 	local distance = p1:Manhattan(target)
 	
 	if not Board:IsBlocked(target,pathing) then target = target + DIR_VECTORS[direction] end
-	if distance == 1 then --and doDamage 
+	if distance == 1 then
 		local pawn = Board:GetPawn(target)
-		if pawn and pawn:GetType() == "Meta_VampiricVek" and (pawn:GetHealth() <= damageAmount or
-		   (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2) or 
-		   (ANIMS.tosx_whirlpooltile ~= nil and customAnim:get(pawn:GetSpace(), "tosx_whirlpooltile"))) then 
-		   --check this is enough damage
-			if not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(target) == "tosx_rocks_0.png") then
-			--check target is not immune to damage
-				ret:AddScript("GetCurrentMission().Staked = true") 
-			end
+		local isWhirlpool = pawn
+			and ANIMS.tosx_whirlpooltile ~= nil
+			and customAnim:get(pawn:GetSpace(), "tosx_whirlpooltile")
+
+		local isVampiric = pawn and pawn:GetType() == "Meta_VampiricVek"
+			and (pawn:GetHealth() <= damageAmount or (pawn:IsAcid() and pawn:GetHealth() <= damageAmount * 2))
+
+		if (isVampiric or isWhirlpool) and not (pawn:IsFrozen() or pawn:IsShield() or Board:GetCustomTile(target) == "tosx_rocks_0.png") then
+			ret:AddScript("GetCurrentMission().Staked = true")
 		end
-		ret:AddMelee(p1,SpaceDamage(target, 1))
+		ret:AddMelee(p1,SpaceDamage(target, damageAmount))
 	else
 		local move = PointList()
 		move:push_back(p1)
@@ -379,12 +378,12 @@ function Meta_StakeAtk:GetSkillEffect(p1,p2)
 						ret:AddScript("GetCurrentMission().Staked = true") 
 					end
 				end
-				ret:AddDamage(SpaceDamage(temp, 1))
+				ret:AddDamage(SpaceDamage(temp, damageAmount))
 			end
 			temp = temp + DIR_VECTORS[direction]
 			if temp ~= target then ret:AddDelay(0.06) end
 		end
-		-- ret:AddDamage(SpaceDamage(target, 1))
+		-- ret:AddDamage(SpaceDamage(target, damageAmount))
 	end
 	return ret
 end
@@ -459,7 +458,7 @@ ExplosiveDiggerAtk = DiggerAtk1:new{
 }
 
 function ExplosiveDiggerAtk:GetTargetArea(point)
-	ret = PointList()
+	local ret = PointList()
 	ret:push_back(point)
 	return ret
 end
@@ -485,13 +484,13 @@ function ExplosiveDiggerAtk:GetTargetScore(p1, p2)
 				local curr2 = p1 + DIR_VECTORS[i] + DIR_VECTORS[j]
 				if curr2 == p1 then
 					score = score + self.ScoreNothing
-				elseif Board:GetPawn(curr) then
-					if Board:GetPawn(curr):GetTeam() == Board:GetPawn(p1):GetTeam() then
+				elseif Board:GetPawn(curr2) then
+					if Board:GetPawn(curr2):GetTeam() == Board:GetPawn(p1):GetTeam() then
 						score = score + self.ScoreFriendlyDamage
 					else
 						score = score + self.ScoreEnemy
 					end
-				elseif Board:IsBuilding(curr) then
+				elseif Board:IsBuilding(curr2) then
 					score = score + self.ScoreBuilding
 				else
 					score = score + self.ScoreNothing
@@ -598,7 +597,7 @@ Meta_SleepHeli = Pawn:new{
 	DefaultTeam = TEAM_PLAYER,
 	ImpactMaterial = IMPACT_METAL,
 }
-AddPawn("Meta_Trapper")
+AddPawn("Meta_SleepHeli")
 
 
 Meta_SleepTossAtk = Skill:new{   
@@ -614,7 +613,7 @@ Meta_SleepTossAtk = Skill:new{
 		Enemy = Point(2,1),
 		Enemy2 = Point(2,2),
 		Target = Point(2,2),
-		CustomPawn = "Meta_Trapper",
+		CustomPawn = "Meta_SleepHeli",
 	}	
 }
 
@@ -629,15 +628,17 @@ function Meta_SleepTossAtk:GetTargetArea(point)
 	return ret
 end
 
-local customAnim = require(mod_loader.mods.meta_mods.scriptPath.."libs/customAnim")
-
 function Meta_SleepTossAtk:GetSkillEffect(p1,p2)
 	local ret = SkillEffect()
 	local damage = SpaceDamage(p2)
-	damage.sScript = string.format("Board:GetPawn(%s):SetPowered(false)", p2:GetString())	
+	damage.sScript = string.format([[
+    local pawn = Board:GetPawn(%s)
+    if pawn then
+        pawn:SetPowered(false)
+        pawn:ClearQueued()
+        CustomAnim:add(pawn:GetId(), "sleepAnim")
+    end]], p2:GetString())
 	ret:AddArtillery(p1, damage, "effects/shotup_tranquilizer.png", PROJ_DELAY)
-	ret:AddScript(string.format("Board:GetPawn(%s):ClearQueued()", p2:GetString()))
-	ret:AddScript(string.format("CustomAnim:add(%s, %q)", Board:GetPawn(p2):GetId(), "sleepAnim"))
 	return ret
 end
 
