@@ -1,7 +1,7 @@
 local function PickEnding(corporation, island)
 	--mod options contains weights; we add N cards for each ending to a deck with N the weight
 	local options = mod_loader.currentModContent["Meta_AltFinalMissions"].options
-	if Game:GetSector() == 1 then 
+	if GAME.Meta_AltFinalMission == nil then 
 		local possibleMissions = {}
 		for i = 1, options.Meta_RegularFinalMissionWeight.value do
 			possibleMissions[#possibleMissions+1] = "Normal"
@@ -1066,6 +1066,7 @@ end
 
 function Mission_Final_Cave:StartMission()
 	local effect = SkillEffect()
+	GAME.Meta_AltFinalMission = GAME.Meta_AltFinalMission or "Normal"
 	self:GetSpawner():SetSpawnIsland(5)
 	LOG("Final mission type: "..GAME.Meta_AltFinalMission)
 	if GAME.Meta_AltFinalMission == "Fluorous" then
